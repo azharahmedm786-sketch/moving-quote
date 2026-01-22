@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Instant Moving Quote</title>
+
+<style>
+body { font-family: Arial; background:#f2f2f2; padding:10px }
+.box { background:#fff; padding:15px; border-radius:10px }
+input, select { width:100%; padding:12px; margin-top:10px }
+label { display:block; margin-top:6px }
+.price { margin-top:15px; font-size:20px; font-weight:bold }
+button { width:100%; padding:14px; background:#25D366; color:#fff;
+border:none; border-radius:8px; font-size:16px; margin-top:15px }
+</style>
+</head>
+
+<body>
+
+<div class="box">
+<h3>Get Instant Moving Quote</h3>
+
+<input id="pickup" placeholder="Pickup Location">
+<input id="drop" placeholder="Drop Location">
+
+<select id="vehicle" onchange="calculate()">
+<option value="">Select Vehicle</option>
+<option value="mini">Mini Truck</option>
+<option value="407">407</option>
+<option value="709">709</option>
+<option value="909">909</option>
+</select>
+
+<h4>Furniture Items</h4>
+<label><input type="checkbox" value="500" onchange="calculate()"> Bed</label>
+<label><input type="checkbox" value="400" onchange="calculate()"> Sofa</label>
+<label><input type="checkbox" value="300" onchange="calculate()"> Fridge</label>
+<label><input type="checkbox" value="300" onchange="calculate()"> Washing Machine</label>
+<label><input type="checkbox" value="400" onchange="calculate()"> Dining Table</label>
+<label><input type="checkbox" value="600" onchange="calculate()"> Wardrobe</label>
+
+<div class="price" id="result"></div>
+
+<button onclick="bookNow()">Book on WhatsApp</button>
+</div>
+
+<script src="https://maps.googleapis.com/maps/api/js?key=PASTE_YOUR_API_KEY_HERE&libraries=places"></script>
+
+<script>
+new google.maps.places.Autocomplete(pickup);
+new google.maps.places.Autocomplete(drop);
+
+function calculate() {
+  if (!pickup.value || !drop.value || !vehicle.value) return;
+
+  let furnitureCost = 0;
+  document.querySelectorAll("input[type=checkbox]:checked")
+    .forEach(i => furnitureCost += parseInt(i.value));
+
+  let pricing = {
+    mini:{base:1500, rate:25},
+    "407":{base:3000, rate:35},
+    "709":{base:4500, rate:45},
+    "909":{base:6500, rate:55}
+  };
+
+  let service = new google.maps.DistanceMatrixService();
+  service.getDistanceMatrix({
+    origins:[pickup.value],
+    destinations:[drop.value],
+    travelMode:'DRIVING'
+  }, function(res) {
+    let km = res.rows[0].elements[0].distance.value / 1000;
+    let total = pricing[vehicle.value].base +
+                (km * pricing[vehicle.value].rate) +
+                furnitureCost;
+
+    result.innerHTML =
+      `Distance: ${km.toFixed(1)} km<br>
+       Furniture Charges: ₹${furnitureCost}<br>
+       Estimated Price: ₹${Math.round(total)}`;
+  });
+}
+
+function bookNow() {
+  let items = [];
+  document.querySelectorAll("input[type=checkbox]:checked")
+    .forEach(i => items.push(i.parentNode.innerText));
+
+  let msg =
+`Moving Enquiry
+Pickup: ${pickup.value}
+Drop: ${drop.value}
+Vehicle: ${vehicle.value}
+Furniture: ${items.join(", ")}
+${result.innerText}`;
+
+  window.open("https://wa.me/91XXXXXXXXXX?text="+encodeURIComponent(msg));
+}
+</script>
+
+</body>
+</html>
