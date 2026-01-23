@@ -1,7 +1,6 @@
 let pickupPlace = null;
 let dropPlace = null;
 
-// minimum base charge
 const MIN_BASE_PRICE = 1100;
 
 function initAutocomplete() {
@@ -26,13 +25,11 @@ function initAutocomplete() {
 }
 
 function calculateQuote() {
-  // address validation
   if (!pickupPlace || !dropPlace) {
     alert("Please select pickup and drop from Google suggestions");
     return;
   }
 
-  // date & time validation
   const shiftDate = document.getElementById("shiftDate").value;
   const shiftTime = document.getElementById("shiftTime").value;
 
@@ -41,7 +38,6 @@ function calculateQuote() {
     return;
   }
 
-  // house & vehicle
   const houseBase = document.getElementById("house").value;
   const vehicleRate = document.getElementById("vehicle").value;
 
@@ -72,18 +68,50 @@ function calculateQuote() {
       }
 
       const distanceKm = element.distance.value / 1000;
-
-      // cost calculations
       const distanceCost = distanceKm * parseFloat(vehicleRate);
       const houseCost = parseInt(houseBase);
 
       let furnitureCost = 0;
-      document.querySelectorAll(".item:checked").forEach(item => {
-        furnitureCost += parseInt(item.value);
-      });
+
+      if (document.getElementById("sofaCheck").checked) {
+        furnitureCost +=
+          parseInt(document.getElementById("sofaType").value) *
+          parseInt(document.getElementById("sofaQty").value || 1);
+      }
+
+      if (document.getElementById("bedCheck").checked) {
+        furnitureCost +=
+          parseInt(document.getElementById("bedType").value) *
+          parseInt(document.getElementById("bedQty").value || 1);
+      }
+
+      if (document.getElementById("fridgeCheck").checked) {
+        furnitureCost += parseInt(document.getElementById("fridgeType").value);
+      }
+
+      if (document.getElementById("wmCheck").checked) {
+        furnitureCost += parseInt(document.getElementById("wmType").value);
+      }
 
       const total =
         MIN_BASE_PRICE +
         houseCost +
         distanceCost +
         furnitureCost;
+
+      document.getElementById("result").innerHTML = `
+        <strong>Shifting Summary</strong><br>
+        Date: ${shiftDate}<br>
+        Time: ${shiftTime}<br><br>
+
+        Distance: ${distanceKm.toFixed(1)} km<br>
+        Base Price: ₹${MIN_BASE_PRICE}<br>
+        House Cost: ₹${houseCost}<br>
+        Distance Cost: ₹${Math.round(distanceCost)}<br>
+        Furniture Cost: ₹${furnitureCost}<br><br>
+
+        <strong>Total Cost: ₹${Math.round(total)}</strong>
+      `;
+    }
+  );
+}
