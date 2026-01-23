@@ -10,24 +10,11 @@
 <div class="container">
   <h1>Get Instant Moving Quote</h1>
 
-  <label>Pickup Location (Bangalore)</label>
-  <select id="pickup">
-    <option value="">Select Pickup</option>
-    <option>BTM Layout</option>
-    <option>HSR Layout</option>
-    <option>Whitefield</option>
-    <option>Yelahanka</option>
-    <option>Electronic City</option>
-  </select>
+ <label>Pickup Location</label>
+<input type="text" id="pickup" placeholder="Enter pickup address">
 
-  <label>Drop Location (Bangalore)</label>
-  <select id="drop">
-    <option value="">Select Drop</option>
-    <option>BTM Layout</option>
-    <option>HSR Layout</option>
-    <option>Whitefield</option>
-    <option>Yelahanka</option>
-    <option>Electronic City</option>
+<label>Drop Location</label>
+<input type="text" id="drop" placeholder="Enter drop address">
   </select>
 
   <label>Vehicle Type</label>
@@ -50,7 +37,8 @@
   <h2 id="result"></h2>
 </div>
 
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCX170t24bkq7SYdfe8EhdPK07l8MqoRzY"></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places"></script>
 <script src="script.js"></script>
+
 </body>
 </html>
