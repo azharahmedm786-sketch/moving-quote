@@ -2,6 +2,7 @@ let pickupPlace = null;
 let dropPlace = null;
 
 const MIN_BASE_PRICE = 1100;
+const FRIDGE_PRICE = 400; // flat price for fridge
 
 function initAutocomplete() {
   const pickupInput = document.getElementById("pickup");
@@ -73,22 +74,26 @@ function calculateQuote() {
 
       let furnitureCost = 0;
 
+      // Sofa (optional)
       if (document.getElementById("sofaCheck").checked) {
         furnitureCost +=
           parseInt(document.getElementById("sofaType").value) *
           parseInt(document.getElementById("sofaQty").value || 1);
       }
 
+      // Bed (optional)
       if (document.getElementById("bedCheck").checked) {
         furnitureCost +=
           parseInt(document.getElementById("bedType").value) *
           parseInt(document.getElementById("bedQty").value || 1);
       }
 
+      // Fridge (flat price, optional)
       if (document.getElementById("fridgeCheck").checked) {
-        furnitureCost += parseInt(document.getElementById("fridgeType").value);
+        furnitureCost += FRIDGE_PRICE;
       }
 
+      // Washing Machine
       if (document.getElementById("wmCheck").checked) {
         furnitureCost += parseInt(document.getElementById("wmType").value);
       }
