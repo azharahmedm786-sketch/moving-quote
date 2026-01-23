@@ -28,7 +28,7 @@ function calculateQuote() {
     return;
   }
 
-  let vehicleRate = document.getElementById("vehicle").value;
+  const vehicleRate = document.getElementById("vehicle").value;
   if (!vehicleRate) {
     alert("Please select a vehicle");
     return;
@@ -45,7 +45,7 @@ function calculateQuote() {
     },
     (response, status) => {
       if (status !== "OK") {
-        alert("Distance service failed");
+        alert("Distance service error");
         return;
       }
 
