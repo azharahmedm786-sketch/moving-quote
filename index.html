@@ -10,12 +10,11 @@
 <div class="container">
   <h1>Get Instant Moving Quote</h1>
 
- <label>Pickup Location</label>
-<input type="text" id="pickup" placeholder="Enter pickup address" autocomplete="off">
+  <label>Pickup Location</label>
+  <input type="text" id="pickup" placeholder="Enter pickup address" autocomplete="off">
 
-<label>Drop Location</label>
-<input type="text" id="drop" placeholder="Enter drop address" autocomplete="off">
-  </select>
+  <label>Drop Location</label>
+  <input type="text" id="drop" placeholder="Enter drop address" autocomplete="off">
 
   <label>Vehicle Type</label>
   <select id="vehicle">
@@ -26,23 +25,22 @@
   </select>
 
   <h3>Furniture Items</h3>
-  <label><input type="checkbox" value="500" class="item"> Bed</label>
-  <label><input type="checkbox" value="300" class="item"> Sofa</label>
-  <label><input type="checkbox" value="200" class="item"> Fridge</label>
-  <label><input type="checkbox" value="200" class="item"> Washing Machine</label>
+  <label><input type="checkbox" class="item" value="500"> Bed</label>
+  <label><input type="checkbox" class="item" value="300"> Sofa</label>
+  <label><input type="checkbox" class="item" value="200"> Fridge</label>
+  <label><input type="checkbox" class="item" value="200"> Washing Machine</label>
 
   <button onclick="calculateQuote()">Get Quote</button>
 
   <h2 id="result"></h2>
 </div>
 
+<!-- IMPORTANT: script order -->
 <script src="script.js"></script>
 <script
   src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCX170t24bkq7SYdfe8EhdPK07l8MqoRzY&libraries=places&callback=initAutocomplete"
-  async
-  defer>
+  async defer>
 </script>
-
 
 </body>
 </html>
