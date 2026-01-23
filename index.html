@@ -18,16 +18,17 @@
   <label>Drop Location</label>
   <input type="text" id="drop" placeholder="Enter drop address" autocomplete="off">
 
-  <!-- Date & Time -->
+  <!-- Date -->
   <label>Shifting Date</label>
-  <input type="date" id="shiftDate">
+  <input type="date" id="shiftDate" required>
 
+  <!-- Time (FIXED) -->
   <label>Shifting Time</label>
-  <input type="time" id="shiftTime">
+  <input type="time" id="shiftTime" required step="900">
 
   <!-- House Type -->
   <label>House Type</label>
-  <select id="house">
+  <select id="house" required>
     <option value="">Select House Type</option>
     <option value="0">1 RK</option>
     <option value="1200">1 BHK</option>
@@ -37,7 +38,7 @@
 
   <!-- Vehicle Type -->
   <label>Vehicle Type</label>
-  <select id="vehicle">
+  <select id="vehicle" required>
     <option value="">Select Vehicle</option>
     <option value="25">Tata Ace / Dost (₹25/km)</option>
     <option value="40">14 ft Truck (₹40/km)</option>
@@ -57,7 +58,7 @@
   <h2 id="result"></h2>
 </div>
 
-<!-- Scripts (ORDER IS CRITICAL) -->
+<!-- Scripts (ORDER IS IMPORTANT) -->
 <script src="script.js"></script>
 <script
   src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCX170t24bkq7SYdfe8EhdPK07l8MqoRzY&libraries=places&callback=initAutocomplete"
@@ -66,4 +67,3 @@
 
 </body>
 </html>
-
