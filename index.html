@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Bangalore Packers & Movers – Instant Quote</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -10,31 +11,41 @@
 <div class="container">
   <h1>Get Instant Moving Quote</h1>
 
+  <!-- Pickup & Drop -->
   <label>Pickup Location</label>
   <input type="text" id="pickup" placeholder="Enter pickup address" autocomplete="off">
 
   <label>Drop Location</label>
   <input type="text" id="drop" placeholder="Enter drop address" autocomplete="off">
 
+  <!-- Date & Time -->
+  <label>Shifting Date</label>
+  <input type="date" id="shiftDate">
+
+  <label>Shifting Time</label>
+  <input type="time" id="shiftTime">
+
+  <!-- House Type -->
   <label>House Type</label>
-<select id="house">
-  <option value="">Select House Type</option>
-  <option value="1500">1 RK</option>
-  <option value="2500">1 BHK</option>
-  <option value="4000">2 BHK</option>
-  <option value="6000">3 BHK</option>
-</select>
+  <select id="house">
+    <option value="">Select House Type</option>
+    <option value="0">1 RK</option>
+    <option value="1200">1 BHK</option>
+    <option value="2500">2 BHK</option>
+    <option value="4000">3 BHK</option>
+  </select>
 
-<label>Vehicle Type</label>
-<select id="vehicle">
-  <option value="">Select Vehicle</option>
-  <option value="25">Tata Ace / Dost (₹25/km)</option>
-  <option value="40">14 ft Truck (₹40/km)</option>
-  <option value="50">17 ft Truck (₹50/km)</option>
-  <option value="60">19–22 ft Truck (₹60/km)</option>
-</select>
+  <!-- Vehicle Type -->
+  <label>Vehicle Type</label>
+  <select id="vehicle">
+    <option value="">Select Vehicle</option>
+    <option value="25">Tata Ace / Dost (₹25/km)</option>
+    <option value="40">14 ft Truck (₹40/km)</option>
+    <option value="50">17 ft Truck (₹50/km)</option>
+    <option value="60">19–22 ft Truck (₹60/km)</option>
+  </select>
 
-
+  <!-- Furniture -->
   <h3>Furniture Items</h3>
   <label><input type="checkbox" class="item" value="500"> Bed</label>
   <label><input type="checkbox" class="item" value="300"> Sofa</label>
@@ -46,7 +57,7 @@
   <h2 id="result"></h2>
 </div>
 
-<!-- IMPORTANT: script order -->
+<!-- Scripts (ORDER IS CRITICAL) -->
 <script src="script.js"></script>
 <script
   src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCX170t24bkq7SYdfe8EhdPK07l8MqoRzY&libraries=places&callback=initAutocomplete"
@@ -55,3 +66,4 @@
 
 </body>
 </html>
+
