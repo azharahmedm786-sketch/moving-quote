@@ -69,7 +69,17 @@
   </select>
   <input type="number" id="bedQty" min="1" value="1">
 
-  <!-- Fridge -->
+  <!-- Fridge (NO TYPE, ONLY YES/NO) -->
   <label><input type="checkbox" id="fridgeCheck"> Fridge</label>
-  <select id="fridgeType">
-    <option value="0">Select Fridge Type</op
+
+  <!-- Washing Machine -->
+  <label><input type="checkbox" id="wmCheck"> Washing Machine</label>
+  <select id="wmType">
+    <option value="0">Select Type</option>
+    <option value="300">Semi Automatic</option>
+    <option value="500">Fully Automatic</option>
+  </select>
+
+  <button onclick="calculateQuote()">Get Quote</button>
+
+  <h
