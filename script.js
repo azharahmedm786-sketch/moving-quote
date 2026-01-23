@@ -1,6 +1,9 @@
 let pickupPlace = null;
 let dropPlace = null;
 
+// minimum base charge
+const MIN_BASE_PRICE = 1100;
+
 function initAutocomplete() {
   const pickupInput = document.getElementById("pickup");
   const dropInput = document.getElementById("drop");
@@ -23,14 +26,27 @@ function initAutocomplete() {
 }
 
 function calculateQuote() {
+  // address validation
   if (!pickupPlace || !dropPlace) {
     alert("Please select pickup and drop from Google suggestions");
     return;
   }
 
+  // date & time validation
+  const shiftDate = document.getElementById("shiftDate").value;
+  const shiftTime = document.getElementById("shiftTime").value;
+
+  if (!shiftDate || !shiftTime) {
+    alert("Please select shifting date and time");
+    return;
+  }
+
+  // house & vehicle
+  const houseBase = document.getElementById("house").value;
   const vehicleRate = document.getElementById("vehicle").value;
-  if (!vehicleRate) {
-    alert("Please select a vehicle");
+
+  if (!houseBase || !vehicleRate) {
+    alert("Please select house type and vehicle");
     return;
   }
 
@@ -56,17 +72,18 @@ function calculateQuote() {
       }
 
       const distanceKm = element.distance.value / 1000;
-      const vehicleCost = distanceKm * parseFloat(vehicleRate);
 
-      let itemCost = 0;
+      // cost calculations
+      const distanceCost = distanceKm * parseFloat(vehicleRate);
+      const houseCost = parseInt(houseBase);
+
+      let furnitureCost = 0;
       document.querySelectorAll(".item:checked").forEach(item => {
-        itemCost += parseInt(item.value);
+        furnitureCost += parseInt(item.value);
       });
 
-      const total = Math.round(vehicleCost + itemCost);
-
-      document.getElementById("result").innerHTML =
-        `Distance: ${distanceKm.toFixed(1)} km<br><strong>Total Cost: ₹${total}</strong>`;
-    }
-  );
-}
+      const total =
+        MIN_BASE_PRICE +
+        houseCost +
+        distanceCost +
+        furnitureCost;
