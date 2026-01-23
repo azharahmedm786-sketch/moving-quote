@@ -1,1 +1,36 @@
+body {
+  font-family: Arial, sans-serif;
+  background: #f4f6f8;
+}
+
+.container {
+  max-width: 400px;
+  background: #fff;
+  padding: 20px;
+  margin: 40px auto;
+  border-radius: 10px;
+}
+
+label {
+  display: block;
+  margin-top: 10px;
+}
+
+select, button {
+  width: 100%;
+  padding: 8px;
+  margin-top: 5px;
+}
+
+button {
+  background: #0a7cff;
+  color: #fff;
+  border: none;
+  margin-top: 15px;
+  cursor: pointer;
+}
+
+h1, h3 {
+  text-align: center;
+}
 
