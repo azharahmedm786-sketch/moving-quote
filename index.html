@@ -1,1 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Bangalore Packers & Movers – Instant Quote</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
 
+<div class="container">
+  <h1>Get Instant Moving Quote</h1>
+
+  <label>Pickup Location (Bangalore)</label>
+  <select id="pickup">
+    <option value="">Select Pickup</option>
+    <option>BTM Layout</option>
+    <option>HSR Layout</option>
+    <option>Whitefield</option>
+    <option>Yelahanka</option>
+    <option>Electronic City</option>
+  </select>
+
+  <label>Drop Location (Bangalore)</label>
+  <select id="drop">
+    <option value="">Select Drop</option>
+    <option>BTM Layout</option>
+    <option>HSR Layout</option>
+    <option>Whitefield</option>
+    <option>Yelahanka</option>
+    <option>Electronic City</option>
+  </select>
+
+  <label>Vehicle Type</label>
+  <select id="vehicle">
+    <option value="">Select Vehicle</option>
+    <option value="15">Bike (₹15/km)</option>
+    <option value="25">Mini Truck (₹25/km)</option>
+    <option value="35">407 Truck (₹35/km)</option>
+    <option value="45">14ft Truck (₹45/km)</option>
+  </select>
+
+  <h3>Furniture Items</h3>
+  <label><input type="checkbox" value="500" class="item"> Bed</label>
+  <label><input type="checkbox" value="300" class="item"> Sofa</label>
+  <label><input type="checkbox" value="200" class="item"> Fridge</label>
+  <label><input type="checkbox" value="200" class="item"> Washing Machine</label>
+
+  <button onclick="calculateQuote()">Get Quote</button>
+
+  <h2 id="result"></h2>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
