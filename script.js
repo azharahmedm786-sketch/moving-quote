@@ -1,15 +1,26 @@
-function calculateQuote() {
-  if (typeof google === "undefined") {
-    alert("Maps not loaded. Please refresh.");
-    return;
-  }
+let pickupAutocomplete, dropAutocomplete;
 
+function initAutocomplete() {
+  pickupAutocomplete = new google.maps.places.Autocomplete(
+    document.getElementById("pickup"),
+    { componentRestrictions: { country: "in" } }
+  );
+
+  dropAutocomplete = new google.maps.places.Autocomplete(
+    document.getElementById("drop"),
+    { componentRestrictions: { country: "in" } }
+  );
+}
+
+window.onload = initAutocomplete;
+
+function calculateQuote() {
   let pickup = document.getElementById("pickup").value;
   let drop = document.getElementById("drop").value;
   let vehicleRate = document.getElementById("vehicle").value;
 
   if (!pickup || !drop || !vehicleRate) {
-    alert("Please select all fields");
+    alert("Please enter pickup, drop and vehicle");
     return;
   }
 
@@ -17,14 +28,14 @@ function calculateQuote() {
 
   service.getDistanceMatrix(
     {
-      origins: [pickup + ", Bangalore"],
-      destinations: [drop + ", Bangalore"],
+      origins: [pickup],
+      destinations: [drop],
       travelMode: google.maps.TravelMode.DRIVING,
       unitSystem: google.maps.UnitSystem.METRIC
     },
     function (response, status) {
       if (status !== "OK") {
-        alert("Distance service failed");
+        alert("Distance service error");
         return;
       }
 
@@ -36,7 +47,6 @@ function calculateQuote() {
       }
 
       let distanceKm = element.distance.value / 1000;
-
       let vehicleCost = distanceKm * parseFloat(vehicleRate);
 
       let itemCost = 0;
@@ -45,6 +55,13 @@ function calculateQuote() {
       });
 
       let total = Math.round(vehicleCost + itemCost);
+
+      document.getElementById("result").innerHTML =
+        `Distance: ${distanceKm.toFixed(1)} km<br><strong>Total Cost: ₹${total}</strong>`;
+    }
+  );
+}
+
 
       document.getElementById("result").innerHTML =
         `Distance: ${distanceKm.toFixed(1)} km<br><strong>Total Cost: ₹${total}</strong>`;
