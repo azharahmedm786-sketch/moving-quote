@@ -22,8 +22,6 @@ function initAutocomplete() {
   });
 }
 
-window.onload = initAutocomplete;
-
 function calculateQuote() {
   if (!pickupPlace || !dropPlace) {
     alert("Please select pickup and drop from Google suggestions");
