@@ -1,89 +1,65 @@
-body {
-  font-family: Arial, sans-serif;
-  background: #f4f6f8;
-}
-
-.container {
-  max-width: 400px;
-  background: #fff;
-  padding: 20px;
-  margin: 40px auto;
-  border-radius: 10px;
-}
-
-label {
-  display: block;
-  margin-top: 10px;
-}
-
-select, button {
-  width: 100%;
-  padding: 8px;
-  margin-top: 5px;
-}
-
-button {
-  background: #0a7cff;
-  color: #fff;
-  border: none;
-  margin-top: 15px;
-  cursor: pointer;
-}
-
-h1, h3 {
-  text-align: center;
-}
-
 /* ---------- RESET ---------- */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: "Segoe UI", Arial, sans-serif;
+  font-family: "Poppins", "Segoe UI", sans-serif;
 }
 
 /* ---------- BODY ---------- */
 body {
-  background: linear-gradient(120deg, #f1f5f9, #e2e8f0);
   min-height: 100vh;
-  padding: 20px;
+  background: linear-gradient(135deg, #ff9a9e, #fad0c4, #a18cd1);
+  padding: 25px;
 }
 
-/* ---------- MAIN CONTAINER ---------- */
+/* ---------- MAIN CARD ---------- */
 .container {
-  max-width: 520px;
+  max-width: 540px;
   margin: auto;
-  background: #ffffff;
-  padding: 25px;
-  border-radius: 14px;
-  box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+  background: linear-gradient(180deg, #ffffff, #f8fafc);
+  padding: 28px;
+  border-radius: 18px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.18);
+  animation: fadeIn 0.6s ease;
+}
+
+/* ---------- ANIMATION ---------- */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 /* ---------- HEADINGS ---------- */
 h1 {
   text-align: center;
-  color: #0f4c81;
-  margin-bottom: 20px;
+  font-size: 26px;
+  background: linear-gradient(90deg, #ff512f, #dd2476);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 22px;
 }
 
 h3 {
-  margin: 20px 0 10px;
-  color: #1e88e5;
+  margin: 22px 0 12px;
+  color: #7c3aed;
+  border-left: 5px solid #7c3aed;
+  padding-left: 10px;
 }
 
 h2 {
   text-align: center;
-  margin-top: 20px;
-  color: #0f4c81;
+  margin-top: 22px;
+  font-size: 22px;
+  color: #0f766e;
 }
 
 /* ---------- LABELS ---------- */
 label {
-  display: block;
   font-weight: 600;
-  margin-top: 12px;
-  margin-bottom: 5px;
-  color: #333;
+  margin-top: 14px;
+  margin-bottom: 6px;
+  color: #334155;
 }
 
 /* ---------- INPUTS ---------- */
@@ -93,43 +69,33 @@ input[type="time"],
 input[type="number"],
 select {
   width: 100%;
-  padding: 12px;
-  border-radius: 8px;
-  border: 1px solid #cbd5e1;
+  padding: 13px;
+  border-radius: 10px;
+  border: 2px solid #e2e8f0;
   font-size: 14px;
-  transition: border 0.2s ease, box-shadow 0.2s ease;
+  background: #fff;
+  transition: all 0.25s ease;
 }
 
 input:focus,
 select:focus {
   outline: none;
-  border-color: #1e88e5;
-  box-shadow: 0 0 0 2px rgba(30,136,229,0.2);
+  border-color: #ec4899;
+  box-shadow: 0 0 0 3px rgba(236,72,153,0.25);
 }
 
-/* ---------- CHECKBOX ROW ---------- */
+/* ---------- CHECKBOX ---------- */
 label input[type="checkbox"] {
+  accent-color: #7c3aed;
+  transform: scale(1.2);
   margin-right: 8px;
-  transform: scale(1.1);
 }
 
-/* ---------- FURNITURE LAYOUT ---------- */
-#sofaType,
-#bedType,
-#wmType {
-  margin-bottom: 8px;
-}
-
+/* ---------- QUANTITY ---------- */
 #sofaQty,
 #bedQty {
-  margin-bottom: 12px;
+  background: #fdf4ff;
 }
 
-/* ---------- BUTTON ---------- */
-button {
-  width: 100%;
-  margin-top: 20px;
-  padding: 14px;
-  border: none;
-  border-radius: 30px;
-  background: linear-
+/* ----*
+
