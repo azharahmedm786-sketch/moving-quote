@@ -1,122 +1,89 @@
-let pickupPlace = null;
-let dropPlace = null;
-
-const MIN_BASE_PRICE = 1100;
-const FRIDGE_PRICE = 400; // flat price for fridge
-
-function initAutocomplete() {
-  const pickupInput = document.getElementById("pickup");
-  const dropInput = document.getElementById("drop");
-
-  const options = {
-    componentRestrictions: { country: "in" },
-    fields: ["formatted_address", "geometry"]
-  };
-
-  const pickupAutocomplete = new google.maps.places.Autocomplete(pickupInput, options);
-  const dropAutocomplete = new google.maps.places.Autocomplete(dropInput, options);
-
-  pickupAutocomplete.addListener("place_changed", () => {
-    pickupPlace = pickupAutocomplete.getPlace();
-  });
-
-  dropAutocomplete.addListener("place_changed", () => {
-    dropPlace = dropAutocomplete.getPlace();
-  });
+* {
+  box-sizing: border-box;
+  font-family: Inter, system-ui, Arial, sans-serif;
 }
 
-function calculateQuote() {
-  if (!pickupPlace || !dropPlace) {
-    alert("Please select pickup and drop from Google suggestions");
-    return;
+body {
+  margin: 0;
+  background: #f1f5f9;
+}
+
+.wrapper {
+  padding: 16px;
+}
+
+.container {
+  max-width: 540px;
+  margin: auto;
+  background: #ffffff;
+  padding: 24px;
+  border-radius: 16px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.12);
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #0f4c81;
+}
+
+h3 {
+  margin-top: 24px;
+  margin-bottom: 10px;
+  color: #1e40af;
+}
+
+label {
+  display: block;
+  margin-top: 14px;
+  margin-bottom: 6px;
+  font-weight: 600;
+  color: #334155;
+}
+
+input,
+select {
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1.6px solid #cbd5e1;
+  background: #f8fafc;
+}
+
+.row {
+  display: flex;
+  gap: 10px;
+}
+
+.item {
+  margin-top: 10px;
+}
+
+button {
+  width: 100%;
+  margin-top: 24px;
+  padding: 14px;
+  border: none;
+  border-radius: 30px;
+  background: linear-gradient(135deg, #0f4c81, #0284c7);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+#result {
+  margin-top: 20px;
+  padding: 16px;
+  background: #ecfeff;
+  border-radius: 12px;
+  font-weight: 600;
+  color: #065f46;
+  text-align: center;
+}
+
+@media (max-width: 600px) {
+  .row {
+    flex-direction: column;
   }
-
-  const shiftDate = document.getElementById("shiftDate").value;
-  const shiftTime = document.getElementById("shiftTime").value;
-
-  if (!shiftDate || !shiftTime) {
-    alert("Please select shifting date and time");
-    return;
-  }
-
-  const houseBase = document.getElementById("house").value;
-  const vehicleRate = document.getElementById("vehicle").value;
-
-  if (!houseBase || !vehicleRate) {
-    alert("Please select house type and vehicle");
-    return;
-  }
-
-  const service = new google.maps.DistanceMatrixService();
-
-  service.getDistanceMatrix(
-    {
-      origins: [pickupPlace.formatted_address],
-      destinations: [dropPlace.formatted_address],
-      travelMode: google.maps.TravelMode.DRIVING,
-      unitSystem: google.maps.UnitSystem.METRIC
-    },
-    (response, status) => {
-      if (status !== "OK") {
-        alert("Distance service error");
-        return;
-      }
-
-      const element = response.rows[0].elements[0];
-      if (element.status !== "OK") {
-        alert("Route not found");
-        return;
-      }
-
-      const distanceKm = element.distance.value / 1000;
-      const distanceCost = distanceKm * parseFloat(vehicleRate);
-      const houseCost = parseInt(houseBase);
-
-      let furnitureCost = 0;
-
-      // Sofa (optional)
-      if (document.getElementById("sofaCheck").checked) {
-        furnitureCost +=
-          parseInt(document.getElementById("sofaType").value) *
-          parseInt(document.getElementById("sofaQty").value || 1);
-      }
-
-      // Bed (optional)
-      if (document.getElementById("bedCheck").checked) {
-        furnitureCost +=
-          parseInt(document.getElementById("bedType").value) *
-          parseInt(document.getElementById("bedQty").value || 1);
-      }
-
-      // Fridge (flat price, optional)
-      if (document.getElementById("fridgeCheck").checked) {
-        furnitureCost += FRIDGE_PRICE;
-      }
-
-      // Washing Machine
-      if (document.getElementById("wmCheck").checked) {
-        furnitureCost += parseInt(document.getElementById("wmType").value);
-      }
-
-      const total =
-        MIN_BASE_PRICE +
-        houseCost +
-        distanceCost +
-        furnitureCost;
-
-      document.getElementById("result").innerHTML = `
-        <strong>Shifting Summary</strong><br>
-        Date: ${shiftDate}<br>
-        Time: ${shiftTime}<br><br>
-
-        Distance: ${distanceKm.toFixed(1)} km<br>
-        Base Price: ₹${MIN_BASE_PRICE}<br>
-        House Cost: ₹${houseCost}<br>
-        Distance Cost: ₹${Math.round(distanceCost)}<br>
-        Furniture Cost: ₹${furnitureCost}<br><br>
-
-        <strong>Total Cost: ₹${Math.round(total)}</strong>
-      `;
-    }
-  );
 }
