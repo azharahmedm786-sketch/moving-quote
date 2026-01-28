@@ -1,89 +1,57 @@
-* {
-  box-sizing: border-box;
-  font-family: Inter, system-ui, Arial, sans-serif;
-}
+let pickupPlace = null;
+let dropPlace = null;
 
-body {
-  margin: 0;
-  background: #f1f5f9;
-}
+const MIN_BASE_PRICE = 1100;
+const FRIDGE_PRICE = 400;
 
-.wrapper {
-  padding: 16px;
-}
+function calculateQuote() {
+  const shiftDate = document.getElementById("shiftDate").value;
+  const shiftTime = document.getElementById("shiftTime").value;
+  const houseBase = parseInt(document.getElementById("house").value || 0);
+  const vehicleRate = parseFloat(document.getElementById("vehicle").value || 0);
 
-.container {
-  max-width: 540px;
-  margin: auto;
-  background: #ffffff;
-  padding: 24px;
-  border-radius: 16px;
-  box-shadow: 0 20px 40px rgba(0,0,0,0.12);
-}
-
-h1 {
-  text-align: center;
-  margin-bottom: 20px;
-  color: #0f4c81;
-}
-
-h3 {
-  margin-top: 24px;
-  margin-bottom: 10px;
-  color: #1e40af;
-}
-
-label {
-  display: block;
-  margin-top: 14px;
-  margin-bottom: 6px;
-  font-weight: 600;
-  color: #334155;
-}
-
-input,
-select {
-  width: 100%;
-  padding: 12px;
-  border-radius: 10px;
-  border: 1.6px solid #cbd5e1;
-  background: #f8fafc;
-}
-
-.row {
-  display: flex;
-  gap: 10px;
-}
-
-.item {
-  margin-top: 10px;
-}
-
-button {
-  width: 100%;
-  margin-top: 24px;
-  padding: 14px;
-  border: none;
-  border-radius: 30px;
-  background: linear-gradient(135deg, #0f4c81, #0284c7);
-  color: #fff;
-  font-size: 16px;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-#result {
-  margin-top: 20px;
-  padding: 16px;
-  background: #ecfeff;
-  border-radius: 12px;
-  font-weight: 600;
-  color: #065f46;
-  text-align: center;
-}
-
-@media (max-width: 600px) {
-  .row {
-    flex-direction: column;
+  if (!shiftDate || !shiftTime || !houseBase || !vehicleRate) {
+    alert("Please fill all required fields");
+    return;
   }
+
+  let furnitureCost = 0;
+
+  if (document.getElementById("sofaCheck").checked) {
+    furnitureCost +=
+      parseInt(document.getElementById("sofaType").value) *
+      parseInt(document.getElementById("sofaQty").value || 1);
+  }
+
+  if (document.getElementById("bedCheck").checked) {
+    furnitureCost +=
+      parseInt(document.getElementById("bedType").value) *
+      parseInt(document.getElementById("bedQty").value || 1);
+  }
+
+  if (document.getElementById("fridgeCheck").checked) {
+    furnitureCost += FRIDGE_PRICE;
+  }
+
+  if (document.getElementById("wmCheck").checked) {
+    furnitureCost += parseInt(document.getElementById("wmType").value);
+  }
+
+  const estimatedDistance = 10; // temporary average
+  const distanceCost = estimatedDistance * vehicleRate;
+
+  const total =
+    MIN_BASE_PRICE +
+    houseBase +
+    distanceCost +
+    furnitureCost;
+
+  document.getElementById("result").innerHTML = `
+    Estimated Distance: ${estimatedDistance} km<br>
+    Base: ₹${MIN_BASE_PRICE}<br>
+    House: ₹${houseBase}<br>
+    Distance: ₹${distanceCost}<br>
+    Furniture: ₹${furnitureCost}<br><br>
+    <strong>Total: ₹${Math.round(total)}</strong>
+  `;
 }
