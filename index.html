@@ -2,40 +2,40 @@
 <html>
 <head>
 <meta charset="utf-8">
-<title>Packers & Movers Booking</title>
+<title>Moving Quote</title>
 
 <style>
 body { font-family: Arial; padding:20px; }
-input, select, button {
-  width:100%;
-  padding:10px;
-  margin:8px 0;
-}
-#map {
-  height:400px;
-  width:100%;
-  margin-top:10px;
-}
-.result {
-  font-size:18px;
-  font-weight:bold;
-  margin-top:10px;
-}
+input, select, button { width:100%; padding:10px; margin:8px 0; }
+#map { height:400px; margin-top:10px; }
+.result { font-size:18px; font-weight:bold; margin-top:10px; }
+.items label { display:block; }
 </style>
 </head>
 
 <body>
 
-<h2>Book Your Move</h2>
+<h2>Packers & Movers Booking</h2>
 
 <input id="pickup" placeholder="Pickup location">
 <input id="drop" placeholder="Drop location">
 
+<h3>Select Vehicle</h3>
 <select id="vehicle">
   <option value="25">Mini Truck - ₹25/km</option>
   <option value="35">Medium Truck - ₹35/km</option>
   <option value="45">Large Truck - ₹45/km</option>
 </select>
+
+<h3>Select Items</h3>
+<div class="items">
+<label><input type="checkbox" value="500"> Sofa</label>
+<label><input type="checkbox" value="400"> Bed</label>
+<label><input type="checkbox" value="300"> Washing Machine</label>
+<label><input type="checkbox" value="300"> Refrigerator</label>
+<label><input type="checkbox" value="200"> Table</label>
+<label><input type="checkbox" value="100"> Chairs</label>
+</div>
 
 <button onclick="calculate()">Calculate Price</button>
 
@@ -55,12 +55,8 @@ function initMap() {
   directionsRenderer = new google.maps.DirectionsRenderer();
   directionsRenderer.setMap(map);
 
-  new google.maps.places.Autocomplete(
-    document.getElementById("pickup")
-  );
-  new google.maps.places.Autocomplete(
-    document.getElementById("drop")
-  );
+  new google.maps.places.Autocomplete(document.getElementById("pickup"));
+  new google.maps.places.Autocomplete(document.getElementById("drop"));
 }
 
 function calculate() {
@@ -69,9 +65,13 @@ function calculate() {
   const rate = document.getElementById("vehicle").value;
 
   if (!pickup || !drop) {
-    alert("Enter both locations");
+    alert("Enter locations");
     return;
   }
+
+  let itemCost = 0;
+  document.querySelectorAll(".items input:checked")
+    .forEach(el => itemCost += parseInt(el.value));
 
   const request = {
     origin: pickup,
@@ -83,15 +83,18 @@ function calculate() {
     if (status === "OK") {
       directionsRenderer.setDirections(result);
 
-      const distanceMeters =
+      const meters =
         result.routes[0].legs[0].distance.value;
 
-      const distanceKm = distanceMeters / 1000;
-      const price = Math.round(distanceKm * rate);
+      const km = meters / 1000;
+      const travelCost = Math.round(km * rate);
+      const total = travelCost + itemCost;
 
       document.getElementById("result").innerHTML =
-        "Distance: " + distanceKm.toFixed(1) +
-        " km<br>Estimated Price: ₹" + price;
+        `Distance: ${km.toFixed(1)} km<br>
+         Travel Cost: ₹${travelCost}<br>
+         Item Handling: ₹${itemCost}<br>
+         <strong>Total Estimate: ₹${total}</strong>`;
     } else {
       alert("Route not found");
     }
@@ -105,3 +108,4 @@ src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCdYIaoNUMxf0uWuHmWk_Nu2Rc
 
 </body>
 </html>
+
