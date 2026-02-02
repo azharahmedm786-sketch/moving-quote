@@ -1,106 +1,107 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <title>Instant Moving Quote</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="stylesheet" href="style.css" />
+<meta charset="utf-8">
+<title>Packers & Movers Booking</title>
+
+<style>
+body { font-family: Arial; padding:20px; }
+input, select, button {
+  width:100%;
+  padding:10px;
+  margin:8px 0;
+}
+#map {
+  height:400px;
+  width:100%;
+  margin-top:10px;
+}
+.result {
+  font-size:18px;
+  font-weight:bold;
+  margin-top:10px;
+}
+</style>
 </head>
 
 <body>
-  <div class="wrapper">
-    <div class="container">
-      <h1>Get Instant Moving Quote</h1>
 
-      <label>Pickup Location</label>
-      <input type="text" id="pickup" placeholder="Enter pickup address" />
+<h2>Book Your Move</h2>
 
-      <label>Drop Location</label>
-      <input type="text" id="drop" placeholder="Enter drop address" />
+<input id="pickup" placeholder="Pickup location">
+<input id="drop" placeholder="Drop location">
 
-      <div class="row">
-        <div>
-          <label>Shifting Date</label>
-          <input type="date" id="shiftDate" />
-        </div>
-        <div>
-          <label>Shifting Time</label>
-          <input type="time" id="shiftTime" step="900" />
-        </div>
-      </div>
+<select id="vehicle">
+  <option value="25">Mini Truck - ₹25/km</option>
+  <option value="35">Medium Truck - ₹35/km</option>
+  <option value="45">Large Truck - ₹45/km</option>
+</select>
 
-      <label>House Type</label>
-      <select id="house">
-        <option value="">Select House Type</option>
-        <option value="0">1 RK</option>
-        <option value="1200">1 BHK</option>
-        <option value="2500">2 BHK</option>
-        <option value="4000">3 BHK</option>
-      </select>
+<button onclick="calculate()">Calculate Price</button>
 
-      <label>Vehicle Type</label>
-      <select id="vehicle">
-        <option value="">Select Vehicle</option>
-        <option value="25">Tata Ace / Dost (₹25/km)</option>
-        <option value="40">14 ft Truck (₹40/km)</option>
-        <option value="50">17 ft Truck (₹50/km)</option>
-        <option value="60">19–22 ft Truck (₹60/km)</option>
-      </select>
+<div class="result" id="result"></div>
+<div id="map"></div>
 
-      <h3>Furniture Details</h3>
+<script>
+let map, directionsService, directionsRenderer;
 
-      <div class="item">
-        <label><input type="checkbox" id="sofaCheck" /> Sofa</label>
-        <div class="row">
-          <select id="sofaType">
-            <option value="0">Select Type</option>
-            <option value="300">Single</option>
-            <option value="500">2 Seater</option>
-            <option value="700">3 Seater</option>
-            <option value="1000">L-Shape</option>
-          </select>
-          <input type="number" id="sofaQty" min="1" value="1" />
-        </div>
-      </div>
+function initMap() {
+  map = new google.maps.Map(document.getElementById("map"), {
+    center: { lat: 12.9716, lng: 77.5946 },
+    zoom: 10,
+  });
 
-      <div class="item">
-        <label><input type="checkbox" id="bedCheck" /> Bed</label>
-        <div class="row">
-          <select id="bedType">
-            <option value="0">Select Type</option>
-            <option value="500">Single</option>
-            <option value="700">Queen</option>
-            <option value="900">King</option>
-          </select>
-          <input type="number" id="bedQty" min="1" value="1" />
-        </div>
-      </div>
+  directionsService = new google.maps.DirectionsService();
+  directionsRenderer = new google.maps.DirectionsRenderer();
+  directionsRenderer.setMap(map);
 
-      <label><input type="checkbox" id="fridgeCheck" /> Fridge</label>
+  new google.maps.places.Autocomplete(
+    document.getElementById("pickup")
+  );
+  new google.maps.places.Autocomplete(
+    document.getElementById("drop")
+  );
+}
 
-      <div class="item">
-        <label><input type="checkbox" id="wmCheck" /> Washing Machine</label>
-        <select id="wmType">
-          <option value="0">Select Type</option>
-          <option value="300">Semi Automatic</option>
-          <option value="500">Fully Automatic</option>
-        </select>
-      </div>
+function calculate() {
+  const pickup = document.getElementById("pickup").value;
+  const drop = document.getElementById("drop").value;
+  const rate = document.getElementById("vehicle").value;
 
-      <button onclick="calculateQuote()">Get Quote</button>
+  if (!pickup || !drop) {
+    alert("Enter both locations");
+    return;
+  }
 
-      <div id="result"></div>
-    </div>
-  </div>
+  const request = {
+    origin: pickup,
+    destination: drop,
+    travelMode: "DRIVING",
+  };
 
-  <script src="script.js"></script>
+  directionsService.route(request, function(result, status) {
+    if (status === "OK") {
+      directionsRenderer.setDirections(result);
 
-  <!-- Enable later when billing is verified -->
-  <!--
-  <script
-    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCdYIaoNUMxf0uWuHmWk_Nu2RcuYSsMuAY&libraries=places&callback=initAutocomplete"
-    async defer>
-  </script>
-  -->
+      const distanceMeters =
+        result.routes[0].legs[0].distance.value;
+
+      const distanceKm = distanceMeters / 1000;
+      const price = Math.round(distanceKm * rate);
+
+      document.getElementById("result").innerHTML =
+        "Distance: " + distanceKm.toFixed(1) +
+        " km<br>Estimated Price: ₹" + price;
+    } else {
+      alert("Route not found");
+    }
+  });
+}
+</script>
+
+<script async
+src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCdYIaoNUMxf0uWuHmWk_Nu2RcuYSsMuAY&libraries=places&callback=initMap">
+</script>
+
 </body>
 </html>
