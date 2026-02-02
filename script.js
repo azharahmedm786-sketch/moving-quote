@@ -4,6 +4,22 @@ let dropPlace = null;
 const MIN_BASE_PRICE = 1100;
 const FRIDGE_PRICE = 400;
 
+function initAutocomplete() {
+  const pickupInput = document.getElementById("pickup");
+  const dropInput = document.getElementById("drop");
+
+  const pickupAutocomplete = new google.maps.places.Autocomplete(pickupInput);
+  const dropAutocomplete = new google.maps.places.Autocomplete(dropInput);
+
+  pickupAutocomplete.addListener("place_changed", () => {
+    pickupPlace = pickupAutocomplete.getPlace();
+  });
+
+  dropAutocomplete.addListener("place_changed", () => {
+    dropPlace = dropAutocomplete.getPlace();
+  });
+}
+
 function calculateQuote() {
   const shiftDate = document.getElementById("shiftDate").value;
   const shiftTime = document.getElementById("shiftTime").value;
@@ -12,6 +28,11 @@ function calculateQuote() {
 
   if (!shiftDate || !shiftTime || !houseBase || !vehicleRate) {
     alert("Please fill all required fields");
+    return;
+  }
+
+  if (!pickupPlace || !dropPlace) {
+    alert("Please select pickup and drop locations");
     return;
   }
 
@@ -34,24 +55,44 @@ function calculateQuote() {
   }
 
   if (document.getElementById("wmCheck").checked) {
-    furnitureCost += parseInt(document.getElementById("wmType").value);
+    furnitureCost += parseInt(document.getElementById("wmType").value || 0);
   }
 
-  const estimatedDistance = 10; // temporary average
-  const distanceCost = estimatedDistance * vehicleRate;
+  const service = new google.maps.DistanceMatrixService();
 
-  const total =
-    MIN_BASE_PRICE +
-    houseBase +
-    distanceCost +
-    furnitureCost;
+  service.getDistanceMatrix(
+    {
+      origins: [pickupPlace.formatted_address],
+      destinations: [dropPlace.formatted_address],
+      travelMode: "DRIVING",
+      unitSystem: google.maps.UnitSystem.METRIC
+    },
+    (response, status) => {
+      if (status !== "OK") {
+        alert("Distance calculation failed");
+        return;
+      }
 
-  document.getElementById("result").innerHTML = `
-    Estimated Distance: ${estimatedDistance} km<br>
-    Base: ₹${MIN_BASE_PRICE}<br>
-    House: ₹${houseBase}<br>
-    Distance: ₹${distanceCost}<br>
-    Furniture: ₹${furnitureCost}<br><br>
-    <strong>Total: ₹${Math.round(total)}</strong>
-  `;
+      const distanceMeters =
+        response.rows[0].elements[0].distance.value;
+
+      const distanceKm = distanceMeters / 1000;
+      const distanceCost = distanceKm * vehicleRate;
+
+      const total =
+        MIN_BASE_PRICE +
+        houseBase +
+        distanceCost +
+        furnitureCost;
+
+      document.getElementById("result").innerHTML = `
+        Estimated Distance: ${distanceKm.toFixed(1)} km<br>
+        Base: ₹${MIN_BASE_PRICE}<br>
+        House: ₹${houseBase}<br>
+        Distance: ₹${Math.round(distanceCost)}<br>
+        Furniture: ₹${furnitureCost}<br><br>
+        <strong>Total: ₹${Math.round(total)}</strong>
+      `;
+    }
+  );
 }
