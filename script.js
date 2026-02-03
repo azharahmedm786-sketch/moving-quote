@@ -60,33 +60,47 @@ function initAutocomplete() {
 function useCurrentLocation() {
 
   if (!navigator.geolocation) {
-    alert("Location not supported");
+    alert("Location not supported on this device.");
     return;
   }
 
-  navigator.geolocation.getCurrentPosition(pos => {
+  navigator.geolocation.getCurrentPosition(
+    pos => {
 
-    const loc = {
-      lat: pos.coords.latitude,
-      lng: pos.coords.longitude
-    };
+      const loc = {
+        lat: pos.coords.latitude,
+        lng: pos.coords.longitude
+      };
 
-    const geocoder = new google.maps.Geocoder();
+      const geocoder = new google.maps.Geocoder();
 
-    geocoder.geocode({ location: loc }, (res, status) => {
-      if (status === "OK" && res[0]) {
+      geocoder.geocode({ location: loc }, (res, status) => {
 
-        document.getElementById("pickup").value =
-          res[0].formatted_address;
+        if (status === "OK" && res[0]) {
 
-        pickupPlace = { geometry: { location: loc } };
+          document.getElementById("pickup").value =
+            res[0].formatted_address;
 
-        showLocation("pickup");
-      }
-    });
-  });
+          pickupPlace = { geometry: { location: loc } };
+
+          showLocation("pickup");
+        } else {
+          alert("Unable to get address.");
+        }
+      });
+    },
+
+    err => {
+      alert("Location permission denied or unavailable.");
+    },
+
+    {
+      enableHighAccuracy: true,
+      timeout: 10000,
+      maximumAge: 0
+    }
+  );
 }
-
 /* =============================
    SHOW LOCATION ON MAP
 ============================= */
