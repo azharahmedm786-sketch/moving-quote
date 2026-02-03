@@ -8,12 +8,19 @@ body {
   background: #f1f5f9;
 }
 
+/* Wrapper padding improves desktop spacing */
 .wrapper {
   padding: 16px;
 }
 
+@media (min-width: 900px) {
+  .wrapper {
+    padding: 40px;
+  }
+}
+
 .container {
-  max-width: 1100px;
+  max-width: 1200px;
   margin: auto;
   background: #ffffff;
   padding: 24px;
@@ -21,6 +28,7 @@ body {
   box-shadow: 0 20px 40px rgba(0,0,0,0.12);
 }
 
+/* Titles */
 h1 {
   text-align: center;
   margin-bottom: 20px;
@@ -33,6 +41,7 @@ h3 {
   color: #1e40af;
 }
 
+/* Labels */
 label {
   display: block;
   margin-top: 14px;
@@ -41,6 +50,7 @@ label {
   color: #334155;
 }
 
+/* Inputs */
 input,
 select {
   width: 100%;
@@ -50,15 +60,18 @@ select {
   background: #f8fafc;
 }
 
+/* Rows */
 .row {
   display: flex;
   gap: 10px;
 }
 
+/* Furniture items */
 .item {
   margin-top: 10px;
 }
 
+/* Buttons */
 button {
   width: 100%;
   margin-top: 24px;
@@ -79,6 +92,7 @@ button {
   border-radius: 30px;
 }
 
+/* Result box */
 #result {
   margin-top: 20px;
   padding: 16px;
@@ -89,35 +103,46 @@ button {
   text-align: center;
 }
 
-/* Map default height */
+/* Map */
 #map {
   height: 350px;
   margin-top: 20px;
   border-radius: 12px;
 }
 
-/* Desktop layout */
+/* ===== Desktop Layout ===== */
 @media (min-width: 900px) {
 
   .container {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 20px;
+    gap: 30px;
   }
 
-  #map {
-    height: 100%;
-    min-height: 500px;
+  /* Header spans both columns */
+  .container h1 {
+    grid-column: span 2;
   }
 
-  .container h1,
-  #result,
+  /* Result spans both */
+  #result {
+    grid-column: span 2;
+  }
+
+  /* Buttons span both */
   button {
     grid-column: span 2;
   }
+
+  /* Map full height */
+  #map {
+    height: 100%;
+    min-height: 600px;
+    margin-top: 0;
+  }
 }
 
-/* Mobile layout */
+/* ===== Mobile Layout ===== */
 @media (max-width: 600px) {
   .row {
     flex-direction: column;
