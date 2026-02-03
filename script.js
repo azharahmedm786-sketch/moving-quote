@@ -235,9 +235,13 @@ function calculateQuote() {
       furnitureCost;
 
     document.getElementById("result").innerHTML = `
-      Distance: ${km.toFixed(1)} km<br>
-      Total: ₹${Math.round(total)}
-    `;
+  Distance: ${km.toFixed(1)} km<br>
+  Base: ₹${MIN_BASE_PRICE}<br>
+  House: ₹${houseBase}<br>
+  Distance Cost: ₹${Math.round(km * vehicleRate)}<br>
+  Furniture: ₹${furnitureCost}<br><br>
+  <strong>Total: ₹${Math.round(total)}</strong>
+`;
   });
 }
 
