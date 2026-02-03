@@ -1,134 +1,128 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Instant Moving Quote</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="stylesheet" href="style.css" />
+<meta charset="UTF-8" />
+<title>Instant Moving Quote</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<link rel="stylesheet" href="style.css" />
 </head>
 
 <body>
-  <div class="wrapper">
-    <div class="container">
+<div class="wrapper">
+<div class="container">
 
-      <h1>Get Instant Moving Quote</h1>
+<h1>Get Instant Moving Quote</h1>
 
-      <!-- Pickup -->
-      <label>Pickup Location</label>
-      <input type="text" id="pickup" placeholder="Enter pickup address" />
+<label>Customer Name</label>
+<input type="text" id="custName" placeholder="Enter your name" />
 
-      <!-- Drop -->
-      <label>Drop Location</label>
-      <input type="text" id="drop" placeholder="Enter drop address" />
+<label>Mobile Number</label>
+<input type="tel" id="custPhone" placeholder="Enter mobile number" />
 
-      <!-- Date & Time -->
-      <div class="row">
-        <div>
-          <label>Shifting Date</label>
-          <input type="date" id="shiftDate" />
-        </div>
+<label>Pickup Location</label>
+<input type="text" id="pickup" placeholder="Enter pickup address" />
 
-        <div>
-          <label>Shifting Time</label>
-          <input type="time" id="shiftTime" step="900" />
-        </div>
-      </div>
+<label>Drop Location</label>
+<input type="text" id="drop" placeholder="Enter drop address" />
 
-      <!-- House -->
-      <label>House Type</label>
-      <select id="house">
-        <option value="">Select House Type</option>
-        <option value="0">1 RK</option>
-        <option value="1200">1 BHK</option>
-        <option value="2500">2 BHK</option>
-        <option value="4000">3 BHK</option>
-      </select>
+<button type="button" onclick="openMap('pickup')">
+📍 Pin Pickup on Map
+</button>
 
-      <!-- Vehicle -->
-      <label>Vehicle Type</label>
-      <select id="vehicle">
-        <option value="">Select Vehicle</option>
-        <option value="25">Tata Ace / Dost (₹25/km)</option>
-        <option value="40">14 ft Truck (₹40/km)</option>
-        <option value="50">17 ft Truck (₹50/km)</option>
-        <option value="60">19–22 ft Truck (₹60/km)</option>
-      </select>
+<button type="button" onclick="openMap('drop')">
+📍 Pin Drop on Map
+</button>
 
-      <!-- Furniture -->
-      <h3>Furniture Details</h3>
+<div id="map" style="height:300px;margin-top:10px;display:none;"></div>
 
-      <!-- Sofa -->
-      <div class="item">
-        <label><input type="checkbox" id="sofaCheck" /> Sofa</label>
-        <div class="row">
-          <select id="sofaType">
-            <option value="0">Select Type</option>
-            <option value="300">Single</option>
-            <option value="500">2 Seater</option>
-            <option value="700">3 Seater</option>
-            <option value="1000">L-Shape</option>
-          </select>
-          <input type="number" id="sofaQty" min="1" value="1" />
-        </div>
-      </div>
+<div class="row">
+<div>
+<label>Shifting Date</label>
+<input type="date" id="shiftDate" />
+</div>
 
-      <!-- Bed -->
-      <div class="item">
-        <label><input type="checkbox" id="bedCheck" /> Bed</label>
-        <div class="row">
-          <select id="bedType">
-            <option value="0">Select Type</option>
-            <option value="500">Single</option>
-            <option value="700">Queen</option>
-            <option value="900">King</option>
-          </select>
-          <input type="number" id="bedQty" min="1" value="1" />
-        </div>
-      </div>
+<div>
+<label>Shifting Time</label>
+<input type="time" id="shiftTime" step="900" />
+</div>
+</div>
 
-      <!-- Fridge -->
-      <label>
-        <input type="checkbox" id="fridgeCheck" />
-        Fridge
-      </label>
+<label>House Type</label>
+<select id="house">
+<option value="">Select House Type</option>
+<option value="0">1 RK</option>
+<option value="1200">1 BHK</option>
+<option value="2500">2 BHK</option>
+<option value="4000">3 BHK</option>
+</select>
 
-      <!-- Washing Machine -->
-      <div class="item">
-        <label>
-          <input type="checkbox" id="wmCheck" />
-          Washing Machine
-        </label>
+<label>Vehicle Type</label>
+<select id="vehicle">
+<option value="">Select Vehicle</option>
+<option value="25">Tata Ace / Dost (₹25/km)</option>
+<option value="40">14 ft Truck (₹40/km)</option>
+<option value="50">17 ft Truck (₹50/km)</option>
+<option value="60">19–22 ft Truck (₹60/km)</option>
+</select>
 
-        <select id="wmType">
-          <option value="0">Select Type</option>
-          <option value="300">Semi Automatic</option>
-          <option value="500">Fully Automatic</option>
-        </select>
-      </div>
+<h3>Furniture Details</h3>
 
-      <!-- Buttons -->
-      <button type="button" onclick="calculateQuote()">
-        Get Quote
-      </button>
+<div class="item">
+<label><input type="checkbox" id="sofaCheck" /> Sofa</label>
+<div class="row">
+<select id="sofaType">
+<option value="0">Select Type</option>
+<option value="300">Single</option>
+<option value="500">2 Seater</option>
+<option value="700">3 Seater</option>
+<option value="1000">L-Shape</option>
+</select>
+<input type="number" id="sofaQty" min="1" value="1" />
+</div>
+</div>
 
-      <!-- Result -->
-      <div id="result"></div>
+<div class="item">
+<label><input type="checkbox" id="bedCheck" /> Bed</label>
+<div class="row">
+<select id="bedType">
+<option value="0">Select Type</option>
+<option value="500">Single</option>
+<option value="700">Queen</option>
+<option value="900">King</option>
+</select>
+<input type="number" id="bedQty" min="1" value="1" />
+</div>
+</div>
 
-      <!-- WhatsApp Booking -->
-      <button type="button" onclick="bookOnWhatsApp()" class="book-btn">
-        Book on WhatsApp
-      </button>
+<label>
+<input type="checkbox" id="fridgeCheck" /> Fridge
+</label>
 
-    </div>
-  </div>
+<div class="item">
+<label><input type="checkbox" id="wmCheck" /> Washing Machine</label>
+<select id="wmType">
+<option value="0">Select Type</option>
+<option value="300">Semi Automatic</option>
+<option value="500">Fully Automatic</option>
+</select>
+</div>
 
-  <!-- Quote Script -->
-  <script src="script.js"></script>
+<button type="button" onclick="calculateQuote()">Get Quote</button>
 
-  <!-- Google Maps -->
-  <script async defer
-    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCdYIaoNUMxf0uWuHmWk_Nu2RcuYSsMuAY&libraries=places&callback=initAutocomplete">
-  </script>
+<div id="result"></div>
+
+<button type="button" onclick="bookOnWhatsApp()" class="book-btn">
+Book on WhatsApp
+</button>
+
+</div>
+</div>
+
+<script src="script.js"></script>
+
+<script async defer
+src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCdYIaoNUMxf0uWuHmWk_Nu2RcuYSsMuAY&libraries=places&callback=initAutocomplete">
+</script>
 
 </body>
 </html>
