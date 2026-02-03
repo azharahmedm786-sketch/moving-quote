@@ -4,7 +4,6 @@ let dropPlace = null;
 let map;
 let pickupMarker = null;
 let dropMarker = null;
-let activeField = null;
 
 const MIN_BASE_PRICE = 1100;
 const FRIDGE_PRICE = 400;
@@ -13,6 +12,7 @@ const FRIDGE_PRICE = 400;
    INIT AUTOCOMPLETE
 ============================= */
 function initAutocomplete() {
+
   detectCurrentLocation();
 
   const pickupInput = document.getElementById("pickup");
@@ -36,27 +36,26 @@ function initAutocomplete() {
 }
 
 /* =============================
-   CURRENT LOCATION DETECT
+   DETECT CURRENT LOCATION
 ============================= */
 function detectCurrentLocation() {
   if (!navigator.geolocation) return;
 
-  navigator.geolocation.getCurrentPosition(position => {
+  navigator.geolocation.getCurrentPosition(pos => {
+
     const loc = {
-      lat: position.coords.latitude,
-      lng: position.coords.longitude
+      lat: pos.coords.latitude,
+      lng: pos.coords.longitude
     };
 
     const geocoder = new google.maps.Geocoder();
 
-    geocoder.geocode({ location: loc }, (results, status) => {
-      if (status === "OK" && results[0]) {
+    geocoder.geocode({ location: loc }, (res, status) => {
+      if (status === "OK" && res[0]) {
         document.getElementById("pickup").value =
-          results[0].formatted_address;
+          res[0].formatted_address;
 
-        pickupPlace = {
-          geometry: { location: loc }
-        };
+        pickupPlace = { geometry: { location: loc } };
 
         showLocation("pickup");
       }
@@ -68,6 +67,7 @@ function detectCurrentLocation() {
    SHOW LOCATION ON MAP
 ============================= */
 function showLocation(type) {
+
   const mapDiv = document.getElementById("map");
   mapDiv.style.display = "block";
 
@@ -85,34 +85,35 @@ function showLocation(type) {
 
   map.setCenter(loc);
 
-  let markerObj;
+  let marker;
 
   if (type === "pickup") {
     if (pickupMarker) pickupMarker.setMap(null);
 
     pickupMarker = new google.maps.Marker({
-      map: map,
+      map,
       position: loc,
       draggable: true,
       label: "P"
     });
 
-    markerObj = pickupMarker;
+    marker = pickupMarker;
+
   } else {
     if (dropMarker) dropMarker.setMap(null);
 
     dropMarker = new google.maps.Marker({
-      map: map,
+      map,
       position: loc,
       draggable: true,
       label: "D"
     });
 
-    markerObj = dropMarker;
+    marker = dropMarker;
   }
 
-  markerObj.addListener("dragend", function () {
-    updateAddressFromMarker(type, markerObj.getPosition());
+  marker.addListener("dragend", () => {
+    updateAddressFromMarker(type, marker.getPosition());
   });
 
   adjustBounds();
@@ -122,12 +123,14 @@ function showLocation(type) {
    UPDATE ADDRESS AFTER DRAG
 ============================= */
 function updateAddressFromMarker(type, latlng) {
+
   const geocoder = new google.maps.Geocoder();
 
-  geocoder.geocode({ location: latlng }, (results, status) => {
-    if (status === "OK" && results[0]) {
+  geocoder.geocode({ location: latlng }, (res, status) => {
+    if (status === "OK" && res[0]) {
+
       document.getElementById(type).value =
-        results[0].formatted_address;
+        res[0].formatted_address;
 
       if (type === "pickup")
         pickupPlace = { geometry: { location: latlng } };
@@ -140,16 +143,22 @@ function updateAddressFromMarker(type, latlng) {
 }
 
 /* =============================
-   FIT MAP TO BOTH LOCATIONS
+   FIT MAP TO BOTH PINS
 ============================= */
 function adjustBounds() {
-  if (!pickupPlace || !dropPlace) return;
+
+  if (!map) return;
 
   const bounds = new google.maps.LatLngBounds();
-  bounds.extend(pickupPlace.geometry.location);
-  bounds.extend(dropPlace.geometry.location);
 
-  map.fitBounds(bounds);
+  if (pickupPlace)
+    bounds.extend(pickupPlace.geometry.location);
+
+  if (dropPlace)
+    bounds.extend(dropPlace.geometry.location);
+
+  if (!bounds.isEmpty())
+    map.fitBounds(bounds);
 }
 
 /* =============================
@@ -157,22 +166,25 @@ function adjustBounds() {
 ============================= */
 function calculateQuote() {
 
-  const shiftDate = shiftDateInput.value;
-  const shiftTime = shiftTimeInput.value;
-
-  const houseBase = parseInt(house.value || 0);
-  const vehicleRate = parseFloat(vehicle.value || 0);
+  const shiftDate = document.getElementById("shiftDate").value;
+  const shiftTime = document.getElementById("shiftTime").value;
+  const houseBase =
+    parseInt(document.getElementById("house").value || 0);
+  const vehicleRate =
+    parseFloat(document.getElementById("vehicle").value || 0);
 
   if (!shiftDate || !shiftTime || !houseBase || !vehicleRate) {
-    alert("Please fill all required fields");
+    alert("Fill required fields");
     return;
   }
 
-  const pickupText = pickup.value.trim();
-  const dropText = drop.value.trim();
+  const pickupText =
+    document.getElementById("pickup").value.trim();
+  const dropText =
+    document.getElementById("drop").value.trim();
 
   if (!pickupText || !dropText) {
-    alert("Please enter pickup and drop locations");
+    alert("Enter locations");
     return;
   }
 
@@ -196,15 +208,15 @@ function calculateQuote() {
     origins: [pickupText],
     destinations: [dropText],
     travelMode: "DRIVING",
-  }, (response, status) => {
+  }, (res, status) => {
 
     if (status !== "OK") {
-      alert("Distance calculation failed");
+      alert("Distance error");
       return;
     }
 
     const km =
-      response.rows[0].elements[0].distance.value / 1000;
+      res.rows[0].elements[0].distance.value / 1000;
 
     const total =
       MIN_BASE_PRICE +
@@ -223,8 +235,9 @@ function calculateQuote() {
    WHATSAPP BOOKING
 ============================= */
 function bookOnWhatsApp() {
+
   const message =
-    `New Moving Request 🚚\n\n` +
+    "New Moving Request 🚚\n\n" +
     result.innerText;
 
   window.location.href =
