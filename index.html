@@ -8,16 +8,14 @@
 </head>
 
 <body>
+
 <div class="wrapper">
 <div class="container">
-<div class="furniture-grid">
-   <!-- sofa -->
-   <!-- bed -->
-   <!-- fridge -->
-   <!-- washing machine -->
-</div>
 
 <h1>Get Instant Moving Quote</h1>
+
+<!-- LEFT COLUMN -->
+<div class="left-col">
 
 <label>Customer Name</label>
 <input type="text" id="custName" placeholder="Enter your name" />
@@ -27,12 +25,12 @@
 
 <label>Pickup Location</label>
 <input type="text" id="pickup" placeholder="Enter pickup address" />
-  
+
 <label>
-  <input type="checkbox" id="useCurrentLocation" checked>
-  Use current location
+<input type="checkbox" id="useCurrentLocation" checked>
+Use current location
 </label>
-  
+
 <label>Drop Location</label>
 <input type="text" id="drop" placeholder="Enter drop address" />
 
@@ -44,7 +42,13 @@
 📍 Pin Drop on Map
 </button>
 
-<div id="map" style="height:300px;margin-top:10px;display:none;"></div>
+<div id="map"></div>
+
+</div>
+
+
+<!-- RIGHT COLUMN -->
+<div class="right-col">
 
 <div class="row">
 <div>
@@ -125,6 +129,8 @@
 <button type="button" onclick="bookOnWhatsApp()" class="book-btn">
 Book on WhatsApp
 </button>
+
+</div>
 
 </div>
 </div>
