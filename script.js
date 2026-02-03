@@ -90,6 +90,7 @@ function showLocation(type) {
   let marker;
 
   if (type === "pickup") {
+
     if (pickupMarker) pickupMarker.setMap(null);
 
     pickupMarker = new google.maps.Marker({
@@ -102,6 +103,7 @@ function showLocation(type) {
     marker = pickupMarker;
 
   } else {
+
     if (dropMarker) dropMarker.setMap(null);
 
     dropMarker = new google.maps.Marker({
@@ -129,7 +131,7 @@ function showLocation(type) {
 }
 
 /* =============================
-   UPDATE ADDRESS AFTER DRAG
+   UPDATE ADDRESS FROM PIN
 ============================= */
 function updateAddressFromMarker(type, latlng) {
 
@@ -180,6 +182,7 @@ function calculateQuote() {
 
   const houseBase =
     parseInt(document.getElementById("house").value || 0);
+
   const vehicleRate =
     parseFloat(document.getElementById("vehicle").value || 0);
 
@@ -198,23 +201,24 @@ function calculateQuote() {
     return;
   }
 
+  /* ---- Furniture Cost ---- */
   let furnitureCost = 0;
 
-if (sofaCheck.checked)
-  furnitureCost +=
-    parseInt(sofaType.value || 0) *
-    parseInt(sofaQty.value || 1);
+  if (sofaCheck.checked)
+    furnitureCost +=
+      parseInt(sofaType.value || 0) *
+      parseInt(sofaQty.value || 1);
 
-if (bedCheck.checked)
-  furnitureCost +=
-    parseInt(bedType.value || 0) *
-    parseInt(bedQty.value || 1);
+  if (bedCheck.checked)
+    furnitureCost +=
+      parseInt(bedType.value || 0) *
+      parseInt(bedQty.value || 1);
 
-if (fridgeCheck.checked)
-  furnitureCost += FRIDGE_PRICE;
+  if (fridgeCheck.checked)
+    furnitureCost += FRIDGE_PRICE;
 
-if (wmCheck.checked)
-  furnitureCost += parseInt(wmType.value || 0);
+  if (wmCheck.checked)
+    furnitureCost += parseInt(wmType.value || 0);
 
   const service = new google.maps.DistanceMatrixService();
 
@@ -232,19 +236,21 @@ if (wmCheck.checked)
     const km =
       res.rows[0].elements[0].distance.value / 1000;
 
+    const distanceCost = km * vehicleRate;
+
     const total =
       MIN_BASE_PRICE +
       houseBase +
-      km * vehicleRate +
+      distanceCost +
       furnitureCost;
 
     document.getElementById("result").innerHTML = `
-  Distance: ${km.toFixed(1)} km<br>
-  Base: ₹${MIN_BASE_PRICE}<br>
-  House: ₹${houseBase}<br>
-  Distance Cost: ₹${Math.round(km * vehicleRate)}<br>
-  Furniture: ₹${furnitureCost}<br><br>
-  <strong>Total: ₹${Math.round(total)}</strong>
+Distance: ${km.toFixed(1)} km<br>
+Base: ₹${MIN_BASE_PRICE}<br>
+House: ₹${houseBase}<br>
+Distance Cost: ₹${Math.round(distanceCost)}<br>
+Furniture: ₹${furnitureCost}<br><br>
+<strong>Total: ₹${Math.round(total)}</strong>
 `;
   });
 }
