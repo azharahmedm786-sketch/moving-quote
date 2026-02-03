@@ -36,13 +36,13 @@ function initAutocomplete() {
 }
 
 /* =============================
-   ENSURE GEOMETRY EXISTS
+   ENSURE LOCATION GEOMETRY
 ============================= */
 function ensureGeometry(type) {
   const place = type === "pickup" ? pickupPlace : dropPlace;
 
   if (place.geometry) {
-    tryShowBothLocations();
+    showSingleLocation(type);
     return;
   }
 
@@ -59,9 +59,54 @@ function ensureGeometry(type) {
         dropPlace = { geometry: { location: loc } };
       }
 
-      tryShowBothLocations();
+      showSingleLocation(type);
     }
   });
+}
+
+/* =============================
+   SHOW SINGLE LOCATION PIN
+============================= */
+function showSingleLocation(type) {
+
+  const mapDiv = document.getElementById("map");
+  mapDiv.style.display = "block";
+
+  const loc =
+    type === "pickup"
+      ? pickupPlace.geometry.location
+      : dropPlace.geometry.location;
+
+  if (!map) {
+    map = new google.maps.Map(mapDiv, {
+      center: loc,
+      zoom: 14,
+    });
+  }
+
+  map.setCenter(loc);
+
+  if (type === "pickup") {
+    if (pickupMarker) pickupMarker.setMap(null);
+
+    pickupMarker = new google.maps.Marker({
+      map: map,
+      position: loc,
+      label: "P"
+    });
+  } else {
+    if (dropMarker) dropMarker.setMap(null);
+
+    dropMarker = new google.maps.Marker({
+      map: map,
+      position: loc,
+      label: "D"
+    });
+  }
+
+  if (pickupPlace && dropPlace) {
+    tryShowBothLocations();
+  }
 }
 
 /* =============================
@@ -70,37 +115,13 @@ function ensureGeometry(type) {
 function tryShowBothLocations() {
   if (!pickupPlace || !dropPlace) return;
 
-  const mapDiv = document.getElementById("map");
-  mapDiv.style.display = "block";
-
   const pickupLoc = pickupPlace.geometry.location;
   const dropLoc = dropPlace.geometry.location;
-
-  if (!map) {
-    map = new google.maps.Map(mapDiv, {
-      center: pickupLoc,
-      zoom: 12,
-    });
-  }
-
-  if (pickupMarker) pickupMarker.setMap(null);
-  if (dropMarker) dropMarker.setMap(null);
-
-  pickupMarker = new google.maps.Marker({
-    map: map,
-    position: pickupLoc,
-    label: "P"
-  });
-
-  dropMarker = new google.maps.Marker({
-    map: map,
-    position: dropLoc,
-    label: "D"
-  });
 
   const bounds = new google.maps.LatLngBounds();
   bounds.extend(pickupLoc);
   bounds.extend(dropLoc);
+
   map.fitBounds(bounds);
 }
 
