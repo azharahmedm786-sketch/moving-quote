@@ -204,21 +204,25 @@ function calculateQuote() {
   /* ---- Furniture Cost ---- */
   let furnitureCost = 0;
 
-  if (sofaCheck.checked)
-    furnitureCost +=
-      parseInt(sofaType.value || 0) *
-      parseInt(sofaQty.value || 1);
+if (document.getElementById("sofaCheck").checked) {
+  const price = Number(document.getElementById("sofaType").value || 0);
+  const qty = Number(document.getElementById("sofaQty").value || 1);
+  furnitureCost += price * qty;
+}
 
-  if (bedCheck.checked)
-    furnitureCost +=
-      parseInt(bedType.value || 0) *
-      parseInt(bedQty.value || 1);
+if (document.getElementById("bedCheck").checked) {
+  const price = Number(document.getElementById("bedType").value || 0);
+  const qty = Number(document.getElementById("bedQty").value || 1);
+  furnitureCost += price * qty;
+}
 
-  if (fridgeCheck.checked)
-    furnitureCost += FRIDGE_PRICE;
+if (document.getElementById("fridgeCheck").checked) {
+  furnitureCost += FRIDGE_PRICE;
+}
 
-  if (wmCheck.checked)
-    furnitureCost += parseInt(wmType.value || 0);
+if (document.getElementById("wmCheck").checked) {
+  furnitureCost += Number(document.getElementById("wmType").value || 0);
+}
 
   const service = new google.maps.DistanceMatrixService();
 
