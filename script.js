@@ -32,19 +32,23 @@ function initAutocomplete() {
    QUOTE CALCULATION
 ============================= */
 function calculateQuote() {
+
   const shiftDate = document.getElementById("shiftDate").value;
   const shiftTime = document.getElementById("shiftTime").value;
-  const houseBase =
-    parseInt(document.getElementById("house").value || 0);
-  const vehicleRate =
-    parseFloat(document.getElementById("vehicle").value || 0);
 
-  if (!shiftDate || !shiftTime || !houseBase || !vehicleRate) {
+  const houseValue = document.getElementById("house").value;
+  const vehicleValue = document.getElementById("vehicle").value;
+
+  /* Correct validation */
+  if (!shiftDate || !shiftTime || houseValue === "" || vehicleValue === "") {
     alert("Please fill all required fields");
     return;
   }
 
-  /* Location text fallback */
+  const houseBase = parseInt(houseValue);
+  const vehicleRate = parseFloat(vehicleValue);
+
+  /* Location fallback */
   const pickupText =
     document.getElementById("pickup").value.trim();
   const dropText =
@@ -55,19 +59,25 @@ function calculateQuote() {
     return;
   }
 
-  /* Furniture cost calculation */
+  /* =============================
+     Furniture Cost Calculation
+  ============================= */
   let furnitureCost = 0;
 
   if (document.getElementById("sofaCheck").checked) {
-    furnitureCost +=
-      parseInt(document.getElementById("sofaType").value || 0) *
+    const sofaType =
+      parseInt(document.getElementById("sofaType").value || 0);
+    const sofaQty =
       parseInt(document.getElementById("sofaQty").value || 1);
+    furnitureCost += sofaType * sofaQty;
   }
 
   if (document.getElementById("bedCheck").checked) {
-    furnitureCost +=
-      parseInt(document.getElementById("bedType").value || 0) *
+    const bedType =
+      parseInt(document.getElementById("bedType").value || 0);
+    const bedQty =
       parseInt(document.getElementById("bedQty").value || 1);
+    furnitureCost += bedType * bedQty;
   }
 
   if (document.getElementById("fridgeCheck").checked) {
@@ -75,11 +85,14 @@ function calculateQuote() {
   }
 
   if (document.getElementById("wmCheck").checked) {
-    furnitureCost +=
+    const wmType =
       parseInt(document.getElementById("wmType").value || 0);
+    furnitureCost += wmType;
   }
 
-  /* Distance calculation */
+  /* =============================
+     Distance Calculation
+  ============================= */
   const service = new google.maps.DistanceMatrixService();
 
   service.getDistanceMatrix(
@@ -90,6 +103,7 @@ function calculateQuote() {
       unitSystem: google.maps.UnitSystem.METRIC
     },
     (response, status) => {
+
       if (
         status !== "OK" ||
         response.rows[0].elements[0].status !== "OK"
