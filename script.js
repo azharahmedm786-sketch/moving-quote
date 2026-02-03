@@ -2,7 +2,6 @@ let pickupPlace = null;
 let dropPlace = null;
 
 let map;
-let marker;
 let pickupMarker = null;
 let dropMarker = null;
 let activeField = null;
@@ -81,11 +80,6 @@ function tryShowBothLocations() {
     map = new google.maps.Map(mapDiv, {
       center: pickupLoc,
       zoom: 12,
-    });
-
-    map.addListener("click", function (event) {
-      placeMarker(event.latLng);
-      getAddress(event.latLng);
     });
   }
 
@@ -219,32 +213,55 @@ function openMap(field) {
       center: { lat: 12.9716, lng: 77.5946 },
       zoom: 13,
     });
-
-    map.addListener("click", function (event) {
-      placeMarker(event.latLng);
-      getAddress(event.latLng);
-    });
   }
+
+  map.addListener("click", function (event) {
+    updateManualPin(event.latLng);
+    getAddress(event.latLng);
+  });
 
   setTimeout(() => {
     google.maps.event.trigger(map, "resize");
   }, 300);
 }
 
-function placeMarker(location) {
-  if (marker) marker.setMap(null);
+function updateManualPin(location) {
 
-  marker = new google.maps.Marker({
-    position: location,
-    map: map,
-  });
+  if (activeField === "pickup") {
+
+    if (pickupMarker) pickupMarker.setMap(null);
+
+    pickupMarker = new google.maps.Marker({
+      position: location,
+      map: map,
+      label: "P"
+    });
+
+    pickupPlace = { geometry: { location: location } };
+
+  } else {
+
+    if (dropMarker) dropMarker.setMap(null);
+
+    dropMarker = new google.maps.Marker({
+      position: location,
+      map: map,
+      label: "D"
+    });
+
+    dropPlace = { geometry: { location: location } };
+  }
+
+  if (pickupPlace && dropPlace) {
+    tryShowBothLocations();
+  }
 }
 
 function getAddress(latlng) {
   const geocoder = new google.maps.Geocoder();
 
   geocoder.geocode({ location: latlng }, (results, status) => {
-    if (status === "OK") {
+    if (status === "OK" && results[0]) {
       document.getElementById(activeField).value =
         results[0].formatted_address;
     }
