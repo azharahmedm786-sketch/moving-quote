@@ -133,5 +133,32 @@ function calculateQuote() {
         <strong>Total: ₹${Math.round(total)}</strong>
       `;
     }
+  );function bookOnWhatsApp() {
+  const pickup = document.getElementById("pickup").value;
+  const drop = document.getElementById("drop").value;
+  const date = document.getElementById("shiftDate").value;
+  const time = document.getElementById("shiftTime").value;
+  const resultText =
+    document.getElementById("result").innerText;
+
+  if (!pickup || !drop || !date || !time || !resultText) {
+    alert("Please calculate quote first");
+    return;
+  }
+
+  const message =
+    `New Moving Request 🚚\n\n` +
+    `Pickup: ${pickup}\n` +
+    `Drop: ${drop}\n` +
+    `Date: ${date}\n` +
+    `Time: ${time}\n\n` +
+    `${resultText}`;
+
+  const encoded = encodeURIComponent(message);
+
+  window.open(
+    `https://wa.me/917996062921?text=${encoded}`,
+    "_blank"
   );
+  }
 }
