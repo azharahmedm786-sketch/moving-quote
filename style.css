@@ -12,30 +12,28 @@ body {
   padding: 20px;
 }
 
-/* ---------- CONTAINER ---------- */
+/* Main container */
 .container {
-  max-width: 1400px;
+  max-width: 1000px;
   margin: auto;
   background: #ffffff;
-  padding: 30px;
+  padding: 28px;
   border-radius: 16px;
   box-shadow: 0 20px 40px rgba(0,0,0,0.12);
 }
 
-/* ---------- TITLES ---------- */
 h1 {
   text-align: center;
-  margin-bottom: 24px;
+  margin-bottom: 25px;
   color: #0f4c81;
 }
 
 h3 {
-  margin-top: 24px;
-  margin-bottom: 10px;
+  margin-top: 26px;
+  margin-bottom: 12px;
   color: #1e40af;
 }
 
-/* ---------- FORM ---------- */
 label {
   display: block;
   margin-top: 14px;
@@ -47,27 +45,32 @@ label {
 input,
 select {
   width: 100%;
-  padding: 12px;
+  padding: 13px;
   border-radius: 10px;
   border: 1.6px solid #cbd5e1;
   background: #f8fafc;
 }
 
-/* row inputs */
+/* Row fields */
 .row {
   display: flex;
   gap: 12px;
 }
 
-.item {
-  margin-top: 10px;
+.row > * {
+  flex: 1;
 }
 
-/* ---------- BUTTONS ---------- */
+/* furniture items */
+.item {
+  margin-top: 12px;
+}
+
+/* Buttons */
 button {
   width: 100%;
   margin-top: 24px;
-  padding: 14px;
+  padding: 15px;
   border: none;
   border-radius: 30px;
   background: linear-gradient(135deg, #0f4c81, #0284c7);
@@ -82,7 +85,7 @@ button {
   background: #25D366;
 }
 
-/* ---------- RESULT ---------- */
+/* Result box */
 #result {
   margin-top: 20px;
   padding: 16px;
@@ -93,57 +96,44 @@ button {
   text-align: center;
 }
 
-/* ---------- MAP ---------- */
+/* Map */
 #map {
-  height: 420px;
+  height: 360px;
   margin-top: 20px;
   border-radius: 12px;
 }
 
-/* =========================
-   DESKTOP LAYOUT
-========================= */
+/* -------------------------
+   DESKTOP IMPROVEMENTS
+--------------------------*/
 @media (min-width: 900px) {
 
   .container {
-    display: grid;
-    grid-template-columns: 55% 45%;
-    gap: 30px;
-    align-items: start;
+    max-width: 1200px;
+    padding: 40px;
   }
 
-  /* Title spans full width */
-  .container h1 {
-    grid-column: span 2;
+  /* Two column form layout */
+  .row {
+    gap: 20px;
   }
 
-  /* Map & result stay right */
-  #map,
-  #result,
-  .book-btn {
-    margin-top: 0;
-  }
-
+  /* Map bigger */
   #map {
-    height: 600px;
-    position: sticky;
-    top: 20px;
+    height: 450px;
+  }
+
+  /* Furniture grid */
+  .furniture-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
   }
 }
 
-/* =========================
-   MOBILE
-========================= */
+/* Mobile adjustments */
 @media (max-width: 600px) {
   .row {
     flex-direction: column;
-  }
-
-  .container {
-    padding: 18px;
-  }
-
-  #map {
-    height: 320px;
   }
 }
