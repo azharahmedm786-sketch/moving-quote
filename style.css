@@ -85,5 +85,16 @@ button {
 @media (max-width: 600px) {
   .row {
     flex-direction: column;
+    .book-btn {
+  margin-top: 15px;
+  width: 100%;
+  padding: 14px;
+  font-size: 16px;
+  background: #25D366;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
   }
 }
