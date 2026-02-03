@@ -34,6 +34,24 @@ function initAutocomplete() {
     dropPlace = dropAutocomplete.getPlace();
     showLocation("drop");
   });
+
+  /* Current location checkbox control */
+  const currentLocationCheck =
+    document.getElementById("useCurrentLocation");
+
+  if (currentLocationCheck) {
+    currentLocationCheck.addEventListener("change", function () {
+
+      if (this.checked) {
+        useCurrentLocation();
+      } else {
+        document.getElementById("pickup").value = "";
+        pickupPlace = null;
+
+        if (pickupMarker) pickupMarker.setMap(null);
+      }
+    });
+  }
 }
 
 /* =============================
