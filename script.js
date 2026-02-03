@@ -39,7 +39,6 @@ function calculateQuote() {
   const houseValue = document.getElementById("house").value;
   const vehicleValue = document.getElementById("vehicle").value;
 
-  /* Correct validation */
   if (!shiftDate || !shiftTime || houseValue === "" || vehicleValue === "") {
     alert("Please fill all required fields");
     return;
@@ -48,7 +47,6 @@ function calculateQuote() {
   const houseBase = parseInt(houseValue);
   const vehicleRate = parseFloat(vehicleValue);
 
-  /* Location fallback */
   const pickupText =
     document.getElementById("pickup").value.trim();
   const dropText =
@@ -59,9 +57,7 @@ function calculateQuote() {
     return;
   }
 
-  /* =============================
-     Furniture Cost Calculation
-  ============================= */
+  /* Furniture cost */
   let furnitureCost = 0;
 
   if (document.getElementById("sofaCheck").checked) {
@@ -90,9 +86,7 @@ function calculateQuote() {
     furnitureCost += wmType;
   }
 
-  /* =============================
-     Distance Calculation
-  ============================= */
+  /* Distance calculation */
   const service = new google.maps.DistanceMatrixService();
 
   service.getDistanceMatrix(
@@ -133,7 +127,14 @@ function calculateQuote() {
         <strong>Total: ₹${Math.round(total)}</strong>
       `;
     }
-  );function bookOnWhatsApp() {
+  );
+}
+
+/* =============================
+   WHATSAPP BOOKING
+============================= */
+function bookOnWhatsApp() {
+
   const pickup = document.getElementById("pickup").value;
   const drop = document.getElementById("drop").value;
   const date = document.getElementById("shiftDate").value;
@@ -160,5 +161,4 @@ function calculateQuote() {
     `https://wa.me/917996062921?text=${encoded}`,
     "_blank"
   );
-  }
 }
