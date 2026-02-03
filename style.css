@@ -8,30 +8,24 @@ body {
   background: #f1f5f9;
 }
 
-/* Wrapper padding improves desktop spacing */
 .wrapper {
-  padding: 16px;
+  padding: 20px;
 }
 
-@media (min-width: 900px) {
-  .wrapper {
-    padding: 40px;
-  }
-}
-
+/* ---------- CONTAINER ---------- */
 .container {
-  max-width: 1200px;
+  max-width: 1400px;
   margin: auto;
   background: #ffffff;
-  padding: 24px;
+  padding: 30px;
   border-radius: 16px;
   box-shadow: 0 20px 40px rgba(0,0,0,0.12);
 }
 
-/* Titles */
+/* ---------- TITLES ---------- */
 h1 {
   text-align: center;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
   color: #0f4c81;
 }
 
@@ -41,7 +35,7 @@ h3 {
   color: #1e40af;
 }
 
-/* Labels */
+/* ---------- FORM ---------- */
 label {
   display: block;
   margin-top: 14px;
@@ -50,7 +44,6 @@ label {
   color: #334155;
 }
 
-/* Inputs */
 input,
 select {
   width: 100%;
@@ -60,18 +53,17 @@ select {
   background: #f8fafc;
 }
 
-/* Rows */
+/* row inputs */
 .row {
   display: flex;
-  gap: 10px;
+  gap: 12px;
 }
 
-/* Furniture items */
 .item {
   margin-top: 10px;
 }
 
-/* Buttons */
+/* ---------- BUTTONS ---------- */
 button {
   width: 100%;
   margin-top: 24px;
@@ -85,14 +77,12 @@ button {
   cursor: pointer;
 }
 
-/* WhatsApp Button */
 .book-btn {
   margin-top: 12px;
   background: #25D366;
-  border-radius: 30px;
 }
 
-/* Result box */
+/* ---------- RESULT ---------- */
 #result {
   margin-top: 20px;
   padding: 16px;
@@ -103,48 +93,57 @@ button {
   text-align: center;
 }
 
-/* Map */
+/* ---------- MAP ---------- */
 #map {
-  height: 350px;
+  height: 420px;
   margin-top: 20px;
   border-radius: 12px;
 }
 
-/* ===== Desktop Layout ===== */
+/* =========================
+   DESKTOP LAYOUT
+========================= */
 @media (min-width: 900px) {
 
   .container {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 55% 45%;
     gap: 30px;
+    align-items: start;
   }
 
-  /* Header spans both columns */
+  /* Title spans full width */
   .container h1 {
     grid-column: span 2;
   }
 
-  /* Result spans both */
-  #result {
-    grid-column: span 2;
-  }
-
-  /* Buttons span both */
-  button {
-    grid-column: span 2;
-  }
-
-  /* Map full height */
-  #map {
-    height: 100%;
-    min-height: 600px;
+  /* Map & result stay right */
+  #map,
+  #result,
+  .book-btn {
     margin-top: 0;
+  }
+
+  #map {
+    height: 600px;
+    position: sticky;
+    top: 20px;
   }
 }
 
-/* ===== Mobile Layout ===== */
+/* =========================
+   MOBILE
+========================= */
 @media (max-width: 600px) {
   .row {
     flex-direction: column;
+  }
+
+  .container {
+    padding: 18px;
+  }
+
+  #map {
+    height: 320px;
   }
 }
