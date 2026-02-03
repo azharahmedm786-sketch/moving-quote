@@ -39,6 +39,7 @@ function initAutocomplete() {
    DETECT CURRENT LOCATION
 ============================= */
 function detectCurrentLocation() {
+
   if (!navigator.geolocation) return;
 
   navigator.geolocation.getCurrentPosition(pos => {
@@ -52,6 +53,7 @@ function detectCurrentLocation() {
 
     geocoder.geocode({ location: loc }, (res, status) => {
       if (status === "OK" && res[0]) {
+
         document.getElementById("pickup").value =
           res[0].formatted_address;
 
@@ -79,7 +81,7 @@ function showLocation(type) {
   if (!map) {
     map = new google.maps.Map(mapDiv, {
       center: loc,
-      zoom: 15,
+      zoom: 16,
     });
   }
 
@@ -112,8 +114,15 @@ function showLocation(type) {
     marker = dropMarker;
   }
 
+  /* Drag reposition */
   marker.addListener("dragend", () => {
     updateAddressFromMarker(type, marker.getPosition());
+  });
+
+  /* Tap map reposition */
+  map.addListener("click", function (event) {
+    marker.setPosition(event.latLng);
+    updateAddressFromMarker(type, event.latLng);
   });
 
   adjustBounds();
@@ -168,6 +177,7 @@ function calculateQuote() {
 
   const shiftDate = document.getElementById("shiftDate").value;
   const shiftTime = document.getElementById("shiftTime").value;
+
   const houseBase =
     parseInt(document.getElementById("house").value || 0);
   const vehicleRate =
@@ -224,7 +234,7 @@ function calculateQuote() {
       km * vehicleRate +
       furnitureCost;
 
-    result.innerHTML = `
+    document.getElementById("result").innerHTML = `
       Distance: ${km.toFixed(1)} km<br>
       Total: ₹${Math.round(total)}
     `;
@@ -238,7 +248,7 @@ function bookOnWhatsApp() {
 
   const message =
     "New Moving Request 🚚\n\n" +
-    result.innerText;
+    document.getElementById("result").innerText;
 
   window.location.href =
     `https://wa.me/917996062921?text=${encodeURIComponent(message)}`;
