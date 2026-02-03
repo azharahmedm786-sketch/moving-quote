@@ -8,8 +8,13 @@ function initAutocomplete() {
   const pickupInput = document.getElementById("pickup");
   const dropInput = document.getElementById("drop");
 
-  const pickupAutocomplete = new google.maps.places.Autocomplete(pickupInput);
-  const dropAutocomplete = new google.maps.places.Autocomplete(dropInput);
+  if (!pickupInput || !dropInput) return;
+
+  const pickupAutocomplete =
+    new google.maps.places.Autocomplete(pickupInput);
+
+  const dropAutocomplete =
+    new google.maps.places.Autocomplete(dropInput);
 
   pickupAutocomplete.addListener("place_changed", () => {
     pickupPlace = pickupAutocomplete.getPlace();
@@ -96,3 +101,4 @@ function calculateQuote() {
     }
   );
 }
+
