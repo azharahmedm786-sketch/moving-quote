@@ -13,8 +13,6 @@ const FRIDGE_PRICE = 400;
 ============================= */
 function initAutocomplete() {
 
-  detectCurrentLocation();
-
   const pickupInput = document.getElementById("pickup");
   const dropInput = document.getElementById("drop");
 
@@ -36,11 +34,14 @@ function initAutocomplete() {
 }
 
 /* =============================
-   DETECT CURRENT LOCATION
+   USE CURRENT LOCATION BUTTON
 ============================= */
-function detectCurrentLocation() {
+function useCurrentLocation() {
 
-  if (!navigator.geolocation) return;
+  if (!navigator.geolocation) {
+    alert("Location not supported");
+    return;
+  }
 
   navigator.geolocation.getCurrentPosition(pos => {
 
@@ -81,7 +82,7 @@ function showLocation(type) {
   if (!map) {
     map = new google.maps.Map(mapDiv, {
       center: loc,
-      zoom: 16,
+      zoom: 15,
     });
   }
 
@@ -90,7 +91,6 @@ function showLocation(type) {
   let marker;
 
   if (type === "pickup") {
-
     if (pickupMarker) pickupMarker.setMap(null);
 
     pickupMarker = new google.maps.Marker({
@@ -103,7 +103,6 @@ function showLocation(type) {
     marker = pickupMarker;
 
   } else {
-
     if (dropMarker) dropMarker.setMap(null);
 
     dropMarker = new google.maps.Marker({
@@ -116,12 +115,10 @@ function showLocation(type) {
     marker = dropMarker;
   }
 
-  /* Drag reposition */
   marker.addListener("dragend", () => {
     updateAddressFromMarker(type, marker.getPosition());
   });
 
-  /* Tap map reposition */
   map.addListener("click", function (event) {
     marker.setPosition(event.latLng);
     updateAddressFromMarker(type, event.latLng);
@@ -193,37 +190,37 @@ function calculateQuote() {
 
   const pickupText =
     document.getElementById("pickup").value.trim();
+
   const dropText =
     document.getElementById("drop").value.trim();
 
   if (!pickupText || !dropText) {
-    alert("Enter locations");
+    alert("Enter pickup & drop");
     return;
   }
 
-  /* ---- Furniture Cost ---- */
+  /* ===== Furniture Cost ===== */
   let furnitureCost = 0;
 
-if (document.getElementById("sofaCheck").checked) {
-  const price = Number(document.getElementById("sofaType").value || 0);
-  const qty = Number(document.getElementById("sofaQty").value || 1);
-  furnitureCost += price * qty;
-}
+  if (sofaCheck.checked) {
+    const price = Number(sofaType.value || 0);
+    const qty = Number(sofaQty.value || 1);
+    furnitureCost += price * qty;
+  }
 
-if (document.getElementById("bedCheck").checked) {
-  const price = Number(document.getElementById("bedType").value || 0);
-  const qty = Number(document.getElementById("bedQty").value || 1);
-  furnitureCost += price * qty;
-}
+  if (bedCheck.checked) {
+    const price = Number(bedType.value || 0);
+    const qty = Number(bedQty.value || 1);
+    furnitureCost += price * qty;
+  }
 
-if (document.getElementById("fridgeCheck").checked) {
-  furnitureCost += FRIDGE_PRICE;
-}
+  if (fridgeCheck.checked)
+    furnitureCost += FRIDGE_PRICE;
 
-if (document.getElementById("wmCheck").checked) {
-  furnitureCost += Number(document.getElementById("wmType").value || 0);
-}
+  if (wmCheck.checked)
+    furnitureCost += Number(wmType.value || 0);
 
+  /* ===== Distance ===== */
   const service = new google.maps.DistanceMatrixService();
 
   service.getDistanceMatrix({
