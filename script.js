@@ -10,13 +10,13 @@ const MIN_BASE_PRICE = 1100;
 const FRIDGE_PRICE = 400;
 
 /* =============================
-   GOOGLE AUTOCOMPLETE SETUP
+   INIT AUTOCOMPLETE
 ============================= */
 function initAutocomplete() {
+  detectCurrentLocation();
+
   const pickupInput = document.getElementById("pickup");
   const dropInput = document.getElementById("drop");
-
-  if (!pickupInput || !dropInput) return;
 
   const pickupAutocomplete =
     new google.maps.places.Autocomplete(pickupInput);
@@ -26,65 +26,66 @@ function initAutocomplete() {
 
   pickupAutocomplete.addListener("place_changed", () => {
     pickupPlace = pickupAutocomplete.getPlace();
-    ensureGeometry("pickup");
+    showLocation("pickup");
   });
 
   dropAutocomplete.addListener("place_changed", () => {
     dropPlace = dropAutocomplete.getPlace();
-    ensureGeometry("drop");
+    showLocation("drop");
   });
 }
 
 /* =============================
-   ENSURE LOCATION GEOMETRY
+   CURRENT LOCATION DETECT
 ============================= */
-function ensureGeometry(type) {
-  const place = type === "pickup" ? pickupPlace : dropPlace;
+function detectCurrentLocation() {
+  if (!navigator.geolocation) return;
 
-  if (place.geometry) {
-    showSingleLocation(type);
-    return;
-  }
+  navigator.geolocation.getCurrentPosition(position => {
+    const loc = {
+      lat: position.coords.latitude,
+      lng: position.coords.longitude
+    };
 
-  const address = document.getElementById(type).value;
-  const geocoder = new google.maps.Geocoder();
+    const geocoder = new google.maps.Geocoder();
 
-  geocoder.geocode({ address: address }, (results, status) => {
-    if (status === "OK" && results[0]) {
-      const loc = results[0].geometry.location;
+    geocoder.geocode({ location: loc }, (results, status) => {
+      if (status === "OK" && results[0]) {
+        document.getElementById("pickup").value =
+          results[0].formatted_address;
 
-      if (type === "pickup") {
-        pickupPlace = { geometry: { location: loc } };
-      } else {
-        dropPlace = { geometry: { location: loc } };
+        pickupPlace = {
+          geometry: { location: loc }
+        };
+
+        showLocation("pickup");
       }
-
-      showSingleLocation(type);
-    }
+    });
   });
 }
 
 /* =============================
-   SHOW SINGLE LOCATION PIN
+   SHOW LOCATION ON MAP
 ============================= */
-function showSingleLocation(type) {
-
+function showLocation(type) {
   const mapDiv = document.getElementById("map");
   mapDiv.style.display = "block";
 
-  const loc =
-    type === "pickup"
-      ? pickupPlace.geometry.location
-      : dropPlace.geometry.location;
+  const place = type === "pickup" ? pickupPlace : dropPlace;
+  if (!place || !place.geometry) return;
+
+  const loc = place.geometry.location;
 
   if (!map) {
     map = new google.maps.Map(mapDiv, {
       center: loc,
-      zoom: 14,
+      zoom: 15,
     });
   }
 
   map.setCenter(loc);
+
+  let markerObj;
 
   if (type === "pickup") {
     if (pickupMarker) pickupMarker.setMap(null);
@@ -92,35 +93,61 @@ function showSingleLocation(type) {
     pickupMarker = new google.maps.Marker({
       map: map,
       position: loc,
+      draggable: true,
       label: "P"
     });
+
+    markerObj = pickupMarker;
   } else {
     if (dropMarker) dropMarker.setMap(null);
 
     dropMarker = new google.maps.Marker({
       map: map,
       position: loc,
+      draggable: true,
       label: "D"
     });
+
+    markerObj = dropMarker;
   }
 
-  if (pickupPlace && dropPlace) {
-    tryShowBothLocations();
-  }
+  markerObj.addListener("dragend", function () {
+    updateAddressFromMarker(type, markerObj.getPosition());
+  });
+
+  adjustBounds();
 }
 
 /* =============================
-   SHOW BOTH LOCATIONS
+   UPDATE ADDRESS AFTER DRAG
 ============================= */
-function tryShowBothLocations() {
+function updateAddressFromMarker(type, latlng) {
+  const geocoder = new google.maps.Geocoder();
+
+  geocoder.geocode({ location: latlng }, (results, status) => {
+    if (status === "OK" && results[0]) {
+      document.getElementById(type).value =
+        results[0].formatted_address;
+
+      if (type === "pickup")
+        pickupPlace = { geometry: { location: latlng } };
+      else
+        dropPlace = { geometry: { location: latlng } };
+
+      adjustBounds();
+    }
+  });
+}
+
+/* =============================
+   FIT MAP TO BOTH LOCATIONS
+============================= */
+function adjustBounds() {
   if (!pickupPlace || !dropPlace) return;
 
-  const pickupLoc = pickupPlace.geometry.location;
-  const dropLoc = dropPlace.geometry.location;
-
   const bounds = new google.maps.LatLngBounds();
-  bounds.extend(pickupLoc);
-  bounds.extend(dropLoc);
+  bounds.extend(pickupPlace.geometry.location);
+  bounds.extend(dropPlace.geometry.location);
 
   map.fitBounds(bounds);
 }
@@ -130,24 +157,19 @@ function tryShowBothLocations() {
 ============================= */
 function calculateQuote() {
 
-  const shiftDate = document.getElementById("shiftDate").value;
-  const shiftTime = document.getElementById("shiftTime").value;
+  const shiftDate = shiftDateInput.value;
+  const shiftTime = shiftTimeInput.value;
 
-  const houseValue = document.getElementById("house").value;
-  const vehicleValue = document.getElementById("vehicle").value;
+  const houseBase = parseInt(house.value || 0);
+  const vehicleRate = parseFloat(vehicle.value || 0);
 
-  if (!shiftDate || !shiftTime || houseValue === "" || vehicleValue === "") {
+  if (!shiftDate || !shiftTime || !houseBase || !vehicleRate) {
     alert("Please fill all required fields");
     return;
   }
 
-  const houseBase = parseInt(houseValue);
-  const vehicleRate = parseFloat(vehicleValue);
-
-  const pickupText =
-    document.getElementById("pickup").value.trim();
-  const dropText =
-    document.getElementById("drop").value.trim();
+  const pickupText = pickup.value.trim();
+  const dropText = drop.value.trim();
 
   if (!pickupText || !dropText) {
     alert("Please enter pickup and drop locations");
@@ -184,18 +206,16 @@ function calculateQuote() {
     const km =
       response.rows[0].elements[0].distance.value / 1000;
 
-    const distanceCost = km * vehicleRate;
-
     const total =
-      MIN_BASE_PRICE + houseBase + distanceCost + furnitureCost;
+      MIN_BASE_PRICE +
+      houseBase +
+      km * vehicleRate +
+      furnitureCost;
 
-    document.getElementById("result").innerHTML = `
-        Estimated Distance: ${km.toFixed(1)} km<br>
-        Base: ₹${MIN_BASE_PRICE}<br>
-        House: ₹${houseBase}<br>
-        Distance: ₹${Math.round(distanceCost)}<br>
-        Furniture: ₹${furnitureCost}<br><br>
-        <strong>Total: ₹${Math.round(total)}</strong>`;
+    result.innerHTML = `
+      Distance: ${km.toFixed(1)} km<br>
+      Total: ₹${Math.round(total)}
+    `;
   });
 }
 
@@ -203,88 +223,10 @@ function calculateQuote() {
    WHATSAPP BOOKING
 ============================= */
 function bookOnWhatsApp() {
-
-  const name = custName.value.trim();
-  const phone = custPhone.value.trim();
-
-  if (!name || !phone) {
-    alert("Enter name & phone");
-    return;
-  }
-
   const message =
-    `New Moving Request 🚚\n\nCustomer: ${name}\nPhone: ${phone}\n\n` +
-    document.getElementById("result").innerText;
+    `New Moving Request 🚚\n\n` +
+    result.innerText;
 
   window.location.href =
     `https://wa.me/917996062921?text=${encodeURIComponent(message)}`;
-}
-
-/* =============================
-   MANUAL MAP PIN
-============================= */
-function openMap(field) {
-  activeField = field;
-
-  const mapDiv = document.getElementById("map");
-  mapDiv.style.display = "block";
-
-  if (!map) {
-    map = new google.maps.Map(mapDiv, {
-      center: { lat: 12.9716, lng: 77.5946 },
-      zoom: 13,
-    });
-  }
-
-  map.addListener("click", function (event) {
-    updateManualPin(event.latLng);
-    getAddress(event.latLng);
-  });
-
-  setTimeout(() => {
-    google.maps.event.trigger(map, "resize");
-  }, 300);
-}
-
-function updateManualPin(location) {
-
-  if (activeField === "pickup") {
-
-    if (pickupMarker) pickupMarker.setMap(null);
-
-    pickupMarker = new google.maps.Marker({
-      position: location,
-      map: map,
-      label: "P"
-    });
-
-    pickupPlace = { geometry: { location: location } };
-
-  } else {
-
-    if (dropMarker) dropMarker.setMap(null);
-
-    dropMarker = new google.maps.Marker({
-      position: location,
-      map: map,
-      label: "D"
-    });
-
-    dropPlace = { geometry: { location: location } };
-  }
-
-  if (pickupPlace && dropPlace) {
-    tryShowBothLocations();
-  }
-}
-
-function getAddress(latlng) {
-  const geocoder = new google.maps.Geocoder();
-
-  geocoder.geocode({ location: latlng }, (results, status) => {
-    if (status === "OK" && results[0]) {
-      document.getElementById(activeField).value =
-        results[0].formatted_address;
-    }
-  });
 }
