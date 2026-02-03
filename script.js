@@ -1,6 +1,9 @@
 let pickupPlace = null;
 let dropPlace = null;
 
+let directionsService;
+let directionsRenderer;
+
 let map;
 let pickupMarker = null;
 let dropMarker = null;
@@ -34,7 +37,7 @@ function initAutocomplete() {
 }
 
 /* =============================
-   USE CURRENT LOCATION BUTTON
+   USE CURRENT LOCATION
 ============================= */
 function useCurrentLocation() {
 
@@ -84,6 +87,13 @@ function showLocation(type) {
       center: loc,
       zoom: 15,
     });
+
+    directionsService = new google.maps.DirectionsService();
+
+    directionsRenderer = new google.maps.DirectionsRenderer({
+      map: map,
+      suppressMarkers: true
+    });
   }
 
   map.setCenter(loc);
@@ -91,6 +101,7 @@ function showLocation(type) {
   let marker;
 
   if (type === "pickup") {
+
     if (pickupMarker) pickupMarker.setMap(null);
 
     pickupMarker = new google.maps.Marker({
@@ -103,6 +114,7 @@ function showLocation(type) {
     marker = pickupMarker;
 
   } else {
+
     if (dropMarker) dropMarker.setMap(null);
 
     dropMarker = new google.maps.Marker({
@@ -151,6 +163,25 @@ function updateAddressFromMarker(type, latlng) {
 }
 
 /* =============================
+   DRAW ROUTE
+============================= */
+function drawRoute() {
+
+  if (!pickupPlace || !dropPlace) return;
+
+  directionsService.route({
+    origin: pickupPlace.geometry.location,
+    destination: dropPlace.geometry.location,
+    travelMode: "DRIVING"
+  }, (result, status) => {
+
+    if (status === "OK") {
+      directionsRenderer.setDirections(result);
+    }
+  });
+}
+
+/* =============================
    FIT MAP TO BOTH PINS
 ============================= */
 function adjustBounds() {
@@ -167,6 +198,9 @@ function adjustBounds() {
 
   if (!bounds.isEmpty())
     map.fitBounds(bounds);
+
+  if (pickupPlace && dropPlace)
+    drawRoute();
 }
 
 /* =============================
@@ -199,7 +233,6 @@ function calculateQuote() {
     return;
   }
 
-  /* ===== Furniture Cost ===== */
   let furnitureCost = 0;
 
   if (sofaCheck.checked) {
@@ -220,7 +253,6 @@ function calculateQuote() {
   if (wmCheck.checked)
     furnitureCost += Number(wmType.value || 0);
 
-  /* ===== Distance ===== */
   const service = new google.maps.DistanceMatrixService();
 
   service.getDistanceMatrix({
@@ -266,5 +298,5 @@ function bookOnWhatsApp() {
     document.getElementById("result").innerText;
 
   window.location.href =
-    `https://wa.me/917996062921?text=${encodeURIComponent(message)}`;
+    `https://wa.me/919742700167?text=${encodeURIComponent(message)}`;
 }
