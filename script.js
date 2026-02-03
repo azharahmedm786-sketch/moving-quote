@@ -157,8 +157,7 @@ function bookOnWhatsApp() {
 
   const encoded = encodeURIComponent(message);
 
-  window.open(
-    `https://wa.me/917996062921?text=${encoded}`,
-    "_blank"
-  );
+  /* Mobile-safe redirect */
+  window.location.href =
+    `https://wa.me/917996062921?text=${encoded}`;
 }
