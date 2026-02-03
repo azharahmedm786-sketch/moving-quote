@@ -27,12 +27,41 @@ function initAutocomplete() {
 
   pickupAutocomplete.addListener("place_changed", () => {
     pickupPlace = pickupAutocomplete.getPlace();
-    tryShowBothLocations();
+    ensureGeometry("pickup");
   });
 
   dropAutocomplete.addListener("place_changed", () => {
     dropPlace = dropAutocomplete.getPlace();
+    ensureGeometry("drop");
+  });
+}
+
+/* =============================
+   ENSURE GEOMETRY EXISTS
+============================= */
+function ensureGeometry(type) {
+  const place = type === "pickup" ? pickupPlace : dropPlace;
+
+  if (place.geometry) {
     tryShowBothLocations();
+    return;
+  }
+
+  const address = document.getElementById(type).value;
+  const geocoder = new google.maps.Geocoder();
+
+  geocoder.geocode({ address: address }, (results, status) => {
+    if (status === "OK" && results[0]) {
+      const loc = results[0].geometry.location;
+
+      if (type === "pickup") {
+        pickupPlace = { geometry: { location: loc } };
+      } else {
+        dropPlace = { geometry: { location: loc } };
+      }
+
+      tryShowBothLocations();
+    }
   });
 }
 
