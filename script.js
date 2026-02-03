@@ -1,6 +1,12 @@
 let pickupPlace = null;
 let dropPlace = null;
 
+let map;
+let marker;
+let pickupMarker = null;
+let dropMarker = null;
+let activeField = null;
+
 const MIN_BASE_PRICE = 1100;
 const FRIDGE_PRICE = 400;
 
@@ -21,13 +27,58 @@ function initAutocomplete() {
 
   pickupAutocomplete.addListener("place_changed", () => {
     pickupPlace = pickupAutocomplete.getPlace();
-    showPlaceOnMap(pickupPlace);   // NEW
+    tryShowBothLocations();
   });
 
   dropAutocomplete.addListener("place_changed", () => {
     dropPlace = dropAutocomplete.getPlace();
-    showPlaceOnMap(dropPlace);     // NEW
+    tryShowBothLocations();
   });
+}
+
+/* =============================
+   SHOW BOTH LOCATIONS
+============================= */
+function tryShowBothLocations() {
+  if (!pickupPlace || !dropPlace) return;
+
+  const mapDiv = document.getElementById("map");
+  mapDiv.style.display = "block";
+
+  const pickupLoc = pickupPlace.geometry.location;
+  const dropLoc = dropPlace.geometry.location;
+
+  if (!map) {
+    map = new google.maps.Map(mapDiv, {
+      center: pickupLoc,
+      zoom: 12,
+    });
+
+    map.addListener("click", function (event) {
+      placeMarker(event.latLng);
+      getAddress(event.latLng);
+    });
+  }
+
+  if (pickupMarker) pickupMarker.setMap(null);
+  if (dropMarker) dropMarker.setMap(null);
+
+  pickupMarker = new google.maps.Marker({
+    map: map,
+    position: pickupLoc,
+    label: "P"
+  });
+
+  dropMarker = new google.maps.Marker({
+    map: map,
+    position: dropLoc,
+    label: "D"
+  });
+
+  const bounds = new google.maps.LatLngBounds();
+  bounds.extend(pickupLoc);
+  bounds.extend(dropLoc);
+  map.fitBounds(bounds);
 }
 
 /* =============================
@@ -61,68 +112,47 @@ function calculateQuote() {
 
   let furnitureCost = 0;
 
-  if (document.getElementById("sofaCheck").checked) {
-    furnitureCost +=
-      parseInt(document.getElementById("sofaType").value || 0) *
-      parseInt(document.getElementById("sofaQty").value || 1);
-  }
+  if (sofaCheck.checked)
+    furnitureCost += sofaType.value * sofaQty.value;
 
-  if (document.getElementById("bedCheck").checked) {
-    furnitureCost +=
-      parseInt(document.getElementById("bedType").value || 0) *
-      parseInt(document.getElementById("bedQty").value || 1);
-  }
+  if (bedCheck.checked)
+    furnitureCost += bedType.value * bedQty.value;
 
-  if (document.getElementById("fridgeCheck").checked) {
+  if (fridgeCheck.checked)
     furnitureCost += FRIDGE_PRICE;
-  }
 
-  if (document.getElementById("wmCheck").checked) {
-    furnitureCost +=
-      parseInt(document.getElementById("wmType").value || 0);
-  }
+  if (wmCheck.checked)
+    furnitureCost += wmType.value;
 
   const service = new google.maps.DistanceMatrixService();
 
-  service.getDistanceMatrix(
-    {
-      origins: [pickupText],
-      destinations: [dropText],
-      travelMode: "DRIVING",
-      unitSystem: google.maps.UnitSystem.METRIC
-    },
-    (response, status) => {
+  service.getDistanceMatrix({
+    origins: [pickupText],
+    destinations: [dropText],
+    travelMode: "DRIVING",
+  }, (response, status) => {
 
-      if (
-        status !== "OK" ||
-        response.rows[0].elements[0].status !== "OK"
-      ) {
-        alert("Distance calculation failed");
-        return;
-      }
+    if (status !== "OK") {
+      alert("Distance calculation failed");
+      return;
+    }
 
-      const distanceMeters =
-        response.rows[0].elements[0].distance.value;
+    const km =
+      response.rows[0].elements[0].distance.value / 1000;
 
-      const distanceKm = distanceMeters / 1000;
-      const distanceCost = distanceKm * vehicleRate;
+    const distanceCost = km * vehicleRate;
 
-      const total =
-        MIN_BASE_PRICE +
-        houseBase +
-        distanceCost +
-        furnitureCost;
+    const total =
+      MIN_BASE_PRICE + houseBase + distanceCost + furnitureCost;
 
-      document.getElementById("result").innerHTML = `
-        Estimated Distance: ${distanceKm.toFixed(1)} km<br>
+    document.getElementById("result").innerHTML = `
+        Estimated Distance: ${km.toFixed(1)} km<br>
         Base: ₹${MIN_BASE_PRICE}<br>
         House: ₹${houseBase}<br>
         Distance: ₹${Math.round(distanceCost)}<br>
         Furniture: ₹${furnitureCost}<br><br>
-        <strong>Total: ₹${Math.round(total)}</strong>
-      `;
-    }
-  );
+        <strong>Total: ₹${Math.round(total)}</strong>`;
+  });
 }
 
 /* =============================
@@ -130,11 +160,11 @@ function calculateQuote() {
 ============================= */
 function bookOnWhatsApp() {
 
-  const name = document.getElementById("custName").value.trim();
-  const phone = document.getElementById("custPhone").value.trim();
+  const name = custName.value.trim();
+  const phone = custPhone.value.trim();
 
   if (!name || !phone) {
-    alert("Please enter name and phone number");
+    alert("Enter name & phone");
     return;
   }
 
@@ -147,12 +177,8 @@ function bookOnWhatsApp() {
 }
 
 /* =============================
-   MAP PIN LOCATION FEATURE
+   MANUAL MAP PIN
 ============================= */
-let map;
-let marker;
-let activeField = null;
-
 function openMap(field) {
   activeField = field;
 
@@ -173,7 +199,6 @@ function openMap(field) {
 
   setTimeout(() => {
     google.maps.event.trigger(map, "resize");
-    map.setCenter({ lat: 12.9716, lng: 77.5946 });
   }, 300);
 }
 
@@ -190,35 +215,9 @@ function getAddress(latlng) {
   const geocoder = new google.maps.Geocoder();
 
   geocoder.geocode({ location: latlng }, (results, status) => {
-    if (status === "OK" && results[0]) {
+    if (status === "OK") {
       document.getElementById(activeField).value =
         results[0].formatted_address;
     }
-  });
-}
-
-/* =============================
-   NEW: SHOW AUTOCOMPLETE PLACE
-============================= */
-function showPlaceOnMap(place) {
-  if (!place.geometry) return;
-
-  const mapDiv = document.getElementById("map");
-  mapDiv.style.display = "block";
-
-  if (!map) {
-    map = new google.maps.Map(mapDiv, {
-      center: place.geometry.location,
-      zoom: 14,
-    });
-  }
-
-  map.setCenter(place.geometry.location);
-
-  if (marker) marker.setMap(null);
-
-  marker = new google.maps.Marker({
-    map: map,
-    position: place.geometry.location,
   });
 }
