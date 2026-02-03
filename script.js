@@ -4,7 +4,9 @@ let dropPlace = null;
 const MIN_BASE_PRICE = 1100;
 const FRIDGE_PRICE = 400;
 
-/* AUTOCOMPLETE */
+/* =============================
+   GOOGLE AUTOCOMPLETE SETUP
+============================= */
 function initAutocomplete() {
   const pickupInput = document.getElementById("pickup");
   const dropInput = document.getElementById("drop");
@@ -26,10 +28,14 @@ function initAutocomplete() {
   });
 }
 
-/* QUOTE CALCULATION */
+/* =============================
+   QUOTE CALCULATION
+============================= */
 function calculateQuote() {
+
   const shiftDate = document.getElementById("shiftDate").value;
   const shiftTime = document.getElementById("shiftTime").value;
+
   const houseValue = document.getElementById("house").value;
   const vehicleValue = document.getElementById("vehicle").value;
 
@@ -41,8 +47,10 @@ function calculateQuote() {
   const houseBase = parseInt(houseValue);
   const vehicleRate = parseFloat(vehicleValue);
 
-  const pickupText = document.getElementById("pickup").value.trim();
-  const dropText = document.getElementById("drop").value.trim();
+  const pickupText =
+    document.getElementById("pickup").value.trim();
+  const dropText =
+    document.getElementById("drop").value.trim();
 
   if (!pickupText || !dropText) {
     alert("Please enter pickup and drop locations");
@@ -51,56 +59,80 @@ function calculateQuote() {
 
   let furnitureCost = 0;
 
-  if (sofaCheck.checked)
-    furnitureCost += sofaType.value * sofaQty.value;
+  if (document.getElementById("sofaCheck").checked) {
+    furnitureCost +=
+      parseInt(document.getElementById("sofaType").value || 0) *
+      parseInt(document.getElementById("sofaQty").value || 1);
+  }
 
-  if (bedCheck.checked)
-    furnitureCost += bedType.value * bedQty.value;
+  if (document.getElementById("bedCheck").checked) {
+    furnitureCost +=
+      parseInt(document.getElementById("bedType").value || 0) *
+      parseInt(document.getElementById("bedQty").value || 1);
+  }
 
-  if (fridgeCheck.checked)
+  if (document.getElementById("fridgeCheck").checked) {
     furnitureCost += FRIDGE_PRICE;
+  }
 
-  if (wmCheck.checked)
-    furnitureCost += wmType.value;
+  if (document.getElementById("wmCheck").checked) {
+    furnitureCost +=
+      parseInt(document.getElementById("wmType").value || 0);
+  }
 
   const service = new google.maps.DistanceMatrixService();
 
-  service.getDistanceMatrix({
-    origins: [pickupText],
-    destinations: [dropText],
-    travelMode: "DRIVING",
-  }, (response, status) => {
+  service.getDistanceMatrix(
+    {
+      origins: [pickupText],
+      destinations: [dropText],
+      travelMode: "DRIVING",
+      unitSystem: google.maps.UnitSystem.METRIC
+    },
+    (response, status) => {
 
-    if (status !== "OK") {
-      alert("Distance calculation failed");
-      return;
+      if (
+        status !== "OK" ||
+        response.rows[0].elements[0].status !== "OK"
+      ) {
+        alert("Distance calculation failed");
+        return;
+      }
+
+      const distanceMeters =
+        response.rows[0].elements[0].distance.value;
+
+      const distanceKm = distanceMeters / 1000;
+      const distanceCost = distanceKm * vehicleRate;
+
+      const total =
+        MIN_BASE_PRICE +
+        houseBase +
+        distanceCost +
+        furnitureCost;
+
+      document.getElementById("result").innerHTML = `
+        Estimated Distance: ${distanceKm.toFixed(1)} km<br>
+        Base: ₹${MIN_BASE_PRICE}<br>
+        House: ₹${houseBase}<br>
+        Distance: ₹${Math.round(distanceCost)}<br>
+        Furniture: ₹${furnitureCost}<br><br>
+        <strong>Total: ₹${Math.round(total)}</strong>
+      `;
     }
-
-    const km =
-      response.rows[0].elements[0].distance.value / 1000;
-
-    const distanceCost = km * vehicleRate;
-
-    const total =
-      MIN_BASE_PRICE + houseBase + distanceCost + furnitureCost;
-
-    document.getElementById("result").innerHTML = `
-      Estimated Distance: ${km.toFixed(1)} km<br>
-      Base: ₹${MIN_BASE_PRICE}<br>
-      House: ₹${houseBase}<br>
-      Distance: ₹${Math.round(distanceCost)}<br>
-      Furniture: ₹${furnitureCost}<br><br>
-      <strong>Total: ₹${Math.round(total)}</strong>`;
-  });
+  );
 }
 
-/* WHATSAPP BOOKING */
+/* =============================
+   WHATSAPP BOOKING
+============================= */
 function bookOnWhatsApp() {
-  const name = custName.value.trim();
-  const phone = custPhone.value.trim();
+
+  const name = document.getElementById("custName").value.trim();
+  const phone = document.getElementById("custPhone").value.trim();
 
   if (!name || !phone) {
-    alert("Enter name & phone");
+    alert("Please enter name and phone number");
     return;
   }
 
@@ -112,24 +144,36 @@ function bookOnWhatsApp() {
     `https://wa.me/917996062921?text=${encodeURIComponent(message)}`;
 }
 
-/* MAP PIN FEATURE */
-let map, marker, activeField;
+/* =============================
+   MAP PIN LOCATION FEATURE
+============================= */
+let map;
+let marker;
+let activeField = null;
 
 function openMap(field) {
   activeField = field;
-  document.getElementById("map").style.display = "block";
+
+  const mapDiv = document.getElementById("map");
+  mapDiv.style.display = "block";
 
   if (!map) {
-    map = new google.maps.Map(document.getElementById("map"), {
+    map = new google.maps.Map(mapDiv, {
       center: { lat: 12.9716, lng: 77.5946 },
       zoom: 13,
     });
 
-    map.addListener("click", (event) => {
+    map.addListener("click", function (event) {
       placeMarker(event.latLng);
       getAddress(event.latLng);
     });
   }
+
+  /* Mobile resize fix */
+  setTimeout(() => {
+    google.maps.event.trigger(map, "resize");
+    map.setCenter({ lat: 12.9716, lng: 77.5946 });
+  }, 300);
 }
 
 function placeMarker(location) {
@@ -145,7 +189,7 @@ function getAddress(latlng) {
   const geocoder = new google.maps.Geocoder();
 
   geocoder.geocode({ location: latlng }, (results, status) => {
-    if (status === "OK") {
+    if (status === "OK" && results[0]) {
       document.getElementById(activeField).value =
         results[0].formatted_address;
     }
