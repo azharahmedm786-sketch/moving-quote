@@ -12,34 +12,27 @@ body {
   padding: 20px;
 }
 
-/* Main container */
 .container {
-  max-width: 1000px;
+  max-width: 1200px;
   margin: auto;
-  background: #ffffff;
-  padding: 28px;
+  background: #fff;
+  padding: 30px;
   border-radius: 16px;
   box-shadow: 0 20px 40px rgba(0,0,0,0.12);
 }
 
 h1 {
   text-align: center;
-  margin-bottom: 25px;
+  margin-bottom: 30px;
   color: #0f4c81;
 }
 
-h3 {
-  margin-top: 26px;
-  margin-bottom: 12px;
-  color: #1e40af;
-}
-
+/* Form controls */
 label {
   display: block;
   margin-top: 14px;
   margin-bottom: 6px;
   font-weight: 600;
-  color: #334155;
 }
 
 input,
@@ -51,87 +44,67 @@ select {
   background: #f8fafc;
 }
 
-/* Row fields */
 .row {
   display: flex;
-  gap: 12px;
+  gap: 15px;
 }
 
 .row > * {
   flex: 1;
 }
 
-/* furniture items */
-.item {
-  margin-top: 12px;
-}
-
 /* Buttons */
 button {
   width: 100%;
-  margin-top: 24px;
+  margin-top: 22px;
   padding: 15px;
-  border: none;
   border-radius: 30px;
-  background: linear-gradient(135deg, #0f4c81, #0284c7);
+  border: none;
+  background: linear-gradient(135deg,#0f4c81,#0284c7);
   color: #fff;
-  font-size: 16px;
   font-weight: 700;
   cursor: pointer;
 }
 
 .book-btn {
-  margin-top: 12px;
   background: #25D366;
 }
 
-/* Result box */
 #result {
   margin-top: 20px;
   padding: 16px;
   background: #ecfeff;
   border-radius: 12px;
-  font-weight: 600;
-  color: #065f46;
   text-align: center;
+  font-weight: 600;
 }
 
 /* Map */
 #map {
-  height: 360px;
+  height: 420px;
   margin-top: 20px;
   border-radius: 12px;
 }
 
-/* -------------------------
-   DESKTOP IMPROVEMENTS
---------------------------*/
+/* ===== DESKTOP GRID ===== */
 @media (min-width: 900px) {
 
-  .container {
-    max-width: 1200px;
-    padding: 40px;
-  }
-
-  /* Two column form layout */
-  .row {
-    gap: 20px;
-  }
-
-  /* Map bigger */
-  #map {
-    height: 450px;
-  }
-
-  /* Furniture grid */
-  .furniture-grid {
+  .desktop-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 20px;
+    gap: 30px;
+  }
+
+  .full-width {
+    grid-column: span 2;
+  }
+
+  #map {
+    height: 520px;
   }
 }
 
-/* Mobile adjustments */
+/* Mobile */
 @media (max-width: 600px) {
   .row {
     flex-direction: column;
