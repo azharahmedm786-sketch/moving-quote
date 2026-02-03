@@ -21,10 +21,12 @@ function initAutocomplete() {
 
   pickupAutocomplete.addListener("place_changed", () => {
     pickupPlace = pickupAutocomplete.getPlace();
+    showPlaceOnMap(pickupPlace);   // NEW
   });
 
   dropAutocomplete.addListener("place_changed", () => {
     dropPlace = dropAutocomplete.getPlace();
+    showPlaceOnMap(dropPlace);     // NEW
   });
 }
 
@@ -169,7 +171,6 @@ function openMap(field) {
     });
   }
 
-  /* Mobile resize fix */
   setTimeout(() => {
     google.maps.event.trigger(map, "resize");
     map.setCenter({ lat: 12.9716, lng: 77.5946 });
@@ -193,5 +194,31 @@ function getAddress(latlng) {
       document.getElementById(activeField).value =
         results[0].formatted_address;
     }
+  });
+}
+
+/* =============================
+   NEW: SHOW AUTOCOMPLETE PLACE
+============================= */
+function showPlaceOnMap(place) {
+  if (!place.geometry) return;
+
+  const mapDiv = document.getElementById("map");
+  mapDiv.style.display = "block";
+
+  if (!map) {
+    map = new google.maps.Map(mapDiv, {
+      center: place.geometry.location,
+      zoom: 14,
+    });
+  }
+
+  map.setCenter(place.geometry.location);
+
+  if (marker) marker.setMap(null);
+
+  marker = new google.maps.Marker({
+    map: map,
+    position: place.geometry.location,
   });
 }
