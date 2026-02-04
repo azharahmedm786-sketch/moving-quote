@@ -11,6 +11,25 @@ let dropMarker = null;
 const MIN_BASE_PRICE = 1100;
 const FRIDGE_PRICE = 400;
 
+/* ---------- SAVE LEAD ---------- */
+function saveLead() {
+
+  const lead = {
+    name: custName?.value || "",
+    phone: custPhone?.value || "",
+    pickup: pickup?.value || "",
+    drop: drop?.value || "",
+    time: new Date().toISOString()
+  };
+
+  let leads =
+    JSON.parse(localStorage.getItem("leads") || "[]");
+
+  leads.push(lead);
+
+  localStorage.setItem("leads", JSON.stringify(leads));
+}
+
 /* ---------- INIT ---------- */
 function initAutocomplete() {
 
@@ -252,11 +271,15 @@ function calculateQuote(auto = false) {
 Distance: ${km.toFixed(1)} km<br>
 Furniture: ₹${furnitureCost}<br>
 <strong>Total: ₹${Math.round(total)}</strong>`;
+
+    saveLead();
   });
 }
 
 /* ---------- BOOKING ---------- */
 function bookOnWhatsApp() {
+
+  saveLead();
 
   const message =
     "New Moving Request 🚚\n\n" +
