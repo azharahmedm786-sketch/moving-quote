@@ -11,20 +11,29 @@ let dropMarker = null;
 const MIN_BASE_PRICE = 1100;
 const FRIDGE_PRICE = 400;
 
-/* ---------- SAVE LEAD TO GOOGLE SHEET ---------- */
+/* ---------- SAVE LEAD ---------- */
 function saveLead() {
 
   const lead = {
     name: custName?.value || "",
     phone: custPhone?.value || "",
     pickup: pickup?.value || "",
-    drop: drop?.value || ""
+    drop: drop?.value || "",
+    time: new Date().toISOString()
   };
 
-  fetch("YOUR_SCRIPT_URL_HERE", {
+  // Save locally
+  let leads =
+    JSON.parse(localStorage.getItem("leads") || "[]");
+
+  leads.push(lead);
+  localStorage.setItem("leads", JSON.stringify(leads));
+
+  // SEND TO GOOGLE SHEETS
+  fetch("https://script.google.com/macros/s/AKfycbwne_QGsKg2vomV1ELPCNkJQ--vMUx4qbkKxfHPvMT9zjkduNZ3t7AC5XC-lNnskEzwVg/exec", {
     method: "POST",
     body: JSON.stringify(lead)
-  }).catch(() => {});
+  }).catch(err => console.log("Sheet error", err));
 }
 
 /* ---------- INIT ---------- */
@@ -67,7 +76,7 @@ function initAutocomplete() {
   attachAutoCalculation();
 }
 
-/* ---------- AUTO CALC LISTENERS ---------- */
+/* ---------- AUTO CALC ---------- */
 function attachAutoCalculation() {
 
   const fields = [
@@ -98,7 +107,7 @@ function useCurrentLocation() {
     const geocoder = new google.maps.Geocoder();
 
     geocoder.geocode({ location: loc }, (res, status) => {
-      if (status === "OK") {
+      if (status === "OK" && res[0]) {
 
         pickup.value = res[0].formatted_address;
 
@@ -129,6 +138,7 @@ function showLocation(type) {
     });
 
     directionsService = new google.maps.DirectionsService();
+
     directionsRenderer =
       new google.maps.DirectionsRenderer({
         map: map,
@@ -142,15 +152,26 @@ function showLocation(type) {
 
   if (type === "pickup") {
     if (pickupMarker) pickupMarker.setMap(null);
+
     pickupMarker = new google.maps.Marker({
-      map, position: loc, draggable: true, label: "P"
+      map,
+      position: loc,
+      draggable: true,
+      label: "P"
     });
+
     marker = pickupMarker;
+
   } else {
     if (dropMarker) dropMarker.setMap(null);
+
     dropMarker = new google.maps.Marker({
-      map, position: loc, draggable: true, label: "D"
+      map,
+      position: loc,
+      draggable: true,
+      label: "D"
     });
+
     marker = dropMarker;
   }
 
@@ -167,7 +188,7 @@ function updateAddress(type, latlng) {
   const geocoder = new google.maps.Geocoder();
 
   geocoder.geocode({ location: latlng }, (res, status) => {
-    if (status === "OK") {
+    if (status === "OK" && res[0]) {
 
       document.getElementById(type).value =
         res[0].formatted_address;
@@ -183,7 +204,7 @@ function updateAddress(type, latlng) {
   });
 }
 
-/* ---------- ROUTE ---------- */
+/* ---------- ROUTE + BOUNDS ---------- */
 function adjustBounds() {
 
   if (!map) return;
@@ -200,11 +221,13 @@ function adjustBounds() {
     map.fitBounds(bounds);
 
   if (pickupPlace && dropPlace) {
+
     directionsService.route({
       origin: pickupPlace.geometry.location,
       destination: dropPlace.geometry.location,
       travelMode: "DRIVING"
     }, (result, status) => {
+
       if (status === "OK")
         directionsRenderer.setDirections(result);
     });
@@ -273,7 +296,7 @@ Furniture: ₹${furnitureCost}<br>
   });
 }
 
-/* ---------- BOOKING ---------- */
+/* ---------- WHATSAPP ---------- */
 function bookOnWhatsApp() {
 
   saveLead();
