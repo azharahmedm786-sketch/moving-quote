@@ -11,29 +11,18 @@ let dropMarker = null;
 const MIN_BASE_PRICE = 1100;
 const FRIDGE_PRICE = 400;
 
-/* ---------- SAVE LEAD ---------- */
+/* ---------- SAVE LEAD TO GOOGLE SHEETS ---------- */
 function saveLead() {
 
-  const lead = {
-    name: custName?.value || "",
-    phone: custPhone?.value || "",
-    pickup: pickup?.value || "",
-    drop: drop?.value || "",
-    time: new Date().toISOString()
-  };
-
-  // Save locally
-  let leads =
-    JSON.parse(localStorage.getItem("leads") || "[]");
-
-  leads.push(lead);
-  localStorage.setItem("leads", JSON.stringify(leads));
-
-  // SEND TO GOOGLE SHEETS
   fetch("https://script.google.com/macros/s/AKfycbwne_QGsKg2vomV1ELPCNkJQ--vMUx4qbkKxfHPvMT9zjkduNZ3t7AC5XC-lNnskEzwVg/exec", {
     method: "POST",
-    body: JSON.stringify(lead)
-  }).catch(err => console.log("Sheet error", err));
+    body: JSON.stringify({
+      name: custName?.value || "",
+      phone: custPhone?.value || "",
+      pickup: pickup?.value || "",
+      drop: drop?.value || ""
+    })
+  });
 }
 
 /* ---------- INIT ---------- */
@@ -107,10 +96,9 @@ function useCurrentLocation() {
     const geocoder = new google.maps.Geocoder();
 
     geocoder.geocode({ location: loc }, (res, status) => {
-      if (status === "OK" && res[0]) {
+      if (status === "OK") {
 
         pickup.value = res[0].formatted_address;
-
         pickupPlace = { geometry: { location: loc } };
 
         showLocation("pickup");
@@ -138,7 +126,6 @@ function showLocation(type) {
     });
 
     directionsService = new google.maps.DirectionsService();
-
     directionsRenderer =
       new google.maps.DirectionsRenderer({
         map: map,
@@ -152,26 +139,15 @@ function showLocation(type) {
 
   if (type === "pickup") {
     if (pickupMarker) pickupMarker.setMap(null);
-
     pickupMarker = new google.maps.Marker({
-      map,
-      position: loc,
-      draggable: true,
-      label: "P"
+      map, position: loc, draggable: true, label: "P"
     });
-
     marker = pickupMarker;
-
   } else {
     if (dropMarker) dropMarker.setMap(null);
-
     dropMarker = new google.maps.Marker({
-      map,
-      position: loc,
-      draggable: true,
-      label: "D"
+      map, position: loc, draggable: true, label: "D"
     });
-
     marker = dropMarker;
   }
 
@@ -188,7 +164,7 @@ function updateAddress(type, latlng) {
   const geocoder = new google.maps.Geocoder();
 
   geocoder.geocode({ location: latlng }, (res, status) => {
-    if (status === "OK" && res[0]) {
+    if (status === "OK") {
 
       document.getElementById(type).value =
         res[0].formatted_address;
@@ -204,7 +180,7 @@ function updateAddress(type, latlng) {
   });
 }
 
-/* ---------- ROUTE + BOUNDS ---------- */
+/* ---------- ROUTE ---------- */
 function adjustBounds() {
 
   if (!map) return;
@@ -221,18 +197,14 @@ function adjustBounds() {
     map.fitBounds(bounds);
 
   if (pickupPlace && dropPlace) {
-
     directionsService.route({
       origin: pickupPlace.geometry.location,
       destination: dropPlace.geometry.location,
       travelMode: "DRIVING"
     }, (result, status) => {
-
       if (status === "OK")
         directionsRenderer.setDirections(result);
     });
-
-    calculateQuote(true);
   }
 }
 
@@ -291,12 +263,10 @@ function calculateQuote(auto = false) {
 Distance: ${km.toFixed(1)} km<br>
 Furniture: ₹${furnitureCost}<br>
 <strong>Total: ₹${Math.round(total)}</strong>`;
-
-    saveLead();
   });
 }
 
-/* ---------- WHATSAPP ---------- */
+/* ---------- BOOKING ---------- */
 function bookOnWhatsApp() {
 
   saveLead();
@@ -305,6 +275,6 @@ function bookOnWhatsApp() {
     "New Moving Request 🚚\n\n" +
     result.innerText;
 
-  window.location.href =
+  window.location.href_toggle =
     `https://wa.me/919742700167?text=${encodeURIComponent(message)}`;
 }
