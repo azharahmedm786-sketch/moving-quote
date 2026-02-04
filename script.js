@@ -11,23 +11,20 @@ let dropMarker = null;
 const MIN_BASE_PRICE = 1100;
 const FRIDGE_PRICE = 400;
 
-/* ---------- SAVE LEAD ---------- */
+/* ---------- SAVE LEAD TO GOOGLE SHEET ---------- */
 function saveLead() {
 
   const lead = {
     name: custName?.value || "",
     phone: custPhone?.value || "",
     pickup: pickup?.value || "",
-    drop: drop?.value || "",
-    time: new Date().toISOString()
+    drop: drop?.value || ""
   };
 
-  let leads =
-    JSON.parse(localStorage.getItem("leads") || "[]");
-
-  leads.push(lead);
-
-  localStorage.setItem("leads", JSON.stringify(leads));
+  fetch("YOUR_SCRIPT_URL_HERE", {
+    method: "POST",
+    body: JSON.stringify(lead)
+  }).catch(() => {});
 }
 
 /* ---------- INIT ---------- */
