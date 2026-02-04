@@ -11,9 +11,7 @@ let dropMarker = null;
 const MIN_BASE_PRICE = 1100;
 const FRIDGE_PRICE = 400;
 
-/* =============================
-   INIT AUTOCOMPLETE
-============================= */
+/* ---------- INIT ---------- */
 function initAutocomplete() {
 
   const pickupInput = document.getElementById("pickup");
@@ -35,75 +33,46 @@ function initAutocomplete() {
     showLocation("drop");
   });
 
-  /* Current location checkbox control */
   const currentLocationCheck =
     document.getElementById("useCurrentLocation");
 
-  if (currentLocationCheck) {
-    currentLocationCheck.addEventListener("change", function () {
-
-      if (this.checked) {
-        useCurrentLocation();
-      } else {
-        document.getElementById("pickup").value = "";
-        pickupPlace = null;
-
-        if (pickupMarker) pickupMarker.setMap(null);
-      }
-    });
-  }
+  currentLocationCheck.addEventListener("change", function () {
+    if (this.checked) {
+      useCurrentLocation();
+    } else {
+      pickup.value = "";
+      pickupPlace = null;
+      if (pickupMarker) pickupMarker.setMap(null);
+    }
+  });
 }
 
-/* =============================
-   USE CURRENT LOCATION
-============================= */
+/* ---------- CURRENT LOCATION ---------- */
 function useCurrentLocation() {
 
-  if (!navigator.geolocation) {
-    alert("Location not supported on this device.");
-    return;
-  }
+  navigator.geolocation.getCurrentPosition(pos => {
 
-  navigator.geolocation.getCurrentPosition(
-    pos => {
+    const loc = {
+      lat: pos.coords.latitude,
+      lng: pos.coords.longitude
+    };
 
-      const loc = {
-        lat: pos.coords.latitude,
-        lng: pos.coords.longitude
-      };
+    const geocoder = new google.maps.Geocoder();
 
-      const geocoder = new google.maps.Geocoder();
+    geocoder.geocode({ location: loc }, (res, status) => {
+      if (status === "OK") {
 
-      geocoder.geocode({ location: loc }, (res, status) => {
+        pickup.value = res[0].formatted_address;
 
-        if (status === "OK" && res[0]) {
+        pickupPlace = { geometry: { location: loc } };
 
-          document.getElementById("pickup").value =
-            res[0].formatted_address;
-
-          pickupPlace = { geometry: { location: loc } };
-
-          showLocation("pickup");
-        } else {
-          alert("Unable to get address.");
-        }
-      });
-    },
-
-    err => {
-      alert("Location permission denied or unavailable.");
-    },
-
-    {
-      enableHighAccuracy: true,
-      timeout: 10000,
-      maximumAge: 0
-    }
-  );
+        showLocation("pickup");
+      }
+    });
+  });
 }
-/* =============================
-   SHOW LOCATION ON MAP
-============================= */
+
+/* ---------- MAP DISPLAY ---------- */
 function showLocation(type) {
 
   const mapDiv = document.getElementById("map");
@@ -117,15 +86,15 @@ function showLocation(type) {
   if (!map) {
     map = new google.maps.Map(mapDiv, {
       center: loc,
-      zoom: 15,
+      zoom: 14,
     });
 
     directionsService = new google.maps.DirectionsService();
-
-    directionsRenderer = new google.maps.DirectionsRenderer({
-      map: map,
-      suppressMarkers: true
-    });
+    directionsRenderer =
+      new google.maps.DirectionsRenderer({
+        map: map,
+        suppressMarkers: true
+      });
   }
 
   map.setCenter(loc);
@@ -133,53 +102,33 @@ function showLocation(type) {
   let marker;
 
   if (type === "pickup") {
-
     if (pickupMarker) pickupMarker.setMap(null);
-
     pickupMarker = new google.maps.Marker({
-      map,
-      position: loc,
-      draggable: true,
-      label: "P"
+      map, position: loc, draggable: true, label: "P"
     });
-
     marker = pickupMarker;
-
   } else {
-
     if (dropMarker) dropMarker.setMap(null);
-
     dropMarker = new google.maps.Marker({
-      map,
-      position: loc,
-      draggable: true,
-      label: "D"
+      map, position: loc, draggable: true, label: "D"
     });
-
     marker = dropMarker;
   }
 
   marker.addListener("dragend", () => {
-    updateAddressFromMarker(type, marker.getPosition());
-  });
-
-  map.addListener("click", function (event) {
-    marker.setPosition(event.latLng);
-    updateAddressFromMarker(type, event.latLng);
+    updateAddress(type, marker.getPosition());
   });
 
   adjustBounds();
 }
 
-/* =============================
-   UPDATE ADDRESS FROM PIN
-============================= */
-function updateAddressFromMarker(type, latlng) {
+/* ---------- UPDATE ADDRESS ---------- */
+function updateAddress(type, latlng) {
 
   const geocoder = new google.maps.Geocoder();
 
   geocoder.geocode({ location: latlng }, (res, status) => {
-    if (status === "OK" && res[0]) {
+    if (status === "OK") {
 
       document.getElementById(type).value =
         res[0].formatted_address;
@@ -194,28 +143,7 @@ function updateAddressFromMarker(type, latlng) {
   });
 }
 
-/* =============================
-   DRAW ROUTE
-============================= */
-function drawRoute() {
-
-  if (!pickupPlace || !dropPlace) return;
-
-  directionsService.route({
-    origin: pickupPlace.geometry.location,
-    destination: dropPlace.geometry.location,
-    travelMode: "DRIVING"
-  }, (result, status) => {
-
-    if (status === "OK") {
-      directionsRenderer.setDirections(result);
-    }
-  });
-}
-
-/* =============================
-   FIT MAP TO BOTH PINS
-============================= */
+/* ---------- ROUTE ---------- */
 function adjustBounds() {
 
   if (!map) return;
@@ -231,72 +159,49 @@ function adjustBounds() {
   if (!bounds.isEmpty())
     map.fitBounds(bounds);
 
-  if (pickupPlace && dropPlace)
-    drawRoute();
+  if (pickupPlace && dropPlace) {
+    directionsService.route({
+      origin: pickupPlace.geometry.location,
+      destination: dropPlace.geometry.location,
+      travelMode: "DRIVING"
+    }, (result, status) => {
+      if (status === "OK")
+        directionsRenderer.setDirections(result);
+    });
+  }
 }
 
-/* =============================
-   QUOTE CALCULATION
-============================= */
+/* ---------- QUOTE ---------- */
 function calculateQuote() {
 
-  const shiftDate = document.getElementById("shiftDate").value;
-  const shiftTime = document.getElementById("shiftTime").value;
-
-  const houseBase =
-    parseInt(document.getElementById("house").value || 0);
-
-  const vehicleRate =
-    parseFloat(document.getElementById("vehicle").value || 0);
-
-  if (!shiftDate || !shiftTime || !houseBase || !vehicleRate) {
-    alert("Fill required fields");
-    return;
-  }
-
-  const pickupText =
-    document.getElementById("pickup").value.trim();
-
-  const dropText =
-    document.getElementById("drop").value.trim();
-
-  if (!pickupText || !dropText) {
-    alert("Enter pickup & drop");
-    return;
-  }
+  const houseBase = Number(house.value || 0);
+  const vehicleRate = Number(vehicle.value || 0);
 
   let furnitureCost = 0;
 
-  if (sofaCheck.checked) {
-    const price = Number(sofaType.value || 0);
-    const qty = Number(sofaQty.value || 1);
-    furnitureCost += price * qty;
-  }
+  if (sofaCheck.checked)
+    furnitureCost +=
+      Number(sofaType.value) *
+      Number(sofaQty.value);
 
-  if (bedCheck.checked) {
-    const price = Number(bedType.value || 0);
-    const qty = Number(bedQty.value || 1);
-    furnitureCost += price * qty;
-  }
+  if (bedCheck.checked)
+    furnitureCost +=
+      Number(bedType.value) *
+      Number(bedQty.value);
 
   if (fridgeCheck.checked)
     furnitureCost += FRIDGE_PRICE;
 
   if (wmCheck.checked)
-    furnitureCost += Number(wmType.value || 0);
+    furnitureCost += Number(wmType.value);
 
   const service = new google.maps.DistanceMatrixService();
 
   service.getDistanceMatrix({
-    origins: [pickupText],
-    destinations: [dropText],
+    origins: [pickup.value],
+    destinations: [drop.value],
     travelMode: "DRIVING",
   }, (res, status) => {
-
-    if (status !== "OK") {
-      alert("Distance error");
-      return;
-    }
 
     const km =
       res.rows[0].elements[0].distance.value / 1000;
@@ -309,25 +214,19 @@ function calculateQuote() {
       distanceCost +
       furnitureCost;
 
-    document.getElementById("result").innerHTML = `
+    result.innerHTML = `
 Distance: ${km.toFixed(1)} km<br>
-Base: ₹${MIN_BASE_PRICE}<br>
-House: ₹${houseBase}<br>
-Distance Cost: ₹${Math.round(distanceCost)}<br>
-Furniture: ₹${furnitureCost}<br><br>
-<strong>Total: ₹${Math.round(total)}</strong>
-`;
+Furniture: ₹${furnitureCost}<br>
+<strong>Total: ₹${Math.round(total)}</strong>`;
   });
 }
 
-/* =============================
-   WHATSAPP BOOKING
-============================= */
+/* ---------- BOOKING ---------- */
 function bookOnWhatsApp() {
 
   const message =
     "New Moving Request 🚚\n\n" +
-    document.getElementById("result").innerText;
+    result.innerText;
 
   window.location.href =
     `https://wa.me/919742700167?text=${encodeURIComponent(message)}`;
