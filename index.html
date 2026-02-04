@@ -15,7 +15,7 @@
 <h1>Get Instant Moving Quote</h1>
 
 <!-- LEFT COLUMN -->
-<div class="left-col">
+<div>
 
 <label>Customer Name</label>
 <input type="text" id="custName" placeholder="Enter your name" />
@@ -34,7 +34,6 @@ Use Current Location
 </label>
 </label>
 
-
 <label>Drop Location</label>
 <input type="text" id="drop" placeholder="Enter drop address" />
 
@@ -42,9 +41,8 @@ Use Current Location
 
 </div>
 
-
 <!-- RIGHT COLUMN -->
-<div class="right-col">
+<div>
 
 <div class="row">
 <div>
@@ -70,10 +68,10 @@ Use Current Location
 <label>Vehicle Type</label>
 <select id="vehicle">
 <option value="">Select Vehicle</option>
-<option value="25">Tata Ace / Dost (₹25/km)</option>
-<option value="40">14 ft Truck (₹40/km)</option>
-<option value="50">17 ft Truck (₹50/km)</option>
-<option value="60">19–22 ft Truck (₹60/km)</option>
+<option value="25">Tata Ace / Dost</option>
+<option value="40">14 ft Truck</option>
+<option value="50">17 ft Truck</option>
+<option value="60">19–22 ft Truck</option>
 </select>
 
 <h3>Furniture Details</h3>
@@ -118,11 +116,11 @@ Use Current Location
 </select>
 </div>
 
-<button type="button" onclick="calculateQuote()">Get Quote</button>
+<button onclick="calculateQuote()">Get Quote</button>
 
 <div id="result"></div>
 
-<button type="button" onclick="bookOnWhatsApp()" class="book-btn">
+<button onclick="bookOnWhatsApp()" class="book-btn">
 Book on WhatsApp
 </button>
 
@@ -134,7 +132,7 @@ Book on WhatsApp
 <script src="script.js"></script>
 
 <script async defer
-src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCdYIaoNUMxf0uWuHmWk_Nu2RcuYSsMuAY&libraries=places&callback=initAutocomplete">
+src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places&callback=initAutocomplete">
 </script>
 
 </body>
