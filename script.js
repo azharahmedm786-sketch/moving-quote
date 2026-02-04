@@ -26,11 +26,13 @@ function initAutocomplete() {
   pickupAutocomplete.addListener("place_changed", () => {
     pickupPlace = pickupAutocomplete.getPlace();
     showLocation("pickup");
+    calculateQuote(true);
   });
 
   dropAutocomplete.addListener("place_changed", () => {
     dropPlace = dropAutocomplete.getPlace();
     showLocation("drop");
+    calculateQuote(true);
   });
 
   const currentLocationCheck =
@@ -44,6 +46,26 @@ function initAutocomplete() {
       pickupPlace = null;
       if (pickupMarker) pickupMarker.setMap(null);
     }
+  });
+
+  attachAutoCalculation();
+}
+
+/* ---------- AUTO CALC LISTENERS ---------- */
+function attachAutoCalculation() {
+
+  const fields = [
+    house, vehicle,
+    sofaCheck, sofaType, sofaQty,
+    bedCheck, bedType, bedQty,
+    fridgeCheck,
+    wmCheck, wmType
+  ];
+
+  fields.forEach(el => {
+    if (!el) return;
+    el.addEventListener("change",
+      () => calculateQuote(true));
   });
 }
 
@@ -67,6 +89,7 @@ function useCurrentLocation() {
         pickupPlace = { geometry: { location: loc } };
 
         showLocation("pickup");
+        calculateQuote(true);
       }
     });
   });
@@ -139,6 +162,7 @@ function updateAddress(type, latlng) {
         dropPlace = { geometry: { location: latlng } };
 
       adjustBounds();
+      calculateQuote(true);
     }
   });
 }
@@ -168,14 +192,22 @@ function adjustBounds() {
       if (status === "OK")
         directionsRenderer.setDirections(result);
     });
+
+    calculateQuote(true);
   }
 }
 
 /* ---------- QUOTE ---------- */
-function calculateQuote() {
+function calculateQuote(auto = false) {
 
   const houseBase = Number(house.value || 0);
   const vehicleRate = Number(vehicle.value || 0);
+
+  if (!pickup.value || !drop.value ||
+      !houseBase || !vehicleRate) {
+    if (!auto) alert("Fill required fields");
+    return;
+  }
 
   let furnitureCost = 0;
 
@@ -202,6 +234,8 @@ function calculateQuote() {
     destinations: [drop.value],
     travelMode: "DRIVING",
   }, (res, status) => {
+
+    if (status !== "OK") return;
 
     const km =
       res.rows[0].elements[0].distance.value / 1000;
