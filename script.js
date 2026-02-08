@@ -275,6 +275,6 @@ function bookOnWhatsApp() {
     "New Moving Request 🚚\n\n" +
     result.innerText;
 
-  window.location.href_toggle =
-    `https://wa.me/919742700167?text=${encodeURIComponent(message)}`;
+ window.location.href =
+  `https://wa.me/919742700167?text=${encodeURIComponent(message)}`;
 }
