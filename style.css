@@ -8,6 +8,7 @@ body {
   background: #f1f5f9;
 }
 
+/* ===== Wrapper ===== */
 .wrapper {
   padding: 20px;
 }
@@ -27,7 +28,7 @@ h1 {
   color: #0f4c81;
 }
 
-/* Form controls */
+/* ===== Form controls ===== */
 label {
   display: block;
   margin-top: 14px;
@@ -44,7 +45,7 @@ select {
   background: #f8fafc;
 }
 
-/* Row */
+/* ===== Row layout ===== */
 .row {
   display: flex;
   gap: 15px;
@@ -54,7 +55,7 @@ select {
   flex: 1;
 }
 
-/* Buttons */
+/* ===== Buttons ===== */
 button {
   width: 100%;
   margin-top: 22px;
@@ -80,7 +81,7 @@ button {
   font-weight: 600;
 }
 
-/* Map */
+/* ===== Map ===== */
 #map {
   height: 420px;
   margin-top: 20px;
@@ -89,7 +90,6 @@ button {
 
 /* ===== Desktop Layout ===== */
 @media (min-width: 900px) {
-
   .container {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -149,12 +149,6 @@ button {
   transform: translateX(22px);
 }
 
-/* Mobile */
-@media (max-width: 600px) {
-  .row {
-    flex-direction: column;
-  }
-}
 /* ===== HERO HEADER ===== */
 .hero {
   background: linear-gradient(135deg,#0f4c81,#0284c7);
@@ -221,21 +215,57 @@ button {
 .footer p {
   margin: 6px 0;
 }
-  .call-btn{
-  display:inline-block;
-  margin-top:15px;
-  padding:12px 20px;
-  background:#22c55e;
-  color:white;
-  border-radius:30px;
-  text-decoration:none;
+
+/* ===== Floating Buttons ===== */
+.call-btn {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  background: linear-gradient(135deg,#16a34a,#22c55e);
+  color: white;
+  padding: 14px 20px;
+  border-radius: 40px;
+  text-decoration: none;
+  font-weight: 600;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+  z-index: 999;
+  transition: 0.3s;
 }
-.call-btn{
-  display:inline-block;
-  margin-top:15px;
-  padding:12px 20px;
-  background:#22c55e;
-  color:white;
-  border-radius:30px;
-  text-decoration:none;
+
+.call-btn:hover {
+  transform: translateY(-2px);
+}
+
+.floating-wa {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: #25D366;
+  color: white;
+  padding: 14px 20px;
+  border-radius: 40px;
+  text-decoration: none;
+  font-weight: 600;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+  z-index: 999;
+  transition: 0.3s;
+}
+
+.floating-wa:hover {
+  background: #20bd5a;
+  transform: translateY(-2px);
+}
+
+/* ===== Mobile Optimization ===== */
+@media (max-width:600px) {
+
+  .row {
+    flex-direction: column;
+  }
+
+  .call-btn,
+  .floating-wa {
+    padding: 12px 16px;
+    font-size: 14px;
+  }
 }
