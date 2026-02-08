@@ -17,12 +17,12 @@ function saveLead() {
   fetch("https://script.google.com/macros/s/AKfycbwne_QGsKg2vomV1ELPCNkJQ--vMUx4qbkKxfHPvMT9zjkduNZ3t7AC5XC-lNnskEzwVg/exec", {
     method: "POST",
     body: JSON.stringify({
-      name: custName?.value || "",
-      phone: custPhone?.value || "",
-      pickup: pickup?.value || "",
-      drop: drop?.value || ""
+      name: document.getElementById("custName")?.value || "",
+      phone: document.getElementById("custPhone")?.value || "",
+      pickup: document.getElementById("pickup")?.value || "",
+      drop: document.getElementById("drop")?.value || ""
     })
-  });
+  }).catch(() => {});
 }
 
 /* ---------- INIT ---------- */
@@ -30,6 +30,8 @@ function initAutocomplete() {
 
   const pickupInput = document.getElementById("pickup");
   const dropInput = document.getElementById("drop");
+
+  if (!pickupInput || !dropInput) return;
 
   const pickupAutocomplete =
     new google.maps.places.Autocomplete(pickupInput);
@@ -52,15 +54,17 @@ function initAutocomplete() {
   const currentLocationCheck =
     document.getElementById("useCurrentLocation");
 
-  currentLocationCheck.addEventListener("change", function () {
-    if (this.checked) {
-      useCurrentLocation();
-    } else {
-      pickup.value = "";
-      pickupPlace = null;
-      if (pickupMarker) pickupMarker.setMap(null);
-    }
-  });
+  if (currentLocationCheck) {
+    currentLocationCheck.addEventListener("change", function () {
+      if (this.checked) {
+        useCurrentLocation();
+      } else {
+        pickupInput.value = "";
+        pickupPlace = null;
+        if (pickupMarker) pickupMarker.setMap(null);
+      }
+    });
+  }
 
   attachAutoCalculation();
 }
@@ -68,15 +72,16 @@ function initAutocomplete() {
 /* ---------- AUTO CALC ---------- */
 function attachAutoCalculation() {
 
-  const fields = [
-    house, vehicle,
-    sofaCheck, sofaType, sofaQty,
-    bedCheck, bedType, bedQty,
-    fridgeCheck,
-    wmCheck, wmType
+  const ids = [
+    "house","vehicle",
+    "sofaCheck","sofaType","sofaQty",
+    "bedCheck","bedType","bedQty",
+    "fridgeCheck",
+    "wmCheck","wmType"
   ];
 
-  fields.forEach(el => {
+  ids.forEach(id => {
+    const el = document.getElementById(id);
     if (!el) return;
     el.addEventListener("change",
       () => calculateQuote(true));
@@ -96,9 +101,11 @@ function useCurrentLocation() {
     const geocoder = new google.maps.Geocoder();
 
     geocoder.geocode({ location: loc }, (res, status) => {
-      if (status === "OK") {
+      if (status === "OK" && res[0]) {
 
-        pickup.value = res[0].formatted_address;
+        const pickupInput = document.getElementById("pickup");
+        pickupInput.value = res[0].formatted_address;
+
         pickupPlace = { geometry: { location: loc } };
 
         showLocation("pickup");
@@ -112,6 +119,8 @@ function useCurrentLocation() {
 function showLocation(type) {
 
   const mapDiv = document.getElementById("map");
+  if (!mapDiv) return;
+
   mapDiv.style.display = "block";
 
   const place = type === "pickup" ? pickupPlace : dropPlace;
@@ -164,7 +173,7 @@ function updateAddress(type, latlng) {
   const geocoder = new google.maps.Geocoder();
 
   geocoder.geocode({ location: latlng }, (res, status) => {
-    if (status === "OK") {
+    if (status === "OK" && res[0]) {
 
       document.getElementById(type).value =
         res[0].formatted_address;
@@ -211,10 +220,15 @@ function adjustBounds() {
 /* ---------- QUOTE ---------- */
 function calculateQuote(auto = false) {
 
-  const houseBase = Number(house.value || 0);
-  const vehicleRate = Number(vehicle.value || 0);
+  const house = document.getElementById("house");
+  const vehicle = document.getElementById("vehicle");
+  const pickup = document.getElementById("pickup");
+  const drop = document.getElementById("drop");
 
-  if (!pickup.value || !drop.value ||
+  const houseBase = Number(house?.value || 0);
+  const vehicleRate = Number(vehicle?.value || 0);
+
+  if (!pickup?.value || !drop?.value ||
       !houseBase || !vehicleRate) {
     if (!auto) alert("Fill required fields");
     return;
@@ -222,21 +236,21 @@ function calculateQuote(auto = false) {
 
   let furnitureCost = 0;
 
-  if (sofaCheck.checked)
+  if (document.getElementById("sofaCheck")?.checked)
     furnitureCost +=
-      Number(sofaType.value) *
-      Number(sofaQty.value);
+      Number(document.getElementById("sofaType").value) *
+      Number(document.getElementById("sofaQty").value);
 
-  if (bedCheck.checked)
+  if (document.getElementById("bedCheck")?.checked)
     furnitureCost +=
-      Number(bedType.value) *
-      Number(bedQty.value);
+      Number(document.getElementById("bedType").value) *
+      Number(document.getElementById("bedQty").value);
 
-  if (fridgeCheck.checked)
+  if (document.getElementById("fridgeCheck")?.checked)
     furnitureCost += FRIDGE_PRICE;
 
-  if (wmCheck.checked)
-    furnitureCost += Number(wmType.value);
+  if (document.getElementById("wmCheck")?.checked)
+    furnitureCost += Number(document.getElementById("wmType").value);
 
   const service = new google.maps.DistanceMatrixService();
 
@@ -259,7 +273,7 @@ function calculateQuote(auto = false) {
       distanceCost +
       furnitureCost;
 
-    result.innerHTML = `
+    document.getElementById("result").innerHTML = `
 Distance: ${km.toFixed(1)} km<br>
 Furniture: ₹${furnitureCost}<br>
 <strong>Total: ₹${Math.round(total)}</strong>`;
@@ -271,10 +285,12 @@ function bookOnWhatsApp() {
 
   saveLead();
 
-  const message =
-    "New Moving Request 🚚\n\n" +
-    result.innerText;
+  const resultText =
+    document.getElementById("result")?.innerText || "";
 
- window.location.href =
-  `https://wa.me/919742700167?text=${encodeURIComponent(message)}`;
+  const message =
+    "New Moving Request 🚚\n\n" + resultText;
+
+  window.location.href =
+    `https://wa.me/919945095453?text=${encodeURIComponent(message)}`;
 }
