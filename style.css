@@ -155,3 +155,70 @@ button {
     flex-direction: column;
   }
 }
+/* ===== HERO HEADER ===== */
+.hero {
+  background: linear-gradient(135deg,#0f4c81,#0284c7);
+  color: white;
+  text-align: center;
+  padding: 70px 20px;
+}
+
+.hero h1 {
+  font-size: 32px;
+  margin-bottom: 10px;
+}
+
+.hero p {
+  font-size: 18px;
+  opacity: 0.9;
+}
+
+/* ===== SERVICES SECTION ===== */
+.services-section {
+  max-width: 1200px;
+  margin: auto;
+  padding: 50px 20px;
+  text-align: center;
+}
+
+.services-section h2 {
+  margin-bottom: 30px;
+  color: #0f4c81;
+}
+
+.services-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px,1fr));
+  gap: 20px;
+}
+
+.service-card {
+  background: white;
+  padding: 20px;
+  border-radius: 14px;
+  box-shadow: 0 15px 35px rgba(0,0,0,0.08);
+}
+
+.service-card h3 {
+  margin-bottom: 10px;
+  color: #0284c7;
+}
+
+/* ===== QUOTE SECTION ===== */
+.quote-section {
+  padding: 40px 10px;
+}
+
+/* ===== FOOTER ===== */
+.footer {
+  background: #0f172a;
+  color: white;
+  text-align: center;
+  padding: 30px 15px;
+  margin-top: 40px;
+}
+
+.footer p {
+  margin: 6px 0;
+}
+  
