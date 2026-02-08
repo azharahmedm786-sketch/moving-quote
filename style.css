@@ -221,4 +221,12 @@ button {
 .footer p {
   margin: 6px 0;
 }
-  
+  .call-btn{
+  display:inline-block;
+  margin-top:15px;
+  padding:12px 20px;
+  background:#22c55e;
+  color:white;
+  border-radius:30px;
+  text-decoration:none;
+}
