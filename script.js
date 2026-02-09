@@ -11,7 +11,7 @@ let dropMarker = null;
 const MIN_BASE_PRICE = 1100;
 const FRIDGE_PRICE = 400;
 
-/* SAVE LEAD */
+/* ================= SAVE LEAD ================= */
 function saveLead() {
   fetch("https://script.google.com/macros/s/AKfycbwne_QGsKg2vomV1ELPCNkJQ--vMUx4qbkKxfHPvMT9zjkduNZ3t7AC5XC-lNnskEzwVg/exec", {
     method: "POST",
@@ -24,14 +24,18 @@ function saveLead() {
   });
 }
 
-/* INIT */
+/* ================= INIT MAP ================= */
 function initAutocomplete() {
 
+  const pickupInput = document.getElementById("pickup");
+  const dropInput = document.getElementById("drop");
+  const locationToggle = document.getElementById("useCurrentLocation");
+
   const pickupAutocomplete =
-    new google.maps.places.Autocomplete(pickup);
+    new google.maps.places.Autocomplete(pickupInput);
 
   const dropAutocomplete =
-    new google.maps.places.Autocomplete(drop);
+    new google.maps.places.Autocomplete(dropInput);
 
   pickupAutocomplete.addListener("place_changed", () => {
     pickupPlace = pickupAutocomplete.getPlace();
@@ -45,31 +49,37 @@ function initAutocomplete() {
     calculateQuote(true);
   });
 
-  useCurrentLocation.addEventListener("change", function () {
-    if (this.checked) {
-      navigator.geolocation.getCurrentPosition(pos => {
+  /* Current location */
+  locationToggle.addEventListener("change", function () {
 
-        const loc = {
-          lat: pos.coords.latitude,
-          lng: pos.coords.longitude
-        };
+    if (!this.checked) return;
 
-        const geocoder = new google.maps.Geocoder();
+    navigator.geolocation.getCurrentPosition(pos => {
 
-        geocoder.geocode({ location: loc }, (res, status) => {
-          if (status === "OK") {
-            pickup.value = res[0].formatted_address;
-            pickupPlace = { geometry: { location: loc } };
-            showLocation("pickup");
-            calculateQuote(true);
-          }
-        });
+      const loc = {
+        lat: pos.coords.latitude,
+        lng: pos.coords.longitude
+      };
+
+      const geocoder = new google.maps.Geocoder();
+
+      geocoder.geocode({ location: loc }, (res, status) => {
+        if (status === "OK") {
+
+          pickupInput.value = res[0].formatted_address;
+          pickupPlace = { geometry: { location: loc } };
+
+          showLocation("pickup");
+          calculateQuote(true);
+        }
       });
-    }
+    });
   });
+
+  initSteps();
 }
 
-/* MAP DISPLAY */
+/* ================= MAP DISPLAY ================= */
 function showLocation(type) {
 
   const mapDiv = document.getElementById("map");
@@ -100,15 +110,27 @@ function showLocation(type) {
 
   if (type === "pickup") {
     if (pickupMarker) pickupMarker.setMap(null);
+
     pickupMarker = new google.maps.Marker({
-      map, position: loc, draggable: true, label: "P"
+      map,
+      position: loc,
+      draggable: true,
+      label: "P"
     });
+
     marker = pickupMarker;
+
   } else {
+
     if (dropMarker) dropMarker.setMap(null);
+
     dropMarker = new google.maps.Marker({
-      map, position: loc, draggable: true, label: "D"
+      map,
+      position: loc,
+      draggable: true,
+      label: "D"
     });
+
     marker = dropMarker;
   }
 
@@ -119,11 +141,14 @@ function showLocation(type) {
   adjustBounds();
 }
 
+/* ================= UPDATE ADDRESS ================= */
 function updateAddress(type, latlng) {
+
   const geocoder = new google.maps.Geocoder();
 
   geocoder.geocode({ location: latlng }, (res, status) => {
     if (status === "OK") {
+
       document.getElementById(type).value =
         res[0].formatted_address;
 
@@ -138,7 +163,7 @@ function updateAddress(type, latlng) {
   });
 }
 
-/* ROUTE */
+/* ================= ROUTE ================= */
 function adjustBounds() {
 
   if (!map) return;
@@ -166,7 +191,7 @@ function adjustBounds() {
   }
 }
 
-/* QUOTE */
+/* ================= QUOTE ================= */
 function calculateQuote(auto = false) {
 
   const houseBase = Number(house.value || 0);
@@ -181,20 +206,16 @@ function calculateQuote(auto = false) {
   let furnitureCost = 0;
 
   if (sofaCheck.checked)
-    furnitureCost +=
-      Number(sofaType.value) *
-      Number(sofaQty.value);
+    furnitureCost += Number(sofaQty.value) * 500;
 
   if (bedCheck.checked)
-    furnitureCost +=
-      Number(bedType.value) *
-      Number(bedQty.value);
+    furnitureCost += Number(bedQty.value) * 700;
 
   if (fridgeCheck.checked)
     furnitureCost += FRIDGE_PRICE;
 
   if (wmCheck.checked)
-    furnitureCost += Number(wmType.value);
+    furnitureCost += 400;
 
   const service = new google.maps.DistanceMatrixService();
 
@@ -224,7 +245,7 @@ Furniture: ₹${furnitureCost}<br>
   });
 }
 
-/* BOOK */
+/* ================= BOOK ================= */
 function bookOnWhatsApp() {
 
   saveLead();
@@ -236,8 +257,15 @@ function bookOnWhatsApp() {
   window.location.href =
     `https://wa.me/919945095453?text=${encodeURIComponent(message)}`;
 }
+
+/* ================= STEP FORM ================= */
 let currentStep = 0;
-const steps = document.querySelectorAll(".form-step");
+let steps = [];
+
+function initSteps() {
+  steps = document.querySelectorAll(".form-step");
+  showStep(0);
+}
 
 function showStep(n) {
   steps.forEach(step => step.classList.remove("active"));
