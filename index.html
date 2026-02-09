@@ -9,7 +9,7 @@
 
 <body>
 
-<!-- TOP BAR -->
+<!-- ===== TOP BAR ===== -->
 <div class="top-bar">
   <span>📞 9945095453</span>
   <div class="top-actions">
@@ -18,30 +18,40 @@
   </div>
 </div>
 
-<!-- HERO -->
+<!-- ===== HERO ===== -->
 <header class="hero">
   <h1>PackZen Packers & Movers Bangalore</h1>
   <p>Reliable & Affordable Moving Services</p>
-  <div class="price-hint">Moves starting from ₹1100 only</div>
-  <a href="#quote" class="hero-quote-btn">Get Instant Quote</a>
+
+  <div class="price-hint">
+    Moves starting from ₹1100 only
+  </div>
+
+  <a href="#quote" class="hero-quote-btn">
+    Get Instant Quote
+  </a>
 </header>
 
-<!-- SERVICES -->
+<!-- ===== SERVICES ===== -->
 <section class="services-section">
   <h2>Our Moving Services</h2>
+
   <div class="services-grid">
     <div class="service-card">
       <h3>Home Relocation</h3>
       <p>Safe & secure home shifting.</p>
     </div>
+
     <div class="service-card">
       <h3>Office Shifting</h3>
       <p>Professional office relocation.</p>
     </div>
+
     <div class="service-card">
       <h3>Local Shifting</h3>
       <p>Affordable Bangalore shifting.</p>
     </div>
+
     <div class="service-card">
       <h3>Loading & Unloading</h3>
       <p>Expert manpower support.</p>
@@ -49,11 +59,12 @@
   </div>
 </section>
 
+<!-- ===== TRUST STRIP ===== -->
 <section class="trust-strip">
 ✔ Licensed & Insured • ✔ Experienced Team • ✔ Safe Packing • ✔ On-Time Delivery
 </section>
 
-<!-- QUOTE -->
+<!-- ===== QUOTE SECTION ===== -->
 <section class="quote-section" id="quote">
 
 <div class="wrapper">
@@ -61,7 +72,10 @@
 
 <h1>Get Instant Moving Quote</h1>
 
-<div class="progress"><div id="progressBar"></div></div>
+<!-- Progress -->
+<div class="progress">
+  <div id="progressBar"></div>
+</div>
 
 <!-- STEP 1 -->
 <div class="form-step active">
@@ -69,7 +83,8 @@
 <label>Pickup Location</label>
 <input id="pickup" placeholder="Enter pickup">
 
-<label>Use Current Location
+<label style="display:flex;align-items:center;gap:10px;">
+Use Current Location
 <label class="toggle">
 <input type="checkbox" id="useCurrentLocation">
 <span class="slider"></span>
@@ -79,6 +94,7 @@
 <label>Drop Location</label>
 <input id="drop" placeholder="Enter drop">
 
+<!-- Map -->
 <div id="map"></div>
 
 <button onclick="nextStep()">Next</button>
@@ -92,6 +108,7 @@
 <label>Date</label>
 <input type="date" id="shiftDate">
 </div>
+
 <div>
 <label>Time</label>
 <input type="time" id="shiftTime">
@@ -116,42 +133,52 @@
 <option value="60">22 ft Truck</option>
 </select>
 
+<div class="row">
 <button onclick="prevStep()">Back</button>
 <button onclick="nextStep()">Next</button>
 </div>
 
+</div>
+
 <!-- STEP 3 -->
 <div class="form-step">
+
 <h3>Furniture</h3>
 
 <label><input type="checkbox" id="sofaCheck"> Sofa</label>
-<input type="number" id="sofaQty" value="1">
+<input type="number" id="sofaQty" value="1" min="1">
 
 <label><input type="checkbox" id="bedCheck"> Bed</label>
-<input type="number" id="bedQty" value="1">
+<input type="number" id="bedQty" value="1" min="1">
 
 <label><input type="checkbox" id="fridgeCheck"> Fridge</label>
 <label><input type="checkbox" id="wmCheck"> Washing Machine</label>
 
+<div class="row">
 <button onclick="prevStep()">Back</button>
 <button onclick="nextStep()">Next</button>
+</div>
+
 </div>
 
 <!-- STEP 4 -->
 <div class="form-step">
 
 <label>Name</label>
-<input id="custName">
+<input id="custName" placeholder="Customer name">
 
 <label>Phone</label>
-<input id="custPhone">
+<input id="custPhone" placeholder="Mobile number">
 
 <div id="result"></div>
 
+<div class="row">
 <button onclick="prevStep()">Back</button>
+
 <button onclick="bookOnWhatsApp()" class="book-btn">
 Book on WhatsApp
 </button>
+</div>
 
 </div>
 
@@ -159,12 +186,14 @@ Book on WhatsApp
 </div>
 </section>
 
+<!-- ===== FOOTER ===== -->
 <footer class="footer">
 <h3>PackZen Packers & Movers</h3>
 <p>HSR Layout, Bangalore</p>
 <p>Phone: 9945095453</p>
 </footer>
 
+<!-- Floating Buttons -->
 <a href="tel:9945095453" class="call-btn">📞 Call</a>
 <a href="https://wa.me/919945095453" class="floating-wa" target="_blank">💬 WhatsApp</a>
 
