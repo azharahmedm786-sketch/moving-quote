@@ -351,3 +351,24 @@ button:hover {
     font-size: 26px;
   }
 }
+/* Step Form */
+.form-step {
+  display: none;
+}
+.form-step.active {
+  display: block;
+}
+
+.progress {
+  height: 6px;
+  background: #ddd;
+  border-radius: 6px;
+  margin-bottom: 20px;
+}
+#progressBar {
+  height: 6px;
+  width: 25%;
+  background: #0284c7;
+  border-radius: 6px;
+  transition: .3s;
+}
