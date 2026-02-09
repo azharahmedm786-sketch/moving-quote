@@ -147,7 +147,7 @@ body {
   box-shadow: 0 20px 40px rgba(0,0,0,0.12);
 }
 
-/* ===== PRICE PANEL ===== */
+/* ===== PRICE PANEL (future ready) ===== */
 .price-panel {
   background: #0f4c81;
   color: white;
@@ -155,13 +155,11 @@ body {
   border-radius: 14px;
   margin-bottom: 20px;
   text-align: center;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
 }
 
 .price-value {
   font-size: 32px;
   font-weight: 800;
-  margin: 10px 0;
 }
 
 .price-breakup {
@@ -185,7 +183,7 @@ select {
   background: #f8fafc;
 }
 
-/* Row */
+/* Row layout */
 .row {
   display: flex;
   gap: 15px;
@@ -297,6 +295,29 @@ button:hover {
   transform: translateX(22px);
 }
 
+/* ===== STEP FORM ===== */
+.form-step {
+  display: none;
+}
+.form-step.active {
+  display: block;
+}
+
+/* Progress bar */
+.progress {
+  height: 6px;
+  background: #ddd;
+  border-radius: 6px;
+  margin-bottom: 20px;
+}
+#progressBar {
+  height: 6px;
+  width: 25%;
+  background: #0284c7;
+  border-radius: 6px;
+  transition: .3s;
+}
+
 /* ===== FOOTER ===== */
 .footer {
   background: #0f172a;
@@ -332,6 +353,7 @@ button:hover {
   text-decoration: none;
   font-weight: 600;
   box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+  z-index: 999;
 }
 
 /* ===== MOBILE ===== */
@@ -350,25 +372,4 @@ button:hover {
   .hero h1 {
     font-size: 26px;
   }
-}
-/* Step Form */
-.form-step {
-  display: none;
-}
-.form-step.active {
-  display: block;
-}
-
-.progress {
-  height: 6px;
-  background: #ddd;
-  border-radius: 6px;
-  margin-bottom: 20px;
-}
-#progressBar {
-  height: 6px;
-  width: 25%;
-  background: #0284c7;
-  border-radius: 6px;
-  transition: .3s;
 }
