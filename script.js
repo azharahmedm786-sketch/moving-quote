@@ -236,3 +236,27 @@ function bookOnWhatsApp() {
   window.location.href =
     `https://wa.me/919945095453?text=${encodeURIComponent(message)}`;
 }
+let currentStep = 0;
+const steps = document.querySelectorAll(".form-step");
+
+function showStep(n) {
+  steps.forEach(step => step.classList.remove("active"));
+  steps[n].classList.add("active");
+
+  document.getElementById("progressBar").style.width =
+    ((n + 1) / steps.length) * 100 + "%";
+}
+
+function nextStep() {
+  if (currentStep < steps.length - 1) {
+    currentStep++;
+    showStep(currentStep);
+  }
+}
+
+function prevStep() {
+  if (currentStep > 0) {
+    currentStep--;
+    showStep(currentStep);
+  }
+}
