@@ -74,20 +74,17 @@
 
 <h1>Get Instant Moving Quote</h1>
 
-<!-- LEFT COLUMN -->
-<div>
+<div class="progress">
+  <div id="progressBar"></div>
+</div>
 
-<label>Customer Name</label>
-<input type="text" id="custName" placeholder="Enter your name" />
-
-<label>Mobile Number</label>
-<input type="tel" id="custPhone" placeholder="Enter mobile number" />
+<!-- STEP 1 -->
+<div class="form-step active">
 
 <label>Pickup Location</label>
-<input type="text" id="pickup" placeholder="Enter pickup address" />
+<input type="text" id="pickup" placeholder="Enter pickup address">
 
-<label style="display:flex;align-items:center;gap:10px;">
-Use Current Location
+<label>Use Current Location
 <label class="toggle">
 <input type="checkbox" id="useCurrentLocation">
 <span class="slider"></span>
@@ -95,30 +92,31 @@ Use Current Location
 </label>
 
 <label>Drop Location</label>
-<input type="text" id="drop" placeholder="Enter drop address" />
+<input type="text" id="drop" placeholder="Enter drop address">
 
 <div id="map"></div>
 
+<button onclick="nextStep()">Next</button>
 </div>
 
-<!-- RIGHT COLUMN -->
-<div>
+<!-- STEP 2 -->
+<div class="form-step">
 
 <div class="row">
 <div>
 <label>Shifting Date</label>
-<input type="date" id="shiftDate" />
+<input type="date" id="shiftDate">
 </div>
 
 <div>
 <label>Shifting Time</label>
-<input type="time" id="shiftTime" step="900" />
+<input type="time" id="shiftTime">
 </div>
 </div>
 
 <label>House Type</label>
 <select id="house">
-<option value="">Select House Type</option>
+<option value="">Select</option>
 <option value="0">1 RK</option>
 <option value="1200">1 BHK</option>
 <option value="2500">2 BHK</option>
@@ -127,57 +125,48 @@ Use Current Location
 
 <label>Vehicle Type</label>
 <select id="vehicle">
-<option value="">Select Vehicle</option>
-<option value="25">Tata Ace / Dost</option>
+<option value="">Select</option>
+<option value="25">Tata Ace</option>
 <option value="40">14 ft Truck</option>
 <option value="50">17 ft Truck</option>
-<option value="60">19–22 ft Truck</option>
+<option value="60">22 ft Truck</option>
 </select>
 
-<h3>Furniture Details</h3>
-
-<div class="item">
-<label><input type="checkbox" id="sofaCheck" /> Sofa</label>
-<div class="row">
-<select id="sofaType">
-<option value="0">Select Type</option>
-<option value="300">Single</option>
-<option value="500">2 Seater</option>
-<option value="700">3 Seater</option>
-<option value="1000">L-Shape</option>
-</select>
-<input type="number" id="sofaQty" min="1" value="1" />
-</div>
+<button onclick="prevStep()">Back</button>
+<button onclick="nextStep()">Next</button>
 </div>
 
-<div class="item">
-<label><input type="checkbox" id="bedCheck" /> Bed</label>
-<div class="row">
-<select id="bedType">
-<option value="0">Select Type</option>
-<option value="500">Single</option>
-<option value="700">Queen</option>
-<option value="900">King</option>
-</select>
-<input type="number" id="bedQty" min="1" value="1" />
-</div>
-</div>
+<!-- STEP 3 -->
+<div class="form-step">
 
-<label><input type="checkbox" id="fridgeCheck" /> Fridge</label>
+<h3>Furniture</h3>
 
-<div class="item">
-<label><input type="checkbox" id="wmCheck" /> Washing Machine</label>
-<select id="wmType">
-<option value="0">Select Type</option>
-<option value="300">Semi Automatic</option>
-<option value="500">Fully Automatic</option>
-</select>
+<label><input type="checkbox" id="sofaCheck"> Sofa</label>
+<input type="number" id="sofaQty" value="1">
+
+<label><input type="checkbox" id="bedCheck"> Bed</label>
+<input type="number" id="bedQty" value="1">
+
+<label><input type="checkbox" id="fridgeCheck"> Fridge</label>
+
+<label><input type="checkbox" id="wmCheck"> Washing Machine</label>
+
+<button onclick="prevStep()">Back</button>
+<button onclick="nextStep()">Next</button>
 </div>
 
-<button onclick="calculateQuote()">Get Quote</button>
+<!-- STEP 4 -->
+<div class="form-step">
+
+<label>Name</label>
+<input type="text" id="custName">
+
+<label>Phone</label>
+<input type="tel" id="custPhone">
 
 <div id="result"></div>
 
+<button onclick="prevStep()">Back</button>
 <button onclick="bookOnWhatsApp()" class="book-btn">
 Book on WhatsApp
 </button>
@@ -186,7 +175,6 @@ Book on WhatsApp
 
 </div>
 </div>
-
 </section>
 
 <footer class="footer">
