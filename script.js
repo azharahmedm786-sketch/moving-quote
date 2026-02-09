@@ -290,3 +290,56 @@ function bookOnWhatsApp() {
 
   }, 700);
 }
+/* ---------- CURRENT LOCATION ---------- */
+window.addEventListener("load", function () {
+
+  const toggle = document.getElementById("useCurrentLocation");
+  if (!toggle) return;
+
+  toggle.addEventListener("change", function () {
+
+    if (!this.checked) return;
+
+    if (!navigator.geolocation) {
+      alert("Geolocation not supported");
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      function (position) {
+
+        const loc = {
+          lat: position.coords.latitude,
+          lng: position.coords.longitude
+        };
+
+        const geocoder = new google.maps.Geocoder();
+
+        geocoder.geocode({ location: loc }, (results, status) => {
+
+          if (status === "OK" && results[0]) {
+
+            const pickupInput =
+              document.getElementById("pickup");
+
+            pickupInput.value =
+              results[0].formatted_address;
+
+            pickupPlace = {
+              geometry: { location: loc }
+            };
+
+            showLocation("pickup");
+            calculateQuote(true);
+          }
+        });
+
+      },
+      function () {
+        alert("Location permission denied");
+      }
+    );
+
+  });
+
+});
