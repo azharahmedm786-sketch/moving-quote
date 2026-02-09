@@ -13,12 +13,13 @@ function saveLead(){
       name:custName?.value||"",
       phone:custPhone?.value||"",
       pickup:pickup?.value||"",
-      drop:drop?.value||""
+      drop:drop?.value||"",
+      price: livePrice?.innerText || ""
     })
   });
 }
 
-/* ---------- INIT MAP + AUTOCOMPLETE ---------- */
+/* ---------- INIT ---------- */
 function initAutocomplete(){
 
   const pickupAuto =
@@ -27,19 +28,21 @@ function initAutocomplete(){
   const dropAuto =
     new google.maps.places.Autocomplete(drop);
 
-  pickupAuto.addListener("place_changed",()=>{
+  pickupAuto.addListener("place_changed", () => {
     pickupPlace = pickupAuto.getPlace();
     showLocation("pickup");
-    calculateQuote(true);
+    showDistance();
+    autoNextStep();
   });
 
-  dropAuto.addListener("place_changed",()=>{
+  dropAuto.addListener("place_changed", () => {
     dropPlace = dropAuto.getPlace();
     showLocation("drop");
-    calculateQuote(true);
+    showDistance();
+    autoNextStep();
   });
 
-  useCurrentLocation.addEventListener("change",()=>{
+  useCurrentLocation?.addEventListener("change",()=>{
     if(!useCurrentLocation.checked) return;
 
     navigator.geolocation.getCurrentPosition(pos=>{
@@ -61,20 +64,23 @@ function initAutocomplete(){
     });
   });
 
-  attachAutoCalculation();
+  attachAutoPriceUpdate();
 }
 
-/* ---------- AUTO PRICE UPDATE ---------- */
-function attachAutoCalculation(){
-  [
-    house,vehicle,
-    sofaCheck,sofaQty,
-    bedCheck,bedQty,
-    fridgeCheck,wmCheck
-  ].forEach(el=>{
+/* ---------- AUTO PRICE ---------- */
+function attachAutoPriceUpdate(){
+
+  const fields = [
+    pickup, drop,
+    house, vehicle,
+    sofaCheck, sofaQty,
+    bedCheck, bedQty,
+    fridgeCheck, wmCheck
+  ];
+
+  fields.forEach(el=>{
     if(!el) return;
-    el.addEventListener("change",
-      ()=>calculateQuote(true));
+    el.addEventListener("change",()=>calculateQuote(true));
   });
 }
 
@@ -88,16 +94,19 @@ function showLocation(type){
 
   const loc=place.geometry.location;
 
+  const mapDiv =
+    document.getElementById("map");
+
   if(!map){
     map=new google.maps.Map(mapDiv,{
       center:loc,
       zoom:14
     });
 
-    directionsService=
+    directionsService =
       new google.maps.DirectionsService();
 
-    directionsRenderer=
+    directionsRenderer =
       new google.maps.DirectionsRenderer({map});
   }
 
@@ -115,29 +124,64 @@ function showLocation(type){
   }
 }
 
+/* ---------- DISTANCE ---------- */
+function showDistance(){
+
+  if(!pickup.value || !drop.value) return;
+
+  const service =
+    new google.maps.DistanceMatrixService();
+
+  service.getDistanceMatrix({
+    origins:[pickup.value],
+    destinations:[drop.value],
+    travelMode:"DRIVING"
+  },(res,status)=>{
+
+    if(status!=="OK") return;
+
+    const km =
+      res.rows[0].elements[0].distance.value/1000;
+
+    const el =
+      document.getElementById("distanceInfo");
+
+    if(el)
+      el.innerHTML =
+        "Estimated Distance: " +
+        km.toFixed(1) + " km";
+  });
+}
+
 /* ---------- QUOTE ---------- */
 function calculateQuote(auto=false){
 
-  if(!pickup.value||!drop.value){
+  if(!pickup.value || !drop.value){
     if(!auto) alert("Enter locations");
     return;
   }
 
-  const houseBase=Number(house.value||0);
-  const vehicleRate=Number(vehicle.value||0);
+  const houseBase =
+    Number(house.value||0);
 
-  if(!houseBase||!vehicleRate){
-    if(!auto) alert("Select house & vehicle");
+  const vehicleRate =
+    Number(vehicle.value||0);
+
+  if(!houseBase || !vehicleRate){
+    if(!auto)
+      alert("Select house & vehicle");
     return;
   }
 
   let furnitureCost=0;
 
   if(sofaCheck.checked)
-    furnitureCost+=500*Number(sofaQty.value||1);
+    furnitureCost+=500*
+      Number(sofaQty.value||1);
 
   if(bedCheck.checked)
-    furnitureCost+=700*Number(bedQty.value||1);
+    furnitureCost+=700*
+      Number(bedQty.value||1);
 
   if(fridgeCheck.checked)
     furnitureCost+=FRIDGE_PRICE;
@@ -157,9 +201,11 @@ function calculateQuote(auto=false){
     if(status!=="OK") return;
 
     const km =
-      res.rows[0].elements[0].distance.value/1000;
+      res.rows[0].elements[0]
+      .distance.value/1000;
 
-    const distanceCost = km*vehicleRate;
+    const distanceCost =
+      km*vehicleRate;
 
     const total =
       MIN_BASE_PRICE+
@@ -172,13 +218,15 @@ function calculateQuote(auto=false){
 Distance: ${km.toFixed(1)} km<br>
 Furniture: ₹${furnitureCost}<br>
 <strong>Total Estimate: ₹${Math.round(total)}</strong>`;
+
+    livePrice.innerText =
+      "₹"+Math.round(total);
+
+    priceBreakup.innerHTML=
+      `Distance: ${km.toFixed(1)} km<br>
+Furniture: ₹${furnitureCost}`;
   });
 }
-livePrice.innerText = "₹" + Math.round(total);
-
-priceBreakup.innerHTML =
-  `Distance: ${km.toFixed(1)} km<br>
-   Furniture: ₹${furnitureCost}`;
 
 /* ---------- BOOK ---------- */
 function bookOnWhatsApp(){
@@ -198,10 +246,14 @@ function bookOnWhatsApp(){
 
 /* ---------- STEP FORM ---------- */
 let currentStep=0;
-const steps=document.querySelectorAll(".form-step");
+const steps =
+  document.querySelectorAll(".form-step");
 
 function showStep(n){
-  steps.forEach(s=>s.classList.remove("active"));
+
+  steps.forEach(s=>
+    s.classList.remove("active"));
+
   steps[n].classList.add("active");
 
   progressBar.style.width =
@@ -237,44 +289,12 @@ function prevStep(){
     showStep(currentStep);
   }
 }
-function attachAutoPriceUpdate() {
 
-  const fields = [
-    pickup, drop,
-    house, vehicle,
-    sofaCheck, sofaQty,
-    bedCheck, bedQty,
-    fridgeCheck, wmCheck
-  ];
-
-  fields.forEach(el => {
-    if (!el) return;
-
-    el.addEventListener("change", () => {
-      calculateQuote(true);
-    });
-  });
-}
-
-window.addEventListener("load", attachAutoPriceUpdate);
-function showDistance() {
-
-  if (!pickup.value || !drop.value) return;
-
-  const service = new google.maps.DistanceMatrixService();
-
-  service.getDistanceMatrix({
-    origins: [pickup.value],
-    destinations: [drop.value],
-    travelMode: "DRIVING",
-  }, (res, status) => {
-
-    if (status !== "OK") return;
-
-    const km =
-      res.rows[0].elements[0].distance.value / 1000;
-
-    document.getElementById("distanceInfo").innerHTML =
-      "Estimated Distance: " + km.toFixed(1) + " km";
-  });
+/* ---------- AUTO STEP ---------- */
+function autoNextStep(){
+  if(pickupPlace &&
+     dropPlace &&
+     currentStep===0){
+    setTimeout(()=>nextStep(),700);
+  }
 }
