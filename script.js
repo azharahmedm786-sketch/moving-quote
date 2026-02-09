@@ -145,10 +145,10 @@ function adjustBounds() {
 
   const bounds = new google.maps.LatLngBounds();
 
-  if (pickupPlace)
+  if (pickupPlace?.geometry)
     bounds.extend(pickupPlace.geometry.location);
 
-  if (dropPlace)
+  if (dropPlace?.geometry)
     bounds.extend(dropPlace.geometry.location);
 
   if (!bounds.isEmpty())
@@ -211,7 +211,10 @@ function calculateQuote(auto = false) {
     travelMode: "DRIVING"
   }, (res, status) => {
 
-    if (status !== "OK") return;
+    if (
+      status !== "OK" ||
+      !res.rows[0].elements[0].distance
+    ) return;
 
     const km =
       res.rows[0].elements[0].distance.value / 1000;
@@ -229,8 +232,10 @@ Distance: ${km.toFixed(1)} km<br>
 Furniture: ₹${furnitureCost}<br>
 <strong>Total Estimate: ₹${Math.round(total)}</strong>`;
 
-    livePrice.innerText =
-      "₹" + Math.round(total);
+    const priceEl = document.getElementById("livePrice");
+    if (priceEl)
+      priceEl.innerText =
+        "₹" + Math.round(total);
 
     lastQuoteData = {
       distance: km.toFixed(1),
@@ -288,63 +293,10 @@ function bookOnWhatsApp() {
       "_blank"
     );
 
-  }, 700);
+  }, 600);
 }
-/* ---------- CURRENT LOCATION ---------- */
-window.addEventListener("load", function () {
 
-  const toggle = document.getElementById("useCurrentLocation");
-  if (!toggle) return;
-
-  toggle.addEventListener("change", function () {
-
-    if (!this.checked) return;
-
-    if (!navigator.geolocation) {
-      alert("Geolocation not supported");
-      return;
-    }
-
-    navigator.geolocation.getCurrentPosition(
-      function (position) {
-
-        const loc = {
-          lat: position.coords.latitude,
-          lng: position.coords.longitude
-        };
-
-        const geocoder = new google.maps.Geocoder();
-
-        geocoder.geocode({ location: loc }, (results, status) => {
-
-          if (status === "OK" && results[0]) {
-
-            const pickupInput =
-              document.getElementById("pickup");
-
-            pickupInput.value =
-              results[0].formatted_address;
-
-            pickupPlace = {
-              geometry: { location: loc }
-            };
-
-            showLocation("pickup");
-            calculateQuote(true);
-          }
-        });
-
-      },
-      function () {
-        alert("Location permission denied");
-      }
-    );
-
-  });
-
-});
-/* ---------- STEP FORM NAVIGATION ---------- */
-
+/* ---------- STEP FORM ---------- */
 let currentStep = 0;
 let steps = [];
 
@@ -362,7 +314,8 @@ function showStep(n) {
   if (steps[n])
     steps[n].classList.add("active");
 
-  const progress = document.getElementById("progressBar");
+  const progress =
+    document.getElementById("progressBar");
 
   if (progress)
     progress.style.width =
@@ -374,20 +327,16 @@ function showStep(n) {
 
 function nextStep() {
 
-  // validation step 1
-  if (currentStep === 0) {
-    if (!pickup.value || !drop.value) {
-      alert("Please enter pickup and drop location");
-      return;
-    }
+  if (currentStep === 0 &&
+      (!pickup.value || !drop.value)) {
+    alert("Enter pickup & drop");
+    return;
   }
 
-  // validation step 2
-  if (currentStep === 1) {
-    if (!house.value || !vehicle.value) {
-      alert("Please select house and vehicle");
-      return;
-    }
+  if (currentStep === 1 &&
+      (!house.value || !vehicle.value)) {
+    alert("Select house & vehicle");
+    return;
   }
 
   if (currentStep < steps.length - 1) {
@@ -402,4 +351,3 @@ function prevStep() {
     showStep(currentStep);
   }
 }
-
