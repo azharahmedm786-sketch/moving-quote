@@ -1,290 +1,85 @@
-let pickupPlace = null;
-let dropPlace = null;
-
-let directionsService;
-let directionsRenderer;
-
-let map;
-let pickupMarker = null;
-let dropMarker = null;
+let pickupPlace, dropPlace;
+let map, directionsService, directionsRenderer;
+let pickupMarker, dropMarker;
 
 const MIN_BASE_PRICE = 1100;
-const FRIDGE_PRICE = 400;
 
-/* ================= SAVE LEAD ================= */
-function saveLead() {
-  fetch("https://script.google.com/macros/s/AKfycbwne_QGsKg2vomV1ELPCNkJQ--vMUx4qbkKxfHPvMT9zjkduNZ3t7AC5XC-lNnskEzwVg/exec", {
-    method: "POST",
-    body: JSON.stringify({
-      name: custName?.value || "",
-      phone: custPhone?.value || "",
-      pickup: pickup?.value || "",
-      drop: drop?.value || ""
-    })
-  });
-}
+function initAutocomplete(){
+  const pickupAuto = new google.maps.places.Autocomplete(pickup);
+  const dropAuto = new google.maps.places.Autocomplete(drop);
 
-/* ================= INIT MAP ================= */
-function initAutocomplete() {
-
-  const pickupInput = document.getElementById("pickup");
-  const dropInput = document.getElementById("drop");
-  const locationToggle = document.getElementById("useCurrentLocation");
-
-  const pickupAutocomplete =
-    new google.maps.places.Autocomplete(pickupInput);
-
-  const dropAutocomplete =
-    new google.maps.places.Autocomplete(dropInput);
-
-  pickupAutocomplete.addListener("place_changed", () => {
-    pickupPlace = pickupAutocomplete.getPlace();
+  pickupAuto.addListener("place_changed",()=>{
+    pickupPlace = pickupAuto.getPlace();
     showLocation("pickup");
-    calculateQuote(true);
   });
 
-  dropAutocomplete.addListener("place_changed", () => {
-    dropPlace = dropAutocomplete.getPlace();
+  dropAuto.addListener("place_changed",()=>{
+    dropPlace = dropAuto.getPlace();
     showLocation("drop");
-    calculateQuote(true);
   });
 
-  /* Current location */
-  locationToggle.addEventListener("change", function () {
-
-    if (!this.checked) return;
-
-    navigator.geolocation.getCurrentPosition(pos => {
-
-      const loc = {
-        lat: pos.coords.latitude,
-        lng: pos.coords.longitude
-      };
-
-      const geocoder = new google.maps.Geocoder();
-
-      geocoder.geocode({ location: loc }, (res, status) => {
-        if (status === "OK") {
-
-          pickupInput.value = res[0].formatted_address;
-          pickupPlace = { geometry: { location: loc } };
-
-          showLocation("pickup");
-          calculateQuote(true);
-        }
+  useCurrentLocation.addEventListener("change",()=>{
+    navigator.geolocation.getCurrentPosition(pos=>{
+      const loc={lat:pos.coords.latitude,lng:pos.coords.longitude};
+      const geo=new google.maps.Geocoder();
+      geo.geocode({location:loc},(res)=>{
+        pickup.value=res[0].formatted_address;
+        pickupPlace={geometry:{location:loc}};
+        showLocation("pickup");
       });
     });
   });
-
-  initSteps();
 }
 
-/* ================= MAP DISPLAY ================= */
-function showLocation(type) {
+function showLocation(type){
+  const loc=(type==="pickup"?pickupPlace:dropPlace)?.geometry?.location;
+  if(!loc) return;
 
-  const mapDiv = document.getElementById("map");
-  mapDiv.style.display = "block";
-
-  const place = type === "pickup" ? pickupPlace : dropPlace;
-  if (!place || !place.geometry) return;
-
-  const loc = place.geometry.location;
-
-  if (!map) {
-    map = new google.maps.Map(mapDiv, {
-      center: loc,
-      zoom: 14,
-    });
-
-    directionsService = new google.maps.DirectionsService();
-    directionsRenderer =
-      new google.maps.DirectionsRenderer({
-        map: map,
-        suppressMarkers: true
-      });
+  if(!map){
+    map=new google.maps.Map(mapDiv,{center:loc,zoom:14});
+    directionsService=new google.maps.DirectionsService();
+    directionsRenderer=new google.maps.DirectionsRenderer({map});
   }
 
-  map.setCenter(loc);
-
-  let marker;
-
-  if (type === "pickup") {
-    if (pickupMarker) pickupMarker.setMap(null);
-
-    pickupMarker = new google.maps.Marker({
-      map,
-      position: loc,
-      draggable: true,
-      label: "P"
-    });
-
-    marker = pickupMarker;
-
-  } else {
-
-    if (dropMarker) dropMarker.setMap(null);
-
-    dropMarker = new google.maps.Marker({
-      map,
-      position: loc,
-      draggable: true,
-      label: "D"
-    });
-
-    marker = dropMarker;
-  }
-
-  marker.addListener("dragend", () => {
-    updateAddress(type, marker.getPosition());
-  });
-
-  adjustBounds();
-}
-
-/* ================= UPDATE ADDRESS ================= */
-function updateAddress(type, latlng) {
-
-  const geocoder = new google.maps.Geocoder();
-
-  geocoder.geocode({ location: latlng }, (res, status) => {
-    if (status === "OK") {
-
-      document.getElementById(type).value =
-        res[0].formatted_address;
-
-      if (type === "pickup")
-        pickupPlace = { geometry: { location: latlng } };
-      else
-        dropPlace = { geometry: { location: latlng } };
-
-      adjustBounds();
-      calculateQuote(true);
-    }
-  });
-}
-
-/* ================= ROUTE ================= */
-function adjustBounds() {
-
-  if (!map) return;
-
-  const bounds = new google.maps.LatLngBounds();
-
-  if (pickupPlace)
-    bounds.extend(pickupPlace.geometry.location);
-
-  if (dropPlace)
-    bounds.extend(dropPlace.geometry.location);
-
-  if (!bounds.isEmpty())
-    map.fitBounds(bounds);
-
-  if (pickupPlace && dropPlace) {
+  if(pickupPlace && dropPlace){
     directionsService.route({
-      origin: pickupPlace.geometry.location,
-      destination: dropPlace.geometry.location,
-      travelMode: "DRIVING"
-    }, (result, status) => {
-      if (status === "OK")
-        directionsRenderer.setDirections(result);
-    });
+      origin:pickupPlace.geometry.location,
+      destination:dropPlace.geometry.location,
+      travelMode:"DRIVING"
+    },(res)=>directionsRenderer.setDirections(res));
   }
 }
 
-/* ================= QUOTE ================= */
-function calculateQuote(auto = false) {
+function calculateQuote(){
+  if(!pickup.value||!drop.value) return;
 
-  const houseBase = Number(house.value || 0);
-  const vehicleRate = Number(vehicle.value || 0);
+  let cost=MIN_BASE_PRICE;
+  cost+=Number(house.value||0);
 
-  if (!pickup.value || !drop.value ||
-      !houseBase || !vehicleRate) {
-    if (!auto) alert("Fill required fields");
-    return;
-  }
+  if(sofaCheck.checked) cost+=500*Number(sofaQty.value);
+  if(bedCheck.checked) cost+=700*Number(bedQty.value);
+  if(fridgeCheck.checked) cost+=400;
+  if(wmCheck.checked) cost+=400;
 
-  let furnitureCost = 0;
-
-  if (sofaCheck.checked)
-    furnitureCost += Number(sofaQty.value) * 500;
-
-  if (bedCheck.checked)
-    furnitureCost += Number(bedQty.value) * 700;
-
-  if (fridgeCheck.checked)
-    furnitureCost += FRIDGE_PRICE;
-
-  if (wmCheck.checked)
-    furnitureCost += 400;
-
-  const service = new google.maps.DistanceMatrixService();
-
-  service.getDistanceMatrix({
-    origins: [pickup.value],
-    destinations: [drop.value],
-    travelMode: "DRIVING",
-  }, (res, status) => {
-
-    if (status !== "OK") return;
-
-    const km =
-      res.rows[0].elements[0].distance.value / 1000;
-
-    const distanceCost = km * vehicleRate;
-
-    const total =
-      MIN_BASE_PRICE +
-      houseBase +
-      distanceCost +
-      furnitureCost;
-
-    result.innerHTML = `
-Distance: ${km.toFixed(1)} km<br>
-Furniture: ₹${furnitureCost}<br>
-<strong>Total: ₹${Math.round(total)}</strong>`;
-  });
+  result.innerHTML=`<strong>Total Estimate: ₹${cost}</strong>`;
 }
 
-/* ================= BOOK ================= */
-function bookOnWhatsApp() {
-
-  saveLead();
-
-  const message =
-    "New Moving Request 🚚\n\n" +
-    result.innerText;
-
-  window.location.href =
-    `https://wa.me/919945095453?text=${encodeURIComponent(message)}`;
+function bookOnWhatsApp(){
+  calculateQuote();
+  window.location.href=`https://wa.me/919945095453?text=${encodeURIComponent(result.innerText)}`;
 }
 
-/* ================= STEP FORM ================= */
-let currentStep = 0;
-let steps = [];
+/* STEP FORM */
+let currentStep=0;
+const steps=document.querySelectorAll(".form-step");
 
-function initSteps() {
-  steps = document.querySelectorAll(".form-step");
-  showStep(0);
-}
-
-function showStep(n) {
-  steps.forEach(step => step.classList.remove("active"));
+function showStep(n){
+  steps.forEach(s=>s.classList.remove("active"));
   steps[n].classList.add("active");
+  progressBar.style.width=((n+1)/steps.length)*100+"%";
 
-  document.getElementById("progressBar").style.width =
-    ((n + 1) / steps.length) * 100 + "%";
+  if(n===steps.length-1) calculateQuote();
 }
 
-function nextStep() {
-  if (currentStep < steps.length - 1) {
-    currentStep++;
-    showStep(currentStep);
-  }
-}
-
-function prevStep() {
-  if (currentStep > 0) {
-    currentStep--;
-    showStep(currentStep);
-  }
-}
+function nextStep(){ if(currentStep<steps.length-1) showStep(++currentStep); }
+function prevStep(){ if(currentStep>0) showStep(--currentStep); }
