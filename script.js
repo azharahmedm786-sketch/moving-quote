@@ -1,10 +1,12 @@
+// Global variables for places
 let pickupPlace, dropPlace;
-const MIN_BASE_PRICE = 1100;
-const FRIDGE_PRICE = 400;
 
-// Initialize Google Autocomplete
+// Initialize Google Maps Autocomplete
 function initAutocomplete() {
-    const options = { componentRestrictions: { country: "in" } }; // Focus on India
+    const options = {
+        componentRestrictions: { country: "in" },
+        fields: ["address_components", "geometry", "name"]
+    };
     
     const pickupInput = document.getElementById("pickup");
     const dropInput = document.getElementById("drop");
@@ -12,96 +14,106 @@ function initAutocomplete() {
     const autoPickup = new google.maps.places.Autocomplete(pickupInput, options);
     const autoDrop = new google.maps.places.Autocomplete(dropInput, options);
 
+    // Update progress bar when a place is selected
     autoPickup.addListener("place_changed", () => {
         pickupPlace = autoPickup.getPlace();
+        updateProgress();
     });
+
     autoDrop.addListener("place_changed", () => {
         dropPlace = autoDrop.getPlace();
+        updateProgress();
     });
 }
 
-/**
- * CALCULATE PRICE Logic
- */
-async function calculateQuote() {
-    const pickupAddr = document.getElementById("pickup").value;
-    const dropAddr = document.getElementById("drop").value;
+// Logic to move the Progress Bar
+function updateProgress() {
+    let score = 0;
+    
+    // Check fields and increment score
+    if (document.getElementById("pickup").value.length > 2) score += 25;
+    if (document.getElementById("drop").value.length > 2) score += 25;
+    if (document.getElementById("house").value !== "0") score += 25;
+    if (document.getElementById("vehicle").value !== "") score += 25;
 
-    if (!pickupAddr || !dropAddr) {
-        alert("Please enter both pickup and drop locations.");
+    // Update the UI
+    const bar = document.getElementById("progressBar");
+    bar.style.width = score + "%";
+    
+    // Change color to green when complete
+    if (score === 100) {
+        bar.style.background = "#22c55e";
+    } else {
+        bar.style.background = "#0284c7";
+    }
+}
+
+// Main Calculation Function
+function calculateQuote() {
+    const pickup = document.getElementById("pickup").value;
+    const drop = document.getElementById("drop").value;
+    const houseVal = Number(document.getElementById("house").value);
+
+    // Validation
+    if (!pickup || !drop || houseVal === 0) {
+        alert("Please fill in the pickup, drop, and house type!");
         return;
     }
 
     // Show Loader
     document.getElementById("loader").style.display = "flex";
 
-    // Use Google Distance Matrix to get real distance
-    const service = new google.maps.DistanceMatrixService();
-    
-    service.getDistanceMatrix({
-        origins: [pickupAddr],
-        destinations: [dropAddr],
-        travelMode: 'DRIVING',
-    }, (response, status) => {
-        if (status === 'OK') {
-            const distanceText = response.rows[0].elements[0].distance.text;
-            const distanceVal = response.rows[0].elements[0].distance.value / 1000; // Convert to KM
+    // Simulate calculation delay for "Pro" feel
+    setTimeout(() => {
+        const vehicleRate = Number(document.getElementById("vehicle").value);
+        
+        // Add-on Furniture Logic
+        let furnitureExtra = 0;
+        if (document.getElementById("sofaCheck").checked) furnitureExtra += 500;
+        if (document.getElementById("bedCheck").checked) furnitureExtra += 700;
+        if (document.getElementById("fridgeCheck").checked) furnitureExtra += 400;
 
-            processFinalQuote(distanceVal, distanceText);
-        } else {
-            alert("Error calculating distance. Using default rate.");
-            processFinalQuote(10, "10 km (est)");
-        }
-    });
+        // Final Calculation (Base 1100 + House + Vehicle Rate * 10km demo distance)
+        const demoDistance = 10;
+        const total = 1100 + houseVal + (demoDistance * vehicleRate) + furnitureExtra;
+
+        // UI Updates: Reveal Price and Booking Button
+        document.getElementById("livePrice").innerText = "₹" + Math.round(total).toLocaleString('en-IN');
+        document.getElementById("priceBreakup").innerText = "Includes professional packing, loading, and transport.";
+        
+        const pricePanel = document.getElementById("priceContainer");
+        const bookBtn = document.querySelector(".book-btn");
+        
+        pricePanel.style.display = "block";
+        bookBtn.style.display = "block";
+
+        // Hide Loader
+        document.getElementById("loader").style.display = "none";
+
+        // Smooth scroll to the result
+        pricePanel.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 1500);
 }
 
-function processFinalQuote(distance, distanceText) {
-    const houseCost = Number(document.getElementById("house").value);
-    const perKmRate = Number(document.getElementById("vehicle").value);
-    
-    // Furniture logic
-    let furniture = 0;
-    let items = [];
-    if (document.getElementById("sofaCheck").checked) { furniture += 500; items.push("Sofa"); }
-    if (document.getElementById("bedCheck").checked) { furniture += 700; items.push("Bed"); }
-    if (document.getElementById("fridgeCheck").checked) { furniture += FRIDGE_PRICE; items.push("Fridge"); }
-
-    const distanceCost = distance * perKmRate;
-    const total = MIN_BASE_PRICE + houseCost + distanceCost + furniture;
-
-    // Update UI
-    document.getElementById("livePrice").innerText = "₹" + Math.round(total);
-    document.getElementById("priceBreakup").innerHTML = `Distance: ${distanceText} | Items: ${items.length > 0 ? items.join(", ") : "None"}`;
-    
-    // Hide Loader
-    document.getElementById("loader").style.display = "none";
-    
-    // Smooth scroll to result
-    document.getElementById("livePrice").scrollIntoView({ behavior: 'smooth' });
-}
-
-/**
- * WHATSAPP BOOKING
- */
+// WhatsApp Integration
 function bookOnWhatsApp() {
     const pickup = document.getElementById("pickup").value;
     const drop = document.getElementById("drop").value;
     const price = document.getElementById("livePrice").innerText;
     const houseType = document.getElementById("house").options[document.getElementById("house").selectedIndex].text;
 
-    if (price === "₹0") {
-        alert("Please calculate the price first!");
-        return;
-    }
-
-    const message = `*New Booking Request - PackZen*%0A` +
-                    `----------------------------%0A` +
+    const message = `*PackZen Booking Request*%0A` +
+                    `--------------------------%0A` +
                     `*From:* ${pickup}%0A` +
                     `*To:* ${drop}%0A` +
-                    `*House:* ${houseType}%0A` +
-                    `*Estimated Quote:* ${price}%0A` +
-                    `----------------------------%0A` +
-                    `Please confirm my booking.`;
+                    `*Type:* ${houseType}%0A` +
+                    `*Quote:* ${price}%0A` +
+                    `--------------------------%0A` +
+                    `I want to confirm this booking. Please contact me.`;
 
     window.open(`https://wa.me/919945095453?text=${message}`, '_blank');
 }
+
+// Attach event listeners for progress tracking on simple selects
+document.getElementById("house").addEventListener("change", updateProgress);
+document.getElementById("vehicle").addEventListener("change", updateProgress);
