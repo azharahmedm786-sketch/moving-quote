@@ -1,222 +1,101 @@
-:root {
-  --primary: #0284c7;
-  --primary-dark: #0369a1;
-  --accent: #22c55e;
-  --dark: #0f172a;
-  --light-bg: #f8fafc;
-  --white: #ffffff;
-  --radius: 12px;
-  --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+body{margin:0;font-family:Arial;background:#f1f5f9}
+
+/* TOP BAR */
+.top-bar{
+background:#0f172a;color:#fff;padding:10px;
+display:flex;justify-content:space-between
 }
 
-body {
-  margin: 0;
-  font-family: 'Inter', sans-serif;
-  background: var(--light-bg);
-  color: var(--dark);
-  line-height: 1.6;
+.top-call,.top-wa{
+background:#0284c7;color:#fff;
+padding:6px 12px;border-radius:20px;text-decoration:none
 }
 
-/* --- PROGRESS BAR --- */
-.progress-container {
-  width: 100%;
-  height: 6px;
-  background: #e2e8f0;
-  position: fixed;
-  top: 0;
-  z-index: 1000;
+/* HERO */
+.hero{
+background:linear-gradient(135deg,#0284c7,#0369a1);
+color:white;text-align:center;padding:80px 20px
 }
 
-.progress-bar {
-  height: 100%;
-  width: 0%;
-  background: var(--accent);
-  transition: width 0.4s ease;
-  box-shadow: 0 0 10px rgba(34, 197, 94, 0.5);
+.price-hint{
+background:rgba(255,255,255,0.2);
+padding:10px;border-radius:20px;margin-top:10px
 }
 
-/* --- TOP BAR --- */
-.top-bar {
-  background: var(--dark);
-  padding: 12px 5%;
-  display: flex;
-  justify-content: space-between; /* Keeps right-side buttons aligned */
-  align-items: center;
+.hero-quote-btn{
+background:#22c55e;color:white;padding:12px 22px;
+border-radius:30px;text-decoration:none
 }
 
-.top-actions {
-  display: flex;
-  gap: 10px;
+/* TRUST */
+.trust-strip{text-align:center;padding:15px;font-weight:bold}
+
+/* CONTAINER */
+.container{
+max-width:800px;margin:auto;background:white;
+padding:20px;border-radius:12px
 }
 
-.top-call, .top-wa {
-  color: white;
-  padding: 8px 18px;
-  border-radius: 50px;
-  text-decoration: none;
-  font-weight: 600;
-  font-size: 0.85rem;
-  transition: 0.3s;
+/* INPUTS */
+input,select{
+width:100%;padding:12px;margin-top:6px;
+border-radius:8px;border:1px solid #ccc
 }
 
-.top-call { background: var(--primary); }
-.top-wa { background: #25D366; }
-
-/* --- HERO --- */
-.hero {
-  background: linear-gradient(135deg, #0284c7, #075985);
-  color: white;
-  text-align: center;
-  padding: 60px 20px 100px;
+/* PRICE PANEL */
+.price-panel{
+background:#0f4c81;color:white;padding:15px;
+border-radius:10px;text-align:center;margin-bottom:20px
 }
 
-.price-hint {
-  display: inline-block;
-  background: rgba(255, 255, 255, 0.2);
-  padding: 8px 20px;
-  border-radius: 50px;
-  margin-top: 15px;
-  font-weight: 600;
+.price-value{font-size:28px;font-weight:bold}
+
+/* MAP */
+#map{
+height:300px;background:#e2e8f0;
+margin-top:15px;border-radius:10px;
+border:2px dashed #cbd5f5
 }
 
-/* --- CONTAINER --- */
-.container {
-  max-width: 650px;
-  margin: -60px auto 40px;
-  background: white;
-  padding: 35px;
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  position: relative;
+/* BUTTONS */
+button{
+width:100%;padding:14px;margin-top:15px;
+background:#0284c7;color:white;
+border:none;border-radius:30px
 }
 
-/* --- PRICE PANEL (Animated Reveal) --- */
-.price-panel {
-  background: #1e293b;
-  color: white;
-  padding: 25px;
-  border-radius: var(--radius);
-  text-align: center;
-  margin-bottom: 25px;
-  border-bottom: 4px solid var(--primary);
-  display: none; /* Hidden until calculated */
-  animation: slideDown 0.5s ease-out;
+.book-btn{background:#25D366}
+
+/* FOOTER */
+.footer{
+background:#0f172a;color:white;
+text-align:center;padding:20px;margin-top:40px
 }
 
-@keyframes slideDown {
-  from { opacity: 0; transform: translateY(-20px); }
-  to { opacity: 1; transform: translateY(0); }
+/* FLOATING */
+.call-btn,.floating-wa{
+position:fixed;bottom:20px;padding:12px;
+border-radius:30px;color:white;text-decoration:none
+}
+.call-btn{left:20px;background:#16a34a}
+.floating-wa{right:20px;background:#25D366}
+
+/* MOBILE STICKY */
+.sticky-book{
+position:fixed;bottom:0;width:100%;
+background:#0284c7;text-align:center
 }
 
-.price-value {
-  font-size: 42px;
-  font-weight: 800;
-  color: var(--primary);
+.sticky-book a{
+color:white;padding:14px;
+display:block;text-decoration:none
 }
 
-/* --- FORM ELEMENTS --- */
-.form-group { margin-bottom: 20px; }
-
-.grid-2 {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 15px;
+/* LOADER */
+#loader{
+display:none;
+position:fixed;inset:0;
+background:rgba(0,0,0,0.6);
+color:white;font-size:24px;
+align-items:center;justify-content:center
 }
-
-label {
-  font-weight: 600;
-  font-size: 0.85rem;
-  color: #64748b;
-  margin-bottom: 8px;
-  display: block;
-}
-
-input, select {
-  width: 100%;
-  padding: 12px;
-  border-radius: 8px;
-  border: 1.5px solid #e2e8f0;
-  box-sizing: border-box;
-  font-size: 1rem;
-}
-
-input:focus {
-  outline: none;
-  border-color: var(--primary);
-  background: #f0f9ff;
-}
-
-/* --- FURNITURE GRID --- */
-.furniture-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-  margin: 15px 0 25px;
-}
-
-.check-item {
-  border: 1.5px solid #e2e8f0;
-  padding: 12px;
-  border-radius: 8px;
-  text-align: center;
-  cursor: pointer;
-  font-size: 0.9rem;
-  transition: 0.2s;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 5px;
-}
-
-.check-item input { width: auto; margin: 0; }
-
-.check-item:has(input:checked) {
-  background: #f0f9ff;
-  border-color: var(--primary);
-  color: var(--primary);
-  font-weight: bold;
-}
-
-/* --- BUTTONS --- */
-button {
-  width: 100%;
-  padding: 16px;
-  border: none;
-  border-radius: 50px;
-  font-weight: bold;
-  font-size: 1.1rem;
-  cursor: pointer;
-  transition: 0.3s;
-  margin-top: 10px;
-}
-
-.calc-btn {
-  background: var(--primary);
-  color: white;
-}
-
-.calc-btn:hover { background: var(--primary-dark); }
-
-.book-btn {
-  background: var(--accent);
-  color: white;
-  display: none; /* Shows after calculation */
-}
-
-/* --- UTILS --- */
-#map { height: 200px; background: #f1f5f9; border-radius: 8px; margin: 20px 0; border: 1px solid #e2e8f0; }
-
-#loader {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(15, 23, 42, 0.9);
-  color: white;
-  z-index: 9999;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
-
-.trust-strip { text-align: center; padding: 20px; font-size: 0.9rem; color: #64748b; }
-.footer { text-align: center; padding: 30px; background: var(--dark); color: white; margin-top: 40px; }
