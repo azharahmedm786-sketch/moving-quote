@@ -12,7 +12,6 @@
 <!-- ===== TOP CONTACT BAR ===== -->
 <div class="top-bar">
   <span>📞 9945095453</span>
-
   <div class="top-actions">
     <a href="tel:9945095453" class="top-call">Call Now</a>
     <a href="https://wa.me/919945095453" target="_blank" class="top-wa">
@@ -74,6 +73,7 @@
 
 <h1>Get Instant Moving Quote</h1>
 
+<!-- Progress -->
 <div class="progress">
   <div id="progressBar"></div>
 </div>
@@ -84,7 +84,8 @@
 <label>Pickup Location</label>
 <input type="text" id="pickup" placeholder="Enter pickup address">
 
-<label>Use Current Location
+<label style="display:flex;align-items:center;gap:10px;">
+Use Current Location
 <label class="toggle">
 <input type="checkbox" id="useCurrentLocation">
 <span class="slider"></span>
@@ -132,8 +133,11 @@
 <option value="60">22 ft Truck</option>
 </select>
 
+<div class="step-buttons">
 <button onclick="prevStep()">Back</button>
 <button onclick="nextStep()">Next</button>
+</div>
+
 </div>
 
 <!-- STEP 3 -->
@@ -148,11 +152,13 @@
 <input type="number" id="bedQty" value="1">
 
 <label><input type="checkbox" id="fridgeCheck"> Fridge</label>
-
 <label><input type="checkbox" id="wmCheck"> Washing Machine</label>
 
+<div class="step-buttons">
 <button onclick="prevStep()">Back</button>
 <button onclick="nextStep()">Next</button>
+</div>
+
 </div>
 
 <!-- STEP 4 -->
@@ -166,10 +172,12 @@
 
 <div id="result"></div>
 
+<div class="step-buttons">
 <button onclick="prevStep()">Back</button>
 <button onclick="bookOnWhatsApp()" class="book-btn">
 Book on WhatsApp
 </button>
+</div>
 
 </div>
 
@@ -177,6 +185,7 @@ Book on WhatsApp
 </div>
 </section>
 
+<!-- ===== FOOTER ===== -->
 <footer class="footer">
 <h3>PackZen Packers & Movers</h3>
 <p>ITI Layout, HSR Layout, Bangalore</p>
@@ -184,6 +193,7 @@ Book on WhatsApp
 <p>Email: packzenblr@gmail.com</p>
 </footer>
 
+<!-- Floating buttons -->
 <a href="tel:9945095453" class="call-btn">📞 Call</a>
 <a href="https://wa.me/919945095453" class="floating-wa" target="_blank">💬 WhatsApp</a>
 
