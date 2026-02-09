@@ -9,8 +9,7 @@ let lastQuoteData = null;
 
 /* ---------- BOOKING ID ---------- */
 function generateBookingID() {
-  const time = Date.now().toString().slice(-6);
-  return "PZ" + time;
+  return "PZ" + Date.now().toString().slice(-6);
 }
 
 /* ---------- SAVE LEAD ---------- */
@@ -21,7 +20,7 @@ function saveLead(data) {
   });
 }
 
-/* ---------- MAP INIT ---------- */
+/* ---------- INIT AUTOCOMPLETE ---------- */
 function initAutocomplete() {
 
   const pickupInput = document.getElementById("pickup");
@@ -44,19 +43,67 @@ function initAutocomplete() {
     showLocation("drop");
     calculateQuote(true);
   });
+
+  setupCurrentLocation();
 }
 
-/* ---------- MAP + MARKERS ---------- */
-function showLocation(type) {
+/* ---------- CURRENT LOCATION ---------- */
+function setupCurrentLocation() {
 
-  const mapDiv = document.getElementById("map");
+  const toggle =
+    document.getElementById("useCurrentLocation");
+
+  if (!toggle) return;
+
+  toggle.addEventListener("change", function () {
+
+    if (!this.checked) return;
+
+    navigator.geolocation.getCurrentPosition(
+      pos => {
+
+        const loc = {
+          lat: pos.coords.latitude,
+          lng: pos.coords.longitude
+        };
+
+        const geocoder = new google.maps.Geocoder();
+
+        geocoder.geocode({ location: loc },
+          (results, status) => {
+
+            if (status === "OK" && results[0]) {
+
+              pickup.value =
+                results[0].formatted_address;
+
+              pickupPlace = {
+                geometry: { location: loc }
+              };
+
+              showLocation("pickup");
+              calculateQuote(true);
+            }
+          });
+      },
+      () => alert("Location permission denied")
+    );
+
+  });
+}
+
+/* ---------- SHOW LOCATION ---------- */
+function showLocation(type) {
 
   const place =
     type === "pickup" ? pickupPlace : dropPlace;
 
-  if (!place || !place.geometry) return;
+  if (!place?.geometry) return;
 
   const loc = place.geometry.location;
+
+  const mapDiv =
+    document.getElementById("map");
 
   if (!map) {
     map = new google.maps.Map(mapDiv, {
@@ -79,9 +126,7 @@ function showLocation(type) {
   let marker;
 
   if (type === "pickup") {
-
-    if (pickupMarker)
-      pickupMarker.setMap(null);
+    if (pickupMarker) pickupMarker.setMap(null);
 
     pickupMarker = new google.maps.Marker({
       map,
@@ -94,9 +139,7 @@ function showLocation(type) {
   }
 
   if (type === "drop") {
-
-    if (dropMarker)
-      dropMarker.setMap(null);
+    if (dropMarker) dropMarker.setMap(null);
 
     dropMarker = new google.maps.Marker({
       map,
@@ -108,42 +151,46 @@ function showLocation(type) {
     marker = dropMarker;
   }
 
-  marker.addListener("dragend", function () {
-    updateAddress(type, marker.getPosition());
-  });
+  marker.addListener("dragend", () =>
+    updateAddress(type, marker.getPosition())
+  );
 
   adjustBounds();
 }
 
-/* ---------- UPDATE ADDRESS AFTER DRAG ---------- */
+/* ---------- UPDATE ADDRESS ---------- */
 function updateAddress(type, latlng) {
 
   const geocoder = new google.maps.Geocoder();
 
-  geocoder.geocode({ location: latlng }, (res, status) => {
+  geocoder.geocode({ location: latlng },
+    (res, status) => {
 
-    if (status === "OK" && res[0]) {
+      if (status === "OK" && res[0]) {
 
-      document.getElementById(type).value =
-        res[0].formatted_address;
+        document.getElementById(type).value =
+          res[0].formatted_address;
 
-      if (type === "pickup")
-        pickupPlace = { geometry: { location: latlng } };
-      else
-        dropPlace = { geometry: { location: latlng } };
+        if (type === "pickup")
+          pickupPlace =
+            { geometry: { location: latlng } };
+        else
+          dropPlace =
+            { geometry: { location: latlng } };
 
-      adjustBounds();
-      calculateQuote(true);
-    }
-  });
+        adjustBounds();
+        calculateQuote(true);
+      }
+    });
 }
 
-/* ---------- AUTO ZOOM + ROUTE ---------- */
+/* ---------- ROUTE + ZOOM ---------- */
 function adjustBounds() {
 
   if (!map) return;
 
-  const bounds = new google.maps.LatLngBounds();
+  const bounds =
+    new google.maps.LatLngBounds();
 
   if (pickupPlace?.geometry)
     bounds.extend(pickupPlace.geometry.location);
@@ -174,11 +221,15 @@ function calculateQuote(auto = false) {
     return;
   }
 
-  const houseBase = Number(house.value || 0);
-  const vehicleRate = Number(vehicle.value || 0);
+  const houseBase =
+    Number(house.value || 0);
+
+  const vehicleRate =
+    Number(vehicle.value || 0);
 
   if (!houseBase || !vehicleRate) {
-    if (!auto) alert("Select house & vehicle");
+    if (!auto)
+      alert("Select house & vehicle");
     return;
   }
 
@@ -186,13 +237,15 @@ function calculateQuote(auto = false) {
   let furnitureList = [];
 
   if (sofaCheck.checked) {
-    const qty = Number(sofaQty.value || 1);
+    const qty =
+      Number(sofaQty.value || 1);
     furnitureCost += 500 * qty;
     furnitureList.push("Sofa x" + qty);
   }
 
   if (bedCheck.checked) {
-    const qty = Number(bedQty.value || 1);
+    const qty =
+      Number(bedQty.value || 1);
     furnitureCost += 700 * qty;
     furnitureList.push("Bed x" + qty);
   }
@@ -211,15 +264,16 @@ function calculateQuote(auto = false) {
     travelMode: "DRIVING"
   }, (res, status) => {
 
-    if (
-      status !== "OK" ||
-      !res.rows[0].elements[0].distance
-    ) return;
+    if (status !== "OK" ||
+        !res.rows[0].elements[0].distance)
+      return;
 
     const km =
-      res.rows[0].elements[0].distance.value / 1000;
+      res.rows[0].elements[0]
+        .distance.value / 1000;
 
-    const distanceCost = km * vehicleRate;
+    const distanceCost =
+      km * vehicleRate;
 
     const total =
       MIN_BASE_PRICE +
@@ -232,16 +286,18 @@ Distance: ${km.toFixed(1)} km<br>
 Furniture: ₹${furnitureCost}<br>
 <strong>Total Estimate: ₹${Math.round(total)}</strong>`;
 
-    const priceEl = document.getElementById("livePrice");
-    if (priceEl)
-      priceEl.innerText =
+    const priceBox =
+      document.getElementById("livePrice");
+
+    if (priceBox)
+      priceBox.innerText =
         "₹" + Math.round(total);
 
     lastQuoteData = {
       distance: km.toFixed(1),
       total: Math.round(total),
-      furniture: furnitureList.join(", "),
-      furnitureCost
+      furniture:
+        furnitureList.join(", ")
     };
   });
 }
@@ -258,7 +314,8 @@ function bookOnWhatsApp() {
       return;
     }
 
-    const bookingID = generateBookingID();
+    const bookingID =
+      generateBookingID();
 
     const leadData = {
       bookingID,
@@ -275,17 +332,16 @@ function bookOnWhatsApp() {
 
     alert(
       "Booking ID: " + bookingID +
-      "\nYou will receive confirmation on WhatsApp."
+      "\nConfirmation will arrive on WhatsApp."
     );
 
     const message =
-      "New Moving Booking 🚚\n\n" +
-      "Booking ID: " + bookingID + "\n" +
-      "Pickup: " + pickup.value + "\n" +
-      "Drop: " + drop.value + "\n" +
-      "Distance: " + lastQuoteData.distance + " km\n" +
-      "Furniture: " + lastQuoteData.furniture + "\n" +
-      "Total: ₹" + lastQuoteData.total;
+      `Booking ID: ${bookingID}
+Pickup: ${pickup.value}
+Drop: ${drop.value}
+Distance: ${lastQuoteData.distance} km
+Furniture: ${lastQuoteData.furniture}
+Total: ₹${lastQuoteData.total}`;
 
     window.open(
       "https://wa.me/919945095453?text=" +
@@ -293,32 +349,31 @@ function bookOnWhatsApp() {
       "_blank"
     );
 
-  }, 600);
+  }, 500);
 }
 
-/* ---------- STEP FORM ---------- */
+/* ---------- STEP NAVIGATION ---------- */
 let currentStep = 0;
 let steps = [];
 
 window.addEventListener("load", () => {
-  steps = document.querySelectorAll(".form-step");
+  steps =
+    document.querySelectorAll(".form-step");
   showStep(currentStep);
 });
 
 function showStep(n) {
 
   steps.forEach(step =>
-    step.classList.remove("active")
-  );
+    step.classList.remove("active"));
 
-  if (steps[n])
-    steps[n].classList.add("active");
+  steps[n].classList.add("active");
 
-  const progress =
+  const bar =
     document.getElementById("progressBar");
 
-  if (progress)
-    progress.style.width =
+  if (bar)
+    bar.style.width =
       ((n + 1) / steps.length) * 100 + "%";
 
   if (n === steps.length - 1)
