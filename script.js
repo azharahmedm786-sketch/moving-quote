@@ -257,3 +257,24 @@ function attachAutoPriceUpdate() {
 }
 
 window.addEventListener("load", attachAutoPriceUpdate);
+function showDistance() {
+
+  if (!pickup.value || !drop.value) return;
+
+  const service = new google.maps.DistanceMatrixService();
+
+  service.getDistanceMatrix({
+    origins: [pickup.value],
+    destinations: [drop.value],
+    travelMode: "DRIVING",
+  }, (res, status) => {
+
+    if (status !== "OK") return;
+
+    const km =
+      res.rows[0].elements[0].distance.value / 1000;
+
+    document.getElementById("distanceInfo").innerHTML =
+      "Estimated Distance: " + km.toFixed(1) + " km";
+  });
+}
