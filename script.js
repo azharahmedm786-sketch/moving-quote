@@ -232,3 +232,23 @@ function prevStep(){
     showStep(currentStep);
   }
 }
+function attachAutoPriceUpdate() {
+
+  const fields = [
+    pickup, drop,
+    house, vehicle,
+    sofaCheck, sofaQty,
+    bedCheck, bedQty,
+    fridgeCheck, wmCheck
+  ];
+
+  fields.forEach(el => {
+    if (!el) return;
+
+    el.addEventListener("change", () => {
+      calculateQuote(true);
+    });
+  });
+}
+
+window.addEventListener("load", attachAutoPriceUpdate);
