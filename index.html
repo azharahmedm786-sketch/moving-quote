@@ -2,20 +2,20 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>PackZen Packers & Movers Bangalore | Reliable Moving</title>
+    <title>PackZen Packers & Movers Bangalore</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
+<body>
 
-<body> 
+<div class="progress-container">
+    <div class="progress-bar" id="progressBar"></div>
+</div>
 
 <div class="top-bar">
-    <div class="contact-info">
-        <i class="fas fa-phone"></i> <span>+91 99450 95453</span>
-    </div>
+    <div></div>
     <div class="top-actions">
         <a href="tel:9945095453" class="top-call">Call Now</a>
         <a href="https://wa.me/919945095453" target="_blank" class="top-wa">
@@ -27,9 +27,7 @@
 <header class="hero">
     <h1>PackZen Packers & Movers</h1>
     <p>Premium Bangalore Moving Services You Can Trust</p>
-    <div class="price-hint">Moves starting from <strong>₹1,100</strong> only</div>
-    <br>
-    <a href="#quote" class="hero-quote-btn">Get Instant Quote</a>
+    <div class="price-hint">Moves starting from <strong>₹1,100</strong></div>
 </header>
 
 <section class="trust-strip">
@@ -38,82 +36,73 @@
     <span><i class="fas fa-truck"></i> Safe Delivery</span>
 </section>
 
-<section class="quote-section" id="quote">
-    <div class="container">
-        <h2 style="text-align: center; margin-bottom: 30px;">Get Your Estimate</h2>
+<div class="container">
+    <h2 style="text-align: center; margin-bottom: 25px;">Instant Quote Engine</h2>
 
-        <div class="price-panel">
-            <span style="text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px;">Estimated Price</span>
-            <div class="price-value" id="livePrice">₹0</div>
-            <div id="priceBreakup" style="font-size: 0.9rem; opacity: 0.8; margin-top: 10px;"></div>
-        </div>
-
-        <div class="form-group">
-            <label><i class="fas fa-map-marker-alt"></i> Pickup Location</label>
-            <input id="pickup" placeholder="Enter pickup area in Bangalore">
-        </div>
-
-        <div class="form-group">
-            <label><i class="fas fa-map-pin"></i> Drop Location</label>
-            <input id="drop" placeholder="Enter destination area">
-        </div>
-
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-            <div class="form-group">
-                <label>House Type</label>
-                <select id="house">
-                    <option value="0">1 RK</option>
-                    <option value="1200">1 BHK</option>
-                    <option value="2500">2 BHK</option>
-                    <option value="4000">3 BHK</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label>Vehicle</label>
-                <select id="vehicle">
-                    <option value="25">Tata Ace</option>
-                    <option value="40">14 ft Truck</option>
-                    <option value="50">17 ft Truck</option>
-                    <option value="60">22 ft Truck</option>
-                </select>
-            </div>
-        </div>
-
-        <h3 style="font-size: 1.1rem; margin: 20px 0 10px;">Furniture (Add-ons)</h3>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px;">
-            <label class="checkbox-card"><input type="checkbox" id="sofaCheck"> Sofa</label>
-            <label class="checkbox-card"><input type="checkbox" id="bedCheck"> Bed</label>
-            <label class="checkbox-card"><input type="checkbox" id="fridgeCheck"> Fridge</label>
-        </div>
-
-        <div id="map"></div>
-
-        <button onclick="calculateQuote()">
-            <i class="fas fa-calculator"></i> Calculate Price
-        </button>
-
-        <div id="result"></div>
-
-        <button onclick="bookOnWhatsApp()" class="book-btn">
-            <i class="fab fa-whatsapp"></i> Book on WhatsApp
-        </button>
+    <div class="price-panel result-hidden" id="priceContainer">
+        <span style="text-transform: uppercase; font-size: 0.75rem; letter-spacing: 1px;">Estimated Total</span>
+        <div class="price-value" id="livePrice">₹0</div>
+        <div id="priceBreakup" style="font-size: 0.85rem; margin-top: 8px; opacity: 0.9;"></div>
     </div>
-</section>
+
+    <div class="form-group">
+        <label><i class="fas fa-map-marker-alt"></i> Pickup Location</label>
+        <input id="pickup" placeholder="Enter pickup area" oninput="updateProgress()">
+    </div>
+
+    <div class="form-group">
+        <label><i class="fas fa-map-pin"></i> Drop Location</label>
+        <input id="drop" placeholder="Enter destination area" oninput="updateProgress()">
+    </div>
+
+    <div class="grid-2">
+        <div class="form-group">
+            <label>House Type</label>
+            <select id="house" onchange="updateProgress()">
+                <option value="0">Select Type</option>
+                <option value="1200">1 BHK</option>
+                <option value="2500">2 BHK</option>
+                <option value="4000">3 BHK</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Vehicle</label>
+            <select id="vehicle" onchange="updateProgress()">
+                <option value="25">Tata Ace</option>
+                <option value="40">14 ft Truck</option>
+                <option value="50">17 ft Truck</option>
+            </select>
+        </div>
+    </div>
+
+    <h3 style="font-size: 1rem; margin: 20px 0 10px;">Add Furniture</h3>
+    <div class="furniture-grid">
+        <label class="check-item"><input type="checkbox" id="sofaCheck"> Sofa</label>
+        <label class="check-item"><input type="checkbox" id="bedCheck"> Bed</label>
+        <label class="check-item"><input type="checkbox" id="fridgeCheck"> Fridge</label>
+    </div>
+
+    <div id="map"></div>
+
+    <button onclick="calculateQuote()" class="calc-btn">
+        <i class="fas fa-calculator"></i> Calculate Price
+    </button>
+
+    <button onclick="bookOnWhatsApp()" class="book-btn">
+        <i class="fab fa-whatsapp"></i> Book via WhatsApp
+    </button>
+</div>
 
 <footer class="footer">
     <p>&copy; 2026 PackZen Packers & Movers • Bangalore</p>
 </footer>
 
-<a href="tel:9945095453" class="call-btn"><i class="fas fa-phone"></i> Call</a>
-<a href="https://wa.me/919945095453" class="floating-wa"><i class="fab fa-whatsapp"></i> WhatsApp</a>
-
 <div id="loader">
-    <i class="fas fa-circle-notch fa-spin" style="font-size: 3rem; margin-bottom: 15px;"></i>
-    <p>Calculating Best Price...</p>
+    <i class="fas fa-circle-notch fa-spin"></i>
+    <p>Calculating...</p>
 </div>
 
 <script src="script.js"></script>
-<script async defer src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places&callback=initAutocomplete"></script>
-
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCdYIaoNUMxf0uWuHmWk_Nu2RcuYSsMuAY&libraries=places&callback=initAutocomplete"></script>
 </body>
 </html>
