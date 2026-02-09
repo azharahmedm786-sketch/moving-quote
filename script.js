@@ -1,5 +1,6 @@
 let pickupPlace, dropPlace;
 let map, directionsService, directionsRenderer;
+let pickupMarker, dropMarker;
 
 const MIN_BASE_PRICE = 1100;
 const FRIDGE_PRICE = 400;
@@ -23,38 +24,39 @@ function saveLead(data) {
 /* ---------- MAP INIT ---------- */
 function initAutocomplete() {
 
+  const pickupInput = document.getElementById("pickup");
+  const dropInput = document.getElementById("drop");
+
   const pickupAuto =
-    new google.maps.places.Autocomplete(
-      document.getElementById("pickup")
-    );
+    new google.maps.places.Autocomplete(pickupInput);
 
   const dropAuto =
-    new google.maps.places.Autocomplete(
-      document.getElementById("drop")
-    );
+    new google.maps.places.Autocomplete(dropInput);
 
   pickupAuto.addListener("place_changed", () => {
     pickupPlace = pickupAuto.getPlace();
-    showLocation();
+    showLocation("pickup");
     calculateQuote(true);
   });
 
   dropAuto.addListener("place_changed", () => {
     dropPlace = dropAuto.getPlace();
-    showLocation();
+    showLocation("drop");
     calculateQuote(true);
   });
 }
 
-/* ---------- MAP ROUTE ---------- */
-function showLocation() {
-
-  if (!pickupPlace?.geometry ||
-      !dropPlace?.geometry) return;
-
-  const loc = pickupPlace.geometry.location;
+/* ---------- MAP + MARKERS ---------- */
+function showLocation(type) {
 
   const mapDiv = document.getElementById("map");
+
+  const place =
+    type === "pickup" ? pickupPlace : dropPlace;
+
+  if (!place || !place.geometry) return;
+
+  const loc = place.geometry.location;
 
   if (!map) {
     map = new google.maps.Map(mapDiv, {
@@ -66,17 +68,102 @@ function showLocation() {
       new google.maps.DirectionsService();
 
     directionsRenderer =
-      new google.maps.DirectionsRenderer({ map });
+      new google.maps.DirectionsRenderer({
+        map,
+        suppressMarkers: true
+      });
   }
 
-  directionsService.route({
-    origin: pickupPlace.geometry.location,
-    destination: dropPlace.geometry.location,
-    travelMode: "DRIVING"
-  }, (res, status) => {
-    if (status === "OK")
-      directionsRenderer.setDirections(res);
+  map.setCenter(loc);
+
+  let marker;
+
+  if (type === "pickup") {
+
+    if (pickupMarker)
+      pickupMarker.setMap(null);
+
+    pickupMarker = new google.maps.Marker({
+      map,
+      position: loc,
+      draggable: true,
+      label: "P"
+    });
+
+    marker = pickupMarker;
+  }
+
+  if (type === "drop") {
+
+    if (dropMarker)
+      dropMarker.setMap(null);
+
+    dropMarker = new google.maps.Marker({
+      map,
+      position: loc,
+      draggable: true,
+      label: "D"
+    });
+
+    marker = dropMarker;
+  }
+
+  marker.addListener("dragend", function () {
+    updateAddress(type, marker.getPosition());
   });
+
+  adjustBounds();
+}
+
+/* ---------- UPDATE ADDRESS AFTER DRAG ---------- */
+function updateAddress(type, latlng) {
+
+  const geocoder = new google.maps.Geocoder();
+
+  geocoder.geocode({ location: latlng }, (res, status) => {
+
+    if (status === "OK" && res[0]) {
+
+      document.getElementById(type).value =
+        res[0].formatted_address;
+
+      if (type === "pickup")
+        pickupPlace = { geometry: { location: latlng } };
+      else
+        dropPlace = { geometry: { location: latlng } };
+
+      adjustBounds();
+      calculateQuote(true);
+    }
+  });
+}
+
+/* ---------- AUTO ZOOM + ROUTE ---------- */
+function adjustBounds() {
+
+  if (!map) return;
+
+  const bounds = new google.maps.LatLngBounds();
+
+  if (pickupPlace)
+    bounds.extend(pickupPlace.geometry.location);
+
+  if (dropPlace)
+    bounds.extend(dropPlace.geometry.location);
+
+  if (!bounds.isEmpty())
+    map.fitBounds(bounds);
+
+  if (pickupPlace && dropPlace) {
+    directionsService.route({
+      origin: pickupPlace.geometry.location,
+      destination: dropPlace.geometry.location,
+      travelMode: "DRIVING"
+    }, (result, status) => {
+      if (status === "OK")
+        directionsRenderer.setDirections(result);
+    });
+  }
 }
 
 /* ---------- PRICE CALC ---------- */
@@ -145,7 +232,6 @@ Furniture: ₹${furnitureCost}<br>
     livePrice.innerText =
       "₹" + Math.round(total);
 
-    /* Save last quote */
     lastQuoteData = {
       distance: km.toFixed(1),
       total: Math.round(total),
@@ -204,48 +290,3 @@ function bookOnWhatsApp() {
 
   }, 700);
 }
-const currentLocationToggle =
-  document.getElementById("useCurrentLocation");
-
-currentLocationToggle.addEventListener("change", function () {
-
-  if (!this.checked) return;
-
-  if (!navigator.geolocation) {
-    alert("Geolocation not supported");
-    return;
-  }
-
-  navigator.geolocation.getCurrentPosition(
-    function (position) {
-
-      const loc = {
-        lat: position.coords.latitude,
-        lng: position.coords.longitude
-      };
-
-      const geocoder = new google.maps.Geocoder();
-
-      geocoder.geocode({ location: loc }, (results, status) => {
-
-        if (status === "OK" && results[0]) {
-
-          pickup.value = results[0].formatted_address;
-
-          pickupPlace = {
-            geometry: {
-              location: loc
-            }
-          };
-
-          showLocation("pickup");
-          calculateQuote(true);
-        }
-      });
-
-    },
-    function () {
-      alert("Location permission denied");
-    }
-  );
-});
