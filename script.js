@@ -70,16 +70,33 @@ function bookOnWhatsApp(){
 }
 
 /* STEP FORM */
-let currentStep=0;
-const steps=document.querySelectorAll(".form-step");
 
-function showStep(n){
-  steps.forEach(s=>s.classList.remove("active"));
+let currentStep = 0;
+const steps = document.querySelectorAll(".form-step");
+
+function showStep(n) {
+  steps.forEach(step => step.classList.remove("active"));
   steps[n].classList.add("active");
-  progressBar.style.width=((n+1)/steps.length)*100+"%";
 
-  if(n===steps.length-1) calculateQuote();
+  document.getElementById("progressBar").style.width =
+    ((n + 1) / steps.length) * 100 + "%";
+
+  // Calculate quote when reaching last step
+  if (n === steps.length - 1) {
+    calculateQuote();
+  }
 }
 
-function nextStep(){ if(currentStep<steps.length-1) showStep(++currentStep); }
-function prevStep(){ if(currentStep>0) showStep(--currentStep); }
+function nextStep() {
+  if (currentStep < steps.length - 1) {
+    currentStep++;
+    showStep(currentStep);
+  }
+}
+
+function prevStep() {
+  if (currentStep > 0) {
+    currentStep--;
+    showStep(currentStep);
+  }
+}
