@@ -174,6 +174,11 @@ Furniture: ₹${furnitureCost}<br>
 <strong>Total Estimate: ₹${Math.round(total)}</strong>`;
   });
 }
+livePrice.innerText = "₹" + Math.round(total);
+
+priceBreakup.innerHTML =
+  `Distance: ${km.toFixed(1)} km<br>
+   Furniture: ₹${furnitureCost}`;
 
 /* ---------- BOOK ---------- */
 function bookOnWhatsApp(){
