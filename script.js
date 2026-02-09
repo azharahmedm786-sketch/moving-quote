@@ -4,9 +4,26 @@ let pickupMarker, dropMarker;
 
 const MIN_BASE_PRICE = 1100;
 
+/* ===== SAVE LEAD ===== */
+function saveLead() {
+  fetch("https://script.google.com/macros/s/AKfycbwne_QGsKg2vomV1ELPCNkJQ--vMUx4qbkKxfHPvMT9zjkduNZ3t7AC5XC-lNnskEzwVg/exec", {
+    method: "POST",
+    body: JSON.stringify({
+      name: custName?.value || "",
+      phone: custPhone?.value || "",
+      pickup: pickup?.value || "",
+      drop: drop?.value || ""
+    })
+  });
+}
+
+/* ===== INIT ===== */
 function initAutocomplete(){
-  const pickupAuto = new google.maps.places.Autocomplete(pickup);
-  const dropAuto = new google.maps.places.Autocomplete(drop);
+  const pickupAuto =
+    new google.maps.places.Autocomplete(pickup);
+
+  const dropAuto =
+    new google.maps.places.Autocomplete(drop);
 
   pickupAuto.addListener("place_changed",()=>{
     pickupPlace = pickupAuto.getPlace();
@@ -19,8 +36,14 @@ function initAutocomplete(){
   });
 
   useCurrentLocation.addEventListener("change",()=>{
+    if(!navigator.geolocation) return;
+
     navigator.geolocation.getCurrentPosition(pos=>{
-      const loc={lat:pos.coords.latitude,lng:pos.coords.longitude};
+      const loc={
+        lat:pos.coords.latitude,
+        lng:pos.coords.longitude
+      };
+
       const geo=new google.maps.Geocoder();
       geo.geocode({location:loc},(res)=>{
         pickup.value=res[0].formatted_address;
@@ -31,47 +54,107 @@ function initAutocomplete(){
   });
 }
 
+/* ===== MAP DISPLAY ===== */
 function showLocation(type){
-  const loc=(type==="pickup"?pickupPlace:dropPlace)?.geometry?.location;
+
+  const mapDiv=document.getElementById("map");
+
+  const loc=(type==="pickup"
+    ? pickupPlace
+    : dropPlace)?.geometry?.location;
+
   if(!loc) return;
 
   if(!map){
-    map=new google.maps.Map(mapDiv,{center:loc,zoom:14});
-    directionsService=new google.maps.DirectionsService();
-    directionsRenderer=new google.maps.DirectionsRenderer({map});
+    map=new google.maps.Map(mapDiv,{
+      center:loc,
+      zoom:14
+    });
+
+    directionsService=
+      new google.maps.DirectionsService();
+
+    directionsRenderer=
+      new google.maps.DirectionsRenderer({map});
   }
+
+  map.setCenter(loc);
 
   if(pickupPlace && dropPlace){
     directionsService.route({
       origin:pickupPlace.geometry.location,
       destination:dropPlace.geometry.location,
       travelMode:"DRIVING"
-    },(res)=>directionsRenderer.setDirections(res));
+    },(res,status)=>{
+      if(status==="OK")
+        directionsRenderer.setDirections(res);
+    });
   }
 }
 
-function calculateQuote(){
-  if(!pickup.value||!drop.value) return;
+/* ===== QUOTE ===== */
+function calculateQuote(auto=false){
 
-  let cost=MIN_BASE_PRICE;
-  cost+=Number(house.value||0);
+  if(!pickup.value || !drop.value){
+    if(!auto) alert("Enter pickup & drop");
+    return;
+  }
 
-  if(sofaCheck.checked) cost+=500*Number(sofaQty.value);
-  if(bedCheck.checked) cost+=700*Number(bedQty.value);
-  if(fridgeCheck.checked) cost+=400;
-  if(wmCheck.checked) cost+=400;
+  let furnitureCost=0;
 
-  document.getElementById("result").innerHTML = `
+  if(sofaCheck.checked)
+    furnitureCost+=500*Number(sofaQty.value||1);
+
+  if(bedCheck.checked)
+    furnitureCost+=700*Number(bedQty.value||1);
+
+  if(fridgeCheck.checked)
+    furnitureCost+=400;
+
+  if(wmCheck.checked)
+    furnitureCost+=400;
+
+  const houseBase=Number(house.value||0);
+  const vehicleRate=Number(vehicle.value||25);
+
+  const service=new google.maps.DistanceMatrixService();
+
+  service.getDistanceMatrix({
+    origins:[pickup.value],
+    destinations:[drop.value],
+    travelMode:"DRIVING",
+  },(res,status)=>{
+
+    if(status!=="OK") return;
+
+    const km =
+      res.rows[0].elements[0]
+        .distance.value / 1000;
+
+    const distanceCost = km * vehicleRate;
+
+    const total =
+      MIN_BASE_PRICE +
+      houseBase +
+      distanceCost +
+      furnitureCost;
+
+    document.getElementById("result").innerHTML = `
 <h3>Estimated Price</h3>
 Distance: ${km.toFixed(1)} km<br>
-Furniture Cost: ₹${furnitureCost}<br>
+Base: ₹${MIN_BASE_PRICE}<br>
+House: ₹${houseBase}<br>
+Distance Cost: ₹${Math.round(distanceCost)}<br>
+Furniture: ₹${furnitureCost}<br>
 <strong>Total Estimate: ₹${Math.round(total)}</strong>
 `;
+  });
+}
 
-function bookOnWhatsApp() {
+/* ===== BOOKING ===== */
+function bookOnWhatsApp(){
 
-  calculateQuote(); // ensure latest price
-
+  calculateQuote(true);
   saveLead();
 
   const message =
@@ -82,33 +165,33 @@ function bookOnWhatsApp() {
     `https://wa.me/919945095453?text=${encodeURIComponent(message)}`;
 }
 
-/* STEP FORM */
+/* ===== STEP FORM ===== */
+let currentStep=0;
 
-let currentStep = 0;
-const steps = document.querySelectorAll(".form-step");
+const steps=document.querySelectorAll(".form-step");
 
-function showStep(n) {
-  steps.forEach(step => step.classList.remove("active"));
+function showStep(n){
+  steps.forEach(step =>
+    step.classList.remove("active"));
+
   steps[n].classList.add("active");
 
   document.getElementById("progressBar").style.width =
-    ((n + 1) / steps.length) * 100 + "%";
+    ((n+1)/steps.length)*100+"%";
 
-  // Calculate quote when reaching last step
-  if (n === steps.length - 1) {
-    calculateQuote();
-  }
+  if(n===steps.length-1)
+    calculateQuote(true);
 }
 
-function nextStep() {
-  if (currentStep < steps.length - 1) {
+function nextStep(){
+  if(currentStep<steps.length-1){
     currentStep++;
     showStep(currentStep);
   }
 }
 
-function prevStep() {
-  if (currentStep > 0) {
+function prevStep(){
+  if(currentStep>0){
     currentStep--;
     showStep(currentStep);
   }
