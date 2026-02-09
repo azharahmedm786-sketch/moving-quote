@@ -61,12 +61,25 @@ function calculateQuote(){
   if(fridgeCheck.checked) cost+=400;
   if(wmCheck.checked) cost+=400;
 
-  result.innerHTML=`<strong>Total Estimate: ₹${cost}</strong>`;
-}
+  document.getElementById("result").innerHTML = `
+<h3>Estimated Price</h3>
+Distance: ${km.toFixed(1)} km<br>
+Furniture Cost: ₹${furnitureCost}<br>
+<strong>Total Estimate: ₹${Math.round(total)}</strong>
+`;
 
-function bookOnWhatsApp(){
-  calculateQuote();
-  window.location.href=`https://wa.me/919945095453?text=${encodeURIComponent(result.innerText)}`;
+function bookOnWhatsApp() {
+
+  calculateQuote(); // ensure latest price
+
+  saveLead();
+
+  const message =
+    "New Moving Request 🚚\n\n" +
+    document.getElementById("result").innerText;
+
+  window.location.href =
+    `https://wa.me/919945095453?text=${encodeURIComponent(message)}`;
 }
 
 /* STEP FORM */
