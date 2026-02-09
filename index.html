@@ -9,54 +9,42 @@
 
 <body>
 
-<!-- ===== TOP CONTACT BAR ===== -->
+<!-- TOP BAR -->
 <div class="top-bar">
   <span>📞 9945095453</span>
   <div class="top-actions">
     <a href="tel:9945095453" class="top-call">Call Now</a>
-    <a href="https://wa.me/919945095453" target="_blank" class="top-wa">
-      WhatsApp
-    </a>
+    <a href="https://wa.me/919945095453" target="_blank" class="top-wa">WhatsApp</a>
   </div>
 </div>
 
-<!-- ===== HERO ===== -->
+<!-- HERO -->
 <header class="hero">
   <h1>PackZen Packers & Movers Bangalore</h1>
   <p>Reliable & Affordable Moving Services</p>
-
-  <div class="price-hint">
-    Moves starting from ₹1100 only
-  </div>
-
-  <a href="#quote" class="hero-quote-btn">
-    Get Instant Quote
-  </a>
+  <div class="price-hint">Moves starting from ₹1100 only</div>
+  <a href="#quote" class="hero-quote-btn">Get Instant Quote</a>
 </header>
 
-<!-- ===== SERVICES ===== -->
+<!-- SERVICES -->
 <section class="services-section">
   <h2>Our Moving Services</h2>
-
   <div class="services-grid">
     <div class="service-card">
       <h3>Home Relocation</h3>
-      <p>Safe & secure home shifting with expert packing.</p>
+      <p>Safe & secure home shifting.</p>
     </div>
-
     <div class="service-card">
       <h3>Office Shifting</h3>
-      <p>Professional office relocation services.</p>
+      <p>Professional office relocation.</p>
     </div>
-
     <div class="service-card">
       <h3>Local Shifting</h3>
-      <p>Affordable local shifting within Bangalore.</p>
+      <p>Affordable Bangalore shifting.</p>
     </div>
-
     <div class="service-card">
       <h3>Loading & Unloading</h3>
-      <p>Skilled manpower for safe handling.</p>
+      <p>Expert manpower support.</p>
     </div>
   </div>
 </section>
@@ -65,7 +53,7 @@
 ✔ Licensed & Insured • ✔ Experienced Team • ✔ Safe Packing • ✔ On-Time Delivery
 </section>
 
-<!-- ===== QUOTE SECTION ===== -->
+<!-- QUOTE -->
 <section class="quote-section" id="quote">
 
 <div class="wrapper">
@@ -73,19 +61,15 @@
 
 <h1>Get Instant Moving Quote</h1>
 
-<!-- Progress -->
-<div class="progress">
-  <div id="progressBar"></div>
-</div>
+<div class="progress"><div id="progressBar"></div></div>
 
 <!-- STEP 1 -->
 <div class="form-step active">
 
 <label>Pickup Location</label>
-<input type="text" id="pickup" placeholder="Enter pickup address">
+<input id="pickup" placeholder="Enter pickup">
 
-<label style="display:flex;align-items:center;gap:10px;">
-Use Current Location
+<label>Use Current Location
 <label class="toggle">
 <input type="checkbox" id="useCurrentLocation">
 <span class="slider"></span>
@@ -93,7 +77,7 @@ Use Current Location
 </label>
 
 <label>Drop Location</label>
-<input type="text" id="drop" placeholder="Enter drop address">
+<input id="drop" placeholder="Enter drop">
 
 <div id="map"></div>
 
@@ -105,12 +89,11 @@ Use Current Location
 
 <div class="row">
 <div>
-<label>Shifting Date</label>
+<label>Date</label>
 <input type="date" id="shiftDate">
 </div>
-
 <div>
-<label>Shifting Time</label>
+<label>Time</label>
 <input type="time" id="shiftTime">
 </div>
 </div>
@@ -133,16 +116,12 @@ Use Current Location
 <option value="60">22 ft Truck</option>
 </select>
 
-<div class="step-buttons">
 <button onclick="prevStep()">Back</button>
 <button onclick="nextStep()">Next</button>
 </div>
 
-</div>
-
 <!-- STEP 3 -->
 <div class="form-step">
-
 <h3>Furniture</h3>
 
 <label><input type="checkbox" id="sofaCheck"> Sofa</label>
@@ -154,30 +133,25 @@ Use Current Location
 <label><input type="checkbox" id="fridgeCheck"> Fridge</label>
 <label><input type="checkbox" id="wmCheck"> Washing Machine</label>
 
-<div class="step-buttons">
 <button onclick="prevStep()">Back</button>
 <button onclick="nextStep()">Next</button>
-</div>
-
 </div>
 
 <!-- STEP 4 -->
 <div class="form-step">
 
 <label>Name</label>
-<input type="text" id="custName">
+<input id="custName">
 
 <label>Phone</label>
-<input type="tel" id="custPhone">
+<input id="custPhone">
 
 <div id="result"></div>
 
-<div class="step-buttons">
 <button onclick="prevStep()">Back</button>
 <button onclick="bookOnWhatsApp()" class="book-btn">
 Book on WhatsApp
 </button>
-</div>
 
 </div>
 
@@ -185,22 +159,19 @@ Book on WhatsApp
 </div>
 </section>
 
-<!-- ===== FOOTER ===== -->
 <footer class="footer">
 <h3>PackZen Packers & Movers</h3>
-<p>ITI Layout, HSR Layout, Bangalore</p>
+<p>HSR Layout, Bangalore</p>
 <p>Phone: 9945095453</p>
-<p>Email: packzenblr@gmail.com</p>
 </footer>
 
-<!-- Floating buttons -->
 <a href="tel:9945095453" class="call-btn">📞 Call</a>
 <a href="https://wa.me/919945095453" class="floating-wa" target="_blank">💬 WhatsApp</a>
 
 <script src="script.js"></script>
 
 <script async defer
-src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCdYIaoNUMxf0uWuHmWk_Nu2RcuYSsMuAY&libraries=places&callback=initAutocomplete">
+src="https://maps.googleapis.com/maps/api/js?key=YOUR_KEY&libraries=places&callback=initAutocomplete">
 </script>
 
 </body>
