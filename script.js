@@ -1,300 +1,300 @@
 let pickupPlace, dropPlace;
 let map, directionsService, directionsRenderer;
-let pickupMarker, dropMarker;
 
 const MIN_BASE_PRICE = 1100;
 const FRIDGE_PRICE = 400;
 
 /* ---------- SAVE LEAD ---------- */
-function saveLead(){
-  fetch("https://script.google.com/macros/s/AKfycbwne_QGsKg2vomV1ELPCNkJQ--vMUx4qbkKxfHPvMT9zjkduNZ3t7AC5XC-lNnskEzwVg/exec",{
-    method:"POST",
-    body:JSON.stringify({
-      name:custName?.value||"",
-      phone:custPhone?.value||"",
-      pickup:pickup?.value||"",
-      drop:drop?.value||"",
-      price: livePrice?.innerText || ""
+function saveLead() {
+  fetch("https://script.google.com/macros/s/AKfycbwne_QGsKg2vomV1ELPCNkJQ--vMUx4qbkKxfHPvMT9zjkduNZ3t7AC5XC-lNnskEzwVg/exec", {
+    method: "POST",
+    body: JSON.stringify({
+      name: custName?.value || "",
+      phone: custPhone?.value || "",
+      pickup: pickup?.value || "",
+      drop: drop?.value || ""
     })
   });
 }
 
-/* ---------- INIT ---------- */
-function initAutocomplete(){
+/* ---------- INIT GOOGLE MAP ---------- */
+function initAutocomplete() {
 
   const pickupAuto =
-    new google.maps.places.Autocomplete(pickup);
+    new google.maps.places.Autocomplete(
+      document.getElementById("pickup")
+    );
 
   const dropAuto =
-    new google.maps.places.Autocomplete(drop);
+    new google.maps.places.Autocomplete(
+      document.getElementById("drop")
+    );
 
   pickupAuto.addListener("place_changed", () => {
     pickupPlace = pickupAuto.getPlace();
-    showLocation("pickup");
+    showLocation();
     showDistance();
-    autoNextStep();
+    calculateQuote(true);
   });
 
   dropAuto.addListener("place_changed", () => {
     dropPlace = dropAuto.getPlace();
-    showLocation("drop");
+    showLocation();
     showDistance();
-    autoNextStep();
+    calculateQuote(true);
   });
 
-  useCurrentLocation?.addEventListener("change",()=>{
-    if(!useCurrentLocation.checked) return;
+  /* Current location */
+  const currentToggle =
+    document.getElementById("useCurrentLocation");
 
-    navigator.geolocation.getCurrentPosition(pos=>{
-      const loc={
-        lat:pos.coords.latitude,
-        lng:pos.coords.longitude
-      };
+  if (currentToggle) {
+    currentToggle.addEventListener("change", () => {
+      if (!currentToggle.checked) return;
 
-      const geo=new google.maps.Geocoder();
+      navigator.geolocation.getCurrentPosition(pos => {
 
-      geo.geocode({location:loc},(res,status)=>{
-        if(status==="OK"){
-          pickup.value=res[0].formatted_address;
-          pickupPlace={geometry:{location:loc}};
-          showLocation("pickup");
-          calculateQuote(true);
-        }
+        const loc = {
+          lat: pos.coords.latitude,
+          lng: pos.coords.longitude
+        };
+
+        const geocoder = new google.maps.Geocoder();
+
+        geocoder.geocode({ location: loc }, (res, status) => {
+          if (status === "OK") {
+            pickup.value = res[0].formatted_address;
+            pickupPlace = { geometry: { location: loc } };
+            showLocation();
+            calculateQuote(true);
+          }
+        });
       });
     });
-  });
+  }
 
   attachAutoPriceUpdate();
 }
 
-/* ---------- AUTO PRICE ---------- */
-function attachAutoPriceUpdate(){
+/* ---------- AUTO PRICE UPDATE ---------- */
+function attachAutoPriceUpdate() {
 
   const fields = [
-    pickup, drop,
-    house, vehicle,
-    sofaCheck, sofaQty,
-    bedCheck, bedQty,
-    fridgeCheck, wmCheck
+    "pickup", "drop",
+    "house", "vehicle",
+    "sofaCheck", "sofaQty",
+    "bedCheck", "bedQty",
+    "fridgeCheck", "wmCheck"
   ];
 
-  fields.forEach(el=>{
-    if(!el) return;
-    el.addEventListener("change",()=>calculateQuote(true));
+  fields.forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+
+    el.addEventListener("change", () => {
+      calculateQuote(true);
+      showDistance();
+    });
   });
 }
 
-/* ---------- MAP ---------- */
-function showLocation(type){
+/* ---------- MAP DISPLAY ---------- */
+function showLocation() {
 
-  const place =
-    type==="pickup"?pickupPlace:dropPlace;
+  if (!pickupPlace?.geometry &&
+      !dropPlace?.geometry) return;
 
-  if(!place?.geometry) return;
+  const loc =
+    pickupPlace?.geometry?.location ||
+    dropPlace.geometry.location;
 
-  const loc=place.geometry.location;
+  const mapDiv = document.getElementById("map");
 
-  const mapDiv =
-    document.getElementById("map");
-
-  if(!map){
-    map=new google.maps.Map(mapDiv,{
-      center:loc,
-      zoom:14
+  if (!map) {
+    map = new google.maps.Map(mapDiv, {
+      center: loc,
+      zoom: 14
     });
 
     directionsService =
       new google.maps.DirectionsService();
 
     directionsRenderer =
-      new google.maps.DirectionsRenderer({map});
+      new google.maps.DirectionsRenderer({
+        map
+      });
   }
 
   map.setCenter(loc);
 
-  if(pickupPlace && dropPlace){
+  if (pickupPlace && dropPlace) {
     directionsService.route({
-      origin:pickupPlace.geometry.location,
-      destination:dropPlace.geometry.location,
-      travelMode:"DRIVING"
-    },(res,status)=>{
-      if(status==="OK")
+      origin: pickupPlace.geometry.location,
+      destination: dropPlace.geometry.location,
+      travelMode: "DRIVING"
+    }, (res, status) => {
+      if (status === "OK")
         directionsRenderer.setDirections(res);
     });
   }
 }
 
-/* ---------- DISTANCE ---------- */
-function showDistance(){
+/* ---------- DISTANCE DISPLAY ---------- */
+function showDistance() {
 
-  if(!pickup.value || !drop.value) return;
+  if (!pickup.value || !drop.value) return;
 
   const service =
     new google.maps.DistanceMatrixService();
 
   service.getDistanceMatrix({
-    origins:[pickup.value],
-    destinations:[drop.value],
-    travelMode:"DRIVING"
-  },(res,status)=>{
+    origins: [pickup.value],
+    destinations: [drop.value],
+    travelMode: "DRIVING"
+  }, (res, status) => {
 
-    if(status!=="OK") return;
+    if (status !== "OK") return;
 
     const km =
-      res.rows[0].elements[0].distance.value/1000;
+      res.rows[0].elements[0].distance.value / 1000;
 
     const el =
       document.getElementById("distanceInfo");
 
-    if(el)
+    if (el)
       el.innerHTML =
         "Estimated Distance: " +
         km.toFixed(1) + " km";
   });
 }
 
-/* ---------- QUOTE ---------- */
-function calculateQuote(auto=false){
+/* ---------- PRICE CALCULATION ---------- */
+function calculateQuote(auto = false) {
 
-  if(!pickup.value || !drop.value){
-    if(!auto) alert("Enter locations");
+  if (!pickup.value || !drop.value) {
+    if (!auto) alert("Enter locations");
     return;
   }
 
-  const houseBase =
-    Number(house.value||0);
+  const houseBase = Number(house.value || 0);
+  const vehicleRate = Number(vehicle.value || 0);
 
-  const vehicleRate =
-    Number(vehicle.value||0);
-
-  if(!houseBase || !vehicleRate){
-    if(!auto)
-      alert("Select house & vehicle");
+  if (!houseBase || !vehicleRate) {
+    if (!auto) alert("Select house & vehicle");
     return;
   }
 
-  let furnitureCost=0;
+  let furnitureCost = 0;
 
-  if(sofaCheck.checked)
-    furnitureCost+=500*
-      Number(sofaQty.value||1);
+  if (sofaCheck.checked)
+    furnitureCost += 500 *
+      Number(sofaQty.value || 1);
 
-  if(bedCheck.checked)
-    furnitureCost+=700*
-      Number(bedQty.value||1);
+  if (bedCheck.checked)
+    furnitureCost += 700 *
+      Number(bedQty.value || 1);
 
-  if(fridgeCheck.checked)
-    furnitureCost+=FRIDGE_PRICE;
+  if (fridgeCheck.checked)
+    furnitureCost += FRIDGE_PRICE;
 
-  if(wmCheck.checked)
-    furnitureCost+=400;
+  if (wmCheck?.checked)
+    furnitureCost += 400;
 
   const service =
     new google.maps.DistanceMatrixService();
 
   service.getDistanceMatrix({
-    origins:[pickup.value],
-    destinations:[drop.value],
-    travelMode:"DRIVING"
-  },(res,status)=>{
+    origins: [pickup.value],
+    destinations: [drop.value],
+    travelMode: "DRIVING"
+  }, (res, status) => {
 
-    if(status!=="OK") return;
+    if (status !== "OK") return;
 
     const km =
-      res.rows[0].elements[0]
-      .distance.value/1000;
+      res.rows[0].elements[0].distance.value / 1000;
 
     const distanceCost =
-      km*vehicleRate;
+      km * vehicleRate;
 
     const total =
-      MIN_BASE_PRICE+
-      houseBase+
-      distanceCost+
+      MIN_BASE_PRICE +
+      houseBase +
+      distanceCost +
       furnitureCost;
 
-    result.innerHTML=`
-<h3>Estimated Price</h3>
+    result.innerHTML = `
 Distance: ${km.toFixed(1)} km<br>
 Furniture: ₹${furnitureCost}<br>
 <strong>Total Estimate: ₹${Math.round(total)}</strong>`;
 
-    livePrice.innerText =
-      "₹"+Math.round(total);
+    const livePrice =
+      document.getElementById("livePrice");
 
-    priceBreakup.innerHTML=
-      `Distance: ${km.toFixed(1)} km<br>
-Furniture: ₹${furnitureCost}`;
+    if (livePrice)
+      livePrice.innerText =
+        "₹" + Math.round(total);
   });
 }
 
-/* ---------- BOOK ---------- */
-function bookOnWhatsApp(){
+/* ---------- BOOKING ---------- */
+function bookOnWhatsApp() {
 
   calculateQuote(true);
-  saveLead();
 
-  alert("✅ Booking request sent!");
+  setTimeout(() => {
 
-  const message =
-    "New Moving Request 🚚\n\n"+
-    result.innerText;
+    saveLead();
 
-  window.location.href =
-    `https://wa.me/919945095453?text=${encodeURIComponent(message)}`;
+    const message =
+      "New Moving Request 🚚\n\n" +
+      document.getElementById("result").innerText;
+
+    window.open(
+      "https://wa.me/919945095453?text=" +
+      encodeURIComponent(message),
+      "_blank"
+    );
+
+  }, 800);
 }
 
 /* ---------- STEP FORM ---------- */
-let currentStep=0;
+let currentStep = 0;
+
 const steps =
   document.querySelectorAll(".form-step");
 
-function showStep(n){
+function showStep(n) {
 
-  steps.forEach(s=>
+  steps.forEach(s =>
     s.classList.remove("active"));
 
   steps[n].classList.add("active");
 
-  progressBar.style.width =
-    ((n+1)/steps.length)*100+"%";
+  const bar =
+    document.getElementById("progressBar");
 
-  if(n===steps.length-1)
+  if (bar)
+    bar.style.width =
+      ((n + 1) / steps.length) * 100 + "%";
+
+  if (n === steps.length - 1)
     calculateQuote(true);
 }
 
-function nextStep(){
+function nextStep() {
 
-  if(currentStep===0 &&
-     (!pickup.value||!drop.value)){
-    alert("Enter pickup & drop");
-    return;
-  }
-
-  if(currentStep===1 &&
-     (!house.value||!vehicle.value)){
-    alert("Select house & vehicle");
-    return;
-  }
-
-  if(currentStep<steps.length-1){
+  if (currentStep < steps.length - 1) {
     currentStep++;
     showStep(currentStep);
   }
 }
 
-function prevStep(){
-  if(currentStep>0){
+function prevStep() {
+
+  if (currentStep > 0) {
     currentStep--;
     showStep(currentStep);
-  }
-}
-
-/* ---------- AUTO STEP ---------- */
-function autoNextStep(){
-  if(pickupPlace &&
-     dropPlace &&
-     currentStep===0){
-    setTimeout(()=>nextStep(),700);
   }
 }
