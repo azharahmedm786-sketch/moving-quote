@@ -57,3 +57,24 @@ function bookOnWhatsApp(){
  window.location.href=
  `https://wa.me/919945095453?text=${encodeURIComponent(msg)}`;
 }
+function generateBookingId(){
+  return "PKZ" + Date.now().toString().slice(-6);
+}
+
+function saveLead(){
+  const bookingId = generateBookingId();
+
+  fetch(YOUR_SCRIPT_URL,{
+    method:"POST",
+    body:JSON.stringify({
+      bookingId,
+      name:custName.value,
+      phone:custPhone.value,
+      pickup:pickup.value,
+      drop:drop.value
+    })
+  });
+
+  alert("Booking ID: " + bookingId);
+}
+
