@@ -1,110 +1,119 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>PackZen Packers & Movers Bangalore</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <title>PackZen Packers & Movers Bangalore | Reliable Moving</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
 </head>
 
 <body> 
 
-<!-- TOP BAR -->
 <div class="top-bar">
-  <span>📞 9945095453</span>
-  <div class="top-actions">
-    <a href="tel:9945095453" class="top-call">Call Now</a>
-    <a href="https://wa.me/919945095453" target="_blank" class="top-wa">
-      WhatsApp
-    </a>
-  </div>
+    <div class="contact-info">
+        <i class="fas fa-phone"></i> <span>+91 99450 95453</span>
+    </div>
+    <div class="top-actions">
+        <a href="tel:9945095453" class="top-call">Call Now</a>
+        <a href="https://wa.me/919945095453" target="_blank" class="top-wa">
+            <i class="fab fa-whatsapp"></i> WhatsApp
+        </a>
+    </div>
 </div>
 
-<!-- HERO -->
 <header class="hero">
-  <h1>PackZen Packers & Movers Bangalore</h1>
-  <p>Reliable & Affordable Moving Services</p>
-  <div class="price-hint">Moves starting from ₹1100 only</div>
-  <a href="#quote" class="hero-quote-btn">Get Instant Quote</a>
+    <h1>PackZen Packers & Movers</h1>
+    <p>Premium Bangalore Moving Services You Can Trust</p>
+    <div class="price-hint">Moves starting from <strong>₹1,100</strong> only</div>
+    <br>
+    <a href="#quote" class="hero-quote-btn">Get Instant Quote</a>
 </header>
 
 <section class="trust-strip">
-✔ Licensed • ✔ Insured • ✔ Experienced • ✔ Safe Delivery
+    <span><i class="fas fa-check-circle"></i> Licensed</span> • 
+    <span><i class="fas fa-shield-alt"></i> Insured</span> • 
+    <span><i class="fas fa-truck"></i> Safe Delivery</span>
 </section>
 
-<!-- QUOTE -->
 <section class="quote-section" id="quote">
-<div class="container">
+    <div class="container">
+        <h2 style="text-align: center; margin-bottom: 30px;">Get Your Estimate</h2>
 
-<h2>Instant Moving Quote</h2>
+        <div class="price-panel">
+            <span style="text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px;">Estimated Price</span>
+            <div class="price-value" id="livePrice">₹0</div>
+            <div id="priceBreakup" style="font-size: 0.9rem; opacity: 0.8; margin-top: 10px;"></div>
+        </div>
 
-<div class="price-panel">
-  Estimated Price
-  <div class="price-value" id="livePrice">₹0</div>
-  <div class="price-breakup" id="priceBreakup"></div>
-</div>
+        <div class="form-group">
+            <label><i class="fas fa-map-marker-alt"></i> Pickup Location</label>
+            <input id="pickup" placeholder="Enter pickup area in Bangalore">
+        </div>
 
-<label>Pickup Location</label>
-<input id="pickup" placeholder="Enter pickup">
+        <div class="form-group">
+            <label><i class="fas fa-map-pin"></i> Drop Location</label>
+            <input id="drop" placeholder="Enter destination area">
+        </div>
 
-<label>Drop Location</label>
-<input id="drop" placeholder="Enter drop">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+            <div class="form-group">
+                <label>House Type</label>
+                <select id="house">
+                    <option value="0">1 RK</option>
+                    <option value="1200">1 BHK</option>
+                    <option value="2500">2 BHK</option>
+                    <option value="4000">3 BHK</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Vehicle</label>
+                <select id="vehicle">
+                    <option value="25">Tata Ace</option>
+                    <option value="40">14 ft Truck</option>
+                    <option value="50">17 ft Truck</option>
+                    <option value="60">22 ft Truck</option>
+                </select>
+            </div>
+        </div>
 
-<label>House Type</label>
-<select id="house">
-<option value="0">1 RK</option>
-<option value="1200">1 BHK</option>
-<option value="2500">2 BHK</option>
-<option value="4000">3 BHK</option>
-</select>
+        <h3 style="font-size: 1.1rem; margin: 20px 0 10px;">Furniture (Add-ons)</h3>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px;">
+            <label class="checkbox-card"><input type="checkbox" id="sofaCheck"> Sofa</label>
+            <label class="checkbox-card"><input type="checkbox" id="bedCheck"> Bed</label>
+            <label class="checkbox-card"><input type="checkbox" id="fridgeCheck"> Fridge</label>
+        </div>
 
-<label>Vehicle Type</label>
-<select id="vehicle">
-<option value="25">Tata Ace</option>
-<option value="40">14 ft Truck</option>
-<option value="50">17 ft Truck</option>
-<option value="60">22 ft Truck</option>
-</select>
+        <div id="map"></div>
 
-<h3>Furniture</h3>
-<label><input type="checkbox" id="sofaCheck"> Sofa</label>
-<label><input type="checkbox" id="bedCheck"> Bed</label>
-<label><input type="checkbox" id="fridgeCheck"> Fridge</label>
+        <button onclick="calculateQuote()">
+            <i class="fas fa-calculator"></i> Calculate Price
+        </button>
 
-<div id="map"></div>
+        <div id="result"></div>
 
-<button onclick="calculateQuote()">Calculate Price</button>
-
-<div id="result"></div>
-
-<button onclick="bookOnWhatsApp()" class="book-btn">
-Book on WhatsApp
-</button>
-
-</div>
+        <button onclick="bookOnWhatsApp()" class="book-btn">
+            <i class="fab fa-whatsapp"></i> Book on WhatsApp
+        </button>
+    </div>
 </section>
 
 <footer class="footer">
-PackZen Packers & Movers • Bangalore
+    <p>&copy; 2026 PackZen Packers & Movers • Bangalore</p>
 </footer>
 
-<!-- FLOATING BUTTONS -->
-<a href="tel:9945095453" class="call-btn">📞 Call</a>
-<a href="https://wa.me/919945095453" class="floating-wa">💬 WhatsApp</a>
+<a href="tel:9945095453" class="call-btn"><i class="fas fa-phone"></i> Call</a>
+<a href="https://wa.me/919945095453" class="floating-wa"><i class="fab fa-whatsapp"></i> WhatsApp</a>
 
-<!-- MOBILE STICKY BAR -->
-<div class="sticky-book">
-<a href="#quote">Get Quote</a>
+<div id="loader">
+    <i class="fas fa-circle-notch fa-spin" style="font-size: 3rem; margin-bottom: 15px;"></i>
+    <p>Calculating Best Price...</p>
 </div>
 
-<!-- LOADER -->
-<div id="loader">Calculating Price...</div>
-
 <script src="script.js"></script>
-
-<script async defer
-src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCdYIaoNUMxf0uWuHmWk_Nu2RcuYSsMuAY&libraries=places&callback=initAutocomplete">
-</script>
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places&callback=initAutocomplete"></script>
 
 </body>
 </html>
