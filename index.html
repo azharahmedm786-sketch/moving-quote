@@ -35,22 +35,12 @@
 
 <h2>Instant Moving Quote</h2>
 
-<!-- LIVE PRICE PANEL -->
-<div class="price-panel">
-  Estimated Price
-  <div class="price-value" id="livePrice">₹0</div>
-  <div class="price-breakup" id="priceBreakup"></div>
-</div>
-
-<!-- PICKUP -->
 <label>Pickup Location</label>
 <input id="pickup" placeholder="Enter pickup address">
 
-<!-- DROP -->
 <label>Drop Location</label>
 <input id="drop" placeholder="Enter drop address">
 
-<!-- HOUSE -->
 <label>House Type</label>
 <select id="house">
 <option value="0">1 RK</option>
@@ -59,7 +49,6 @@
 <option value="4000">3 BHK</option>
 </select>
 
-<!-- VEHICLE -->
 <label>Vehicle Type</label>
 <select id="vehicle">
 <option value="25">Tata Ace</option>
@@ -68,22 +57,24 @@
 <option value="60">22 ft Truck</option>
 </select>
 
-<!-- FURNITURE -->
 <h3>Furniture</h3>
 <label><input type="checkbox" id="sofaCheck"> Sofa</label>
 <label><input type="checkbox" id="bedCheck"> Bed</label>
 <label><input type="checkbox" id="fridgeCheck"> Fridge</label>
 
-<!-- MAP -->
 <div id="map"></div>
 
-<!-- CALCULATE -->
 <button onclick="calculateQuote()">Calculate Price</button>
 
-<!-- RESULT -->
+<!-- PRICE PANEL MOVED BELOW -->
+<div class="price-panel">
+  Estimated Price
+  <div class="price-value" id="livePrice">₹0</div>
+  <div class="price-breakup" id="priceBreakup"></div>
+</div>
+
 <div id="result"></div>
 
-<!-- BOOK -->
 <button onclick="bookOnWhatsApp()" class="book-btn">
 Book on WhatsApp
 </button>
@@ -91,7 +82,6 @@ Book on WhatsApp
 </div>
 </section>
 
-<!-- FOOTER -->
 <footer class="footer">
 PackZen Packers & Movers • Bangalore
 </footer>
@@ -99,11 +89,6 @@ PackZen Packers & Movers • Bangalore
 <!-- FLOATING BUTTONS -->
 <a href="tel:9945095453" class="call-btn">📞 Call</a>
 <a href="https://wa.me/919945095453" class="floating-wa" target="_blank">💬 WhatsApp</a>
-
-<!-- MOBILE STICKY BAR -->
-<div class="sticky-book">
-<a href="#quote">Get Quote</a>
-</div>
 
 <!-- LOADER -->
 <div id="loader">Calculating Price...</div>
