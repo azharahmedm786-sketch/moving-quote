@@ -343,3 +343,63 @@ window.addEventListener("load", function () {
   });
 
 });
+/* ---------- STEP FORM NAVIGATION ---------- */
+
+let currentStep = 0;
+let steps = [];
+
+window.addEventListener("load", () => {
+  steps = document.querySelectorAll(".form-step");
+  showStep(currentStep);
+});
+
+function showStep(n) {
+
+  steps.forEach(step =>
+    step.classList.remove("active")
+  );
+
+  if (steps[n])
+    steps[n].classList.add("active");
+
+  const progress = document.getElementById("progressBar");
+
+  if (progress)
+    progress.style.width =
+      ((n + 1) / steps.length) * 100 + "%";
+
+  if (n === steps.length - 1)
+    calculateQuote(true);
+}
+
+function nextStep() {
+
+  // validation step 1
+  if (currentStep === 0) {
+    if (!pickup.value || !drop.value) {
+      alert("Please enter pickup and drop location");
+      return;
+    }
+  }
+
+  // validation step 2
+  if (currentStep === 1) {
+    if (!house.value || !vehicle.value) {
+      alert("Please select house and vehicle");
+      return;
+    }
+  }
+
+  if (currentStep < steps.length - 1) {
+    currentStep++;
+    showStep(currentStep);
+  }
+}
+
+function prevStep() {
+  if (currentStep > 0) {
+    currentStep--;
+    showStep(currentStep);
+  }
+}
+
