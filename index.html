@@ -10,53 +10,40 @@
 <body>
 
 <header class="hero">
-<h1>PackZen Packers & Movers</h1>
+<h1>PackZen Packers & Movers Bangalore</h1>
 <p>Reliable & Affordable Moving Services</p>
 <a href="#quote" class="hero-quote-btn">Get Instant Quote</a>
 </header>
 
 <section class="quote-section" id="quote">
+<div class="wrapper">
 <div class="container">
 
-<h2>Book Your Move</h2>
+<h1>Get Instant Moving Quote</h1>
+<div class="progress"><div id="progressBar"></div></div>
 
-<div class="progress">
-<div id="progressBar"></div>
-</div>
-
-<!-- STEP 1 LOGIN -->
+<!-- STEP 1 -->
 <div class="form-step active">
 
-<h3>Login with OTP</h3>
-
-<input id="loginPhone" placeholder="Enter Mobile Number">
-
-<button onclick="sendOTP()">Send OTP</button>
-
-<div id="otpBox" style="display:none">
-<input id="otpInput" placeholder="Enter OTP">
-<button onclick="verifyOTP()">Verify</button>
-</div>
-
-</div>
-
-<!-- STEP 2 LOCATIONS -->
-<div class="form-step">
-
-<label>Pickup</label>
+<label>Pickup Location</label>
 <input id="pickup">
 
-<label>Drop</label>
+<label>Use Current Location
+<label class="toggle">
+<input type="checkbox" id="useCurrentLocation">
+<span class="slider"></span>
+</label>
+</label>
+
+<label>Drop Location</label>
 <input id="drop">
 
 <div id="map"></div>
 
-<button onclick="prevStep()">Back</button>
 <button onclick="nextStep()">Next</button>
-
 </div>
 
-<!-- STEP 3 HOUSE -->
+<!-- STEP 2 -->
 <div class="form-step">
 
 <label>House Type</label>
@@ -76,43 +63,56 @@
 
 <button onclick="prevStep()">Back</button>
 <button onclick="nextStep()">Next</button>
-
 </div>
 
-<!-- STEP 4 INVENTORY -->
+<!-- STEP 3 -->
 <div class="form-step">
+<h3>Furniture</h3>
 
-<h3>Inventory</h3>
+<label><input type="checkbox" id="sofaCheck"> Sofa</label>
+<input id="sofaQty" type="number" value="1">
 
-<label><input type="checkbox" class="inv" data-name="Sofa"> Sofa</label>
-<input class="qty" data-name="Sofa" value="1">
+<label><input type="checkbox" id="bedCheck"> Bed</label>
+<input id="bedQty" type="number" value="1">
 
-<label><input type="checkbox" class="inv" data-name="Bed"> Bed</label>
-<input class="qty" data-name="Bed" value="1">
-
-<label><input type="checkbox" class="inv" data-name="Fridge"> Fridge</label>
-<input class="qty" data-name="Fridge" value="1">
-
-<label><input type="checkbox" class="inv" data-name="Washing Machine"> Washing Machine</label>
-<input class="qty" data-name="Washing Machine" value="1">
+<label><input type="checkbox" id="fridgeCheck"> Fridge</label>
 
 <button onclick="prevStep()">Back</button>
 <button onclick="nextStep()">Next</button>
-
 </div>
 
-<!-- STEP 5 FINAL -->
+<!-- STEP 4 -->
 <div class="form-step">
 
-<h3>Final Price</h3>
+<label>Name</label>
+<input id="custName">
+
+<label>Phone</label>
+<input id="custPhone">
+
+<h3>Login with OTP</h3>
+<input id="loginPhone" placeholder="Phone number">
+<button type="button" onclick="sendOTP()">Send OTP</button>
+
+<div id="otpBox" style="display:none">
+<input id="otpInput" placeholder="Enter OTP">
+<button type="button" onclick="verifyOTP()">Verify OTP</button>
+</div>
+
+<div style="margin-top:10px;font-size:20px;font-weight:700">
+Estimated Price: ₹<span id="livePrice">0</span>
+</div>
 
 <div id="result"></div>
 
 <button onclick="prevStep()">Back</button>
-<button onclick="bookOnWhatsApp()">Book on WhatsApp</button>
+<button onclick="bookOnWhatsApp()" class="book-btn">
+Book on WhatsApp
+</button>
 
 </div>
 
+</div>
 </div>
 </section>
 
