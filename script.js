@@ -1,135 +1,237 @@
-let currentStep=0;
-let steps=[];
 let pickupPlace, dropPlace;
 let map, directionsService, directionsRenderer;
-let lastQuoteData=null;
+let pickupMarker, dropMarker;
 
-const MIN_BASE_PRICE=1100;
+const MIN_BASE_PRICE = 1100;
+const FRIDGE_PRICE = 400;
+let lastQuoteData = null;
 
-window.addEventListener("load",()=>{
-steps=document.querySelectorAll(".form-step");
-showStep(0);
-});
-
-function showStep(n){
-steps.forEach(s=>s.classList.remove("active"));
-steps[n].classList.add("active");
-document.getElementById("progressBar").style.width=
-((n+1)/steps.length)*100+"%";
+/* BOOKING ID */
+function generateBookingID(){
+ return "PZ"+Date.now().toString().slice(-6);
 }
 
-function nextStep(){
-currentStep++;
-showStep(currentStep);
+/* SAVE LEAD */
+function saveLead(data){
+ fetch("YOUR_GOOGLE_SCRIPT_URL",{
+  method:"POST",
+  body:JSON.stringify(data)
+ });
 }
 
-function prevStep(){
-currentStep--;
-showStep(currentStep);
+/* MAP INIT */
+function initAutocomplete(){
+ const pickupAuto =
+  new google.maps.places.Autocomplete(pickup);
+
+ const dropAuto =
+  new google.maps.places.Autocomplete(drop);
+
+ pickupAuto.addListener("place_changed",()=>{
+  pickupPlace = pickupAuto.getPlace();
+  showLocation("pickup");
+ });
+
+ dropAuto.addListener("place_changed",()=>{
+  dropPlace = dropAuto.getPlace();
+  showLocation("drop");
+ });
+
+ setupCurrentLocation();
 }
 
-/* OTP DEMO */
+/* CURRENT LOCATION */
+function setupCurrentLocation(){
+ useCurrentLocation.addEventListener("change",()=>{
+  navigator.geolocation.getCurrentPosition(pos=>{
+   const loc={
+    lat:pos.coords.latitude,
+    lng:pos.coords.longitude
+   };
+   pickup.value="Current Location";
+   pickupPlace={geometry:{location:loc}};
+   showLocation("pickup");
+  });
+ });
+}
+
+/* SHOW LOCATION */
+function showLocation(type){
+ const place = type==="pickup"?pickupPlace:dropPlace;
+ if(!place?.geometry) return;
+
+ const loc = place.geometry.location;
+
+ if(!map){
+  map=new google.maps.Map(map,{
+   center:loc,zoom:14
+  });
+
+  directionsService=new google.maps.DirectionsService();
+  directionsRenderer=new google.maps.DirectionsRenderer({
+   map,suppressMarkers:true
+  });
+ }
+
+ let marker;
+
+ if(type==="pickup"){
+  if(pickupMarker) pickupMarker.setMap(null);
+  pickupMarker=new google.maps.Marker({map,position:loc,draggable:true,label:"P"});
+  marker=pickupMarker;
+ }
+
+ if(type==="drop"){
+  if(dropMarker) dropMarker.setMap(null);
+  dropMarker=new google.maps.Marker({map,position:loc,draggable:true,label:"D"});
+  marker=dropMarker;
+ }
+
+ marker.addListener("dragend",()=>calculateQuote(true));
+
+ if(pickupPlace && dropPlace){
+  directionsService.route({
+   origin:pickupPlace.geometry.location,
+   destination:dropPlace.geometry.location,
+   travelMode:"DRIVING"
+  },(res,status)=>{
+   if(status==="OK")
+    directionsRenderer.setDirections(res);
+  });
+ }
+
+ calculateQuote(true);
+}
+
+/* PRICE CALC */
+function calculateQuote(auto=false){
+
+ if(!pickup.value||!drop.value) return;
+
+ const houseBase=Number(house.value||0);
+ const vehicleRate=Number(vehicle.value||0);
+
+ if(!houseBase||!vehicleRate) return;
+
+ let furnitureCost=0;
+ let list=[];
+
+ if(sofaCheck.checked){
+  furnitureCost+=500*Number(sofaQty.value||1);
+  list.push("Sofa");
+ }
+
+ if(bedCheck.checked){
+  furnitureCost+=700*Number(bedQty.value||1);
+  list.push("Bed");
+ }
+
+ if(fridgeCheck.checked){
+  furnitureCost+=FRIDGE_PRICE;
+  list.push("Fridge");
+ }
+
+ const service=new google.maps.DistanceMatrixService();
+
+ service.getDistanceMatrix({
+  origins:[pickup.value],
+  destinations:[drop.value],
+  travelMode:"DRIVING"
+ },(res,status)=>{
+
+  if(status!=="OK") return;
+
+  const km=res.rows[0].elements[0].distance.value/1000;
+  const total =
+   MIN_BASE_PRICE +
+   houseBase +
+   km*vehicleRate +
+   furnitureCost;
+
+  livePrice.innerText=Math.round(total);
+
+  result.innerHTML =
+   `Distance: ${km.toFixed(1)} km<br>
+   Total: ₹${Math.round(total)}`;
+
+  lastQuoteData={
+   distance:km.toFixed(1),
+   total:Math.round(total),
+   furniture:list.join(", ")
+  };
+ });
+}
+
+/* OTP */
 function sendOTP(){
-alert("Demo OTP: 1234");
-document.getElementById("otpBox").style.display="block";
+ window.generatedOTP="1234";
+ alert("Demo OTP: 1234");
+ otpBox.style.display="block";
 }
 
 function verifyOTP(){
-if(document.getElementById("otpInput").value=="1234"){
-alert("Login Success");
-nextStep();
-}else alert("Wrong OTP");
-}
-
-/* MAP */
-function initAutocomplete(){
-const pickupAuto=new google.maps.places.Autocomplete(pickup);
-const dropAuto=new google.maps.places.Autocomplete(drop);
-
-pickupAuto.addListener("place_changed",()=>{
-pickupPlace=pickupAuto.getPlace();
-});
-
-dropAuto.addListener("place_changed",()=>{
-dropPlace=dropAuto.getPlace();
-});
-}
-
-/* PRICE */
-function calculateQuote(cb){
-
-let service=new google.maps.DistanceMatrixService();
-
-service.getDistanceMatrix({
-origins:[pickup.value],
-destinations:[drop.value],
-travelMode:"DRIVING"
-},(res,status)=>{
-
-let km=res.rows[0].elements[0].distance.value/1000;
-
-let house=Number(document.getElementById("house").value);
-let vehicle=Number(document.getElementById("vehicle").value);
-
-let inventoryCost=0;
-let list=[];
-
-document.querySelectorAll(".inv").forEach(c=>{
-if(c.checked){
-let qty=document.querySelector(
-`.qty[data-name="${c.dataset.name}"]`
-).value;
-
-inventoryCost+=300*qty;
-list.push(c.dataset.name+" x"+qty);
-}
-});
-
-let total=MIN_BASE_PRICE+house+(km*vehicle)+inventoryCost;
-
-lastQuoteData={
-distance:km.toFixed(1),
-total:Math.round(total),
-items:list.join(", ")
-};
-
-result.innerHTML=
-`Distance: ${km.toFixed(1)} km<br>
-Items: ${list.join(", ")}<br>
-Total: ₹${Math.round(total)}`;
-
-if(cb)cb();
-});
+ if(otpInput.value===window.generatedOTP)
+  alert("Login successful");
+ else alert("Wrong OTP");
 }
 
 /* BOOKING */
 function bookOnWhatsApp(){
 
-calculateQuote(()=>{
+ calculateQuote(true);
 
-let id="PZ"+Date.now().toString().slice(-6);
+ setTimeout(()=>{
+  if(!lastQuoteData){
+   alert("Calculate price first");
+   return;
+  }
 
-fetch("YOUR_GOOGLE_SCRIPT_URL",{
-method:"POST",
-body:JSON.stringify({
-booking:id,
-pickup:pickup.value,
-drop:drop.value,
-distance:lastQuoteData.distance,
-items:lastQuoteData.items,
-total:lastQuoteData.total
-})
-});
+  const bookingID=generateBookingID();
 
-let msg=`Booking ID: ${id}
-Pickup: ${pickup.value}
-Drop: ${drop.value}
-Distance: ${lastQuoteData.distance} km
-Items: ${lastQuoteData.items}
-Total: ₹${lastQuoteData.total}`;
+  saveLead({
+   bookingID,
+   name:custName.value,
+   phone:custPhone.value,
+   pickup:pickup.value,
+   drop:drop.value,
+   total:lastQuoteData.total
+  });
 
-window.open(
-"https://wa.me/919945095453?text="+encodeURIComponent(msg)
-);
-});
+  alert("Booking ID: "+bookingID);
+
+  window.open(
+   "https://wa.me/919945095453?text="+
+   encodeURIComponent("Booking ID: "+bookingID),
+   "_blank"
+  );
+ },500);
+}
+
+/* STEP NAVIGATION */
+let currentStep=0;
+let steps;
+
+window.onload=()=>{
+ steps=document.querySelectorAll(".form-step");
+ showStep(0);
+};
+
+function showStep(n){
+ steps.forEach(s=>s.classList.remove("active"));
+ steps[n].classList.add("active");
+ progressBar.style.width=((n+1)/steps.length)*100+"%";
+}
+
+function nextStep(){
+ if(currentStep<steps.length-1){
+  currentStep++;
+  showStep(currentStep);
+ }
+}
+
+function prevStep(){
+ if(currentStep>0){
+  currentStep--;
+  showStep(currentStep);
+ }
 }
