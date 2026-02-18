@@ -1,6 +1,6 @@
 /* ============================================
-   script.js — PackZen Complete JavaScript
-   (Original logic + Animations combined)
+   PackZen — Premium script.js
+   All logic + animations combined
    ============================================ */
 
 let pickupPlace, dropPlace;
@@ -11,34 +11,31 @@ const MIN_BASE_PRICE = 1100;
 const FRIDGE_PRICE   = 400;
 
 /* ============================================
-   ANIMATIONS — SCROLL REVEAL
+   ON PAGE LOAD — ANIMATIONS & UI
    ============================================ */
 document.addEventListener("DOMContentLoaded", () => {
 
-  /* -- Scroll Reveal Observer -- */
-  const observer = new IntersectionObserver((entries) => {
+  /* -- Scroll Reveal -- */
+  const revealObserver = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
         entry.target.classList.add("visible");
-        observer.unobserve(entry.target);
+        revealObserver.unobserve(entry.target);
       }
     });
-  }, { threshold: 0.15 });
+  }, { threshold: 0.12 });
 
-  document.querySelectorAll(".reveal, .reveal-stagger").forEach(el => {
-    observer.observe(el);
-  });
+  document.querySelectorAll(".reveal, .reveal-stagger")
+    .forEach(el => revealObserver.observe(el));
 
   /* -- Stats Counter -- */
   function animateCounter(el) {
     const target   = parseInt(el.dataset.target);
-    const duration = 1800;
+    const duration = 2000;
     const start    = performance.now();
-
     function update(time) {
-      const elapsed  = time - start;
-      const progress = Math.min(elapsed / duration, 1);
-      const eased    = 1 - (1 - progress) * (1 - progress);
+      const progress = Math.min((time - start) / duration, 1);
+      const eased    = 1 - Math.pow(1 - progress, 3);
       el.textContent = Math.floor(eased * target).toLocaleString();
       if (progress < 1) requestAnimationFrame(update);
       else el.textContent = target.toLocaleString();
@@ -53,14 +50,14 @@ document.addEventListener("DOMContentLoaded", () => {
         statsObserver.unobserve(entry.target);
       }
     });
-  }, { threshold: 0.4 });
+  }, { threshold: 0.3 });
 
   const statsStrip = document.getElementById("statsStrip");
   if (statsStrip) statsObserver.observe(statsStrip);
 
-  /* -- Ripple Effect on Buttons -- */
-  document.querySelectorAll("button, .hero-quote-btn").forEach(btn => {
-    btn.addEventListener("click", function (e) {
+  /* -- Ripple on Buttons -- */
+  document.querySelectorAll("button, .btn-primary, .btn-ghost").forEach(btn => {
+    btn.addEventListener("click", function(e) {
       const ripple = document.createElement("span");
       ripple.classList.add("ripple");
       const rect = this.getBoundingClientRect();
@@ -73,34 +70,30 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  /* -- Price Pop Animation -- */
+  /* -- Price Pop -- */
   const priceEl = document.getElementById("livePrice");
   if (priceEl) {
-    const priceObserver = new MutationObserver(() => {
+    new MutationObserver(() => {
       priceEl.classList.remove("updated");
-      void priceEl.offsetWidth; // force reflow
+      void priceEl.offsetWidth;
       priceEl.classList.add("updated");
-    });
-    priceObserver.observe(priceEl, { childList: true });
+    }).observe(priceEl, { childList: true });
   }
 
-  /* -- WhatsApp Button Loading Spinner -- */
-  const bookBtn = document.querySelector(".book-btn");
-  if (bookBtn) {
-    bookBtn.addEventListener("click", () => {
-      const originalText = bookBtn.innerHTML;
-      bookBtn.innerHTML  = `Booking... <span class="price-loading"></span>`;
-      bookBtn.disabled   = true;
-      setTimeout(() => {
-        bookBtn.innerHTML = originalText;
-        bookBtn.disabled  = false;
-      }, 2000);
+  /* -- WhatsApp Button Spinner -- */
+  const waBtn = document.querySelector(".btn-whatsapp");
+  if (waBtn) {
+    waBtn.addEventListener("click", () => {
+      const orig = waBtn.innerHTML;
+      waBtn.innerHTML  = `Sending... <span class="price-loading"></span>`;
+      waBtn.disabled   = true;
+      setTimeout(() => { waBtn.innerHTML = orig; waBtn.disabled = false; }, 2000);
     }, { capture: true });
   }
 
-  /* -- Smooth Scroll for CTA button -- */
-  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener("click", function (e) {
+  /* -- Smooth Scroll -- */
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener("click", function(e) {
       const target = document.querySelector(this.getAttribute("href"));
       if (target) {
         e.preventDefault();
@@ -109,19 +102,19 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  /* -- Hero Parallax -- */
-  const hero = document.querySelector(".hero");
-  if (hero) {
-    window.addEventListener("scroll", () => {
-      hero.style.backgroundPositionY = `${window.scrollY * 0.4}px`;
-    }, { passive: true });
-  }
+  /* -- Navbar scroll effect -- */
+  const navbar = document.querySelector(".navbar");
+  window.addEventListener("scroll", () => {
+    navbar.style.background = window.scrollY > 50
+      ? "rgba(5,13,26,0.97)"
+      : "rgba(5,13,26,0.85)";
+  }, { passive: true });
 
 }); // end DOMContentLoaded
 
 
 /* ============================================
-   SAVE LEAD TO GOOGLE SHEETS
+   SAVE LEAD
    ============================================ */
 function saveLead() {
   fetch("https://script.google.com/macros/s/AKfycbwne_QGsKg2vomV1ELPCNkJQ--vMUx4qbkKxfHPvMT9zjkduNZ3t7AC5XC-lNnskEzwVg/exec", {
@@ -137,7 +130,7 @@ function saveLead() {
 
 
 /* ============================================
-   INIT GOOGLE MAP + AUTOCOMPLETE
+   GOOGLE MAPS AUTOCOMPLETE
    ============================================ */
 function initAutocomplete() {
 
@@ -159,17 +152,13 @@ function initAutocomplete() {
     calculateQuote(true);
   });
 
-  /* Current Location Toggle */
   const toggle = document.getElementById("useCurrentLocation");
   if (toggle) {
     toggle.addEventListener("change", () => {
       if (!toggle.checked) return;
-
       navigator.geolocation.getCurrentPosition(pos => {
         const loc = { lat: pos.coords.latitude, lng: pos.coords.longitude };
-        const geo = new google.maps.Geocoder();
-
-        geo.geocode({ location: loc }, (res, status) => {
+        new google.maps.Geocoder().geocode({ location: loc }, (res, status) => {
           if (status === "OK" && res[0]) {
             pickupInput.value = res[0].formatted_address;
             pickupPlace = { geometry: { location: loc } };
@@ -186,7 +175,7 @@ function initAutocomplete() {
 
 
 /* ============================================
-   AUTO PRICE UPDATE ON FIELD CHANGE
+   AUTO PRICE ON FIELD CHANGE
    ============================================ */
 function attachAutoCalculation() {
   [house, vehicle, sofaCheck, sofaQty, bedCheck, bedQty, fridgeCheck, wmCheck]
@@ -198,12 +187,11 @@ function attachAutoCalculation() {
 
 
 /* ============================================
-   SHOW LOCATION ON MAP
+   MAP DISPLAY
    ============================================ */
 function showLocation(type) {
   const mapDiv = document.getElementById("map");
   const place  = type === "pickup" ? pickupPlace : dropPlace;
-
   if (!place?.geometry) return;
 
   const loc = place.geometry.location;
@@ -222,37 +210,26 @@ function showLocation(type) {
     if (pickupMarker) pickupMarker.setMap(null);
     pickupMarker = new google.maps.Marker({ map, position: loc, draggable: true, label: "P" });
     marker = pickupMarker;
-  }
-
-  if (type === "drop") {
+  } else {
     if (dropMarker) dropMarker.setMap(null);
     dropMarker = new google.maps.Marker({ map, position: loc, draggable: true, label: "D" });
     marker = dropMarker;
   }
 
-  marker.addListener("dragend", () => {
-    updateAddress(type, marker.getPosition());
-  });
-
+  marker.addListener("dragend", () => updateAddress(type, marker.getPosition()));
   adjustBounds();
 }
 
 
 /* ============================================
-   UPDATE ADDRESS AFTER MARKER DRAG
+   UPDATE ADDRESS AFTER DRAG
    ============================================ */
 function updateAddress(type, latlng) {
-  const geocoder = new google.maps.Geocoder();
-
-  geocoder.geocode({ location: latlng }, (res, status) => {
+  new google.maps.Geocoder().geocode({ location: latlng }, (res, status) => {
     if (status === "OK" && res[0]) {
       document.getElementById(type).value = res[0].formatted_address;
-
-      if (type === "pickup")
-        pickupPlace = { geometry: { location: latlng } };
-      else
-        dropPlace = { geometry: { location: latlng } };
-
+      if (type === "pickup") pickupPlace = { geometry: { location: latlng } };
+      else                   dropPlace   = { geometry: { location: latlng } };
       adjustBounds();
       calculateQuote(true);
     }
@@ -261,16 +238,13 @@ function updateAddress(type, latlng) {
 
 
 /* ============================================
-   ROUTE + AUTO-ZOOM MAP
+   ROUTE + AUTO ZOOM
    ============================================ */
 function adjustBounds() {
   if (!map) return;
-
   const bounds = new google.maps.LatLngBounds();
-
   if (pickupPlace?.geometry) bounds.extend(pickupPlace.geometry.location);
   if (dropPlace?.geometry)   bounds.extend(dropPlace.geometry.location);
-
   if (!bounds.isEmpty()) map.fitBounds(bounds);
 
   if (pickupPlace && dropPlace) {
@@ -291,7 +265,7 @@ function adjustBounds() {
 function calculateQuote(auto = false) {
 
   if (!pickup.value || !drop.value) {
-    if (!auto) alert("Enter locations");
+    if (!auto) alert("Enter pickup & drop locations");
     return;
   }
 
@@ -299,24 +273,21 @@ function calculateQuote(auto = false) {
   const vehicleRate = Number(vehicle.value || 0);
 
   if (!houseBase || !vehicleRate) {
-    if (!auto) alert("Select house & vehicle");
+    if (!auto) alert("Select house type & vehicle");
     return;
   }
 
   let furnitureCost = 0;
-  if (sofaCheck.checked)  furnitureCost += 500 * Number(sofaQty.value || 1);
-  if (bedCheck.checked)   furnitureCost += 700 * Number(bedQty.value  || 1);
+  if (sofaCheck.checked)   furnitureCost += 500 * Number(sofaQty.value || 1);
+  if (bedCheck.checked)    furnitureCost += 700 * Number(bedQty.value  || 1);
   if (fridgeCheck.checked) furnitureCost += FRIDGE_PRICE;
-  if (wmCheck.checked)    furnitureCost += 400;
+  if (wmCheck.checked)     furnitureCost += 400;
 
-  const service = new google.maps.DistanceMatrixService();
-
-  service.getDistanceMatrix({
+  new google.maps.DistanceMatrixService().getDistanceMatrix({
     origins:      [pickup.value],
     destinations: [drop.value],
     travelMode:   "DRIVING"
   }, (res, status) => {
-
     if (status !== "OK") return;
 
     const km           = res.rows[0].elements[0].distance.value / 1000;
@@ -324,13 +295,13 @@ function calculateQuote(auto = false) {
     const total        = MIN_BASE_PRICE + houseBase + distanceCost + furnitureCost;
 
     result.innerHTML = `
-      Distance: ${km.toFixed(1)} km<br>
+      Distance: ${km.toFixed(1)} km &nbsp;|&nbsp;
       Furniture: ₹${furnitureCost}<br>
       <strong>Total Estimate: ₹${Math.round(total)}</strong>
     `;
 
-    const priceBox = document.getElementById("livePrice");
-    if (priceBox) priceBox.innerText = "₹" + Math.round(total);
+    const priceEl = document.getElementById("livePrice");
+    if (priceEl) priceEl.innerText = "₹" + Math.round(total).toLocaleString();
   });
 }
 
@@ -342,13 +313,8 @@ function bookOnWhatsApp() {
   calculateQuote(true);
   saveLead();
 
-  const message =
-    "New Moving Request 🚚\n\n" + result.innerText;
-
-  window.open(
-    `https://wa.me/919945095453?text=${encodeURIComponent(message)}`,
-    "_blank"
-  );
+  const message = "New Moving Request 🚚\n\n" + result.innerText;
+  window.open(`https://wa.me/919945095453?text=${encodeURIComponent(message)}`, "_blank");
 }
 
 
@@ -358,27 +324,39 @@ function bookOnWhatsApp() {
 let currentStep = 0;
 const steps     = document.querySelectorAll(".form-step");
 
+function updateStepDots(n) {
+  document.querySelectorAll(".step-dot").forEach((dot, i) => {
+    dot.classList.remove("active", "done");
+    if (i < n)  dot.classList.add("done");
+    if (i === n) dot.classList.add("active");
+  });
+  document.querySelectorAll(".step-line").forEach((line, i) => {
+    line.classList.toggle("done", i < n);
+  });
+}
+
 function showStep(n) {
   steps.forEach(s => s.classList.remove("active"));
   steps[n].classList.add("active");
 
-  // Re-trigger step animation
+  // Re-trigger animation
   steps[n].style.animation = "none";
   void steps[n].offsetWidth;
   steps[n].style.animation = "";
 
   progressBar.style.width = ((n + 1) / steps.length) * 100 + "%";
+  updateStepDots(n);
 
   if (n === steps.length - 1) calculateQuote(true);
 }
 
 function nextStep() {
   if (currentStep === 0 && (!pickup.value || !drop.value)) {
-    alert("Enter pickup & drop");
+    alert("Please enter pickup & drop locations");
     return;
   }
   if (currentStep === 1 && (!house.value || !vehicle.value)) {
-    alert("Select house & vehicle");
+    alert("Please select house type & vehicle");
     return;
   }
   if (currentStep < steps.length - 1) {
