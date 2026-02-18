@@ -1,408 +1,135 @@
+let currentStep=0;
+let steps=[];
 let pickupPlace, dropPlace;
 let map, directionsService, directionsRenderer;
-let pickupMarker, dropMarker;
+let lastQuoteData=null;
 
-const MIN_BASE_PRICE = 1100;
-const FRIDGE_PRICE = 400;
+const MIN_BASE_PRICE=1100;
 
-let lastQuoteData = null;
+window.addEventListener("load",()=>{
+steps=document.querySelectorAll(".form-step");
+showStep(0);
+});
 
-/* ---------- BOOKING ID ---------- */
-function generateBookingID() {
-  return "PZ" + Date.now().toString().slice(-6);
+function showStep(n){
+steps.forEach(s=>s.classList.remove("active"));
+steps[n].classList.add("active");
+document.getElementById("progressBar").style.width=
+((n+1)/steps.length)*100+"%";
 }
 
-/* ---------- SAVE LEAD ---------- */
-function saveLead(data) {
-  fetch("https://script.google.com/macros/s/AKfycbwne_QGsKg2vomV1ELPCNkJQ--vMUx4qbkKxfHPvMT9zjkduNZ3t7AC5XC-lNnskEzwVg/exec", {
-    method: "POST",
-    body: JSON.stringify(data)
-  });
+function nextStep(){
+currentStep++;
+showStep(currentStep);
 }
 
-/* ---------- INIT AUTOCOMPLETE ---------- */
-function initAutocomplete() {
-
-  const pickupInput = document.getElementById("pickup");
-  const dropInput = document.getElementById("drop");
-
-  const pickupAuto =
-    new google.maps.places.Autocomplete(pickupInput);
-
-  const dropAuto =
-    new google.maps.places.Autocomplete(dropInput);
-
-  pickupAuto.addListener("place_changed", () => {
-    pickupPlace = pickupAuto.getPlace();
-    showLocation("pickup");
-    calculateQuote(true);
-  });
-
-  dropAuto.addListener("place_changed", () => {
-    dropPlace = dropAuto.getPlace();
-    showLocation("drop");
-    calculateQuote(true);
-  });
-
-  setupCurrentLocation();
+function prevStep(){
+currentStep--;
+showStep(currentStep);
 }
 
-/* ---------- CURRENT LOCATION ---------- */
-function setupCurrentLocation() {
-
-  const toggle =
-    document.getElementById("useCurrentLocation");
-
-  if (!toggle) return;
-
-  toggle.addEventListener("change", function () {
-
-    if (!this.checked) return;
-
-    navigator.geolocation.getCurrentPosition(
-      pos => {
-
-        const loc = {
-          lat: pos.coords.latitude,
-          lng: pos.coords.longitude
-        };
-
-        const geocoder = new google.maps.Geocoder();
-
-        geocoder.geocode({ location: loc },
-          (results, status) => {
-
-            if (status === "OK" && results[0]) {
-
-              pickup.value =
-                results[0].formatted_address;
-
-              pickupPlace = {
-                geometry: { location: loc }
-              };
-
-              showLocation("pickup");
-              calculateQuote(true);
-            }
-          });
-      },
-      () => alert("Location permission denied")
-    );
-
-  });
+/* OTP DEMO */
+function sendOTP(){
+alert("Demo OTP: 1234");
+document.getElementById("otpBox").style.display="block";
 }
 
-/* ---------- SHOW LOCATION ---------- */
-function showLocation(type) {
-
-  const place =
-    type === "pickup" ? pickupPlace : dropPlace;
-
-  if (!place?.geometry) return;
-
-  const loc = place.geometry.location;
-
-  const mapDiv =
-    document.getElementById("map");
-
-  if (!map) {
-    map = new google.maps.Map(mapDiv, {
-      center: loc,
-      zoom: 14
-    });
-
-    directionsService =
-      new google.maps.DirectionsService();
-
-    directionsRenderer =
-      new google.maps.DirectionsRenderer({
-        map,
-        suppressMarkers: true
-      });
-  }
-
-  map.setCenter(loc);
-
-  let marker;
-
-  if (type === "pickup") {
-    if (pickupMarker) pickupMarker.setMap(null);
-
-    pickupMarker = new google.maps.Marker({
-      map,
-      position: loc,
-      draggable: true,
-      label: "P"
-    });
-
-    marker = pickupMarker;
-  }
-
-  if (type === "drop") {
-    if (dropMarker) dropMarker.setMap(null);
-
-    dropMarker = new google.maps.Marker({
-      map,
-      position: loc,
-      draggable: true,
-      label: "D"
-    });
-
-    marker = dropMarker;
-  }
-
-  marker.addListener("dragend", () =>
-    updateAddress(type, marker.getPosition())
-  );
-
-  adjustBounds();
+function verifyOTP(){
+if(document.getElementById("otpInput").value=="1234"){
+alert("Login Success");
+nextStep();
+}else alert("Wrong OTP");
 }
 
-/* ---------- UPDATE ADDRESS ---------- */
-function updateAddress(type, latlng) {
+/* MAP */
+function initAutocomplete(){
+const pickupAuto=new google.maps.places.Autocomplete(pickup);
+const dropAuto=new google.maps.places.Autocomplete(drop);
 
-  const geocoder = new google.maps.Geocoder();
+pickupAuto.addListener("place_changed",()=>{
+pickupPlace=pickupAuto.getPlace();
+});
 
-  geocoder.geocode({ location: latlng },
-    (res, status) => {
-
-      if (status === "OK" && res[0]) {
-
-        document.getElementById(type).value =
-          res[0].formatted_address;
-
-        if (type === "pickup")
-          pickupPlace =
-            { geometry: { location: latlng } };
-        else
-          dropPlace =
-            { geometry: { location: latlng } };
-
-        adjustBounds();
-        calculateQuote(true);
-      }
-    });
+dropAuto.addListener("place_changed",()=>{
+dropPlace=dropAuto.getPlace();
+});
 }
 
-/* ---------- ROUTE + ZOOM ---------- */
-function adjustBounds() {
+/* PRICE */
+function calculateQuote(cb){
 
-  if (!map) return;
+let service=new google.maps.DistanceMatrixService();
 
-  const bounds =
-    new google.maps.LatLngBounds();
+service.getDistanceMatrix({
+origins:[pickup.value],
+destinations:[drop.value],
+travelMode:"DRIVING"
+},(res,status)=>{
 
-  if (pickupPlace?.geometry)
-    bounds.extend(pickupPlace.geometry.location);
+let km=res.rows[0].elements[0].distance.value/1000;
 
-  if (dropPlace?.geometry)
-    bounds.extend(dropPlace.geometry.location);
+let house=Number(document.getElementById("house").value);
+let vehicle=Number(document.getElementById("vehicle").value);
 
-  if (!bounds.isEmpty())
-    map.fitBounds(bounds);
+let inventoryCost=0;
+let list=[];
 
-  if (pickupPlace && dropPlace) {
-    directionsService.route({
-      origin: pickupPlace.geometry.location,
-      destination: dropPlace.geometry.location,
-      travelMode: "DRIVING"
-    }, (result, status) => {
-      if (status === "OK")
-        directionsRenderer.setDirections(result);
-    });
-  }
+document.querySelectorAll(".inv").forEach(c=>{
+if(c.checked){
+let qty=document.querySelector(
+`.qty[data-name="${c.dataset.name}"]`
+).value;
+
+inventoryCost+=300*qty;
+list.push(c.dataset.name+" x"+qty);
+}
+});
+
+let total=MIN_BASE_PRICE+house+(km*vehicle)+inventoryCost;
+
+lastQuoteData={
+distance:km.toFixed(1),
+total:Math.round(total),
+items:list.join(", ")
+};
+
+result.innerHTML=
+`Distance: ${km.toFixed(1)} km<br>
+Items: ${list.join(", ")}<br>
+Total: ₹${Math.round(total)}`;
+
+if(cb)cb();
+});
 }
 
-/* ---------- PRICE CALC ---------- */
-function calculateQuote(auto = false) {
+/* BOOKING */
+function bookOnWhatsApp(){
 
-  if (!pickup.value || !drop.value) {
-    if (!auto) alert("Enter locations");
-    return;
-  }
+calculateQuote(()=>{
 
-  const houseBase =
-    Number(house.value || 0);
+let id="PZ"+Date.now().toString().slice(-6);
 
-  const vehicleRate =
-    Number(vehicle.value || 0);
+fetch("YOUR_GOOGLE_SCRIPT_URL",{
+method:"POST",
+body:JSON.stringify({
+booking:id,
+pickup:pickup.value,
+drop:drop.value,
+distance:lastQuoteData.distance,
+items:lastQuoteData.items,
+total:lastQuoteData.total
+})
+});
 
-  if (!houseBase || !vehicleRate) {
-    if (!auto)
-      alert("Select house & vehicle");
-    return;
-  }
-
-  let furnitureCost = 0;
-  let furnitureList = [];
-
-  if (sofaCheck.checked) {
-    const qty =
-      Number(sofaQty.value || 1);
-    furnitureCost += 500 * qty;
-    furnitureList.push("Sofa x" + qty);
-  }
-
-  if (bedCheck.checked) {
-    const qty =
-      Number(bedQty.value || 1);
-    furnitureCost += 700 * qty;
-    furnitureList.push("Bed x" + qty);
-  }
-
-  if (fridgeCheck.checked) {
-    furnitureCost += FRIDGE_PRICE;
-    furnitureList.push("Fridge");
-  }
-
-  const service =
-    new google.maps.DistanceMatrixService();
-
-  service.getDistanceMatrix({
-    origins: [pickup.value],
-    destinations: [drop.value],
-    travelMode: "DRIVING"
-  }, (res, status) => {
-
-    if (status !== "OK" ||
-        !res.rows[0].elements[0].distance)
-      return;
-
-    const km =
-      res.rows[0].elements[0]
-        .distance.value / 1000;
-
-    const distanceCost =
-      km * vehicleRate;
-
-    const total =
-      MIN_BASE_PRICE +
-      houseBase +
-      distanceCost +
-      furnitureCost;
-
-    result.innerHTML = `
-Distance: ${km.toFixed(1)} km<br>
-Furniture: ₹${furnitureCost}<br>
-<strong>Total Estimate: ₹${Math.round(total)}</strong>`;
-
-    const priceBox =
-      document.getElementById("livePrice");
-
-    if (priceBox)
-      priceBox.innerText =
-        "₹" + Math.round(total);
-
-    lastQuoteData = {
-      distance: km.toFixed(1),
-      total: Math.round(total),
-      furniture:
-        furnitureList.join(", ")
-    };
-  });
-}
-
-/* ---------- BOOKING ---------- */
-function bookOnWhatsApp() {
-
-  calculateQuote(true);
-
-  setTimeout(() => {
-
-    if (!lastQuoteData) {
-      alert("Calculate price first");
-      return;
-    }
-
-    const bookingID =
-      generateBookingID();
-
-    const leadData = {
-      bookingID,
-      name: custName.value || "",
-      phone: custPhone.value || "",
-      pickup: pickup.value,
-      drop: drop.value,
-      distance: lastQuoteData.distance,
-      furniture: lastQuoteData.furniture,
-      total: lastQuoteData.total
-    };
-
-    saveLead(leadData);
-
-    alert(
-      "Booking ID: " + bookingID +
-      "\nConfirmation will arrive on WhatsApp."
-    );
-
-    const message =
-      `Booking ID: ${bookingID}
+let msg=`Booking ID: ${id}
 Pickup: ${pickup.value}
 Drop: ${drop.value}
 Distance: ${lastQuoteData.distance} km
-Furniture: ${lastQuoteData.furniture}
+Items: ${lastQuoteData.items}
 Total: ₹${lastQuoteData.total}`;
 
-    window.open(
-      "https://wa.me/919945095453?text=" +
-      encodeURIComponent(message),
-      "_blank"
-    );
-
-  }, 500);
-}
-
-/* ---------- STEP NAVIGATION ---------- */
-let currentStep = 0;
-let steps = [];
-
-window.addEventListener("load", () => {
-  steps =
-    document.querySelectorAll(".form-step");
-  showStep(currentStep);
+window.open(
+"https://wa.me/919945095453?text="+encodeURIComponent(msg)
+);
 });
-
-function showStep(n) {
-
-  steps.forEach(step =>
-    step.classList.remove("active"));
-
-  steps[n].classList.add("active");
-
-  const bar =
-    document.getElementById("progressBar");
-
-  if (bar)
-    bar.style.width =
-      ((n + 1) / steps.length) * 100 + "%";
-
-  if (n === steps.length - 1)
-    calculateQuote(true);
-}
-
-function nextStep() {
-
-  if (currentStep === 0 &&
-      (!pickup.value || !drop.value)) {
-    alert("Enter pickup & drop");
-    return;
-  }
-
-  if (currentStep === 1 &&
-      (!house.value || !vehicle.value)) {
-    alert("Select house & vehicle");
-    return;
-  }
-
-  if (currentStep < steps.length - 1) {
-    currentStep++;
-    showStep(currentStep);
-  }
-}
-
-function prevStep() {
-  if (currentStep > 0) {
-    currentStep--;
-    showStep(currentStep);
-  }
 }
