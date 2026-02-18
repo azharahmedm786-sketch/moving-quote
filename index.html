@@ -4,196 +4,323 @@
 <meta charset="UTF-8" />
 <title>PackZen Packers & Movers Bangalore</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css" />
-<link rel="stylesheet" href="animate.css" />
 </head>
-
 <body>
+
+<!-- NAV -->
+<nav class="navbar">
+  <div class="nav-inner">
+    <div class="nav-logo">
+      <span class="logo-icon">📦</span>
+      <span class="logo-text">Pack<span class="logo-accent">Zen</span></span>
+    </div>
+    <div class="nav-links">
+      <a href="#services">Services</a>
+      <a href="#quote" class="nav-cta">Get Quote</a>
+    </div>
+  </div>
+</nav>
 
 <!-- HERO -->
 <header class="hero">
-  <h1>PackZen Packers & Movers Bangalore</h1>
-  <p>Reliable & Affordable Moving Services</p>
-  <a href="#quote" class="hero-quote-btn">Get Instant Quote</a>
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+  <div class="blob blob-3"></div>
+
+  <div class="hero-content">
+    <div class="hero-badge">🏆 Bangalore's #1 Trusted Movers</div>
+    <h1 class="hero-title">
+      Move Smarter,<br>
+      <span class="hero-accent">Move Safer</span>
+    </h1>
+    <p class="hero-sub">Reliable, insured & affordable packing and moving services across Bangalore & beyond.</p>
+    <div class="hero-actions">
+      <a href="#quote" class="btn-primary">Get Instant Quote →</a>
+      <a href="tel:9945095453" class="btn-ghost">📞 Call Now</a>
+    </div>
+    <div class="hero-trust">
+      <span>✔ Licensed</span>
+      <span>✔ Insured</span>
+      <span>✔ GPS Tracked</span>
+      <span>✔ Zero Damage</span>
+    </div>
+  </div>
+
+  <div class="hero-visual">
+    <div class="float-card card-a">
+      <span class="fc-icon">🚚</span>
+      <div>
+        <div class="fc-title">Live Tracking</div>
+        <div class="fc-sub">Real-time updates</div>
+      </div>
+    </div>
+    <div class="float-card card-b">
+      <span class="fc-icon">⭐</span>
+      <div>
+        <div class="fc-title">4.9 / 5 Rating</div>
+        <div class="fc-sub">1,200+ reviews</div>
+      </div>
+    </div>
+    <div class="float-card card-c">
+      <span class="fc-icon">🛡️</span>
+      <div>
+        <div class="fc-title">100% Insured</div>
+        <div class="fc-sub">Zero damage policy</div>
+      </div>
+    </div>
+  </div>
 </header>
 
-<!-- STATS STRIP (Auto-animated counters) -->
-<div class="stats-strip" id="statsStrip">
+<!-- STATS -->
+<section class="stats-bar" id="statsStrip">
   <div class="stat-item">
-    <span class="stat-number" data-target="1200">0</span>
+    <div class="stat-top"><span class="stat-number" data-target="1200">0</span><span class="stat-suffix">+</span></div>
     <span class="stat-label">Happy Customers</span>
   </div>
+  <div class="stat-divider"></div>
   <div class="stat-item">
-    <span class="stat-number" data-target="8">0</span>
+    <div class="stat-top"><span class="stat-number" data-target="8">0</span><span class="stat-suffix">+</span></div>
     <span class="stat-label">Years Experience</span>
   </div>
+  <div class="stat-divider"></div>
   <div class="stat-item">
-    <span class="stat-number" data-target="99">0</span>
-    <span class="stat-label">% On-Time Delivery</span>
+    <div class="stat-top"><span class="stat-number" data-target="99">0</span><span class="stat-suffix">%</span></div>
+    <span class="stat-label">On-Time Delivery</span>
   </div>
+  <div class="stat-divider"></div>
   <div class="stat-item">
-    <span class="stat-number" data-target="50">0</span>
+    <div class="stat-top"><span class="stat-number" data-target="50">0</span><span class="stat-suffix">+</span></div>
     <span class="stat-label">Cities Covered</span>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee-wrap">
+  <div class="marquee-track">
+    <span>✔ Licensed &amp; Insured</span><span class="dot">◆</span>
+    <span>✔ Experienced Team</span><span class="dot">◆</span>
+    <span>✔ Safe Packing</span><span class="dot">◆</span>
+    <span>✔ On-Time Delivery</span><span class="dot">◆</span>
+    <span>✔ GPS Tracked Vehicles</span><span class="dot">◆</span>
+    <span>✔ Zero Damage Guarantee</span><span class="dot">◆</span>
+    <span>✔ Licensed &amp; Insured</span><span class="dot">◆</span>
+    <span>✔ Experienced Team</span><span class="dot">◆</span>
+    <span>✔ Safe Packing</span><span class="dot">◆</span>
+    <span>✔ On-Time Delivery</span><span class="dot">◆</span>
+    <span>✔ GPS Tracked Vehicles</span><span class="dot">◆</span>
+    <span>✔ Zero Damage Guarantee</span><span class="dot">◆</span>
   </div>
 </div>
 
 <!-- SERVICES -->
-<section class="services-section">
-  <h2>Our Moving Services</h2>
+<section class="services-section" id="services">
+  <div class="section-header reveal">
+    <div class="section-tag">What We Offer</div>
+    <h2>Our Moving Services</h2>
+    <p>Professional, careful, and affordable — tailored to your needs.</p>
+  </div>
   <div class="services-grid reveal-stagger">
     <div class="service-card">
+      <div class="sc-icon">🏠</div>
       <h3>Home Relocation</h3>
-      <p>Safe & secure home shifting.</p>
+      <p>Safe & secure home shifting with full packing, loading and unpacking at destination.</p>
+      <div class="sc-badge">Most Popular</div>
     </div>
     <div class="service-card">
+      <div class="sc-icon">🏢</div>
       <h3>Office Shifting</h3>
-      <p>Professional office relocation.</p>
+      <p>Minimal downtime office relocation with IT equipment handling and furniture setup.</p>
     </div>
     <div class="service-card">
+      <div class="sc-icon">📍</div>
       <h3>Local Shifting</h3>
-      <p>Affordable Bangalore shifting.</p>
+      <p>Fast & affordable within-Bangalore shifting. Same day delivery available.</p>
     </div>
     <div class="service-card">
+      <div class="sc-icon">💪</div>
       <h3>Loading & Unloading</h3>
-      <p>Expert manpower support.</p>
+      <p>Trained manpower for heavy furniture and appliance handling with care.</p>
     </div>
   </div>
 </section>
 
-<!-- TRUST STRIP (marquee) -->
-<section class="trust-strip">
-  <span class="trust-strip-inner">
-    ✔ Licensed &amp; Insured &nbsp;•&nbsp; ✔ Experienced Team &nbsp;•&nbsp; ✔ Safe Packing &nbsp;•&nbsp; ✔ On-Time Delivery &nbsp;•&nbsp;
-    ✔ Licensed &amp; Insured &nbsp;•&nbsp; ✔ Experienced Team &nbsp;•&nbsp; ✔ Safe Packing &nbsp;•&nbsp; ✔ On-Time Delivery &nbsp;•&nbsp;
-  </span>
-</section>
-
-<!-- QUOTE SECTION -->
+<!-- QUOTE -->
 <section class="quote-section" id="quote">
-  <div class="wrapper">
-    <div class="container reveal">
+  <div class="quote-wrapper">
+    <div class="quote-left reveal">
+      <div class="section-tag light">Free Estimate</div>
+      <h2>Get Your Instant Moving Quote</h2>
+      <p>4 simple steps. Transparent pricing. No hidden charges.</p>
+      <ul class="quote-perks">
+        <li><span class="perk-check">✔</span> Instant price estimate</li>
+        <li><span class="perk-check">✔</span> No hidden charges</li>
+        <li><span class="perk-check">✔</span> Book via WhatsApp</li>
+        <li><span class="perk-check">✔</span> Free packing materials</li>
+      </ul>
+    </div>
 
-      <h1>Get Instant Moving Quote</h1>
+    <div class="quote-right reveal">
+      <div class="form-card">
 
-      <div class="progress">
-        <div id="progressBar"></div>
-      </div>
+        <div class="step-indicators">
+          <div class="step-dot active" id="dot0">1</div>
+          <div class="step-line"></div>
+          <div class="step-dot" id="dot1">2</div>
+          <div class="step-line"></div>
+          <div class="step-dot" id="dot2">3</div>
+          <div class="step-line"></div>
+          <div class="step-dot" id="dot3">4</div>
+        </div>
 
-      <!-- STEP 1 -->
-      <div class="form-step active">
-        <label>Pickup Location</label>
-        <input id="pickup" placeholder="Enter pickup location">
+        <div class="progress"><div id="progressBar"></div></div>
 
-        <label>Use Current Location
-          <label class="toggle">
-            <input type="checkbox" id="useCurrentLocation">
-            <span class="slider"></span>
+        <!-- STEP 1 -->
+        <div class="form-step active">
+          <div class="step-title">📍 Where are you moving?</div>
+          <label class="field-label">Pickup Location</label>
+          <input id="pickup" placeholder="Enter pickup address" class="field-input">
+          <label class="toggle-row">
+            <span>📱 Use my current location</span>
+            <label class="toggle">
+              <input type="checkbox" id="useCurrentLocation">
+              <span class="slider"></span>
+            </label>
           </label>
-        </label>
+          <label class="field-label">Drop Location</label>
+          <input id="drop" placeholder="Enter drop address" class="field-input">
+          <div id="map"></div>
+          <div id="distanceInfo"></div>
+          <button class="btn-next" onclick="nextStep()">Continue →</button>
+        </div>
 
-        <label>Drop Location</label>
-        <input id="drop" placeholder="Enter drop location">
-
-        <div id="map"></div>
-        <div id="distanceInfo" style="margin-top:10px;font-weight:600;"></div>
-
-        <button onclick="nextStep()">Next</button>
-      </div>
-
-      <!-- STEP 2 -->
-      <div class="form-step">
-        <div class="row">
-          <div>
-            <label>Date</label>
-            <input type="date" id="shiftDate">
+        <!-- STEP 2 -->
+        <div class="form-step">
+          <div class="step-title">🗓️ When are you moving?</div>
+          <div class="row">
+            <div>
+              <label class="field-label">Date</label>
+              <input type="date" id="shiftDate" class="field-input">
+            </div>
+            <div>
+              <label class="field-label">Time</label>
+              <input type="time" id="shiftTime" class="field-input">
+            </div>
           </div>
-          <div>
-            <label>Time</label>
-            <input type="time" id="shiftTime">
+          <label class="field-label">House Type</label>
+          <select id="house" class="field-input">
+            <option value="">Select house size</option>
+            <option value="0">1 RK</option>
+            <option value="1200">1 BHK</option>
+            <option value="2500">2 BHK</option>
+            <option value="4000">3 BHK</option>
+          </select>
+          <label class="field-label">Vehicle Type</label>
+          <select id="vehicle" class="field-input">
+            <option value="">Select vehicle</option>
+            <option value="25">Tata Ace (Small)</option>
+            <option value="40">14 ft Truck (Medium)</option>
+            <option value="50">17 ft Truck (Large)</option>
+            <option value="60">22 ft Truck (XL)</option>
+          </select>
+          <div class="btn-row">
+            <button class="btn-back" onclick="prevStep()">← Back</button>
+            <button class="btn-next" onclick="nextStep()">Continue →</button>
           </div>
         </div>
 
-        <label>House Type</label>
-        <select id="house">
-          <option value="">Select</option>
-          <option value="0">1 RK</option>
-          <option value="1200">1 BHK</option>
-          <option value="2500">2 BHK</option>
-          <option value="4000">3 BHK</option>
-        </select>
-
-        <label>Vehicle Type</label>
-        <select id="vehicle">
-          <option value="">Select</option>
-          <option value="25">Tata Ace</option>
-          <option value="40">14 ft Truck</option>
-          <option value="50">17 ft Truck</option>
-          <option value="60">22 ft Truck</option>
-        </select>
-
-        <button onclick="prevStep()">Back</button>
-        <button onclick="nextStep()">Next</button>
-      </div>
-
-      <!-- STEP 3 -->
-      <div class="form-step">
-        <h3>Furniture</h3>
-
-        <label><input type="checkbox" id="sofaCheck"> Sofa</label>
-        <input type="number" id="sofaQty" value="1">
-
-        <label><input type="checkbox" id="bedCheck"> Bed</label>
-        <input type="number" id="bedQty" value="1">
-
-        <label><input type="checkbox" id="fridgeCheck"> Fridge</label>
-        <label><input type="checkbox" id="wmCheck"> Washing Machine</label>
-
-        <button onclick="prevStep()">Back</button>
-        <button onclick="nextStep()">Next</button>
-      </div>
-
-      <!-- STEP 4 -->
-      <div class="form-step">
-        <label>Name</label>
-        <input id="custName" placeholder="Customer name">
-
-        <label>Phone</label>
-        <input id="custPhone" placeholder="Mobile number">
-
-        <div style="margin-top:15px;font-weight:700;font-size:20px;">
-          Estimated Price: <span id="livePrice">₹0</span>
+        <!-- STEP 3 -->
+        <div class="form-step">
+          <div class="step-title">🛋️ What are you moving?</div>
+          <div class="furniture-grid">
+            <label class="furniture-card">
+              <input type="checkbox" id="sofaCheck">
+              <div class="fc-body">
+                <span class="fc-emoji">🛋️</span>
+                <span class="fc-name">Sofa</span>
+                <input type="number" id="sofaQty" value="1" min="1" class="fc-qty" onclick="event.stopPropagation()">
+              </div>
+            </label>
+            <label class="furniture-card">
+              <input type="checkbox" id="bedCheck">
+              <div class="fc-body">
+                <span class="fc-emoji">🛏️</span>
+                <span class="fc-name">Bed</span>
+                <input type="number" id="bedQty" value="1" min="1" class="fc-qty" onclick="event.stopPropagation()">
+              </div>
+            </label>
+            <label class="furniture-card">
+              <input type="checkbox" id="fridgeCheck">
+              <div class="fc-body">
+                <span class="fc-emoji">🧊</span>
+                <span class="fc-name">Fridge</span>
+              </div>
+            </label>
+            <label class="furniture-card">
+              <input type="checkbox" id="wmCheck">
+              <div class="fc-body">
+                <span class="fc-emoji">🫧</span>
+                <span class="fc-name">Washing Machine</span>
+              </div>
+            </label>
+          </div>
+          <div class="btn-row">
+            <button class="btn-back" onclick="prevStep()">← Back</button>
+            <button class="btn-next" onclick="nextStep()">Continue →</button>
+          </div>
         </div>
 
-        <div id="result"></div>
+        <!-- STEP 4 -->
+        <div class="form-step">
+          <div class="step-title">🎉 Almost done!</div>
+          <label class="field-label">Your Name</label>
+          <input id="custName" placeholder="Enter your full name" class="field-input">
+          <label class="field-label">Phone Number</label>
+          <input id="custPhone" placeholder="Enter mobile number" class="field-input">
+          <div class="price-box">
+            <div class="price-label">Your Estimated Price</div>
+            <div class="price-amount"><span id="livePrice">₹0</span></div>
+            <div id="result" class="price-breakdown"></div>
+          </div>
+          <div class="btn-row">
+            <button class="btn-back" onclick="prevStep()">← Back</button>
+          </div>
+          <button onclick="bookOnWhatsApp()" class="btn-whatsapp">
+            💬 Book on WhatsApp
+          </button>
+        </div>
 
-        <button onclick="prevStep()">Back</button>
-        <button onclick="bookOnWhatsApp()" class="book-btn">
-          Book on WhatsApp
-        </button>
       </div>
-
     </div>
   </div>
 </section>
 
-<footer class="footer reveal">
-  <h3>PackZen Packers & Movers</h3>
-  <p>HSR Layout, Bangalore</p>
-  <p>Phone: 9945095453</p>
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <div class="footer-logo">📦 Pack<span>Zen</span></div>
+      <p>Bangalore's trusted packers & movers since 2016. Safe, reliable, and affordable.</p>
+    </div>
+    <div class="footer-info">
+      <div class="footer-detail">📍 HSR Layout, Bangalore</div>
+      <div class="footer-detail">📞 <a href="tel:9945095453">9945095453</a></div>
+      <div class="footer-detail">💬 <a href="https://wa.me/919945095453">WhatsApp Us</a></div>
+    </div>
+  </div>
+  <div class="footer-bottom">© 2026 PackZen Packers & Movers. All rights reserved.</div>
 </footer>
 
 <!-- FLOATING BUTTONS -->
-<a href="tel:9945095453" class="call-btn">📞 Call</a>
-<a href="https://wa.me/919945095453" class="floating-wa" target="_blank">💬 WhatsApp</a>
+<a href="tel:9945095453" class="float-call">📞 Call</a>
+<a href="https://wa.me/919945095453" class="float-wa" target="_blank">💬 WhatsApp</a>
 
-<!-- JS FILES — ORDER MATTERS -->
-<script src="animate.js"></script>
 <script src="script.js"></script>
-
-<!-- GOOGLE MAPS -->
 <script async defer
   src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCdYIaoNUMxf0uWuHmWk_Nu2RcuYSsMuAY&libraries=places&callback=initAutocomplete">
 </script>
-
 </body>
 </html>
