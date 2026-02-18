@@ -28,7 +28,7 @@ const dropInput=document.getElementById("drop");
 
 const pickupAuto=new google.maps.places.Autocomplete(pickupInput);
 const dropAuto=new google.maps.places.Autocomplete(dropInput);
-
+ 
 pickupAuto.addListener("place_changed",()=>{
 pickupPlace=pickupAuto.getPlace();
 showLocation("pickup");
