@@ -1,36 +1,72 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
+<meta charset="UTF-8" />
 <title>PackZen Packers & Movers Bangalore</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"> 
-<link rel="stylesheet" href="style.css">
-
-<!-- jsPDF for Inventory PDF -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<link rel="stylesheet" href="style.css" />
 </head>
+
 <body>
 
+<!-- HERO -->
 <header class="hero">
-<h1>PackZen Packers & Movers Bangalore</h1>
-<p>Reliable & Affordable Moving Services</p>
-<a href="#quote" class="hero-quote-btn">Get Instant Quote</a>
+  <h1>PackZen Packers & Movers Bangalore</h1>
+  <p>Reliable & Affordable Moving Services</p>
+
+  <a href="#quote" class="hero-quote-btn">
+    Get Instant Quote
+  </a>
 </header>
 
+<!-- SERVICES -->
+<section class="services-section">
+  <h2>Our Moving Services</h2>
+
+  <div class="services-grid">
+    <div class="service-card">
+      <h3>Home Relocation</h3>
+      <p>Safe & secure home shifting.</p>
+    </div>
+
+    <div class="service-card">
+      <h3>Office Shifting</h3>
+      <p>Professional office relocation.</p>
+    </div>
+
+    <div class="service-card">
+      <h3>Local Shifting</h3>
+      <p>Affordable Bangalore shifting.</p>
+    </div>
+
+    <div class="service-card">
+      <h3>Loading & Unloading</h3>
+      <p>Expert manpower support.</p>
+    </div>
+  </div>
+</section>
+
+<section class="trust-strip">
+✔ Licensed & Insured • ✔ Experienced Team • ✔ Safe Packing • ✔ On-Time Delivery
+</section>
+
+<!-- QUOTE SECTION -->
 <section class="quote-section" id="quote">
+
+<div class="wrapper">
 <div class="container">
 
-<h2>Get Instant Moving Quote</h2>
+<h1>Get Instant Moving Quote</h1>
 
 <div class="progress">
-<div id="progressBar"></div>
+  <div id="progressBar"></div>
 </div>
 
-<!-- STEP 1 --> 
+<!-- STEP 1 -->
 <div class="form-step active">
+
 <label>Pickup Location</label>
-<input id="pickup">
+<input id="pickup" placeholder="Enter pickup location">
 
 <label>Use Current Location
 <label class="toggle">
@@ -40,15 +76,29 @@
 </label>
 
 <label>Drop Location</label>
-<input id="drop">
+<input id="drop" placeholder="Enter drop location">
 
 <div id="map"></div>
+
+<div id="distanceInfo" style="margin-top:10px;font-weight:600;"></div>
 
 <button onclick="nextStep()">Next</button>
 </div>
 
 <!-- STEP 2 -->
 <div class="form-step">
+
+<div class="row">
+<div>
+<label>Date</label>
+<input type="date" id="shiftDate">
+</div>
+
+<div>
+<label>Time</label>
+<input type="time" id="shiftTime">
+</div>
+</div>
 
 <label>House Type</label>
 <select id="house">
@@ -75,7 +125,7 @@
 <!-- STEP 3 -->
 <div class="form-step">
 
-<h3>Furniture Checklist</h3>
+<h3>Furniture</h3>
 
 <label><input type="checkbox" id="sofaCheck"> Sofa</label>
 <input type="number" id="sofaQty" value="1">
@@ -85,8 +135,6 @@
 
 <label><input type="checkbox" id="fridgeCheck"> Fridge</label>
 <label><input type="checkbox" id="wmCheck"> Washing Machine</label>
-<label><input type="checkbox" id="wardrobeCheck"> Wardrobe</label>
-<label><input type="checkbox" id="tableCheck"> Table</label>
 
 <button onclick="prevStep()">Back</button>
 <button onclick="nextStep()">Next</button>
@@ -96,12 +144,12 @@
 <div class="form-step">
 
 <label>Name</label>
-<input id="custName">
+<input id="custName" placeholder="Customer name">
 
 <label>Phone</label>
-<input id="custPhone">
+<input id="custPhone" placeholder="Mobile number">
 
-<div class="price-box">
+<div style="margin-top:15px;font-weight:700;font-size:20px;">
 Estimated Price: <span id="livePrice">₹0</span>
 </div>
 
@@ -113,21 +161,21 @@ Estimated Price: <span id="livePrice">₹0</span>
 Book on WhatsApp
 </button>
 
-<button onclick="generateInventoryPDF()" class="pdf-btn">
-Download Inventory PDF
-</button>
-
 </div>
 
+</div>
 </div>
 </section>
 
 <footer class="footer">
-PackZen Packers & Movers • Bangalore
+<h3>PackZen Packers & Movers</h3>
+<p>HSR Layout, Bangalore</p>
+<p>Phone: 9945095453</p>
 </footer>
 
+<!-- FLOATING BUTTONS -->
 <a href="tel:9945095453" class="call-btn">📞 Call</a>
-<a href="https://wa.me/919945095453" class="floating-wa">💬 WhatsApp</a>
+<a href="https://wa.me/919945095453" class="floating-wa" target="_blank">💬 WhatsApp</a>
 
 <script src="script.js"></script>
 
