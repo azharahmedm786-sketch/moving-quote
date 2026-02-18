@@ -5,8 +5,11 @@
 <title>PackZen Packers & Movers Bangalore</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="stylesheet" href="style.css">
-</head>
 
+<!-- jsPDF for Inventory PDF -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+</head>
 <body>
 
 <header class="hero">
@@ -16,15 +19,16 @@
 </header>
 
 <section class="quote-section" id="quote">
-<div class="wrapper">
 <div class="container">
 
-<h1>Get Instant Moving Quote</h1>
-<div class="progress"><div id="progressBar"></div></div>
+<h2>Get Instant Moving Quote</h2>
+
+<div class="progress">
+<div id="progressBar"></div>
+</div>
 
 <!-- STEP 1 -->
 <div class="form-step active">
-
 <label>Pickup Location</label>
 <input id="pickup">
 
@@ -49,16 +53,19 @@
 <label>House Type</label>
 <select id="house">
 <option value="">Select</option>
+<option value="0">1 RK</option>
 <option value="1200">1 BHK</option>
 <option value="2500">2 BHK</option>
 <option value="4000">3 BHK</option>
 </select>
 
-<label>Vehicle</label>
+<label>Vehicle Type</label>
 <select id="vehicle">
 <option value="">Select</option>
 <option value="25">Tata Ace</option>
-<option value="40">Truck</option>
+<option value="40">14 ft Truck</option>
+<option value="50">17 ft Truck</option>
+<option value="60">22 ft Truck</option>
 </select>
 
 <button onclick="prevStep()">Back</button>
@@ -67,15 +74,19 @@
 
 <!-- STEP 3 -->
 <div class="form-step">
-<h3>Furniture</h3>
+
+<h3>Furniture Checklist</h3>
 
 <label><input type="checkbox" id="sofaCheck"> Sofa</label>
-<input id="sofaQty" type="number" value="1">
+<input type="number" id="sofaQty" value="1">
 
 <label><input type="checkbox" id="bedCheck"> Bed</label>
-<input id="bedQty" type="number" value="1">
+<input type="number" id="bedQty" value="1">
 
 <label><input type="checkbox" id="fridgeCheck"> Fridge</label>
+<label><input type="checkbox" id="wmCheck"> Washing Machine</label>
+<label><input type="checkbox" id="wardrobeCheck"> Wardrobe</label>
+<label><input type="checkbox" id="tableCheck"> Table</label>
 
 <button onclick="prevStep()">Back</button>
 <button onclick="nextStep()">Next</button>
@@ -90,31 +101,33 @@
 <label>Phone</label>
 <input id="custPhone">
 
-<h3>Login with OTP</h3>
-<input id="loginPhone" placeholder="Phone number">
-<button type="button" onclick="sendOTP()">Send OTP</button>
-
-<div id="otpBox" style="display:none">
-<input id="otpInput" placeholder="Enter OTP">
-<button type="button" onclick="verifyOTP()">Verify OTP</button>
-</div>
-
-<div style="margin-top:10px;font-size:20px;font-weight:700">
-Estimated Price: ₹<span id="livePrice">0</span>
+<div class="price-box">
+Estimated Price: <span id="livePrice">₹0</span>
 </div>
 
 <div id="result"></div>
 
 <button onclick="prevStep()">Back</button>
+
 <button onclick="bookOnWhatsApp()" class="book-btn">
 Book on WhatsApp
+</button>
+
+<button onclick="generateInventoryPDF()" class="pdf-btn">
+Download Inventory PDF
 </button>
 
 </div>
 
 </div>
-</div>
 </section>
+
+<footer class="footer">
+PackZen Packers & Movers • Bangalore
+</footer>
+
+<a href="tel:9945095453" class="call-btn">📞 Call</a>
+<a href="https://wa.me/919945095453" class="floating-wa">💬 WhatsApp</a>
 
 <script src="script.js"></script>
 
