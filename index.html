@@ -11,7 +11,7 @@
 </head>
 <body>
 
-<!-- NAV -->
+<!-- ============ NAVBAR ============ -->
 <nav class="navbar">
   <div class="nav-inner">
     <div class="nav-logo">
@@ -21,84 +21,60 @@
     <div class="nav-links">
       <a href="#services">Services</a>
       <a href="#quote" class="nav-cta">Get Quote</a>
+      <!-- AUTH BUTTONS — shown when logged out -->
+      <button class="nav-auth-btn" id="navLoginBtn" onclick="openAuthModal('login')">Login</button>
+      <!-- USER AVATAR — shown when logged in -->
+      <div class="nav-user" id="navUser" style="display:none;" onclick="toggleUserMenu()">
+        <div class="nav-avatar" id="navAvatar">U</div>
+        <span id="navUserName">User</span>
+        <span class="nav-arrow">▾</span>
+        <div class="user-dropdown" id="userDropdown">
+          <a href="#" onclick="openDashboard()">📋 My Bookings</a>
+          <a href="#" onclick="openProfile()">👤 Edit Profile</a>
+          <a href="#" onclick="signOutUser()">🚪 Sign Out</a>
+        </div>
+      </div>
     </div>
   </div>
 </nav>
 
-<!-- HERO -->
+<!-- ============ HERO ============ -->
 <header class="hero">
   <div class="blob blob-1"></div>
   <div class="blob blob-2"></div>
   <div class="blob blob-3"></div>
-
   <div class="hero-content">
     <div class="hero-badge">🏆 Bangalore's #1 Trusted Movers</div>
-    <h1 class="hero-title">
-      Move Smarter,<br>
-      <span class="hero-accent">Move Safer</span>
-    </h1>
+    <h1 class="hero-title">Move Smarter,<br><span class="hero-accent">Move Safer</span></h1>
     <p class="hero-sub">Reliable, insured & affordable packing and moving services across Bangalore & beyond.</p>
     <div class="hero-actions">
       <a href="#quote" class="btn-primary">Get Instant Quote →</a>
       <a href="tel:9945095453" class="btn-ghost">📞 Call Now</a>
     </div>
     <div class="hero-trust">
-      <span>✔ Licensed</span>
-      <span>✔ Insured</span>
-      <span>✔ GPS Tracked</span>
-      <span>✔ Zero Damage</span>
+      <span>✔ Licensed</span><span>✔ Insured</span>
+      <span>✔ GPS Tracked</span><span>✔ Zero Damage</span>
     </div>
   </div>
-
   <div class="hero-visual">
-    <div class="float-card card-a">
-      <span class="fc-icon">🚚</span>
-      <div>
-        <div class="fc-title">Live Tracking</div>
-        <div class="fc-sub">Real-time updates</div>
-      </div>
-    </div>
-    <div class="float-card card-b">
-      <span class="fc-icon">⭐</span>
-      <div>
-        <div class="fc-title">4.9 / 5 Rating</div>
-        <div class="fc-sub">1,200+ reviews</div>
-      </div>
-    </div>
-    <div class="float-card card-c">
-      <span class="fc-icon">🛡️</span>
-      <div>
-        <div class="fc-title">100% Insured</div>
-        <div class="fc-sub">Zero damage policy</div>
-      </div>
-    </div>
+    <div class="float-card card-a"><span class="fc-icon">🚚</span><div><div class="fc-title">Live Tracking</div><div class="fc-sub">Real-time updates</div></div></div>
+    <div class="float-card card-b"><span class="fc-icon">⭐</span><div><div class="fc-title">4.9 / 5 Rating</div><div class="fc-sub">1,200+ reviews</div></div></div>
+    <div class="float-card card-c"><span class="fc-icon">🛡️</span><div><div class="fc-title">100% Insured</div><div class="fc-sub">Zero damage policy</div></div></div>
   </div>
 </header>
 
-<!-- STATS -->
+<!-- ============ STATS ============ -->
 <section class="stats-bar" id="statsStrip">
-  <div class="stat-item">
-    <div class="stat-top"><span class="stat-number" data-target="1200">0</span><span class="stat-suffix">+</span></div>
-    <span class="stat-label">Happy Customers</span>
-  </div>
+  <div class="stat-item"><div class="stat-top"><span class="stat-number" data-target="1200">0</span><span class="stat-suffix">+</span></div><span class="stat-label">Happy Customers</span></div>
   <div class="stat-divider"></div>
-  <div class="stat-item">
-    <div class="stat-top"><span class="stat-number" data-target="8">0</span><span class="stat-suffix">+</span></div>
-    <span class="stat-label">Years Experience</span>
-  </div>
+  <div class="stat-item"><div class="stat-top"><span class="stat-number" data-target="8">0</span><span class="stat-suffix">+</span></div><span class="stat-label">Years Experience</span></div>
   <div class="stat-divider"></div>
-  <div class="stat-item">
-    <div class="stat-top"><span class="stat-number" data-target="99">0</span><span class="stat-suffix">%</span></div>
-    <span class="stat-label">On-Time Delivery</span>
-  </div>
+  <div class="stat-item"><div class="stat-top"><span class="stat-number" data-target="99">0</span><span class="stat-suffix">%</span></div><span class="stat-label">On-Time Delivery</span></div>
   <div class="stat-divider"></div>
-  <div class="stat-item">
-    <div class="stat-top"><span class="stat-number" data-target="50">0</span><span class="stat-suffix">+</span></div>
-    <span class="stat-label">Cities Covered</span>
-  </div>
+  <div class="stat-item"><div class="stat-top"><span class="stat-number" data-target="50">0</span><span class="stat-suffix">+</span></div><span class="stat-label">Cities Covered</span></div>
 </section>
 
-<!-- MARQUEE -->
+<!-- ============ MARQUEE ============ -->
 <div class="marquee-wrap">
   <div class="marquee-track">
     <span>✔ Licensed &amp; Insured</span><span class="dot">◆</span>
@@ -116,7 +92,7 @@
   </div>
 </div>
 
-<!-- SERVICES -->
+<!-- ============ SERVICES ============ -->
 <section class="services-section" id="services">
   <div class="section-header reveal">
     <div class="section-tag">What We Offer</div>
@@ -124,31 +100,14 @@
     <p>Professional, careful, and affordable — tailored to your needs.</p>
   </div>
   <div class="services-grid reveal-stagger">
-    <div class="service-card">
-      <div class="sc-icon">🏠</div>
-      <h3>Home Relocation</h3>
-      <p>Safe & secure home shifting with full packing, loading and unpacking at destination.</p>
-      <div class="sc-badge">Most Popular</div>
-    </div>
-    <div class="service-card">
-      <div class="sc-icon">🏢</div>
-      <h3>Office Shifting</h3>
-      <p>Minimal downtime office relocation with IT equipment handling and furniture setup.</p>
-    </div>
-    <div class="service-card">
-      <div class="sc-icon">📍</div>
-      <h3>Local Shifting</h3>
-      <p>Fast & affordable within-Bangalore shifting. Same day delivery available.</p>
-    </div>
-    <div class="service-card">
-      <div class="sc-icon">💪</div>
-      <h3>Loading & Unloading</h3>
-      <p>Trained manpower for heavy furniture and appliance handling with care.</p>
-    </div>
+    <div class="service-card"><div class="sc-icon">🏠</div><h3>Home Relocation</h3><p>Safe & secure home shifting with full packing, loading and unpacking at destination.</p><div class="sc-badge">Most Popular</div></div>
+    <div class="service-card"><div class="sc-icon">🏢</div><h3>Office Shifting</h3><p>Minimal downtime office relocation with IT equipment handling and furniture setup.</p></div>
+    <div class="service-card"><div class="sc-icon">📍</div><h3>Local Shifting</h3><p>Fast & affordable within-Bangalore shifting. Same day delivery available.</p></div>
+    <div class="service-card"><div class="sc-icon">💪</div><h3>Loading & Unloading</h3><p>Trained manpower for heavy furniture and appliance handling with care.</p></div>
   </div>
 </section>
 
-<!-- QUOTE -->
+<!-- ============ QUOTE ============ -->
 <section class="quote-section" id="quote">
   <div class="quote-wrapper">
     <div class="quote-left reveal">
@@ -162,20 +121,14 @@
         <li><span class="perk-check">✔</span> Free packing materials</li>
       </ul>
     </div>
-
     <div class="quote-right reveal">
       <div class="form-card">
-
         <div class="step-indicators">
-          <div class="step-dot active" id="dot0">1</div>
-          <div class="step-line"></div>
-          <div class="step-dot" id="dot1">2</div>
-          <div class="step-line"></div>
-          <div class="step-dot" id="dot2">3</div>
-          <div class="step-line"></div>
+          <div class="step-dot active" id="dot0">1</div><div class="step-line"></div>
+          <div class="step-dot" id="dot1">2</div><div class="step-line"></div>
+          <div class="step-dot" id="dot2">3</div><div class="step-line"></div>
           <div class="step-dot" id="dot3">4</div>
         </div>
-
         <div class="progress"><div id="progressBar"></div></div>
 
         <!-- STEP 1 -->
@@ -185,10 +138,7 @@
           <input id="pickup" placeholder="Enter pickup address" class="field-input">
           <label class="toggle-row">
             <span>📱 Use my current location</span>
-            <label class="toggle">
-              <input type="checkbox" id="useCurrentLocation">
-              <span class="slider"></span>
-            </label>
+            <label class="toggle"><input type="checkbox" id="useCurrentLocation"><span class="slider"></span></label>
           </label>
           <label class="field-label">Drop Location</label>
           <input id="drop" placeholder="Enter drop address" class="field-input">
@@ -201,30 +151,20 @@
         <div class="form-step">
           <div class="step-title">🗓️ When are you moving?</div>
           <div class="row">
-            <div>
-              <label class="field-label">Date</label>
-              <input type="date" id="shiftDate" class="field-input">
-            </div>
-            <div>
-              <label class="field-label">Time</label>
-              <input type="time" id="shiftTime" class="field-input">
-            </div>
+            <div><label class="field-label">Date</label><input type="date" id="shiftDate" class="field-input"></div>
+            <div><label class="field-label">Time</label><input type="time" id="shiftTime" class="field-input"></div>
           </div>
           <label class="field-label">House Type</label>
           <select id="house" class="field-input">
             <option value="">Select house size</option>
-            <option value="0">1 RK</option>
-            <option value="1200">1 BHK</option>
-            <option value="2500">2 BHK</option>
-            <option value="4000">3 BHK</option>
+            <option value="0">1 RK</option><option value="1200">1 BHK</option>
+            <option value="2500">2 BHK</option><option value="4000">3 BHK</option>
           </select>
           <label class="field-label">Vehicle Type</label>
           <select id="vehicle" class="field-input">
             <option value="">Select vehicle</option>
-            <option value="25">Tata Ace (Small)</option>
-            <option value="40">14 ft Truck (Medium)</option>
-            <option value="50">17 ft Truck (Large)</option>
-            <option value="60">22 ft Truck (XL)</option>
+            <option value="25">Tata Ace (Small)</option><option value="40">14 ft Truck (Medium)</option>
+            <option value="50">17 ft Truck (Large)</option><option value="60">22 ft Truck (XL)</option>
           </select>
           <div class="btn-row">
             <button class="btn-back" onclick="prevStep()">← Back</button>
@@ -236,36 +176,10 @@
         <div class="form-step">
           <div class="step-title">🛋️ What are you moving?</div>
           <div class="furniture-grid">
-            <label class="furniture-card">
-              <input type="checkbox" id="sofaCheck">
-              <div class="fc-body">
-                <span class="fc-emoji">🛋️</span>
-                <span class="fc-name">Sofa</span>
-                <input type="number" id="sofaQty" value="1" min="1" class="fc-qty" onclick="event.stopPropagation()">
-              </div>
-            </label>
-            <label class="furniture-card">
-              <input type="checkbox" id="bedCheck">
-              <div class="fc-body">
-                <span class="fc-emoji">🛏️</span>
-                <span class="fc-name">Bed</span>
-                <input type="number" id="bedQty" value="1" min="1" class="fc-qty" onclick="event.stopPropagation()">
-              </div>
-            </label>
-            <label class="furniture-card">
-              <input type="checkbox" id="fridgeCheck">
-              <div class="fc-body">
-                <span class="fc-emoji">🧊</span>
-                <span class="fc-name">Fridge</span>
-              </div>
-            </label>
-            <label class="furniture-card">
-              <input type="checkbox" id="wmCheck">
-              <div class="fc-body">
-                <span class="fc-emoji">🫧</span>
-                <span class="fc-name">Washing Machine</span>
-              </div>
-            </label>
+            <label class="furniture-card"><input type="checkbox" id="sofaCheck"><div class="fc-body"><span class="fc-emoji">🛋️</span><span class="fc-name">Sofa</span><input type="number" id="sofaQty" value="1" min="1" class="fc-qty" onclick="event.stopPropagation()"></div></label>
+            <label class="furniture-card"><input type="checkbox" id="bedCheck"><div class="fc-body"><span class="fc-emoji">🛏️</span><span class="fc-name">Bed</span><input type="number" id="bedQty" value="1" min="1" class="fc-qty" onclick="event.stopPropagation()"></div></label>
+            <label class="furniture-card"><input type="checkbox" id="fridgeCheck"><div class="fc-body"><span class="fc-emoji">🧊</span><span class="fc-name">Fridge</span></div></label>
+            <label class="furniture-card"><input type="checkbox" id="wmCheck"><div class="fc-body"><span class="fc-emoji">🫧</span><span class="fc-name">Washing Machine</span></div></label>
           </div>
           <div class="btn-row">
             <button class="btn-back" onclick="prevStep()">← Back</button>
@@ -284,21 +198,23 @@
             <div class="price-label">Your Estimated Price</div>
             <div class="price-amount"><span id="livePrice">₹0</span></div>
             <div id="result" class="price-breakdown"></div>
+            <div class="advance-info">
+              💡 Advance to pay now: <strong><span id="advanceAmount">₹0</span></strong>
+              <span class="advance-note">(10% of total — rest paid on moving day)</span>
+            </div>
           </div>
           <div class="btn-row">
             <button class="btn-back" onclick="prevStep()">← Back</button>
           </div>
-          <button onclick="bookOnWhatsApp()" class="btn-whatsapp">
-            💬 Book on WhatsApp
-          </button>
+          <button onclick="startPayment()" class="btn-pay">💳 Pay Advance &amp; Confirm Booking</button>
+          <button onclick="bookOnWhatsApp()" class="btn-whatsapp-alt">💬 Book via WhatsApp Only</button>
         </div>
-
       </div>
     </div>
   </div>
 </section>
 
-<!-- FOOTER -->
+<!-- ============ FOOTER ============ -->
 <footer class="footer">
   <div class="footer-inner">
     <div class="footer-brand">
@@ -318,7 +234,164 @@
 <a href="tel:9945095453" class="float-call">📞 Call</a>
 <a href="https://wa.me/919945095453" class="float-wa" target="_blank">💬 WhatsApp</a>
 
+<!-- ================================================
+     AUTH MODAL — Login / Signup / OTP / Recover
+     ================================================ -->
+<div id="authModal" class="modal-overlay" style="display:none;">
+  <div class="modal-box auth-modal-box">
+
+    <!-- LOGIN PANEL -->
+    <div class="auth-panel" id="panelLogin">
+      <button class="modal-x" onclick="closeAuthModal()">✕</button>
+      <div class="auth-logo">📦 PackZen</div>
+      <h2 class="auth-title">Welcome Back</h2>
+      <p class="auth-sub">Login to view your bookings & quotes</p>
+      <label class="field-label">Email Address</label>
+      <input id="loginEmail" type="email" placeholder="your@email.com" class="field-input">
+      <label class="field-label">Password</label>
+      <input id="loginPassword" type="password" placeholder="Enter password" class="field-input">
+      <div id="loginError" class="auth-error"></div>
+      <button class="btn-auth" onclick="loginUser()">Login →</button>
+      <div class="auth-divider"><span>or</span></div>
+      <button class="btn-auth-outline" onclick="switchPanel('panelSignup')">Create New Account</button>
+      <p class="auth-link" onclick="switchPanel('panelRecover')">Forgot password? Recover Account</p>
+    </div>
+
+    <!-- SIGNUP PANEL -->
+    <div class="auth-panel" id="panelSignup" style="display:none;">
+      <button class="modal-x" onclick="closeAuthModal()">✕</button>
+      <div class="auth-logo">📦 PackZen</div>
+      <h2 class="auth-title">Create Account</h2>
+      <p class="auth-sub">Sign up to save quotes & track bookings</p>
+      <label class="field-label">Full Name</label>
+      <input id="signupName" type="text" placeholder="Your full name" class="field-input">
+      <label class="field-label">Email Address</label>
+      <input id="signupEmail" type="email" placeholder="your@email.com" class="field-input">
+      <label class="field-label">Phone Number</label>
+      <div class="phone-row">
+        <span class="phone-prefix">+91</span>
+        <input id="signupPhone" type="tel" placeholder="10-digit mobile number" class="field-input phone-input" maxlength="10">
+      </div>
+      <label class="field-label">Password</label>
+      <input id="signupPassword" type="password" placeholder="Min 6 characters" class="field-input">
+      <!-- Invisible reCAPTCHA container for phone auth -->
+      <div id="recaptcha-container"></div>
+      <div id="signupError" class="auth-error"></div>
+      <button class="btn-auth" onclick="signupUser()">Send OTP & Register →</button>
+      <p class="auth-link" onclick="switchPanel('panelLogin')">Already have an account? Login</p>
+    </div>
+
+    <!-- OTP PANEL -->
+    <div class="auth-panel" id="panelOTP" style="display:none;">
+      <button class="modal-x" onclick="closeAuthModal()">✕</button>
+      <div class="auth-logo">📱</div>
+      <h2 class="auth-title">Verify Your Phone</h2>
+      <p class="auth-sub" id="otpSubText">Enter the 6-digit OTP sent to your number</p>
+      <div class="otp-boxes" id="otpBoxes">
+        <input class="otp-box" type="tel" maxlength="1" oninput="otpInput(this,0)">
+        <input class="otp-box" type="tel" maxlength="1" oninput="otpInput(this,1)">
+        <input class="otp-box" type="tel" maxlength="1" oninput="otpInput(this,2)">
+        <input class="otp-box" type="tel" maxlength="1" oninput="otpInput(this,3)">
+        <input class="otp-box" type="tel" maxlength="1" oninput="otpInput(this,4)">
+        <input class="otp-box" type="tel" maxlength="1" oninput="otpInput(this,5)">
+      </div>
+      <div id="otpError" class="auth-error"></div>
+      <button class="btn-auth" onclick="verifyOTP()">Verify OTP →</button>
+      <p class="auth-link" id="resendOTPLink" onclick="resendOTP()">Resend OTP</p>
+    </div>
+
+    <!-- RECOVER PANEL -->
+    <div class="auth-panel" id="panelRecover" style="display:none;">
+      <button class="modal-x" onclick="closeAuthModal()">✕</button>
+      <div class="auth-logo">🔑</div>
+      <h2 class="auth-title">Recover Account</h2>
+      <p class="auth-sub">Enter your registered email. We'll send a password reset link.</p>
+      <label class="field-label">Email Address</label>
+      <input id="recoverEmail" type="email" placeholder="your@email.com" class="field-input">
+      <div id="recoverMsg" class="auth-error"></div>
+      <button class="btn-auth" onclick="recoverAccount()">Send Reset Link →</button>
+      <p class="auth-link" onclick="switchPanel('panelLogin')">← Back to Login</p>
+    </div>
+
+  </div>
+</div>
+
+<!-- ================================================
+     USER DASHBOARD MODAL
+     ================================================ -->
+<div id="dashboardModal" class="modal-overlay" style="display:none;">
+  <div class="modal-box dashboard-box">
+    <button class="modal-x" onclick="closeDashboard()">✕</button>
+    <div class="dashboard-header">
+      <div class="dashboard-avatar" id="dashAvatar">U</div>
+      <div>
+        <div class="dashboard-name" id="dashName">User</div>
+        <div class="dashboard-email" id="dashEmail">email@example.com</div>
+      </div>
+    </div>
+
+    <!-- TABS -->
+    <div class="dash-tabs">
+      <button class="dash-tab active" onclick="switchDashTab('quotes', this)">📋 My Quotes</button>
+      <button class="dash-tab" onclick="switchDashTab('bookings', this)">📦 Bookings</button>
+      <button class="dash-tab" onclick="switchDashTab('profile', this)">👤 Profile</button>
+    </div>
+
+    <!-- QUOTES TAB -->
+    <div class="dash-content" id="dashQuotes">
+      <div id="quotesList" class="quotes-list">
+        <div class="dash-empty">No saved quotes yet.<br>Get a quote and it will appear here!</div>
+      </div>
+    </div>
+
+    <!-- BOOKINGS TAB -->
+    <div class="dash-content" id="dashBookings" style="display:none;">
+      <div id="bookingsList" class="quotes-list">
+        <div class="dash-empty">No bookings yet.<br>Book a move and track it here!</div>
+      </div>
+    </div>
+
+    <!-- PROFILE TAB -->
+    <div class="dash-content" id="dashProfile" style="display:none;">
+      <label class="field-label">Full Name</label>
+      <input id="profileName" class="field-input" placeholder="Your name">
+      <label class="field-label">Email</label>
+      <input id="profileEmail" class="field-input" placeholder="Email" disabled>
+      <label class="field-label">Phone</label>
+      <input id="profilePhone" class="field-input" placeholder="Phone number" disabled>
+      <div class="notif-row">
+        <span>📧 Email updates</span>
+        <label class="toggle"><input type="checkbox" id="prefEmail" onchange="savePreferences()"><span class="slider"></span></label>
+      </div>
+      <div class="notif-row">
+        <span>📱 SMS updates</span>
+        <label class="toggle"><input type="checkbox" id="prefSMS" onchange="savePreferences()"><span class="slider"></span></label>
+      </div>
+      <button class="btn-auth" onclick="saveProfile()" style="margin-top:16px;">Save Profile</button>
+      <div id="profileMsg" class="auth-error" style="margin-top:8px;"></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- PAYMENT SUCCESS MODAL -->
+<div id="paymentModal" class="modal-overlay" style="display:none;">
+  <div class="modal-box">
+    <div class="modal-icon">🎉</div>
+    <h2 class="modal-title">Booking Confirmed!</h2>
+    <p class="modal-sub">Your advance payment was successful. We'll contact you shortly.</p>
+    <div class="modal-detail" id="modalDetail"></div>
+    <button class="modal-wa-btn" onclick="sendWhatsAppAfterPayment()">💬 Get Confirmation on WhatsApp</button>
+    <button class="modal-close" onclick="closeModal()">Close</button>
+  </div>
+</div>
+
+<!-- FIREBASE SDKs -->
+<script type="module" src="firebase-config.js"></script>
 <script src="script.js"></script>
+<!-- RAZORPAY SDK -->
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<!-- GOOGLE MAPS -->
 <script async defer
   src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCdYIaoNUMxf0uWuHmWk_Nu2RcuYSsMuAY&libraries=places&callback=initAutocomplete">
 </script>
