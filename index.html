@@ -1,182 +1,120 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
+<meta charset="UTF-8">
 <title>PackZen Packers & Movers Bangalore</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<link rel="stylesheet" href="style.css" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-<!-- HERO -->
 <header class="hero">
-  <h1>PackZen Packers & Movers Bangalore</h1>
-  <p>Reliable & Affordable Moving Services</p>
-
-  <a href="#quote" class="hero-quote-btn">
-    Get Instant Quote
-  </a>
+<h1>PackZen Packers & Movers</h1>
+<p>Reliable & Affordable Moving Services</p>
+<a href="#quote" class="hero-quote-btn">Get Instant Quote</a>
 </header>
 
-<!-- SERVICES -->
-<section class="services-section">
-  <h2>Our Moving Services</h2>
-
-  <div class="services-grid">
-    <div class="service-card">
-      <h3>Home Relocation</h3>
-      <p>Safe & secure home shifting.</p>
-    </div>
-
-    <div class="service-card">
-      <h3>Office Shifting</h3>
-      <p>Professional office relocation.</p>
-    </div>
-
-    <div class="service-card">
-      <h3>Local Shifting</h3>
-      <p>Affordable Bangalore shifting.</p>
-    </div>
-
-    <div class="service-card">
-      <h3>Loading & Unloading</h3>
-      <p>Expert manpower support.</p>
-    </div>
-  </div>
-</section>
-
-<section class="trust-strip">
-✔ Licensed & Insured • ✔ Experienced Team • ✔ Safe Packing • ✔ On-Time Delivery
-</section>
-
-<!-- QUOTE SECTION -->
 <section class="quote-section" id="quote">
-
-<div class="wrapper">
 <div class="container">
 
-<h1>Get Instant Moving Quote</h1>
+<h2>Book Your Move</h2>
 
 <div class="progress">
-  <div id="progressBar"></div>
+<div id="progressBar"></div>
 </div>
 
-<!-- STEP 1 -->
+<!-- STEP 1 LOGIN -->
 <div class="form-step active">
 
-<label>Pickup Location</label>
-<input id="pickup" placeholder="Enter pickup location">
+<h3>Login with OTP</h3>
 
-<label>Use Current Location
-<label class="toggle">
-<input type="checkbox" id="useCurrentLocation">
-<span class="slider"></span>
-</label>
-</label>
+<input id="loginPhone" placeholder="Enter Mobile Number">
 
-<label>Drop Location</label>
-<input id="drop" placeholder="Enter drop location">
+<button onclick="sendOTP()">Send OTP</button>
+
+<div id="otpBox" style="display:none">
+<input id="otpInput" placeholder="Enter OTP">
+<button onclick="verifyOTP()">Verify</button>
+</div>
+
+</div>
+
+<!-- STEP 2 LOCATIONS -->
+<div class="form-step">
+
+<label>Pickup</label>
+<input id="pickup">
+
+<label>Drop</label>
+<input id="drop">
 
 <div id="map"></div>
 
-<div id="distanceInfo" style="margin-top:10px;font-weight:600;"></div>
-
+<button onclick="prevStep()">Back</button>
 <button onclick="nextStep()">Next</button>
+
 </div>
 
-<!-- STEP 2 -->
+<!-- STEP 3 HOUSE -->
 <div class="form-step">
-
-<div class="row">
-<div>
-<label>Date</label>
-<input type="date" id="shiftDate">
-</div>
-
-<div>
-<label>Time</label>
-<input type="time" id="shiftTime">
-</div>
-</div>
 
 <label>House Type</label>
 <select id="house">
 <option value="">Select</option>
-<option value="0">1 RK</option>
 <option value="1200">1 BHK</option>
 <option value="2500">2 BHK</option>
 <option value="4000">3 BHK</option>
 </select>
 
-<label>Vehicle Type</label>
+<label>Vehicle</label>
 <select id="vehicle">
 <option value="">Select</option>
 <option value="25">Tata Ace</option>
-<option value="40">14 ft Truck</option>
-<option value="50">17 ft Truck</option>
-<option value="60">22 ft Truck</option>
+<option value="40">Truck</option>
 </select>
 
 <button onclick="prevStep()">Back</button>
 <button onclick="nextStep()">Next</button>
+
 </div>
 
-<!-- STEP 3 -->
+<!-- STEP 4 INVENTORY -->
 <div class="form-step">
 
-<h3>Furniture</h3>
+<h3>Inventory</h3>
 
-<label><input type="checkbox" id="sofaCheck"> Sofa</label>
-<input type="number" id="sofaQty" value="1">
+<label><input type="checkbox" class="inv" data-name="Sofa"> Sofa</label>
+<input class="qty" data-name="Sofa" value="1">
 
-<label><input type="checkbox" id="bedCheck"> Bed</label>
-<input type="number" id="bedQty" value="1">
+<label><input type="checkbox" class="inv" data-name="Bed"> Bed</label>
+<input class="qty" data-name="Bed" value="1">
 
-<label><input type="checkbox" id="fridgeCheck"> Fridge</label>
-<label><input type="checkbox" id="wmCheck"> Washing Machine</label>
+<label><input type="checkbox" class="inv" data-name="Fridge"> Fridge</label>
+<input class="qty" data-name="Fridge" value="1">
+
+<label><input type="checkbox" class="inv" data-name="Washing Machine"> Washing Machine</label>
+<input class="qty" data-name="Washing Machine" value="1">
 
 <button onclick="prevStep()">Back</button>
 <button onclick="nextStep()">Next</button>
+
 </div>
 
-<!-- STEP 4 -->
+<!-- STEP 5 FINAL -->
 <div class="form-step">
 
-<label>Name</label>
-<input id="custName" placeholder="Customer name">
-
-<label>Phone</label>
-<input id="custPhone" placeholder="Mobile number">
-
-<!-- Live price shown here -->
-<div style="margin-top:15px;font-weight:700;font-size:20px;">
-Estimated Price: <span id="livePrice">₹0</span>
-</div>
+<h3>Final Price</h3>
 
 <div id="result"></div>
 
 <button onclick="prevStep()">Back</button>
-
-<button onclick="bookOnWhatsApp()" class="book-btn">
-Book on WhatsApp
-</button>
+<button onclick="bookOnWhatsApp()">Book on WhatsApp</button>
 
 </div>
 
-</div>
 </div>
 </section>
-
-<footer class="footer">
-<h3>PackZen Packers & Movers</h3>
-<p>HSR Layout, Bangalore</p>
-<p>Phone: 9945095453</p>
-</footer>
-
-<!-- FLOATING BUTTONS -->
-<a href="tel:9945095453" class="call-btn">📞 Call</a>
-<a href="https://wa.me/919945095453" class="floating-wa" target="_blank">💬 WhatsApp</a>
 
 <script src="script.js"></script>
 
