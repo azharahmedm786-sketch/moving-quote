@@ -85,8 +85,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   /* -- Auth state listener -- */
   waitForFirebase(() => {
-    const { auth, onAuthStateChanged } = window._firebase;
-    onAuthStateChanged(auth, (user) => {
+    const { auth } = window._firebase;
+    auth.onAuthStateChanged((user) => {
       currentUser = user;
       updateNavForUser(user);
     });
@@ -177,7 +177,7 @@ function signupUser() {
   if (password.length < 6)         return showError("signupError", "Password must be at least 6 characters.");
 
   waitForFirebase(() => {
-    const { auth, RecaptchaVerifier, signInWithPhoneNumber } = window._firebase;
+    const { auth, signInWithPhoneNumber } = window._firebase;
 
     // Store signup data to use after OTP
     pendingSignupData = { name, email, password, phone };
@@ -185,14 +185,14 @@ function signupUser() {
 
     // Setup invisible reCAPTCHA
     if (!window.recaptchaVerifier) {
-      window.recaptchaVerifier = new RecaptchaVerifier(auth, "recaptcha-container", {
+      window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier("recaptcha-container", {
         size: "invisible",
         callback: () => {}
       });
     }
 
     const phoneNumber = "+91" + phone;
-    signInWithPhoneNumber(auth, phoneNumber, window.recaptchaVerifier)
+    signInWithPhoneNumber(phoneNumber, window.recaptchaVerifier)
       .then((result) => {
         confirmationResult = result;
         document.getElementById("otpSubText").textContent =
@@ -246,19 +246,19 @@ function verifyOTP() {
 }
 
 async function completeSignup(phoneUser) {
-  const { auth, db, createUserWithEmailAndPassword, updateProfile, doc, setDoc } = window._firebase;
+  const { auth, db } = window._firebase;
   const { name, email, password, phone } = pendingSignupData;
 
   try {
     // Sign out the phone-only user first
-    await window._firebase.signOut(auth);
+    await auth.signOut();
 
     // Create email/password account
-    const cred = await createUserWithEmailAndPassword(auth, email, password);
-    await updateProfile(cred.user, { displayName: name });
+    const cred = await auth.createUserWithEmailAndPassword(email, password);
+    await cred.user.updateProfile({ displayName: name });
 
     // Save user profile to Firestore
-    await setDoc(doc(db, "users", cred.user.uid), {
+    await db.collection("users").doc(cred.user.uid).set({
       name, email, phone,
       phoneVerified: true,
       prefEmail: true,
@@ -300,8 +300,8 @@ function loginUser() {
   if (!password)             return showError("loginError", "Please enter your password.");
 
   waitForFirebase(() => {
-    const { auth, signInWithEmailAndPassword } = window._firebase;
-    signInWithEmailAndPassword(auth, email, password)
+    const { auth } = window._firebase;
+    auth.signInWithEmailAndPassword(email, password)
       .then((cred) => {
         closeAuthModal();
         showWelcomeToast(cred.user.displayName || "User");
@@ -322,8 +322,8 @@ function recoverAccount() {
   if (!email.includes("@")) return showError("recoverMsg", "Please enter a valid email.");
 
   waitForFirebase(() => {
-    const { auth, sendPasswordResetEmail } = window._firebase;
-    sendPasswordResetEmail(auth, email)
+    const { auth } = window._firebase;
+    auth.sendPasswordResetEmail(email)
       .then(() => {
         showError("recoverMsg", "✅ Reset link sent! Check your email inbox.", true);
       })
@@ -338,7 +338,7 @@ function recoverAccount() {
    ============================================ */
 function signOutUser() {
   waitForFirebase(() => {
-    window._firebase.signOut(window._firebase.auth)
+    window._firebase.auth.signOut()
       .then(() => {
         document.getElementById("userDropdown").classList.remove("open");
         showWelcomeToast("Signed out successfully", false);
@@ -409,14 +409,10 @@ function openProfile() {
    ============================================ */
 async function loadUserQuotes() {
   if (!currentUser || !window._firebase) return;
-  const { db, collection, query, where, getDocs, orderBy } = window._firebase;
+  const { db } = window._firebase;
 
   try {
-    const q = query(
-      collection(db, "quotes"),
-      where("uid", "==", currentUser.uid)
-    );
-    const snap = await getDocs(q);
+    const snap = await db.collection("quotes").where("uid", "==", currentUser.uid).get();
     const list = document.getElementById("quotesList");
 
     if (snap.empty) {
@@ -448,11 +444,10 @@ async function loadUserQuotes() {
    ============================================ */
 async function loadBookings() {
   if (!currentUser || !window._firebase) return;
-  const { db, collection, query, where, getDocs } = window._firebase;
+  const { db } = window._firebase;
 
   try {
-    const q = query(collection(db, "bookings"), where("uid", "==", currentUser.uid));
-    const snap = await getDocs(q);
+    const snap = await db.collection("bookings").where("uid", "==", currentUser.uid).get();
     const list = document.getElementById("bookingsList");
 
     if (snap.empty) {
@@ -484,13 +479,13 @@ async function loadBookings() {
    ============================================ */
 async function loadProfile() {
   if (!currentUser || !window._firebase) return;
-  const { db, doc, getDoc } = window._firebase;
+  const { db } = window._firebase;
 
   document.getElementById("profileEmail").value = currentUser.email || "";
 
   try {
-    const snap = await getDoc(doc(db, "users", currentUser.uid));
-    if (snap.exists()) {
+    const snap = await db.collection("users").doc(currentUser.uid).get();
+    if (snap.exists) {
       const data = snap.data();
       document.getElementById("profileName").value  = data.name  || currentUser.displayName || "";
       document.getElementById("profilePhone").value = data.phone || "";
@@ -502,16 +497,16 @@ async function loadProfile() {
 
 async function saveProfile() {
   if (!currentUser || !window._firebase) return;
-  const { db, doc, setDoc, updateProfile, auth } = window._firebase;
+  const { auth, db } = window._firebase;
 
   const name = document.getElementById("profileName").value.trim();
   if (!name) return showError("profileMsg", "Name cannot be empty.");
 
   try {
-    await updateProfile(auth.currentUser, { displayName: name });
-    await setDoc(doc(db, "users", currentUser.uid), {
+    await auth.currentUser.updateProfile({ displayName: name });
+    await db.collection("users").doc(currentUser.uid).set({
       name,
-      email:    currentUser.email,
+      email:     currentUser.email,
       prefEmail: document.getElementById("prefEmail").checked,
       prefSMS:   document.getElementById("prefSMS").checked,
     }, { merge: true });
@@ -532,12 +527,12 @@ function savePreferences() {
    ============================================ */
 async function saveQuoteToFirestore(total) {
   if (!currentUser || !window._firebase) return;
-  const { db, collection, addDoc } = window._firebase;
+  const { db } = window._firebase;
 
   try {
     const houseEl   = document.getElementById("house");
     const vehicleEl = document.getElementById("vehicle");
-    await addDoc(collection(db, "quotes"), {
+    await db.collection("quotes").add({
       uid:     currentUser.uid,
       pickup:  pickup?.value  || "",
       drop:    drop?.value    || "",
