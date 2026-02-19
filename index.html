@@ -1,17 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
 <meta charset="UTF-8" />
 <title>PackZen Packers & Movers Bangalore</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css" /> 
+<link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
-<!-- ============ NAVBAR ============ -->
+<!-- NAVBAR -->
 <nav class="navbar">
   <div class="nav-inner">
     <div class="nav-logo">
@@ -21,9 +22,7 @@
     <div class="nav-links">
       <a href="#services">Services</a>
       <a href="#quote" class="nav-cta">Get Quote</a>
-      <!-- AUTH BUTTONS — shown when logged out -->
       <button class="nav-auth-btn" id="navLoginBtn" onclick="openAuthModal('login')">Login</button>
-      <!-- USER AVATAR — shown when logged in -->
       <div class="nav-user" id="navUser" style="display:none;" onclick="toggleUserMenu()">
         <div class="nav-avatar" id="navAvatar">U</div>
         <span id="navUserName">User</span>
@@ -38,7 +37,7 @@
   </div>
 </nav>
 
-<!-- ============ HERO ============ -->
+<!-- HERO -->
 <header class="hero">
   <div class="blob blob-1"></div>
   <div class="blob blob-2"></div>
@@ -63,7 +62,7 @@
   </div>
 </header>
 
-<!-- ============ STATS ============ -->
+<!-- STATS -->
 <section class="stats-bar" id="statsStrip">
   <div class="stat-item"><div class="stat-top"><span class="stat-number" data-target="1200">0</span><span class="stat-suffix">+</span></div><span class="stat-label">Happy Customers</span></div>
   <div class="stat-divider"></div>
@@ -74,7 +73,7 @@
   <div class="stat-item"><div class="stat-top"><span class="stat-number" data-target="50">0</span><span class="stat-suffix">+</span></div><span class="stat-label">Cities Covered</span></div>
 </section>
 
-<!-- ============ MARQUEE ============ -->
+<!-- MARQUEE -->
 <div class="marquee-wrap">
   <div class="marquee-track">
     <span>✔ Licensed &amp; Insured</span><span class="dot">◆</span>
@@ -92,7 +91,7 @@
   </div>
 </div>
 
-<!-- ============ SERVICES ============ -->
+<!-- SERVICES -->
 <section class="services-section" id="services">
   <div class="section-header reveal">
     <div class="section-tag">What We Offer</div>
@@ -107,7 +106,7 @@
   </div>
 </section>
 
-<!-- ============ QUOTE ============ -->
+<!-- QUOTE -->
 <section class="quote-section" id="quote">
   <div class="quote-wrapper">
     <div class="quote-left reveal">
@@ -157,14 +156,18 @@
           <label class="field-label">House Type</label>
           <select id="house" class="field-input">
             <option value="">Select house size</option>
-            <option value="0">1 RK</option><option value="1200">1 BHK</option>
-            <option value="2500">2 BHK</option><option value="4000">3 BHK</option>
+            <option value="0">1 RK</option>
+            <option value="1200">1 BHK</option>
+            <option value="2500">2 BHK</option>
+            <option value="4000">3 BHK</option>
           </select>
           <label class="field-label">Vehicle Type</label>
           <select id="vehicle" class="field-input">
             <option value="">Select vehicle</option>
-            <option value="25">Tata Ace (Small)</option><option value="40">14 ft Truck (Medium)</option>
-            <option value="50">17 ft Truck (Large)</option><option value="60">22 ft Truck (XL)</option>
+            <option value="25">Tata Ace (Small)</option>
+            <option value="40">14 ft Truck (Medium)</option>
+            <option value="50">17 ft Truck (Large)</option>
+            <option value="60">22 ft Truck (XL)</option>
           </select>
           <div class="btn-row">
             <button class="btn-back" onclick="prevStep()">← Back</button>
@@ -209,12 +212,13 @@
           <button onclick="startPayment()" class="btn-pay">💳 Pay Advance &amp; Confirm Booking</button>
           <button onclick="bookOnWhatsApp()" class="btn-whatsapp-alt">💬 Book via WhatsApp Only</button>
         </div>
+
       </div>
     </div>
   </div>
 </section>
 
-<!-- ============ FOOTER ============ -->
+<!-- FOOTER -->
 <footer class="footer">
   <div class="footer-inner">
     <div class="footer-brand">
@@ -234,13 +238,9 @@
 <a href="tel:9945095453" class="float-call">📞 Call</a>
 <a href="https://wa.me/919945095453" class="float-wa" target="_blank">💬 WhatsApp</a>
 
-<!-- ================================================
-     AUTH MODAL — Login / Signup / OTP / Recover
-     ================================================ -->
+<!-- AUTH MODAL -->
 <div id="authModal" class="modal-overlay" style="display:none;">
   <div class="modal-box auth-modal-box">
-
-    <!-- LOGIN PANEL -->
     <div class="auth-panel" id="panelLogin">
       <button class="modal-x" onclick="closeAuthModal()">✕</button>
       <div class="auth-logo">📦 PackZen</div>
@@ -256,8 +256,6 @@
       <button class="btn-auth-outline" onclick="switchPanel('panelSignup')">Create New Account</button>
       <p class="auth-link" onclick="switchPanel('panelRecover')">Forgot password? Recover Account</p>
     </div>
-
-    <!-- SIGNUP PANEL -->
     <div class="auth-panel" id="panelSignup" style="display:none;">
       <button class="modal-x" onclick="closeAuthModal()">✕</button>
       <div class="auth-logo">📦 PackZen</div>
@@ -274,14 +272,11 @@
       </div>
       <label class="field-label">Password</label>
       <input id="signupPassword" type="password" placeholder="Min 6 characters" class="field-input">
-      <!-- Invisible reCAPTCHA container for phone auth -->
       <div id="recaptcha-container"></div>
       <div id="signupError" class="auth-error"></div>
       <button class="btn-auth" onclick="signupUser()">Send OTP & Register →</button>
       <p class="auth-link" onclick="switchPanel('panelLogin')">Already have an account? Login</p>
     </div>
-
-    <!-- OTP PANEL -->
     <div class="auth-panel" id="panelOTP" style="display:none;">
       <button class="modal-x" onclick="closeAuthModal()">✕</button>
       <div class="auth-logo">📱</div>
@@ -295,12 +290,10 @@
         <input class="otp-box" type="tel" maxlength="1" oninput="otpInput(this,4)">
         <input class="otp-box" type="tel" maxlength="1" oninput="otpInput(this,5)">
       </div>
-      <div id="otpError" class="auth-error"></div> 
+      <div id="otpError" class="auth-error"></div>
       <button class="btn-auth" onclick="verifyOTP()">Verify OTP →</button>
       <p class="auth-link" id="resendOTPLink" onclick="resendOTP()">Resend OTP</p>
     </div>
-
-    <!-- RECOVER PANEL -->
     <div class="auth-panel" id="panelRecover" style="display:none;">
       <button class="modal-x" onclick="closeAuthModal()">✕</button>
       <div class="auth-logo">🔑</div>
@@ -312,13 +305,10 @@
       <button class="btn-auth" onclick="recoverAccount()">Send Reset Link →</button>
       <p class="auth-link" onclick="switchPanel('panelLogin')">← Back to Login</p>
     </div>
-
   </div>
 </div>
 
-<!-- ================================================
-     USER DASHBOARD MODAL
-     ================================================ -->
+<!-- DASHBOARD MODAL -->
 <div id="dashboardModal" class="modal-overlay" style="display:none;">
   <div class="modal-box dashboard-box">
     <button class="modal-x" onclick="closeDashboard()">✕</button>
@@ -326,32 +316,24 @@
       <div class="dashboard-avatar" id="dashAvatar">U</div>
       <div>
         <div class="dashboard-name" id="dashName">User</div>
-        <div class="dashboard-email" id="dashEmail"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="eb8e868a8287ab8e938a869b878ec5888486">[email&#160;protected]</a></div>
+        <div class="dashboard-email" id="dashEmail">email@example.com</div>
       </div>
     </div>
-
-    <!-- TABS -->
     <div class="dash-tabs">
       <button class="dash-tab active" onclick="switchDashTab('quotes', this)">📋 My Quotes</button>
       <button class="dash-tab" onclick="switchDashTab('bookings', this)">📦 Bookings</button>
       <button class="dash-tab" onclick="switchDashTab('profile', this)">👤 Profile</button>
     </div>
-
-    <!-- QUOTES TAB -->
     <div class="dash-content" id="dashQuotes">
       <div id="quotesList" class="quotes-list">
         <div class="dash-empty">No saved quotes yet.<br>Get a quote and it will appear here!</div>
       </div>
     </div>
-
-    <!-- BOOKINGS TAB -->
     <div class="dash-content" id="dashBookings" style="display:none;">
       <div id="bookingsList" class="quotes-list">
         <div class="dash-empty">No bookings yet.<br>Book a move and track it here!</div>
       </div>
     </div>
-
-    <!-- PROFILE TAB -->
     <div class="dash-content" id="dashProfile" style="display:none;">
       <label class="field-label">Full Name</label>
       <input id="profileName" class="field-input" placeholder="Your name">
@@ -370,7 +352,6 @@
       <button class="btn-auth" onclick="saveProfile()" style="margin-top:16px;">Save Profile</button>
       <div id="profileMsg" class="auth-error" style="margin-top:8px;"></div>
     </div>
-
   </div>
 </div>
 
@@ -386,8 +367,13 @@
   </div>
 </div>
 
-<!-- FIREBASE SDKs -->
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="firebase-config.js"></script>
+<!-- ✅ SCRIPTS — correct order, no Cloudflare interference -->
+<script src="firebase-config.js"></script>
 <script src="script.js"></script>
-<!-- RAZORPAY SDK -->
-<script src="https://checkout.razorpay.com/v
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script async defer
+  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCdYIaoNUMxf0uWuHmWk_Nu2RcuYSsMuAY&libraries=places&callback=initAutocomplete">
+</script>
+
+</body>
+</html>
