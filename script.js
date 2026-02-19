@@ -561,16 +561,57 @@ function initAutocomplete() {
   if (toggle) {
     toggle.addEventListener("change", () => {
       if (!toggle.checked) return;
-      navigator.geolocation.getCurrentPosition(pos => {
-        const loc = { lat: pos.coords.latitude, lng: pos.coords.longitude };
-        new google.maps.Geocoder().geocode({ location: loc }, (res, status) => {
-          if (status === "OK" && res[0]) {
-            pickupInput.value = res[0].formatted_address;
-            pickupPlace = { geometry: { location: loc } };
-            showLocation("pickup"); calculateQuote(true);
+
+      // Check if browser supports geolocation
+      if (!navigator.geolocation) {
+        alert("Your browser does not support location access.");
+        toggle.checked = false;
+        return;
+      }
+
+      // Show loading state
+      pickupInput.value = "📍 Getting your location...";
+
+      navigator.geolocation.getCurrentPosition(
+        // ✅ SUCCESS
+        pos => {
+          const latLng = new google.maps.LatLng(
+            pos.coords.latitude,
+            pos.coords.longitude
+          );
+
+          new google.maps.Geocoder().geocode({ location: latLng }, (res, status) => {
+            if (status === "OK" && res[0]) {
+              pickupInput.value = res[0].formatted_address;
+              pickupPlace = { geometry: { location: latLng } };
+              showLocation("pickup");
+              calculateQuote(true);
+            } else {
+              pickupInput.value = "";
+              alert("Could not get address for your location. Try typing it manually.");
+              toggle.checked = false;
+            }
+          });
+        },
+        // ❌ ERROR
+        err => {
+          pickupInput.value = "";
+          toggle.checked = false;
+          if (err.code === 1) {
+            alert("Location permission denied.\n\nPlease allow location access in your browser:\nClick the 🔒 lock icon in the address bar → Allow Location.");
+          } else if (err.code === 2) {
+            alert("Could not detect your location. Please try again or type your address.");
+          } else {
+            alert("Location request timed out. Please type your address manually.");
           }
-        });
-      });
+        },
+        // OPTIONS
+        {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 0
+        }
+      );
     });
   }
   attachAutoCalculation();
