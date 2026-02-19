@@ -34,7 +34,7 @@
           appId:             "1:270978358338:web:20827d29d23b654925e1db",
           measurementId:     "G-9JXKP58GP3"
         });
-      }
+      } 
     } catch(e) {
       console.error("Firebase init failed:", e);
       return;
