@@ -185,14 +185,15 @@ function signupUser() {
 
     // Setup invisible reCAPTCHA
     if (!window.recaptchaVerifier) {
-      window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier("recaptcha-container", {
-        size: "invisible",
-        callback: () => {}
-      });
+      window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier(
+        "recaptcha-container",
+        { size: "invisible", callback: () => {} },
+        auth
+      );
     }
 
     const phoneNumber = "+91" + phone;
-    signInWithPhoneNumber(phoneNumber, window.recaptchaVerifier)
+    auth.signInWithPhoneNumber(phoneNumber, window.recaptchaVerifier)
       .then((result) => {
         confirmationResult = result;
         document.getElementById("otpSubText").textContent =
