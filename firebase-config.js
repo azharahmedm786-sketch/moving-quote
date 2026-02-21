@@ -9,7 +9,8 @@
     "https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js",
     "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js",
     "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js",
-    "https://www.gstatic.com/firebasejs/10.12.0/firebase-analytics-compat.js"
+    "https://www.gstatic.com/firebasejs/10.12.0/firebase-analytics-compat.js",
+"https://www.gstatic.com/firebasejs/10.12.0/firebase-functions-compat.js"
   ];
 
   // Load scripts ONE BY ONE (sequential) — guarantees firebase is ready
