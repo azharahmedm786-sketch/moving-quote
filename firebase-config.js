@@ -26,7 +26,7 @@
     try {
       if (!firebase.apps.length) {
         firebase.initializeApp({
-          apiKey:            "AIzaSyDFJNH0jIm5XiDEsCy5-j5LVybzO60tCuo",
+          apiKey:            "AIzaSyDEtUY1wAyK2PSPgtsxzp7KbYoBfqqWALo",
           authDomain:        "packzen-e7539.firebaseapp.com",
           projectId:         "packzen-e7539",
           storageBucket:     "packzen-e7539.firebasestorage.app",
