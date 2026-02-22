@@ -493,10 +493,12 @@ function updatePriceDisplay() {
   const fullDiscount = Math.round(discounted * 0.05);
   const fullAmount = discounted - fullDiscount;
 
+  const optAtDrop = document.getElementById("optAtDropAmt");
   priceEl.innerText   = "₹" + discounted.toLocaleString();
   advanceEl.innerText = "₹" + Math.round(discounted * 0.10).toLocaleString();
-  if (optAdv)  optAdv.textContent  = "₹" + Math.round(discounted * 0.10).toLocaleString();
-  if (optFull) optFull.textContent = "₹" + fullAmount.toLocaleString();
+  if (optAdv)    optAdv.textContent    = "₹" + Math.round(discounted * 0.10).toLocaleString();
+  if (optFull)   optFull.textContent   = "₹" + fullAmount.toLocaleString();
+  if (optAtDrop) optAtDrop.textContent = "₹" + discounted.toLocaleString();
 
   if (promoDiscount > 0 && discRow) {
     discRow.style.display = "block";
@@ -511,6 +513,14 @@ function selectPayment(type) {
   selectedPayment = type;
   document.getElementById("optAdvance").classList.toggle("selected", type === "advance");
   document.getElementById("optFull").classList.toggle("selected", type === "full");
+  document.getElementById("optAtDrop")?.classList.toggle("selected", type === "at_drop");
+  // Update pay button label
+  const payBtn = document.querySelector(".btn-pay");
+  if (payBtn) {
+    if (type === "advance")  payBtn.textContent = "💳 Pay Advance & Confirm";
+    if (type === "full")     payBtn.textContent = "💳 Pay Full & Confirm";
+    if (type === "at_drop")  payBtn.textContent = "📋 Book Now — Pay at Drop";
+  }
 }
 
 /* ============================================
@@ -682,7 +692,7 @@ function calculateQuote(auto = false) {
       if (status === "OK" && el && el.status === "OK" && el.distance && el.distance.value) {
         applyPrice(el.distance.value / 1000);
       } else {
-        console.warn("DistanceMatrix failed:", status, el ? el.status : "no element", "— using fallback");
+        console.warn("DistanceMatrix failed:", status, el ? el.status : "no element");
         if (pickupPlace && pickupPlace.geometry && dropPlace && dropPlace.geometry) {
           const R = 6371;
           const p1 = pickupPlace.geometry.location;
@@ -717,10 +727,87 @@ function saveLead() {
   }).catch(() => {});
 }
 
-function bookOnWhatsApp() {
-  calculateQuote(true); saveLead();
-  const result = document.getElementById("result");
-  window.open(`https://wa.me/919945095453?text=${encodeURIComponent("New Moving Request 🚚\n\n" + result.innerText)}`, "_blank");
+async function bookOnWhatsApp() {
+  const name  = document.getElementById("custName")?.value?.trim();
+  const phone = document.getElementById("custPhone")?.value?.trim();
+  if (!name)                       return alert("Please enter your name.");
+  if (!phone || phone.length < 10) return alert("Please enter a valid phone number.");
+  if (lastCalculatedTotal === 0)   return alert("Price not calculated yet.");
+
+  saveLead();
+  const pickup     = document.getElementById("pickup")?.value  || "";
+  const drop       = document.getElementById("drop")?.value    || "";
+  const date       = document.getElementById("shiftDate")?.value || "";
+  const house      = document.getElementById("house");
+  const vehicle    = document.getElementById("vehicle");
+  const houseText  = house?.options[house?.selectedIndex]?.text    || "";
+  const vehicleText= vehicle?.options[vehicle?.selectedIndex]?.text || "";
+  const bookingRef = "WA-" + Date.now().toString(36).toUpperCase();
+
+  // 1. Save to Firestore FIRST, then open WhatsApp
+  if (window._firebase) {
+    try {
+      showToast("⏳ Saving booking...");
+      const docRef = await window._firebase.db.collection("bookings").add({
+        bookingRef,
+        customerUid:  currentUser?.uid || null,
+        customerName: name, phone, pickup, drop, date,
+        house: houseText, vehicle: vehicleText,
+        total:        lastCalculatedTotal,
+        paid:         0,
+        status:       "confirmed",
+        source:       "whatsapp",
+        promoDiscount,
+        createdAt:    firebase.firestore.FieldValue.serverTimestamp()
+      });
+      currentBookingId = docRef.id;
+
+      // 2. Show confirmation popup
+      const subEl  = document.getElementById("paymentModalSub");
+      const idBox  = document.getElementById("bookingIdBox");
+      const idDisp = document.getElementById("bookingIdDisplay");
+      const invBtn = document.getElementById("btnInvoice");
+      document.getElementById("modalDetail").innerHTML =
+        `<strong>Booking ID:</strong> ${bookingRef}<br>` +
+        `<strong>Name:</strong> ${name}<br>` +
+        `<strong>Phone:</strong> ${phone}<br>` +
+        `<strong>Pickup:</strong> ${pickup||"—"}<br>` +
+        `<strong>Drop:</strong> ${drop||"—"}<br>` +
+        `<strong>Date:</strong> ${date||"TBD"}<br>` +
+        `<strong>House Type:</strong> ${houseText||"—"}<br>` +
+        `<strong>Vehicle:</strong> ${vehicleText||"—"}<br>` +
+        `<strong>Total Estimate:</strong> ₹${lastCalculatedTotal.toLocaleString()}<br>` +
+        `<strong>Payment:</strong> Cash on moving day`;
+      if (subEl)  subEl.textContent = "Booking confirmed! Your ID is ready — send it to our WhatsApp.";
+      if (idBox)  idBox.style.display = "block";
+      if (idDisp) idDisp.textContent = bookingRef;
+      if (invBtn) invBtn.style.display = "none";
+      document.getElementById("paymentModal").style.display = "flex";
+
+      // 3. Open WhatsApp with full details + booking ID
+      const msg =
+        "✅ *New Booking — PackZen*\n" +
+        "━━━━━━━━━━━━━━━━━━━━\n" +
+        `🔖 *Booking ID:* ${bookingRef}\n` +
+        `👤 *Name:* ${name}\n` +
+        `📞 *Phone:* ${phone}\n` +
+        `📍 *Pickup:* ${pickup}\n` +
+        `🏁 *Drop:* ${drop}\n` +
+        `📅 *Date:* ${date||"TBD"}\n` +
+        `🏠 *House:* ${houseText||"—"}\n` +
+        `🚚 *Vehicle:* ${vehicleText||"—"}\n` +
+        `💰 *Estimate:* ₹${lastCalculatedTotal.toLocaleString()}\n` +
+        "━━━━━━━━━━━━━━━━━━━━\n" +
+        "Payment: Cash on moving day";
+      window.open(`https://wa.me/919945095453?text=${encodeURIComponent(msg)}`, "_blank");
+
+    } catch(e) {
+      console.error("WA booking save:", e);
+      alert("Booking save failed: " + e.message);
+    }
+  } else {
+    alert("Service not ready. Please refresh and try again.");
+  }
 }
 
 /* ============================================
@@ -739,6 +826,13 @@ function startPayment() {
   }
 
   const discounted = Math.max(lastCalculatedTotal - promoDiscount, 0);
+
+  // Pay at Drop — save booking and confirm, no online payment now
+  if (selectedPayment === "at_drop") {
+    bookWithoutPayment("at_drop");
+    return;
+  }
+
   let payAmount;
   if (selectedPayment === "full") {
     payAmount = Math.round(discounted * 0.95); // 5% discount for full payment
@@ -766,7 +860,9 @@ function onPaymentSuccess(response, name, phone, paid, total) {
   const drop   = document.getElementById("drop");
   const shiftDate = document.getElementById("shiftDate");
 
+  const bookingRef = "PKZ-" + Date.now().toString(36).toUpperCase();
   document.getElementById("modalDetail").innerHTML = `
+    <strong>Booking ID:</strong> ${bookingRef}<br>
     <strong>Name:</strong> ${name}<br>
     <strong>Phone:</strong> ${phone}<br>
     <strong>Pickup:</strong> ${pickup?.value||"-"}<br>
@@ -774,6 +870,14 @@ function onPaymentSuccess(response, name, phone, paid, total) {
     <strong>Total Estimate:</strong> ₹${total.toLocaleString()}<br>
     <strong>Amount Paid:</strong> ₹${paid.toLocaleString()} (${selectedPayment === "full" ? "Full" : "Advance"})<br>
     <strong>Payment ID:</strong> ${response.razorpay_payment_id}`;
+  const subEl = document.getElementById("paymentModalSub");
+  if (subEl) subEl.textContent = "Payment successful! Save your Booking ID for tracking.";
+  const idBox = document.getElementById("bookingIdBox");
+  const idDisp = document.getElementById("bookingIdDisplay");
+  if (idBox) idBox.style.display = "block";
+  if (idDisp) idDisp.textContent = bookingRef;
+  const invoiceBtn = document.getElementById("btnInvoice");
+  if (invoiceBtn) invoiceBtn.style.display = "block";
   document.getElementById("paymentModal").style.display = "flex";
 
   // Save booking to Firestore
@@ -1141,7 +1245,28 @@ function showStep(n) {
   const pb = document.getElementById("progressBar");
   if (pb) pb.style.width = ((n + 1) / steps.length) * 100 + "%";
   updateStepDots(n);
-  if (n === steps.length - 1) calculateQuote(true);
+  if (n === steps.length - 1) {
+    calculateQuote(true);
+    autoFillCustomerDetails();
+  }
+}
+
+function autoFillCustomerDetails() {
+  if (!currentUser || !window._firebase) return;
+  const nameEl  = document.getElementById("custName");
+  const phoneEl = document.getElementById("custPhone");
+  // Only fill if fields are empty (don't overwrite what user typed)
+  window._firebase.db.collection("users").doc(currentUser.uid).get()
+    .then(doc => {
+      if (!doc.exists) return;
+      const d = doc.data();
+      if (nameEl  && !nameEl.value.trim())  nameEl.value  = d.name  || currentUser.displayName || "";
+      if (phoneEl && !phoneEl.value.trim()) phoneEl.value = d.phone || "";
+    })
+    .catch(() => {
+      // Fallback to auth profile
+      if (nameEl  && !nameEl.value.trim())  nameEl.value  = currentUser.displayName || "";
+    });
 }
 
 function nextStep() {
@@ -1233,6 +1358,132 @@ async function createDriver() {
 
 
 /* ============================================
+   BOOK WITHOUT PAYMENT
+   ============================================ */
+function bookWithoutPayment() {
+  // Validate name & phone — highlight fields if empty
+  const nameEl  = document.getElementById("custName");
+  const phoneEl = document.getElementById("custPhone");
+  const name    = nameEl?.value?.trim();
+  const phone   = phoneEl?.value?.trim();
+
+  if (!name) {
+    nameEl.style.borderColor = "#e53e3e";
+    nameEl.focus();
+    nameEl.placeholder = "⚠️ Please enter your name";
+    nameEl.addEventListener("input", () => { nameEl.style.borderColor = ""; }, { once: true });
+    return;
+  }
+  if (!phone || phone.length < 10) {
+    phoneEl.style.borderColor = "#e53e3e";
+    phoneEl.focus();
+    phoneEl.placeholder = "⚠️ Please enter valid 10-digit number";
+    phoneEl.addEventListener("input", () => { phoneEl.style.borderColor = ""; }, { once: true });
+    return;
+  }
+  if (lastCalculatedTotal === 0) {
+    showToast("⚠️ Price not calculated yet. Please enter pickup & drop locations.");
+    return;
+  }
+
+  const pickup     = document.getElementById("pickup")?.value    || "";
+  const drop       = document.getElementById("drop")?.value      || "";
+  const date       = document.getElementById("shiftDate")?.value || "";
+  const bookingRef = "PKZ-" + Date.now().toString(36).toUpperCase().slice(-6);
+
+  if (!window._firebase) { showToast("⚠️ Service not ready. Try again."); return; }
+
+  // Disable button to prevent double-click
+  const btn = document.querySelector(".btn-free-book");
+  if (btn) { btn.disabled = true; btn.textContent = "⏳ Saving..."; }
+
+  window._firebase.db.collection("bookings").add({
+    bookingRef,
+    customerUid:  currentUser?.uid || null,
+    customerName: name,
+    phone,
+    pickup,
+    drop,
+    date,
+    total:        lastCalculatedTotal,
+    paid:         0,
+    paymentType:  "pay_later",
+    status:       "confirmed",
+    source:       "direct",
+    promoDiscount,
+    photos:       uploadedPhotos.slice(0, 3),
+    createdAt:    firebase.firestore.FieldValue.serverTimestamp()
+  }).then(docRef => {
+    currentBookingId = docRef.id;
+    if (btn) { btn.disabled = false; btn.textContent = "📋 Book Now (Pay Later)"; }
+
+    // Build confirmation detail
+    const detail =
+      `<strong>Booking ID:</strong> ${bookingRef}<br>` +
+      `<strong>Name:</strong> ${name}<br>` +
+      `<strong>Phone:</strong> +91 ${phone}<br>` +
+      `<strong>Pickup:</strong> ${pickup||"—"}<br>` +
+      `<strong>Drop:</strong> ${drop||"—"}<br>` +
+      `<strong>Date:</strong> ${date||"—"}<br>` +
+      `<strong>Total Estimate:</strong> ₹${lastCalculatedTotal.toLocaleString()}<br>` +
+      `<strong>Payment:</strong> Pay on moving day`;
+
+    // Show popup
+    const subEl  = document.getElementById("paymentModalSub");
+    const idBox  = document.getElementById("bookingIdBox");
+    const idDisp = document.getElementById("bookingIdDisplay");
+    const invBtn = document.getElementById("btnInvoice");
+    document.getElementById("modalDetail").innerHTML = detail;
+    if (subEl)  subEl.textContent = "Booking confirmed! 🎉 Your ID is below — screenshot or copy it.";
+    if (idBox)  idBox.style.display = "block";
+    if (idDisp) idDisp.textContent = bookingRef;
+    if (invBtn) invBtn.style.display = "none";
+    document.getElementById("paymentModal").style.display = "flex";
+
+    // Auto-send WhatsApp to CUSTOMER (no confirm prompt)
+    const customerMsg =
+      `✅ *Booking Confirmed — PackZen* 🚚\n\n` +
+      `📌 *Booking ID:* ${bookingRef}\n` +
+      `👤 *Name:* ${name}\n` +
+      `📍 *Pickup:* ${pickup}\n` +
+      `🏁 *Drop:* ${drop}\n` +
+      `📅 *Date:* ${date||"To be confirmed"}\n` +
+      `💰 *Estimate:* ₹${lastCalculatedTotal.toLocaleString()}\n` +
+      `💳 *Payment:* Pay on moving day\n\n` +
+      `Our team will call you shortly to confirm. Save this Booking ID for tracking!\n\n` +
+      `— PackZen Packers & Movers | 📞 9945095453`;
+    setTimeout(() => {
+      window.open(`https://wa.me/91${phone}?text=${encodeURIComponent(customerMsg)}`, "_blank");
+    }, 800);
+
+    // Also notify admin on WhatsApp
+    const adminMsg =
+      `🔔 *New Booking (Pay Later)* — PackZen\n\n` +
+      `📌 ID: ${bookingRef}\n` +
+      `👤 ${name} | 📞 ${phone}\n` +
+      `📍 ${pickup} → ${drop}\n` +
+      `📅 Date: ${date||"—"}\n` +
+      `💰 Estimate: ₹${lastCalculatedTotal.toLocaleString()}`;
+    setTimeout(() => {
+      window.open(`https://wa.me/919945095453?text=${encodeURIComponent(adminMsg)}`, "_blank");
+    }, 1200);
+
+    showToast("✅ Booking saved! ID: " + bookingRef);
+
+  }).catch(e => {
+    if (btn) { btn.disabled = false; btn.textContent = "📋 Book Now (Pay Later)"; }
+    showToast("❌ Booking failed: " + e.message);
+    console.error("bookWithoutPayment error:", e);
+  });
+}
+
+function copyBookingId() {
+  const id = document.getElementById("bookingIdDisplay")?.textContent;
+  if (!id || id === "—") return;
+  navigator.clipboard.writeText(id).then(() => showToast("✅ Booking ID copied!"));
+}
+
+/* ============================================
    DASHBOARD — MISSING FUNCTIONS
    ============================================ */
 function closeDashboard() {
@@ -1261,15 +1512,12 @@ function loadUserQuotes() {
     .then(snap => {
       const list = document.getElementById("quotesList");
       if (!list) return;
-      if (snap.empty) { list.innerHTML = '<div class="dash-empty">No saved quotes yet.<br>Get a quote to see it here!</div>'; return; }
+      if (snap.empty) { list.innerHTML = '<div class="dash-empty">No saved quotes yet.</div>'; return; }
       list.innerHTML = snap.docs.map(d => {
         const q = d.data();
         return `<div class="quote-item">
           <div class="qi-route">📍 ${q.pickup||"?"} → 🏁 ${q.drop||"?"}</div>
-          <div class="qi-details">
-            <span>${q.house||"—"}</span><span>${q.vehicle||"—"}</span>
-            <span class="qi-price">₹${(q.total||0).toLocaleString()}</span>
-          </div>
+          <div class="qi-details"><span>${q.house||"—"}</span><span>${q.vehicle||"—"}</span><span class="qi-price">₹${(q.total||0).toLocaleString()}</span></div>
           <div class="qi-date">${q.date||""}</div>
         </div>`;
       }).join("");
@@ -1284,17 +1532,18 @@ function loadUserBookings() {
     .then(snap => {
       const list = document.getElementById("bookingsList");
       if (!list) return;
-      if (snap.empty) { list.innerHTML = '<div class="dash-empty">No bookings yet.<br>Book your first move!</div>'; return; }
-      const statusColors = { confirmed:"#0057ff", assigned:"#7c3aed", packing:"#0ea5e9", transit:"#f97316", delivered:"#00c96e" };
+      if (snap.empty) { list.innerHTML = '<div class="dash-empty">No bookings yet.</div>'; return; }
+      const statusColors = { confirmed:"#0057ff", assigned:"#7c3aed", packing:"#0ea5e9", transit:"#f97316", delivered:"#00c96e", pending:"#d97706" };
       list.innerHTML = snap.docs.map(d => {
         const b = d.data();
         const color = statusColors[b.status] || "#5a6a8a";
+        const src = b.source === "whatsapp" ? "💬 " : b.paymentType === "pay_later" ? "📋 " : "💳 ";
         return `<div class="quote-item">
-          <div class="qi-route">📍 ${(b.pickup||"?").split(",")[0]} → 🏁 ${(b.drop||"?").split(",")[0]}</div>
+          <div class="qi-route">${src}${(b.pickup||"?").split(",")[0]} → ${(b.drop||"?").split(",")[0]}</div>
           <div class="qi-details">
             <span class="qi-price">₹${(b.total||0).toLocaleString()}</span>
             <span class="qi-status" style="color:${color}">● ${capitalize(b.status||"confirmed")}</span>
-            ${b.driverName ? `<span>🚚 ${b.driverName}</span>` : ""}
+            ${b.bookingRef ? `<span style="font-size:.75rem;color:#5a6a8a">${b.bookingRef}</span>` : ""}
           </div>
           <div class="qi-date">${b.date||""}</div>
         </div>`;
@@ -1324,19 +1573,14 @@ function saveProfile() {
   if (!currentUser || !window._firebase) return;
   const name  = document.getElementById("profileName")?.value.trim();
   const msgEl = document.getElementById("profileMsg");
-  if (!name) {
-    if (msgEl) { msgEl.textContent = "Name cannot be empty."; msgEl.style.color = "#e53e3e"; }
-    return;
-  }
+  if (!name) { if (msgEl) { msgEl.textContent = "Name cannot be empty."; msgEl.style.color = "#e53e3e"; } return; }
   window._firebase.db.collection("users").doc(currentUser.uid).update({ name })
     .then(() => {
       currentUser.updateProfile({ displayName: name });
       if (msgEl) { msgEl.textContent = "✅ Profile saved!"; msgEl.style.color = "#00a357"; }
       updateNavForUser(currentUser);
     })
-    .catch(e => {
-      if (msgEl) { msgEl.textContent = "Error: " + e.message; msgEl.style.color = "#e53e3e"; }
-    });
+    .catch(e => { if (msgEl) { msgEl.textContent = "Error: " + e.message; msgEl.style.color = "#e53e3e"; } });
 }
 
 function savePreferences() {
@@ -1344,8 +1588,7 @@ function savePreferences() {
   const prefEmail = document.getElementById("prefEmail")?.checked;
   const prefSMS   = document.getElementById("prefSMS")?.checked;
   window._firebase.db.collection("users").doc(currentUser.uid)
-    .update({ prefEmail, prefSMS })
-    .catch(e => console.error("Prefs save:", e));
+    .update({ prefEmail, prefSMS }).catch(e => console.error("Prefs save:", e));
 }
 
 function openProfile() {
