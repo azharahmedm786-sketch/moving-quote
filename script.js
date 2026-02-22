@@ -762,27 +762,18 @@ async function bookOnWhatsApp() {
       });
       currentBookingId = docRef.id;
 
-      // 2. Show confirmation popup
-      const subEl  = document.getElementById("paymentModalSub");
-      const idBox  = document.getElementById("bookingIdBox");
-      const idDisp = document.getElementById("bookingIdDisplay");
-      const invBtn = document.getElementById("btnInvoice");
-      document.getElementById("modalDetail").innerHTML =
-        `<strong>Booking ID:</strong> ${bookingRef}<br>` +
-        `<strong>Name:</strong> ${name}<br>` +
-        `<strong>Phone:</strong> ${phone}<br>` +
-        `<strong>Pickup:</strong> ${pickup||"—"}<br>` +
-        `<strong>Drop:</strong> ${drop||"—"}<br>` +
-        `<strong>Date:</strong> ${date||"TBD"}<br>` +
-        `<strong>House Type:</strong> ${houseText||"—"}<br>` +
-        `<strong>Vehicle:</strong> ${vehicleText||"—"}<br>` +
-        `<strong>Total Estimate:</strong> ₹${lastCalculatedTotal.toLocaleString()}<br>` +
-        `<strong>Payment:</strong> Cash on moving day`;
-      if (subEl)  subEl.textContent = "Booking confirmed! Your ID is ready — send it to our WhatsApp.";
-      if (idBox)  idBox.style.display = "block";
-      if (idDisp) idDisp.textContent = bookingRef;
-      if (invBtn) invBtn.style.display = "none";
-      document.getElementById("paymentModal").style.display = "flex";
+      // 2. Show confirmation card
+      showConfirmationCard({
+        bookingRef,
+        name, phone, pickup, drop, date,
+        house:        houseText   || "—",
+        vehicle:      vehicleText || "—",
+        total:        lastCalculatedTotal,
+        paymentLabel: "Cash on moving day",
+        paymentNote:  "Our team will confirm your slot shortly",
+        source:       "whatsapp",
+        showInvoice:  false
+      });
 
       // 3. Open WhatsApp with full details + booking ID
       const msg =
@@ -861,24 +852,23 @@ function onPaymentSuccess(response, name, phone, paid, total) {
   const shiftDate = document.getElementById("shiftDate");
 
   const bookingRef = "PKZ-" + Date.now().toString(36).toUpperCase();
-  document.getElementById("modalDetail").innerHTML = `
-    <strong>Booking ID:</strong> ${bookingRef}<br>
-    <strong>Name:</strong> ${name}<br>
-    <strong>Phone:</strong> ${phone}<br>
-    <strong>Pickup:</strong> ${pickup?.value||"-"}<br>
-    <strong>Drop:</strong> ${drop?.value||"-"}<br>
-    <strong>Total Estimate:</strong> ₹${total.toLocaleString()}<br>
-    <strong>Amount Paid:</strong> ₹${paid.toLocaleString()} (${selectedPayment === "full" ? "Full" : "Advance"})<br>
-    <strong>Payment ID:</strong> ${response.razorpay_payment_id}`;
-  const subEl = document.getElementById("paymentModalSub");
-  if (subEl) subEl.textContent = "Payment successful! Save your Booking ID for tracking.";
-  const idBox = document.getElementById("bookingIdBox");
-  const idDisp = document.getElementById("bookingIdDisplay");
-  if (idBox) idBox.style.display = "block";
-  if (idDisp) idDisp.textContent = bookingRef;
-  const invoiceBtn = document.getElementById("btnInvoice");
-  if (invoiceBtn) invoiceBtn.style.display = "block";
-  document.getElementById("paymentModal").style.display = "flex";
+  const houseEl   = document.getElementById("house");
+  const vehicleEl = document.getElementById("vehicle");
+  showConfirmationCard({
+    bookingRef,
+    name,
+    phone,
+    pickup:       pickup?.value || "—",
+    drop:         drop?.value   || "—",
+    date:         document.getElementById("shiftDate")?.value || "TBD",
+    house:        houseEl?.options[houseEl?.selectedIndex]?.text    || "—",
+    vehicle:      vehicleEl?.options[vehicleEl?.selectedIndex]?.text || "—",
+    total,
+    paymentLabel: selectedPayment === "full" ? `Paid Full — ₹${paid.toLocaleString()}` : `Advance ₹${paid.toLocaleString()} paid`,
+    paymentNote:  `Payment ID: ${response.razorpay_payment_id}`,
+    source:       "payment",
+    showInvoice:  true
+  });
 
   // Save booking to Firestore
   if (window._firebase) {
@@ -946,6 +936,46 @@ function sendWhatsAppAfterPayment() {
   const drop   = document.getElementById("drop");
   const msg = `✅ Booking Confirmed — PackZen\n\nPickup: ${pickup?.value}\nDrop: ${drop?.value}\nTotal: ₹${lastCalculatedTotal.toLocaleString()}\nReceipt: ${paymentReceiptId}`;
   window.open(`https://wa.me/919945095453?text=${encodeURIComponent(msg)}`, "_blank");
+}
+
+/* ============================================
+   BOOKING CONFIRMATION CARD HELPER
+   ============================================ */
+function showConfirmationCard({ bookingRef, name, phone, pickup, drop, date, house, vehicle, total, paymentLabel, paymentNote, source, showInvoice }) {
+  // Booking ID
+  const idEl = document.getElementById("bookingIdDisplay");
+  if (idEl) idEl.textContent = bookingRef || "—";
+
+  // Header
+  const titleEl = document.getElementById("ccTitle");
+  const subEl   = document.getElementById("ccSubtitle");
+  if (titleEl) titleEl.textContent = source === "whatsapp" ? "Request Sent!" : "Booking Confirmed!";
+  if (subEl)   subEl.textContent   = source === "whatsapp"
+    ? "We received your request. Our team will call you shortly."
+    : "We'll call you within 30 minutes to confirm your slot.";
+
+  // Route
+  const pickupEl = document.getElementById("ccPickup");
+  const dropEl   = document.getElementById("ccDrop");
+  if (pickupEl) pickupEl.textContent = pickup || "—";
+  if (dropEl)   dropEl.textContent   = drop   || "—";
+
+  // Meta fields
+  const fields = { ccName: name, ccPhone: phone, ccDate: date || "TBD", ccHouse: house || "—", ccVehicle: vehicle || "—", ccPayment: paymentLabel || "—" };
+  Object.entries(fields).forEach(([id, val]) => { const el = document.getElementById(id); if (el) el.textContent = val; });
+
+  // Price
+  const amtEl  = document.getElementById("ccAmount");
+  const noteEl = document.getElementById("ccPriceNote");
+  if (amtEl)  amtEl.textContent  = "₹" + (total || 0).toLocaleString();
+  if (noteEl) noteEl.textContent = paymentNote || "Inclusive of all charges";
+
+  // Invoice button
+  const invBtn = document.getElementById("btnInvoice");
+  if (invBtn) invBtn.style.display = showInvoice ? "flex" : "none";
+
+  // Show modal
+  document.getElementById("paymentModal").style.display = "flex";
 }
 
 function closeModal() { document.getElementById("paymentModal").style.display = "none"; }
@@ -1417,28 +1447,22 @@ function bookWithoutPayment() {
     currentBookingId = docRef.id;
     if (btn) { btn.disabled = false; btn.textContent = "📋 Book Now (Pay Later)"; }
 
-    // Build confirmation detail
-    const detail =
-      `<strong>Booking ID:</strong> ${bookingRef}<br>` +
-      `<strong>Name:</strong> ${name}<br>` +
-      `<strong>Phone:</strong> +91 ${phone}<br>` +
-      `<strong>Pickup:</strong> ${pickup||"—"}<br>` +
-      `<strong>Drop:</strong> ${drop||"—"}<br>` +
-      `<strong>Date:</strong> ${date||"—"}<br>` +
-      `<strong>Total Estimate:</strong> ₹${lastCalculatedTotal.toLocaleString()}<br>` +
-      `<strong>Payment:</strong> Pay on moving day`;
-
-    // Show popup
-    const subEl  = document.getElementById("paymentModalSub");
-    const idBox  = document.getElementById("bookingIdBox");
-    const idDisp = document.getElementById("bookingIdDisplay");
-    const invBtn = document.getElementById("btnInvoice");
-    document.getElementById("modalDetail").innerHTML = detail;
-    if (subEl)  subEl.textContent = "Booking confirmed! 🎉 Your ID is below — screenshot or copy it.";
-    if (idBox)  idBox.style.display = "block";
-    if (idDisp) idDisp.textContent = bookingRef;
-    if (invBtn) invBtn.style.display = "none";
-    document.getElementById("paymentModal").style.display = "flex";
+    // Show professional confirmation card
+    const houseEl   = document.getElementById("house");
+    const vehicleEl = document.getElementById("vehicle");
+    showConfirmationCard({
+      bookingRef,
+      name,
+      phone: "+91 " + phone,
+      pickup, drop, date,
+      house:        houseEl?.options[houseEl?.selectedIndex]?.text    || "—",
+      vehicle:      vehicleEl?.options[vehicleEl?.selectedIndex]?.text || "—",
+      total:        lastCalculatedTotal,
+      paymentLabel: "Cash on moving day",
+      paymentNote:  "Pay full amount to driver on moving day",
+      source:       "direct",
+      showInvoice:  false
+    });
 
     // Auto-send WhatsApp to CUSTOMER (no confirm prompt)
     const customerMsg =
@@ -1480,7 +1504,13 @@ function bookWithoutPayment() {
 function copyBookingId() {
   const id = document.getElementById("bookingIdDisplay")?.textContent;
   if (!id || id === "—") return;
-  navigator.clipboard.writeText(id).then(() => showToast("✅ Booking ID copied!"));
+  navigator.clipboard.writeText(id).then(() => showToast("✅ Booking ID copied!")).catch(() => {
+    // Fallback for browsers that block clipboard
+    const el = document.createElement("textarea");
+    el.value = id; document.body.appendChild(el); el.select();
+    document.execCommand("copy"); document.body.removeChild(el);
+    showToast("✅ Booking ID copied!");
+  });
 }
 
 /* ============================================
