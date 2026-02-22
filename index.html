@@ -356,46 +356,119 @@
 <div id="dashboardModal" class="modal-overlay" style="display:none;">
   <div class="modal-box dashboard-box">
     <button class="modal-x" onclick="closeDashboard()">✕</button>
+
     <div class="dashboard-header">
       <div class="dashboard-avatar" id="dashAvatar">U</div>
-      <div><div class="dashboard-name" id="dashName">User</div><div class="dashboard-email" id="dashEmail">email@example.com</div></div>
+      <div>
+        <div class="dashboard-name" id="dashName">User</div>
+        <div class="dashboard-email" id="dashEmail">email@example.com</div>
+      </div>
     </div>
+
     <div class="dash-tabs">
       <button class="dash-tab active" onclick="switchDashTab('quotes',this)">📋 Quotes</button>
       <button class="dash-tab" onclick="switchDashTab('bookings',this)">📦 Bookings</button>
       <button class="dash-tab" onclick="switchDashTab('referral',this)">🎁 Referral</button>
       <button class="dash-tab" onclick="switchDashTab('profile',this)">👤 Profile</button>
+      <button class="dash-tab" id="adminTabBtn" style="display:none;" onclick="switchDashTab('admin',this)">🛠 Admin</button>
     </div>
+
+    <!-- QUOTES -->
     <div class="dash-content" id="dashQuotes">
-      <div id="quotesList" class="quotes-list"><div class="dash-empty">No saved quotes yet.</div></div>
+      <div id="quotesList" class="quotes-list">
+        <div class="dash-empty">No saved quotes yet.</div>
+      </div>
     </div>
+
+    <!-- BOOKINGS -->
     <div class="dash-content" id="dashBookings" style="display:none;">
-      <div id="bookingsList" class="quotes-list"><div class="dash-empty">No bookings yet.</div></div>
+      <div id="bookingsList" class="quotes-list">
+        <div class="dash-empty">No bookings yet.</div>
+      </div>
     </div>
+
+    <!-- REFERRAL -->
     <div class="dash-content" id="dashReferral" style="display:none;">
       <div class="referral-box">
         <div class="referral-title">🎁 Refer & Earn</div>
-        <div class="referral-sub">Share your code. Your friend gets ₹500 off, you get ₹500 credit on next move!</div>
+        <div class="referral-sub">
+          Share your code. Your friend gets ₹500 off, you get ₹500 credit!
+        </div>
         <div class="referral-code-row">
           <div class="referral-code-text" id="referralCodeText">LOADING</div>
           <button class="btn-copy" onclick="copyReferralCode()">Copy</button>
         </div>
         <div class="ref-stats">
-          <div class="ref-stat"><div class="ref-stat-val" id="refCount">0</div><div class="ref-stat-lbl">Referrals</div></div>
-          <div class="ref-stat"><div class="ref-stat-val" id="refEarned">₹0</div><div class="ref-stat-lbl">Credits Earned</div></div>
-          <div class="ref-stat"><div class="ref-stat-val" id="refAvailable">₹0</div><div class="ref-stat-lbl">Available</div></div>
+          <div class="ref-stat">
+            <div class="ref-stat-val" id="refCount">0</div>
+            <div class="ref-stat-lbl">Referrals</div>
+          </div>
+          <div class="ref-stat">
+            <div class="ref-stat-val" id="refEarned">₹0</div>
+            <div class="ref-stat-lbl">Credits Earned</div>
+          </div>
+          <div class="ref-stat">
+            <div class="ref-stat-val" id="refAvailable">₹0</div>
+            <div class="ref-stat-lbl">Available</div>
+          </div>
         </div>
       </div>
     </div>
+
+    <!-- PROFILE -->
     <div class="dash-content" id="dashProfile" style="display:none;">
-      <label class="field-label">Full Name</label><input id="profileName" class="field-input" placeholder="Your name">
-      <label class="field-label">Email</label><input id="profileEmail" class="field-input" disabled>
-      <label class="field-label">Phone</label><input id="profilePhone" class="field-input" disabled>
-      <div class="notif-row"><span>📧 Email updates</span><label class="toggle"><input type="checkbox" id="prefEmail" onchange="savePreferences()"><span class="slider"></span></label></div>
-      <div class="notif-row"><span>📱 SMS updates</span><label class="toggle"><input type="checkbox" id="prefSMS" onchange="savePreferences()"><span class="slider"></span></label></div>
-      <button class="btn-auth" onclick="saveProfile()" style="margin-top:16px;">Save Profile</button>
+      <label class="field-label">Full Name</label>
+      <input id="profileName" class="field-input" placeholder="Your name">
+
+      <label class="field-label">Email</label>
+      <input id="profileEmail" class="field-input" disabled>
+
+      <label class="field-label">Phone</label>
+      <input id="profilePhone" class="field-input" disabled>
+
+      <div class="notif-row">
+        <span>📧 Email updates</span>
+        <label class="toggle">
+          <input type="checkbox" id="prefEmail" onchange="savePreferences()">
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <div class="notif-row">
+        <span>📱 SMS updates</span>
+        <label class="toggle">
+          <input type="checkbox" id="prefSMS" onchange="savePreferences()">
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <button class="btn-auth" onclick="saveProfile()" style="margin-top:16px;">
+        Save Profile
+      </button>
+
       <div id="profileMsg" class="auth-error" style="margin-top:8px;"></div>
     </div>
+
+    <!-- 🛠 ADMIN PANEL -->
+    <div class="dash-content" id="dashAdmin" style="display:none;">
+      <h3 style="margin-bottom:16px;">🚚 Create New Driver</h3>
+
+      <label class="field-label">Driver Name</label>
+      <input id="newDriverName" class="field-input" placeholder="Driver full name">
+
+      <label class="field-label">Driver Email</label>
+      <input id="newDriverEmail" type="email" class="field-input" placeholder="driver@email.com">
+
+      <label class="field-label">Driver Password</label>
+      <input id="newDriverPassword" type="password" class="field-input" placeholder="Strong password">
+
+      <div id="adminMsg" class="auth-error" style="margin-top:10px;"></div>
+
+      <button class="btn-auth" style="margin-top:14px;" onclick="createDriver()">
+        Create Driver →
+      </button>
+    </div>
+
   </div>
 </div>
 
