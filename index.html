@@ -10,6 +10,17 @@
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css"/>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+/* BOOK WITHOUT PAYMENT BUTTON */
+.btn-free-book{width:100%;padding:14px;background:linear-gradient(135deg,#00c96e,#00a357);color:#fff;border:none;border-radius:50px;font-family:'DM Sans',sans-serif;font-size:1rem;font-weight:700;cursor:pointer;transition:transform .2s,box-shadow .2s;box-shadow:0 8px 24px rgba(0,201,110,.35);margin-top:10px}
+.btn-free-book:hover{transform:translateY(-2px);box-shadow:0 12px 32px rgba(0,201,110,.45)}
+
+/* BOOKING ID BOX */
+.booking-id-box{background:linear-gradient(135deg,#f0f7ff,#e8f4ff);border:2px dashed #0057ff;border-radius:16px;padding:18px;margin:16px 0;text-align:center}
+.booking-id-label{font-size:.78rem;font-weight:700;color:#5a6a8a;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px}
+.booking-id-value{font-family:'Syne',sans-serif;font-size:1.6rem;font-weight:800;color:#0057ff;letter-spacing:2px;margin-bottom:10px}
+.btn-copy-id{padding:6px 18px;background:#0057ff;color:#fff;border:none;border-radius:20px;font-family:'DM Sans',sans-serif;font-size:.82rem;font-weight:700;cursor:pointer;transition:background .2s}
+.btn-copy-id:hover{background:#0040cc}
 </head>
 <body>
 
@@ -259,8 +270,9 @@
           <div class="btn-row">
             <button class="btn-back" onclick="prevStep()">← Back</button>
           </div>
-          <button onclick="startPayment()" class="btn-pay">💳 Pay &amp; Confirm Booking</button>
-          <button onclick="bookOnWhatsApp()" class="btn-whatsapp-alt">💬 Book via WhatsApp Only</button>
+          <button onclick="startPayment()" class="btn-pay">💳 Pay Advance &amp; Confirm</button>
+          <button onclick="bookWithoutPayment()" class="btn-free-book">📋 Book Now (Pay Later)</button>
+          <button onclick="bookOnWhatsApp()" class="btn-whatsapp-alt">💬 Book via WhatsApp</button>
           <button onclick="openChecklist()" class="btn-checklist">✅ View Moving Checklist</button>
         </div>
       </div>
@@ -557,9 +569,14 @@
   <div class="modal-box">
     <div class="modal-icon">🎉</div>
     <h2 class="modal-title">Booking Confirmed!</h2>
-    <p class="modal-sub">Your payment was successful. We'll contact you shortly.</p>
+    <p class="modal-sub" id="paymentModalSub">Your payment was successful. We'll contact you shortly.</p>
     <div class="modal-detail" id="modalDetail"></div>
-    <button class="btn-invoice" onclick="downloadInvoice()">📄 Download GST Invoice</button>
+    <div class="booking-id-box" id="bookingIdBox" style="display:none;">
+      <div class="booking-id-label">Your Booking ID</div>
+      <div class="booking-id-value" id="bookingIdDisplay">—</div>
+      <button class="btn-copy-id" onclick="copyBookingId()">📋 Copy ID</button>
+    </div>
+    <button class="btn-invoice" id="btnInvoice" onclick="downloadInvoice()">📄 Download GST Invoice</button>
     <button class="modal-wa-btn" onclick="sendWhatsAppAfterPayment()">💬 Get Confirmation on WhatsApp</button>
     <button class="modal-close" onclick="closeModal()">Close</button>
   </div>
@@ -568,7 +585,7 @@
 <!-- SCRIPTS -->
 <!-- ======================== SCRIPTS ======================== -->
 
-<!-- Firebase Config (loads v10 compat sequentially) -->
+<!-- Firebase Config -->
 <script src="firebase-config.js"></script>
 
 <!-- Razorpay -->
@@ -577,10 +594,8 @@
 <!-- Main Script (must load BEFORE Google Maps callback) -->
 <script src="script.js"></script>
 
-<!-- Google Maps: loaded LAST so initAutocomplete is already defined -->
-<script
-  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDEtUY1wAyK2PSPgtsxzp7KbYoBfqqWALo&libraries=places&callback=initAutocomplete">
-</script>
+<!-- Google Maps loaded LAST so initAutocomplete is defined -->
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDEtUY1wAyK2PSPgtsxzp7KbYoBfqqWALo&libraries=places&callback=initAutocomplete"></script>
 
 </body>
 </html>
