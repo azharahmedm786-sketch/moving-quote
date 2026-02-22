@@ -666,17 +666,42 @@ function calculateQuote(auto = false) {
   if (document.getElementById("fridgeCheck")?.checked) furnitureCost += FRIDGE_PRICE;
   if (document.getElementById("wmCheck")?.checked)     furnitureCost += 400;
 
-  new google.maps.DistanceMatrixService().getDistanceMatrix({
-    origins: [pickup.value], destinations: [drop.value], travelMode: "DRIVING"
-  }, (res, status) => {
-    if (status !== "OK") return;
-    const km    = res.rows[0].elements[0].distance.value / 1000;
+  function applyPrice(km) {
     const total = Math.round(MIN_BASE_PRICE + houseBase + (km * vehicleRate) + furnitureCost);
-    if (result) result.innerHTML = `Distance: ${km.toFixed(1)} km &nbsp;|&nbsp; Furniture: ₹${furnitureCost}<br><strong>Total Estimate: ₹${total.toLocaleString()}</strong>`;
+    if (result) result.innerHTML = `Distance: ~${km.toFixed(1)} km &nbsp;|&nbsp; Furniture: ₹${furnitureCost}<br><strong>Total Estimate: ₹${total.toLocaleString()}</strong>`;
     lastCalculatedTotal = total;
     updatePriceDisplay();
     if (currentUser) saveQuoteToFirestore(total);
-  });
+  }
+
+  try {
+    new google.maps.DistanceMatrixService().getDistanceMatrix({
+      origins: [pickup.value], destinations: [drop.value], travelMode: "DRIVING"
+    }, (res, status) => {
+      const el = res && res.rows && res.rows[0] && res.rows[0].elements && res.rows[0].elements[0];
+      if (status === "OK" && el && el.status === "OK" && el.distance && el.distance.value) {
+        applyPrice(el.distance.value / 1000);
+      } else {
+        console.warn("DistanceMatrix failed:", status, el ? el.status : "no element", "— using fallback");
+        if (pickupPlace && pickupPlace.geometry && dropPlace && dropPlace.geometry) {
+          const R = 6371;
+          const p1 = pickupPlace.geometry.location;
+          const p2 = dropPlace.geometry.location;
+          const lat1 = p1.lat() * Math.PI / 180, lat2 = p2.lat() * Math.PI / 180;
+          const dLat = lat2 - lat1;
+          const dLng = (p2.lng() - p1.lng()) * Math.PI / 180;
+          const a = Math.sin(dLat/2)*Math.sin(dLat/2) + Math.cos(lat1)*Math.cos(lat2)*Math.sin(dLng/2)*Math.sin(dLng/2);
+          const km = R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)) * 1.3;
+          applyPrice(Math.max(km, 5));
+        } else {
+          applyPrice(15);
+        }
+      }
+    });
+  } catch(e) {
+    console.error("DistanceMatrix error:", e);
+    applyPrice(15);
+  }
 }
 
 /* ============================================
@@ -1206,8 +1231,9 @@ async function createDriver() {
   }
 }
 
+
 /* ============================================
-   DASHBOARD HELPERS — Missing Functions Added
+   DASHBOARD — MISSING FUNCTIONS
    ============================================ */
 function closeDashboard() {
   document.getElementById("dashboardModal").style.display = "none";
@@ -1229,9 +1255,12 @@ function switchDashTab(tab, el) {
 
 function loadUserQuotes() {
   if (!currentUser || !window._firebase) return;
-  window._firebase.db.collection("quotes").where("uid","==",currentUser.uid).orderBy("createdAt","desc").limit(10).get()
+  window._firebase.db.collection("quotes")
+    .where("uid","==",currentUser.uid)
+    .orderBy("createdAt","desc").limit(10).get()
     .then(snap => {
       const list = document.getElementById("quotesList");
+      if (!list) return;
       if (snap.empty) { list.innerHTML = '<div class="dash-empty">No saved quotes yet.<br>Get a quote to see it here!</div>'; return; }
       list.innerHTML = snap.docs.map(d => {
         const q = d.data();
@@ -1249,9 +1278,12 @@ function loadUserQuotes() {
 
 function loadUserBookings() {
   if (!currentUser || !window._firebase) return;
-  window._firebase.db.collection("bookings").where("customerUid","==",currentUser.uid).orderBy("createdAt","desc").limit(10).get()
+  window._firebase.db.collection("bookings")
+    .where("customerUid","==",currentUser.uid)
+    .orderBy("createdAt","desc").limit(10).get()
     .then(snap => {
       const list = document.getElementById("bookingsList");
+      if (!list) return;
       if (snap.empty) { list.innerHTML = '<div class="dash-empty">No bookings yet.<br>Book your first move!</div>'; return; }
       const statusColors = { confirmed:"#0057ff", assigned:"#7c3aed", packing:"#0ea5e9", transit:"#f97316", delivered:"#00c96e" };
       list.innerHTML = snap.docs.map(d => {
@@ -1292,14 +1324,19 @@ function saveProfile() {
   if (!currentUser || !window._firebase) return;
   const name  = document.getElementById("profileName")?.value.trim();
   const msgEl = document.getElementById("profileMsg");
-  if (!name) { if (msgEl) { msgEl.textContent = "Name cannot be empty."; msgEl.style.color = "#e53e3e"; } return; }
+  if (!name) {
+    if (msgEl) { msgEl.textContent = "Name cannot be empty."; msgEl.style.color = "#e53e3e"; }
+    return;
+  }
   window._firebase.db.collection("users").doc(currentUser.uid).update({ name })
     .then(() => {
       currentUser.updateProfile({ displayName: name });
       if (msgEl) { msgEl.textContent = "✅ Profile saved!"; msgEl.style.color = "#00a357"; }
       updateNavForUser(currentUser);
     })
-    .catch(e => { if (msgEl) { msgEl.textContent = "Error: " + e.message; msgEl.style.color = "#e53e3e"; } });
+    .catch(e => {
+      if (msgEl) { msgEl.textContent = "Error: " + e.message; msgEl.style.color = "#e53e3e"; }
+    });
 }
 
 function savePreferences() {
@@ -1307,7 +1344,8 @@ function savePreferences() {
   const prefEmail = document.getElementById("prefEmail")?.checked;
   const prefSMS   = document.getElementById("prefSMS")?.checked;
   window._firebase.db.collection("users").doc(currentUser.uid)
-    .update({ prefEmail, prefSMS }).catch(e => console.error("Prefs save:", e));
+    .update({ prefEmail, prefSMS })
+    .catch(e => console.error("Prefs save:", e));
 }
 
 function openProfile() {
