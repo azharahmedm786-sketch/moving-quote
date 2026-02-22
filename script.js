@@ -327,92 +327,51 @@ function showToast(msg, dur = 3000) {
 /* ============================================
    DASHBOARD
    ============================================ */
-function openDashboard() {
+async function openDashboard() {
   document.getElementById("userDropdown").classList.remove("open");
-  if (!currentUser) { openAuthModal("login"); return; }
+
+  if (!currentUser) {
+    openAuthModal("login");
+    return;
+  }
+
+  const { db } = window._firebase;
+
+  const userSnap = await db.collection("users")
+    .doc(currentUser.uid)
+    .get();
+
+  const userData = userSnap.data();
+
   const name = currentUser.displayName || "User";
-  document.getElementById("dashName").textContent   = name;
-  document.getElementById("dashEmail").textContent  = currentUser.email || "";
+
+  document.getElementById("dashName").textContent = name;
+  document.getElementById("dashEmail").textContent = currentUser.email || "";
   document.getElementById("dashAvatar").textContent = name.charAt(0).toUpperCase();
+
+  // 🔥 ADMIN CHECK
+  if (userData.role === "admin") {
+
+    if (!document.getElementById("adminTabBtn")) {
+
+      const tabContainer = document.querySelector(".dash-tabs");
+
+      const btn = document.createElement("button");
+      btn.className = "dash-tab";
+      btn.id = "adminTabBtn";
+      btn.innerText = "🛠 Admin";
+      btn.onclick = function() {
+        switchDashTab("admin", btn);
+      };
+
+      tabContainer.appendChild(btn);
+    }
+  }
+
   loadUserQuotes();
   document.getElementById("dashboardModal").style.display = "flex";
   switchDashTab("quotes", document.querySelector(".dash-tab"));
 }
-
-function closeDashboard() { document.getElementById("dashboardModal").style.display = "none"; }
-
-function switchDashTab(tab, btn) {
-  document.querySelectorAll(".dash-content").forEach(c => c.style.display = "none");
-  document.querySelectorAll(".dash-tab").forEach(b => b.classList.remove("active"));
-  document.getElementById("dash" + tab.charAt(0).toUpperCase() + tab.slice(1)).style.display = "block";
-  if (btn) btn.classList.add("active");
-  if (tab === "profile")  loadProfile();
-  if (tab === "bookings") loadUserBookings();
-  if (tab === "referral") loadReferralData();
-}
-
-function openProfile() {
-  document.getElementById("userDropdown").classList.remove("open");
-  openDashboard();
-  setTimeout(() => switchDashTab("profile", document.querySelectorAll(".dash-tab")[3]), 100);
-}
-
-async function loadUserQuotes() {
-  if (!currentUser || !window._firebase) return;
-  const snap = await window._firebase.db.collection("quotes").where("uid", "==", currentUser.uid).orderBy("createdAt","desc").limit(10).get().catch(() => null);
-  const list = document.getElementById("quotesList");
-  if (!snap || snap.empty) { list.innerHTML = '<div class="dash-empty">No saved quotes yet.<br>Get a quote and it will appear here!</div>'; return; }
-  list.innerHTML = "";
-  snap.forEach(d => {
-    const data = d.data();
-    list.innerHTML += `<div class="quote-item"><div class="qi-route">📍 ${data.pickup||"-"} → ${data.drop||"-"}</div><div class="qi-details"><span>🏠 ${data.house||"-"}</span><span>🚚 ${data.vehicle||"-"}</span><span class="qi-price">₹${data.total||"0"}</span></div><div class="qi-date">${data.date||""}</div></div>`;
-  });
-}
-
-async function loadUserBookings() {
-  if (!currentUser || !window._firebase) return;
-  const snap = await window._firebase.db.collection("bookings").where("customerUid","==",currentUser.uid).orderBy("createdAt","desc").get().catch(() => null);
-  const list = document.getElementById("bookingsList");
-  if (!snap || snap.empty) { list.innerHTML = '<div class="dash-empty">No bookings yet.<br>Book a move and track it here!</div>'; return; }
-  list.innerHTML = "";
-  snap.forEach(d => {
-    const data = d.data();
-    const sc = {delivered:"#00a357",pending:"#d97706",confirmed:"#0057ff",transit:"#f97316"}[data.status]||"#666";
-    list.innerHTML += `<div class="quote-item"><div class="qi-route">📍 ${data.pickup||"-"} → ${data.drop||"-"}</div><div class="qi-details"><span>📅 ${data.date||"-"}</span><span class="qi-price">₹${data.total||"0"}</span><span class="qi-status" style="color:${sc}">● ${capitalize(data.status||"pending")}</span></div>${data.driverName?`<div class="qi-date">🚚 Driver: ${data.driverName}</div>`:""}</div>`;
-  });
-}
-
-async function loadProfile() {
-  if (!currentUser || !window._firebase) return;
-  document.getElementById("profileEmail").value = currentUser.email || "";
-  const snap = await window._firebase.db.collection("users").doc(currentUser.uid).get().catch(() => null);
-  if (snap?.exists) {
-    const d = snap.data();
-    document.getElementById("profileName").value  = d.name || currentUser.displayName || "";
-    document.getElementById("profilePhone").value = d.phone || "";
-    document.getElementById("prefEmail").checked  = d.prefEmail !== false;
-    document.getElementById("prefSMS").checked    = d.prefSMS   !== false;
-  }
-}
-
-async function saveProfile() {
-  if (!currentUser || !window._firebase) return;
-  const { auth, db } = window._firebase;
-  const name = document.getElementById("profileName").value.trim();
-  if (!name) return showError("profileMsg", "Name cannot be empty.");
-  try {
-    await auth.currentUser.updateProfile({ displayName: name });
-    await db.collection("users").doc(currentUser.uid).set({
-      name, email: currentUser.email,
-      prefEmail: document.getElementById("prefEmail").checked,
-      prefSMS:   document.getElementById("prefSMS").checked,
-    }, { merge: true });
-    showError("profileMsg", "✅ Profile saved!", true);
-    updateNavForUser(auth.currentUser);
-  } catch (e) { showError("profileMsg", "Error: " + e.message); }
-}
-
-function savePreferences() { saveProfile(); }
 
 /* ============================================
    REFERRAL
