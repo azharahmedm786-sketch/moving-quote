@@ -1096,11 +1096,13 @@ function capitalize(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : "";
    ============================================ */
 
 function checkAdminAccess() {
-  if (!currentUser || !window._firebase) return;
+  if (!window._firebase || !window._firebase.auth.currentUser) return;
+
+  const user = window._firebase.auth.currentUser;
 
   window._firebase.db
     .collection("users")
-    .doc(currentUser.uid)
+    .doc(user.uid)
     .get()
     .then(doc => {
       const data = doc.data();
@@ -1111,16 +1113,14 @@ function checkAdminAccess() {
         adminTab.style.display = isAdmin ? "inline-block" : "none";
       }
     })
-    .catch(err => {
-      console.error("Admin check error:", err);
-    });
+    .catch(err => console.error("Admin check error:", err));
 }
 
 // Run admin check whenever dashboard opens
 const originalOpenDashboard = openDashboard;
 openDashboard = function() {
   originalOpenDashboard();
-  setTimeout(checkAdminAccess, 300);
+checkAdminAccess();
 };
 
 async function createDriver() {
