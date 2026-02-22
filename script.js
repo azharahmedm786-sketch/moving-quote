@@ -1120,9 +1120,11 @@ function checkAdminAccess() {
 const originalOpenDashboard = openDashboard;
 openDashboard = function() {
   originalOpenDashboard();
-checkAdminAccess();
-};
 
+  setTimeout(() => {
+    checkAdminAccess();
+  }, 100);
+};
 async function createDriver() {
   if (!currentUser) {
     showToast("⚠️ Please login as admin.");
