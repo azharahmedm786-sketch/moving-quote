@@ -1132,3 +1132,94 @@ function prevStep() {
    HELPERS
    ============================================ */
 function capitalize(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : ""; }
+/* ============================================
+   ADMIN PANEL (Secure Driver Creation)
+   ============================================ */
+
+function checkAdminAccess() {
+  if (!currentUser || !window._firebase) return;
+
+  currentUser.getIdTokenResult(true).then((idTokenResult) => {
+    const isAdmin = idTokenResult.claims.admin === true;
+
+    const adminTab = document.getElementById("adminTabBtn");
+    if (adminTab) {
+      adminTab.style.display = isAdmin ? "inline-block" : "none";
+    }
+  }).catch(err => {
+    console.error("Admin check error:", err);
+  });
+}
+
+// Run admin check whenever dashboard opens
+const originalOpenDashboard = openDashboard;
+openDashboard = function() {
+  originalOpenDashboard();
+  setTimeout(checkAdminAccess, 300);
+};
+
+async function createDriver() {
+  if (!currentUser) {
+    showToast("⚠️ Please login as admin.");
+    return;
+  }
+
+  const name = document.getElementById("newDriverName").value.trim();
+  const email = document.getElementById("newDriverEmail").value.trim();
+  const password = document.getElementById("newDriverPassword").value.trim();
+  const msg = document.getElementById("adminMsg");
+
+  msg.style.color = "#e53e3e";
+  msg.innerText = "";
+
+  if (!name || !email || !password) {
+    msg.innerText = "All fields are required.";
+    return;
+  }
+
+  if (password.length < 6) {
+    msg.innerText = "Password must be at least 6 characters.";
+    return;
+  }
+
+  try {
+    const { auth, db } = window._firebase;
+
+    // Create driver account
+    const cred = await auth.createUserWithEmailAndPassword(email, password);
+    const driverUser = cred.user;
+
+    // Create Firestore document
+    await db.collection("users").doc(driverUser.uid).set({
+      name: name,
+      email: email,
+      role: "driver",
+      isOnline: false,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+
+    // Call secure Cloud Function to assign driver claim
+    const functions = firebase.app().functions("us-central1");
+    const assignDriverRole = functions.httpsCallable("assignDriverRole");
+
+    await assignDriverRole({ uid: driverUser.uid });
+
+    msg.style.color = "#00a357";
+    msg.innerText = "✅ Driver created successfully.";
+
+    // Clear fields
+    document.getElementById("newDriverName").value = "";
+    document.getElementById("newDriverEmail").value = "";
+    document.getElementById("newDriverPassword").value = "";
+
+    // IMPORTANT: Re-login admin
+    await auth.signOut();
+    alert("Driver created successfully.\nPlease login again as admin.");
+    window.location.reload();
+
+  } catch (error) {
+    console.error("Driver creation error:", error);
+    msg.style.color = "#e53e3e";
+    msg.innerText = error.message || "Failed to create driver.";
+  }
+}
