@@ -1096,9 +1096,11 @@ function capitalize(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : "";
    ============================================ */
 
 function checkAdminAccess() {
-  if (!window._firebase || !window._firebase.auth.currentUser) return;
-
-  const user = window._firebase.auth.currentUser;
+  const user = window._firebase?.auth?.currentUser;
+  if (!user) {
+    console.log("No user yet");
+    return;
+  }
 
   window._firebase.db
     .collection("users")
@@ -1106,16 +1108,24 @@ function checkAdminAccess() {
     .get()
     .then(doc => {
       const data = doc.data();
-      const isAdmin = data && data.role === "admin";
+      console.log("Admin check data:", data);
 
       const adminTab = document.getElementById("adminTabBtn");
-      if (adminTab) {
-        adminTab.style.display = isAdmin ? "inline-block" : "none";
+      if (!adminTab) {
+        console.log("Admin tab not found");
+        return;
+      }
+
+      if (data && data.role === "admin") {
+        adminTab.style.display = "inline-block";
+        console.log("Admin tab enabled");
+      } else {
+        adminTab.style.display = "none";
+        console.log("Not admin");
       }
     })
     .catch(err => console.error("Admin check error:", err));
 }
-
 // Run admin check whenever dashboard opens
 const originalOpenDashboard = openDashboard;
 openDashboard = function() {
