@@ -1205,3 +1205,117 @@ async function createDriver() {
     msg.innerText = error.message || "Failed to create driver.";
   }
 }
+
+/* ============================================
+   DASHBOARD HELPERS — Missing Functions Added
+   ============================================ */
+function closeDashboard() {
+  document.getElementById("dashboardModal").style.display = "none";
+}
+
+function switchDashTab(tab, el) {
+  ["dashQuotes","dashBookings","dashReferral","dashProfile","dashAdmin"].forEach(id => {
+    const panel = document.getElementById(id);
+    if (panel) panel.style.display = "none";
+  });
+  document.querySelectorAll(".dash-tab").forEach(t => t.classList.remove("active"));
+  const target = document.getElementById("dash" + tab.charAt(0).toUpperCase() + tab.slice(1));
+  if (target) target.style.display = "block";
+  if (el) el.classList.add("active");
+  if (tab === "referral") loadReferralData();
+  if (tab === "bookings") loadUserBookings();
+  if (tab === "profile")  loadProfileData();
+}
+
+function loadUserQuotes() {
+  if (!currentUser || !window._firebase) return;
+  window._firebase.db.collection("quotes").where("uid","==",currentUser.uid).orderBy("createdAt","desc").limit(10).get()
+    .then(snap => {
+      const list = document.getElementById("quotesList");
+      if (snap.empty) { list.innerHTML = '<div class="dash-empty">No saved quotes yet.<br>Get a quote to see it here!</div>'; return; }
+      list.innerHTML = snap.docs.map(d => {
+        const q = d.data();
+        return `<div class="quote-item">
+          <div class="qi-route">📍 ${q.pickup||"?"} → 🏁 ${q.drop||"?"}</div>
+          <div class="qi-details">
+            <span>${q.house||"—"}</span><span>${q.vehicle||"—"}</span>
+            <span class="qi-price">₹${(q.total||0).toLocaleString()}</span>
+          </div>
+          <div class="qi-date">${q.date||""}</div>
+        </div>`;
+      }).join("");
+    }).catch(e => console.error("Quotes load:", e));
+}
+
+function loadUserBookings() {
+  if (!currentUser || !window._firebase) return;
+  window._firebase.db.collection("bookings").where("customerUid","==",currentUser.uid).orderBy("createdAt","desc").limit(10).get()
+    .then(snap => {
+      const list = document.getElementById("bookingsList");
+      if (snap.empty) { list.innerHTML = '<div class="dash-empty">No bookings yet.<br>Book your first move!</div>'; return; }
+      const statusColors = { confirmed:"#0057ff", assigned:"#7c3aed", packing:"#0ea5e9", transit:"#f97316", delivered:"#00c96e" };
+      list.innerHTML = snap.docs.map(d => {
+        const b = d.data();
+        const color = statusColors[b.status] || "#5a6a8a";
+        return `<div class="quote-item">
+          <div class="qi-route">📍 ${(b.pickup||"?").split(",")[0]} → 🏁 ${(b.drop||"?").split(",")[0]}</div>
+          <div class="qi-details">
+            <span class="qi-price">₹${(b.total||0).toLocaleString()}</span>
+            <span class="qi-status" style="color:${color}">● ${capitalize(b.status||"confirmed")}</span>
+            ${b.driverName ? `<span>🚚 ${b.driverName}</span>` : ""}
+          </div>
+          <div class="qi-date">${b.date||""}</div>
+        </div>`;
+      }).join("");
+    }).catch(e => console.error("Bookings load:", e));
+}
+
+function loadProfileData() {
+  if (!currentUser || !window._firebase) return;
+  window._firebase.db.collection("users").doc(currentUser.uid).get().then(doc => {
+    if (!doc.exists) return;
+    const d = doc.data();
+    const nameEl      = document.getElementById("profileName");
+    const emailEl     = document.getElementById("profileEmail");
+    const phoneEl     = document.getElementById("profilePhone");
+    const prefEmailEl = document.getElementById("prefEmail");
+    const prefSMSEl   = document.getElementById("prefSMS");
+    if (nameEl)      nameEl.value  = d.name  || "";
+    if (emailEl)     emailEl.value = d.email || currentUser.email || "";
+    if (phoneEl)     phoneEl.value = d.phone || "";
+    if (prefEmailEl) prefEmailEl.checked = d.prefEmail !== false;
+    if (prefSMSEl)   prefSMSEl.checked   = d.prefSMS   !== false;
+  }).catch(e => console.error("Profile load:", e));
+}
+
+function saveProfile() {
+  if (!currentUser || !window._firebase) return;
+  const name  = document.getElementById("profileName")?.value.trim();
+  const msgEl = document.getElementById("profileMsg");
+  if (!name) { if (msgEl) { msgEl.textContent = "Name cannot be empty."; msgEl.style.color = "#e53e3e"; } return; }
+  window._firebase.db.collection("users").doc(currentUser.uid).update({ name })
+    .then(() => {
+      currentUser.updateProfile({ displayName: name });
+      if (msgEl) { msgEl.textContent = "✅ Profile saved!"; msgEl.style.color = "#00a357"; }
+      updateNavForUser(currentUser);
+    })
+    .catch(e => { if (msgEl) { msgEl.textContent = "Error: " + e.message; msgEl.style.color = "#e53e3e"; } });
+}
+
+function savePreferences() {
+  if (!currentUser || !window._firebase) return;
+  const prefEmail = document.getElementById("prefEmail")?.checked;
+  const prefSMS   = document.getElementById("prefSMS")?.checked;
+  window._firebase.db.collection("users").doc(currentUser.uid)
+    .update({ prefEmail, prefSMS }).catch(e => console.error("Prefs save:", e));
+}
+
+function openProfile() {
+  document.getElementById("userDropdown")?.classList.remove("open");
+  if (!currentUser) { openAuthModal("login"); return; }
+  openDashboard();
+  setTimeout(() => {
+    const profileTab = document.querySelector(".dash-tab:nth-child(4)");
+    switchDashTab("profile", profileTab);
+  }, 300);
+}
