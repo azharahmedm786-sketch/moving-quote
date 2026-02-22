@@ -138,12 +138,27 @@ function updateNavForUser(user) {
   const navUser   = document.getElementById("navUser");
   const navAvatar = document.getElementById("navAvatar");
   const navName   = document.getElementById("navUserName");
+  const adminLink = document.getElementById("adminNavLink");
+
+  // Always hide admin link first (reset state on logout)
+  if (adminLink) adminLink.style.display = "none";
+
   if (user) {
     loginBtn.style.display = "none";
     navUser.style.display  = "flex";
     const name = user.displayName || user.email?.split("@")[0] || "User";
     navName.textContent   = name.split(" ")[0];
     navAvatar.textContent = name.charAt(0).toUpperCase();
+
+    // ✅ Check Firestore for admin role and show Admin Panel link
+    window._firebase.db.collection("users").doc(user.uid).get()
+      .then(doc => {
+        if (doc.exists && doc.data().role === "admin") {
+          if (adminLink) adminLink.style.display = "block";
+        }
+      })
+      .catch(err => console.error("Nav admin check error:", err));
+
   } else {
     loginBtn.style.display = "inline-block";
     navUser.style.display  = "none";
@@ -1094,47 +1109,6 @@ function capitalize(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : "";
 /* ============================================
    ADMIN PANEL (Secure Driver Creation)
    ============================================ */
-
-function checkAdminAccess() {
-  const user = window._firebase?.auth?.currentUser;
-  if (!user) {
-    console.log("No user yet");
-    return;
-  }
-
-  window._firebase.db
-    .collection("users")
-    .doc(user.uid)
-    .get()
-    .then(doc => {
-      const data = doc.data();
-      console.log("Admin check data:", data);
-
-      const adminTab = document.getElementById("adminTabBtn");
-      if (!adminTab) {
-        console.log("Admin tab not found");
-        return;
-      }
-
-      if (data && data.role === "admin") {
-        adminTab.style.display = "inline-block";
-        console.log("Admin tab enabled");
-      } else {
-        adminTab.style.display = "none";
-        console.log("Not admin");
-      }
-    })
-    .catch(err => console.error("Admin check error:", err));
-}
-// Run admin check whenever dashboard opens
-const originalOpenDashboard = openDashboard;
-openDashboard = function() {
-  originalOpenDashboard();
-
-  setTimeout(() => {
-    checkAdminAccess();
-  }, 100);
-};
 async function createDriver() {
   if (!currentUser) {
     showToast("⚠️ Please login as admin.");
