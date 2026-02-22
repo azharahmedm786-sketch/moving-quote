@@ -268,7 +268,7 @@
 
 <script src="firebase-config.js"></script>
 
-<!-- Admin Auth Guard: Verifies user is logged in and has admin role -->
+<!-- Admin Auth Guard: Auto-shows shell if already logged in as admin -->
 <script>
 document.addEventListener("DOMContentLoaded", () => {
   function waitForFirebase(cb, tries = 0) {
@@ -279,22 +279,19 @@ document.addEventListener("DOMContentLoaded", () => {
   waitForFirebase(() => {
     const { auth, db } = window._firebase;
     auth.onAuthStateChanged(async (user) => {
-      if (!user) {
-        window.location.href = "index.html";
-        return;
-      }
+      if (!user) return; // Not logged in — show login form (don't redirect)
       try {
         const snap = await db.collection("users").doc(user.uid).get();
         const data = snap.data();
-        if (!data || data.role !== "admin") {
-          alert("Access denied. Admins only.");
-          window.location.href = "index.html";
-          return;
+        if (data && data.role === "admin") {
+          // Already logged in as admin — skip login form
+          console.log("Admin auto-login verified");
+          // showShell is defined in the next script block, use a small delay
+          setTimeout(() => { if (typeof showShell === "function") showShell(data.name || "Admin"); }, 100);
         }
-        console.log("Admin verified");
+        // If not admin, just stay on login form — don't redirect
       } catch (error) {
-        console.error("Admin verification failed:", error);
-        window.location.href = "index.html";
+        console.error("Admin auth check failed:", error);
       }
     });
   });
@@ -363,14 +360,7 @@ function showShell(name) {
   loadAll();
 }
 
-waitFB(() => {
-  window._firebase.auth.onAuthStateChanged(u => {
-    if (!u) return;
-    window._firebase.db.collection("users").doc(u.uid).get().then(doc => {
-      if (doc.exists && doc.data().role === "admin") { adminUser = u; showShell(doc.data().name || "Admin"); }
-    });
-  });
-});
+// Auth state handled by auth guard script above
 
 /* LOAD ALL */
 function loadAll() { loadBookings(); loadDrivers(); loadCustomers(); loadReviews(); loadPromos(); loadBroadcastHistory(); }
