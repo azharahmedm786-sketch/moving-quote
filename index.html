@@ -568,19 +568,19 @@
 <!-- SCRIPTS -->
 <!-- ======================== SCRIPTS ======================== -->
 
-<!-- Firebase Config (loads Firebase v10 compat sequentially) -->
+<!-- Firebase Config (loads v10 compat sequentially) -->
 <script src="firebase-config.js"></script>
-
-<!-- Google Maps -->
-<script async
-  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDEtUY1wAyK2PSPgtsxzp7KbYoBfqqWALo&libraries=places&callback=initAutocomplete">
-</script>
 
 <!-- Razorpay -->
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
-<!-- Main Script -->
+<!-- Main Script (must load BEFORE Google Maps callback) -->
 <script src="script.js"></script>
+
+<!-- Google Maps: loaded LAST so initAutocomplete is already defined -->
+<script
+  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDEtUY1wAyK2PSPgtsxzp7KbYoBfqqWALo&libraries=places&callback=initAutocomplete">
+</script>
 
 </body>
 </html>
