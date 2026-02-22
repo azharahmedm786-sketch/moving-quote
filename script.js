@@ -1,7 +1,7 @@
 /* ============================================
    PackZen — script.js  (Full Feature Set)
    Dark Mode · Auth · Promo · Referral · Chat
-   Checklist · Reviews · Invoice · Tracking
+   Checklist · Reviews · Invoice · Tracking 
    Photo Upload · Payment Options
    ============================================ */
 
