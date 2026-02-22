@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-<head> 
+<head>
   <meta charset="UTF-8"/><title>PackZen Admin Dashboard</title>
   <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
@@ -279,17 +279,13 @@ document.addEventListener("DOMContentLoaded", () => {
   waitForFirebase(() => {
     const { auth, db } = window._firebase;
     auth.onAuthStateChanged(async (user) => {
-      if (!user) return; // Not logged in — show login form (don't redirect)
+      if (!user) return; // Not logged in — show login form
       try {
         const snap = await db.collection("users").doc(user.uid).get();
         const data = snap.data();
         if (data && data.role === "admin") {
-          // Already logged in as admin — skip login form
-          console.log("Admin auto-login verified");
-          // showShell is defined in the next script block, use a small delay
           setTimeout(() => { if (typeof showShell === "function") showShell(data.name || "Admin"); }, 100);
         }
-        // If not admin, just stay on login form — don't redirect
       } catch (error) {
         console.error("Admin auth check failed:", error);
       }
@@ -360,7 +356,7 @@ function showShell(name) {
   loadAll();
 }
 
-// Auth state handled by auth guard script above
+// Auth state handled by auth guard above
 
 /* LOAD ALL */
 function loadAll() { loadBookings(); loadDrivers(); loadCustomers(); loadReviews(); loadPromos(); loadBroadcastHistory(); }
@@ -468,12 +464,15 @@ function renderBookingsTable(list) {
   if (!list.length) { tbody.innerHTML = '<tr class="empty-row"><td colspan="9">No bookings found</td></tr>'; return; }
   tbody.innerHTML = list.map(b => `
     <tr>
-      <td><code style="font-size:.75rem;color:var(--primary)">#${b.id.slice(-6).toUpperCase()}</code></td>
+      <td>
+        <code style="font-size:.75rem;color:var(--primary)">${b.bookingRef||("#"+b.id.slice(-6).toUpperCase())}</code>
+        ${b.source==="whatsapp"?'<span class="badge" style="background:rgba(37,211,102,.12);color:#25D366;margin-left:4px">💬 WA</span>':b.paymentType==="pay_later"?'<span class="badge" style="background:rgba(251,191,36,.12);color:#d97706;margin-left:4px">📋 Later</span>':''}
+      </td>
       <td>${b.customerName||"—"}</td>
       <td>${b.phone||"—"}</td>
       <td style="max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${(b.pickup||"").split(",")[0]} → ${(b.drop||"").split(",")[0]}</td>
       <td>${b.date||"—"}</td>
-      <td>₹${(b.total||0).toLocaleString()}</td>
+      <td>₹${(b.total||0).toLocaleString()} <small style="color:var(--text-muted)">${b.paymentType==="pay_later"?"(Pay Later)":b.source==="whatsapp"?"(WA)":b.paid?"(₹"+b.paid+" paid)":""}</small></td>
       <td>
         <select class="status-sel" onchange="updateStatus('${b.id}',this.value)">
           ${["pending","confirmed","assigned","packing","transit","delivered"].map(s=>`<option value="${s}"${b.status===s?" selected":""}>${cap(s)}</option>`).join("")}
