@@ -1098,16 +1098,22 @@ function capitalize(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : "";
 function checkAdminAccess() {
   if (!currentUser || !window._firebase) return;
 
-  currentUser.getIdTokenResult(true).then((idTokenResult) => {
-    const isAdmin = idTokenResult.claims.admin === true;
+  window._firebase.db
+    .collection("users")
+    .doc(currentUser.uid)
+    .get()
+    .then(doc => {
+      const data = doc.data();
+      const isAdmin = data && data.role === "admin";
 
-    const adminTab = document.getElementById("adminTabBtn");
-    if (adminTab) {
-      adminTab.style.display = isAdmin ? "inline-block" : "none";
-    }
-  }).catch(err => {
-    console.error("Admin check error:", err);
-  });
+      const adminTab = document.getElementById("adminTabBtn");
+      if (adminTab) {
+        adminTab.style.display = isAdmin ? "inline-block" : "none";
+      }
+    })
+    .catch(err => {
+      console.error("Admin check error:", err);
+    });
 }
 
 // Run admin check whenever dashboard opens
