@@ -1,7 +1,7 @@
 /* ============================================
    PackZen — script.js  (Full Feature Set)
    Dark Mode · Auth · Promo · Referral · Chat
-   Checklist · Reviews · Invoice · Tracking 
+   Checklist · Reviews · Invoice · Tracking
    Photo Upload · Payment Options
    ============================================ */
 
@@ -204,26 +204,57 @@ function signupUser() {
   const password = document.getElementById("signupPassword").value;
   const referral = document.getElementById("signupReferral")?.value.trim().toUpperCase();
 
-  if (!name)               return showError("signupError", "Please enter your name.");
+  if (!name)                return showError("signupError", "Please enter your name.");
   if (!email.includes("@")) return showError("signupError", "Please enter a valid email.");
-  if (phone.length !== 10) return showError("signupError", "Please enter a valid 10-digit phone.");
-  if (password.length < 6) return showError("signupError", "Password must be at least 6 characters.");
+  if (phone.length !== 10)  return showError("signupError", "Please enter a valid 10-digit phone.");
+  if (password.length < 6)  return showError("signupError", "Password must be at least 6 characters.");
+
+  showError("signupError", "⏳ Sending OTP...", true);
 
   waitForFirebase(() => {
     const { auth } = window._firebase;
     pendingSignupData = { name, email, password, phone, referral };
     otpPurpose = "signup";
-    if (!window.recaptchaVerifier) {
-      window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier("recaptcha-container", { size: "invisible", callback: () => {} }, auth);
+
+    // Reset recaptcha every time to avoid stale verifier errors
+    if (window.recaptchaVerifier) {
+      try { window.recaptchaVerifier.clear(); } catch(e) {}
+      window.recaptchaVerifier = null;
     }
-    auth.signInWithPhoneNumber("+91" + phone, window.recaptchaVerifier)
-      .then(result => {
-        confirmationResult = result;
-        document.getElementById("otpSubText").textContent = `OTP sent to +91 ${phone}.`;
-        switchPanel("panelOTP");
-        document.querySelector(".otp-box")?.focus();
-      })
-      .catch(() => showError("signupError", "Failed to send OTP. Check your phone number."));
+
+    // Fix: Only 2 arguments for RecaptchaVerifier (Firebase v8 compat)
+    window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier(
+      "recaptcha-container",
+      { size: "invisible", callback: () => {} }
+    );
+
+    window.recaptchaVerifier.render().then(() => {
+      auth.signInWithPhoneNumber("+91" + phone, window.recaptchaVerifier)
+        .then(result => {
+          confirmationResult = result;
+          document.getElementById("otpSubText").textContent = `OTP sent to +91 ${phone}.`;
+          switchPanel("panelOTP");
+          document.querySelector(".otp-box")?.focus();
+        })
+        .catch(err => {
+          console.error("OTP send error:", err);
+          // Reset recaptcha so user can try again
+          try { window.recaptchaVerifier.clear(); } catch(e) {}
+          window.recaptchaVerifier = null;
+          // Show real error message
+          if (err.code === "auth/invalid-phone-number")
+            showError("signupError", "Invalid phone number. Check and try again.");
+          else if (err.code === "auth/too-many-requests")
+            showError("signupError", "Too many attempts. Please wait a few minutes.");
+          else if (err.code === "auth/operation-not-allowed")
+            showError("signupError", "Phone sign-in is not enabled. Contact support.");
+          else
+            showError("signupError", "OTP failed: " + err.message);
+        });
+    }).catch(err => {
+      console.error("Recaptcha render error:", err);
+      showError("signupError", "reCAPTCHA error: " + err.message);
+    });
   });
 }
 
