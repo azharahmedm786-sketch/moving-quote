@@ -1843,3 +1843,12 @@ body.dark-mode .payment-opt.selected {
   width: auto;
   object-fit: contain;
 }
+/* Confirmation Modal Logo */
+.confirm-logo-wrap {
+  text-align: center;
+  margin-bottom: 12px;
+}
+
+.confirm-logo {
+  height: 50px;
+}
