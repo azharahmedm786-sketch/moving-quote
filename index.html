@@ -743,8 +743,7 @@
 </div>
 
 <!-- PAYMENT SUCCESS MODAL -->
-  <h2>Booking Confirmed</h2>
-  <div class="confirm-logo-wrap">
+<div class="confirm-logo-wrap">
   <img src="assets/logo/packzen-logo.png"
        class="confirm-logo"
        alt="PackZen">
@@ -868,39 +867,51 @@
   </div>
 </div>
 
-<!-- SCRIPTS -->
-<!-- Environment variables (create this file with your keys) -->
+<!-- SCRIPTS - ORDER IS CRITICAL -->
+<!-- 1. Environment variables first -->
 <script src="env-config.js"></script>
 
-<!-- Firebase Config -->
+<!-- 2. Firebase config second -->
 <script src="firebase-config.js"></script>
 
-<!-- Razorpay -->
+<!-- 3. Razorpay third -->
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
-<!-- Main Script -->
+<!-- 4. Main script fourth -->
 <script src="script.js"></script>
 
-<!-- Google Maps loaded with env var -->
+<!-- 5. Google Maps - Load after everything else -->
 <script>
+  // Global function for Google Maps callback
+  window.initAutocomplete = function() {
+    console.log("✅ Google Maps API loaded");
+    // Your existing initAutocomplete function from script.js will handle the rest
+  };
+
   function loadGoogleMaps() {
     if (!window.ENV || !window.ENV.GOOGLE_MAPS_KEY) {
-      console.error('Google Maps key not configured. Please create env-config.js with your key.');
+      console.error('❌ Google Maps key not configured. Check env-config.js');
       return;
     }
+    
+    console.log('📍 Loading Google Maps with key:', window.ENV.GOOGLE_MAPS_KEY.substring(0, 10) + '...');
+    
     const script = document.createElement('script');
     script.src = `https://maps.googleapis.com/maps/api/js?key=${window.ENV.GOOGLE_MAPS_KEY}&libraries=places&callback=initAutocomplete`;
     script.async = true;
     script.defer = true;
+    script.onload = () => console.log('✅ Google Maps script loaded');
+    script.onerror = (err) => console.error('❌ Google Maps failed to load:', err);
     document.head.appendChild(script);
   }
-  
-  // Wait for env to be ready
-</script>
-<script>
-  document.addEventListener("DOMContentLoaded", function() {
+
+  // Wait for everything to be ready
+  if (document.readyState === 'complete') {
     loadGoogleMaps();
-  });
+  } else {
+    window.addEventListener('load', loadGoogleMaps);
+  }
 </script>
+
 </body>
 </html>
