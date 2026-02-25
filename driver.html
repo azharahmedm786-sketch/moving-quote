@@ -245,8 +245,30 @@
 
 <div class="toast" id="drvToast"></div>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="firebase-config.js"></script>
-<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCdYIaoNUMxf0uWuHmWk_Nu2ppfXFp6VDs"></script>
+<!-- 1. Env config first (provides GOOGLE_MAPS_KEY and FIREBASE_AUTH_KEY) -->
+<script src="env-config.js"></script>
+
+<!-- 2. Firebase config second -->
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
+<script src="firebase-config.js"></script>
+
+<!-- 3. Google Maps - loaded dynamically using key from env-config.js -->
+<script>
+  function loadDriverMaps() {
+    if (!window.ENV || !window.ENV.GOOGLE_MAPS_KEY) {
+      console.error('❌ Google Maps key not found in env-config.js');
+      return;
+    }
+    const script = document.createElement('script');
+    script.src = 'https://maps.googleapis.com/maps/api/js?key=' + window.ENV.GOOGLE_MAPS_KEY;
+    script.async = true;
+    script.defer = true;
+    script.onload = () => console.log('✅ Driver Maps loaded');
+    script.onerror = () => console.error('❌ Driver Maps failed to load');
+    document.head.appendChild(script);
+  }
+  loadDriverMaps();
+</script>
 <script>
 let driverUser = null, currentBookingId = null, currentBookingData = null;
 let locationInterval = null, driverMap = null, driverMarker = null;
