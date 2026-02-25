@@ -266,6 +266,8 @@
 
 <div class="toast" id="adminToast"></div>
 
+<!-- env-config.js MUST load first — firebase-config.js depends on window.ENV.FIREBASE_AUTH_KEY -->
+<script src="env-config.js"></script>
 <script src="firebase-config.js"></script>
 
 <!-- Admin Auth Guard: Auto-shows shell if already logged in as admin -->
@@ -298,6 +300,12 @@ document.addEventListener("DOMContentLoaded", () => {
 let adminUser = null, allBookings = [], allDrivers = [], allCustomers = [], allReviews = [], allPromos = [];
 let assigningId = null;
 let bookingsChart = null, revenueChart = null;
+
+/* ADMIN GUARD — re-checks role before any sensitive write */
+function requireAdmin(cb) {
+  if (!adminUser) { toast("⚠️ Not logged in as admin."); return; }
+  cb();
+}
 
 /* THEME */
 function toggleAdminTheme() {
@@ -493,9 +501,11 @@ function filterBookings(q) {
 }
 
 function updateStatus(id, status) {
-  window._firebase.db.collection("bookings").doc(id).update({ status })
-    .then(() => toast("✅ Status → " + cap(status)))
-    .catch(e => toast("❌ " + e.message));
+  requireAdmin(() => {
+    window._firebase.db.collection("bookings").doc(id).update({ status })
+      .then(() => toast("✅ Status → " + cap(status)))
+      .catch(e => toast("❌ " + e.message));
+  });
 }
 
 /* EXPORT CSV */
@@ -567,27 +577,44 @@ function renderReviews() {
 }
 
 function approveReview(id) {
-  window._firebase.db.collection("reviews").doc(id).update({ status: "approved" })
-    .then(() => toast("✅ Review approved!")).catch(e => toast("❌ " + e.message));
+  requireAdmin(() => {
+    window._firebase.db.collection("reviews").doc(id).update({ status: "approved" })
+      .then(() => toast("✅ Review approved!")).catch(e => toast("❌ " + e.message));
+  });
 }
 function deleteReview(id) {
-  if (!confirm("Delete this review?")) return;
-  window._firebase.db.collection("reviews").doc(id).delete()
-    .then(() => toast("🗑️ Review deleted")).catch(e => toast("❌ " + e.message));
+  requireAdmin(() => {
+    if (!confirm("Delete this review?")) return;
+    window._firebase.db.collection("reviews").doc(id).delete()
+      .then(() => toast("🗑️ Review deleted")).catch(e => toast("❌ " + e.message));
+  });
 }
 
 /* PROMOS */
 function createPromo() {
-  const code  = document.getElementById("promoCode").value.trim().toUpperCase();
-  const type  = document.getElementById("promoType").value;
-  const value = Number(document.getElementById("promoValue").value);
-  const max   = Number(document.getElementById("promoMax").value) || 999;
-  if (!code || !value) { toast("⚠️ Fill in code & value"); return; }
-  window._firebase.db.collection("promos").doc(code).set({ code, type, value, max, used: 0, active: true, createdAt: firebase.firestore.FieldValue.serverTimestamp() })
-    .then(() => { toast("✅ Promo created: " + code); document.getElementById("promoCode").value = ""; document.getElementById("promoValue").value = ""; })
-    .catch(e => toast("❌ " + e.message));
+  requireAdmin(() => {
+    const code  = document.getElementById("promoCode").value.trim().toUpperCase();
+    const type  = document.getElementById("promoType").value;
+    const value = Number(document.getElementById("promoValue").value);
+    const max   = Number(document.getElementById("promoMax").value) || 999;
+    if (!code || !value) { toast("⚠️ Fill in code & value"); return; }
+    window._firebase.db.collection("promos").doc(code).set({ code, type, value, max, used: 0, active: true, createdAt: firebase.firestore.FieldValue.serverTimestamp() })
+      .then(() => { toast("✅ Promo created: " + code); document.getElementById("promoCode").value = ""; document.getElementById("promoValue").value = ""; })
+      .catch(e => toast("❌ " + e.message));
+  });
 }
 
+function togglePromo(id, active) {
+  requireAdmin(() => {
+    window._firebase.db.collection("promos").doc(id).update({ active }).then(() => toast(active?"✅ Promo activated":"⏸ Promo paused"));
+  });
+}
+function deletePromo(id) {
+  requireAdmin(() => {
+    if (!confirm("Delete promo?")) return;
+    window._firebase.db.collection("promos").doc(id).delete().then(() => toast("🗑️ Promo deleted"));
+  });
+}
 function renderPromos() {
   const tbody = document.getElementById("promosTable");
   if (!allPromos.length) { tbody.innerHTML = '<tr class="empty-row"><td colspan="7">No promo codes yet</td></tr>'; return; }
@@ -606,33 +633,27 @@ function renderPromos() {
     </tr>`).join("");
 }
 
-function togglePromo(id, active) {
-  window._firebase.db.collection("promos").doc(id).update({ active }).then(() => toast(active?"✅ Promo activated":"⏸ Promo paused"));
-}
-function deletePromo(id) {
-  if (!confirm("Delete promo?")) return;
-  window._firebase.db.collection("promos").doc(id).delete().then(() => toast("🗑️ Promo deleted"));
-}
-
 /* BROADCAST */
 async function sendBroadcast() {
-  const msg   = document.getElementById("broadcastMsg").value.trim();
-  const viaWA = document.getElementById("sendWA").checked;
-  const viaEmail = document.getElementById("sendEmail").checked;
-  if (!msg) { toast("⚠️ Type a message first"); return; }
-  const result = document.getElementById("broadcastResult");
-  result.textContent = "⏳ Sending...";
-  if (viaWA) {
-    const encoded = encodeURIComponent(msg);
-    window.open(`https://wa.me/?text=${encoded}`, "_blank");
-  }
-  await window._firebase.db.collection("broadcasts").add({
-    message: msg, via: [viaWA?"WhatsApp":"", viaEmail?"Email":""].filter(Boolean).join(", "),
-    recipients: allCustomers.length, createdAt: firebase.firestore.FieldValue.serverTimestamp()
+  requireAdmin(async () => {
+    const msg   = document.getElementById("broadcastMsg").value.trim();
+    const viaWA = document.getElementById("sendWA").checked;
+    const viaEmail = document.getElementById("sendEmail").checked;
+    if (!msg) { toast("⚠️ Type a message first"); return; }
+    const result = document.getElementById("broadcastResult");
+    result.textContent = "⏳ Sending...";
+    if (viaWA) {
+      const encoded = encodeURIComponent(msg);
+      window.open(`https://wa.me/?text=${encoded}`, "_blank");
+    }
+    await window._firebase.db.collection("broadcasts").add({
+      message: msg, via: [viaWA?"WhatsApp":"", viaEmail?"Email":""].filter(Boolean).join(", "),
+      recipients: allCustomers.length, createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    result.textContent = `✅ Broadcast sent to ${allCustomers.length} customers!`;
+    document.getElementById("broadcastMsg").value = "";
+    toast("📢 Broadcast sent!");
   });
-  result.textContent = `✅ Broadcast sent to ${allCustomers.length} customers!`;
-  document.getElementById("broadcastMsg").value = "";
-  toast("📢 Broadcast sent!");
 }
 
 /* ASSIGN MODAL */
@@ -649,14 +670,16 @@ function populateAssignSelect() {
   sel.innerHTML = '<option value="">-- Select a driver --</option>' + allDrivers.map(d => `<option value="${d.id}">${d.name||d.email}</option>`).join("");
 }
 function confirmAssign() {
-  const driverUid = document.getElementById("assignSelect").value;
-  if (!driverUid) { toast("⚠️ Select a driver"); return; }
-  const driver = allDrivers.find(d => d.id === driverUid);
-  const db = window._firebase.db;
-  db.collection("bookings").doc(assigningId).update({ driverUid, driverName: driver?.name||"Driver", driverPhone: driver?.phone||"", status: "assigned" })
-    .then(() => db.collection("users").doc(driverUid).update({ currentBooking: assigningId }))
-    .then(() => { toast("✅ Driver assigned!"); closeAssignModal(); })
-    .catch(e => toast("❌ " + e.message));
+  requireAdmin(() => {
+    const driverUid = document.getElementById("assignSelect").value;
+    if (!driverUid) { toast("⚠️ Select a driver"); return; }
+    const driver = allDrivers.find(d => d.id === driverUid);
+    const db = window._firebase.db;
+    db.collection("bookings").doc(assigningId).update({ driverUid, driverName: driver?.name||"Driver", driverPhone: driver?.phone||"", status: "assigned" })
+      .then(() => db.collection("users").doc(driverUid).update({ currentBooking: assigningId }))
+      .then(() => { toast("✅ Driver assigned!"); closeAssignModal(); })
+      .catch(e => toast("❌ " + e.message));
+  });
 }
 
 /* NAV */
