@@ -873,12 +873,16 @@ function onPaymentSuccess(response, name, phone, paid, total) {
   // Save booking to Firestore
   if (window._firebase) {
     window._firebase.db.collection("bookings").add({
+      bookingRef,                              // ✅ fixed: was missing
       customerUid:  currentUser?.uid || null,
       customerName: name, phone,
       pickup: pickup?.value||"", drop: drop?.value||"",
+      house:   houseEl?.options[houseEl?.selectedIndex]?.text    || "",  // ✅ fixed: was missing
+      vehicle: vehicleEl?.options[vehicleEl?.selectedIndex]?.text || "", // ✅ fixed: was missing
       total, paid, paymentType: selectedPayment,
       promoDiscount, date: shiftDate?.value||"",
       status: "confirmed",
+      source: "payment",
       paymentId: response.razorpay_payment_id,
       photos: uploadedPhotos.slice(0,3),
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
@@ -888,7 +892,6 @@ function onPaymentSuccess(response, name, phone, paid, total) {
 }
 
 function downloadInvoice() {
-  const detail = document.getElementById("modalDetail")?.innerText || "";
   if (typeof jspdf === "undefined" && typeof window.jspdf === "undefined") {
     showToast("⚠️ PDF library loading... try again in a moment.");
     return;
@@ -897,26 +900,52 @@ function downloadInvoice() {
   const doc = new jsPDF();
   const now = new Date();
 
+  // ✅ Fixed: read booking details from confirmation card elements (modalDetail element did not exist)
+  const bookingId = document.getElementById("bookingIdDisplay")?.textContent || paymentReceiptId || "—";
+  const custName  = document.getElementById("ccName")?.textContent    || "—";
+  const custPhone = document.getElementById("ccPhone")?.textContent   || "—";
+  const pickup    = document.getElementById("ccPickup")?.textContent  || "—";
+  const drop      = document.getElementById("ccDrop")?.textContent    || "—";
+  const moveDate  = document.getElementById("ccDate")?.textContent    || "—";
+  const houseType = document.getElementById("ccHouse")?.textContent   || "—";
+  const vehicle   = document.getElementById("ccVehicle")?.textContent || "—";
+  const payment   = document.getElementById("ccPayment")?.textContent || "—";
+  const amount    = document.getElementById("ccAmount")?.textContent  || "₹0";
+
+  // Header
   doc.setFillColor(0, 87, 255); doc.rect(0, 0, 210, 30, "F");
   doc.setTextColor(255,255,255); doc.setFontSize(18); doc.setFont("helvetica","bold");
-  doc.text("📦 PackZen Packers & Movers", 14, 15);
+  doc.text("PackZen Packers & Movers", 14, 15);
   doc.setFontSize(10); doc.setFont("helvetica","normal");
   doc.text("GST Invoice", 14, 22);
 
+  // Invoice meta
   doc.setTextColor(0,0,0); doc.setFontSize(11);
-  doc.text("Invoice No: " + paymentReceiptId, 14, 42);
+  doc.text("Invoice No: " + bookingId, 14, 42);
   doc.text("Date: " + now.toLocaleDateString("en-IN"), 14, 50);
   doc.text("GSTIN: 29XXXXX1234Z1 (Add yours)", 14, 58);
 
+  // Booking details section
   doc.setFillColor(240, 247, 255); doc.rect(14, 65, 182, 8, "F");
   doc.setFont("helvetica","bold"); doc.text("Booking Details", 16, 71);
   doc.setFont("helvetica","normal");
 
-  const lines = detail.split("\n").filter(l => l.trim());
+  const lines = [
+    "Customer Name : " + custName,
+    "Phone         : " + custPhone,
+    "Pickup        : " + pickup,
+    "Drop          : " + drop,
+    "Move Date     : " + moveDate,
+    "House Type    : " + houseType,
+    "Vehicle       : " + vehicle,
+    "Payment Type  : " + payment,
+    "Total Amount  : " + amount,
+  ];
+
   let y = 82;
   lines.forEach(line => {
-    doc.text(line.replace(/\s+/g, " "), 14, y);
-    y += 8;
+    doc.text(line, 14, y);
+    y += 9;
   });
 
   y += 4;
@@ -928,7 +957,7 @@ function downloadInvoice() {
   doc.setTextColor(100,100,100); doc.setFontSize(9); doc.setFont("helvetica","normal");
   doc.text("PackZen Packers & Movers | HSR Layout, Bangalore | Ph: 9945095453 | packzen.com", 14, 285);
 
-  doc.save("PackZen-Invoice-" + paymentReceiptId + ".pdf");
+  doc.save("PackZen-Invoice-" + bookingId + ".pdf");
 }
 
 function sendWhatsAppAfterPayment() {
