@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg"> 
+  <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  <meta charset="UTF-8"/> 
+  <title>PackZen Packers & Movers Bangalore</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <div class="nav-inner">
+    <div class="nav-logo"><span class="logo-icon">📦</span><span>Pack<span class="logo-accent">Zen</span></span></div>
+    <div class="nav-links">
+      <a href="#services">Services</a>
+      <a href="#quote">Get Quote</a>
+      <a href="#reviews">Reviews</a>
+      <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Toggle theme">🌙</button>
+      <button class="nav-auth-btn" id="navLoginBtn" onclick="openAuthModal('login')">Login</button>
+      <div class="nav-user" id="navUser" style="display:none;" onclick="toggleUserMenu()">
+        <div class="nav-avatar" id="navAvatar">U</div>
+        <span id="navUserName">User</span>
+        <span class="nav-arrow">▾</span>
+        <div class="user-dropdown" id="userDropdown">
+          <a href="#" onclick="openDashboard()">📋 My Bookings</a>
+          <a href="#" onclick="openTrackingModal()">📍 Track My Move</a>
+          <a href="#" onclick="openChatModal()">💬 Chat with Driver</a>
+          <a href="#" onclick="openChecklist()">✅ Moving Checklist</a>
+          <a href="#" onclick="openProfile()">👤 Edit Profile</a>
+          <a href="admin.html" id="adminNavLink" style="display:none;">🔐 Admin Panel</a>
+          <a href="#" onclick="signOutUser()">🚪 Sign Out</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO SECTION -->
+<header class="hero">
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+  <div class="blob blob-3"></div>
+  <div class="hero-content">
+    <div class="hero-badge">🏆 Bangalore's #1 Trusted Movers</div>
+    <h1 class="hero-title">Move Smarter,<br><span class="hero-accent">Move Safer</span></h1>
+    <p class="hero-sub">Reliable, insured & affordable packing and moving services across Bangalore & beyond.</p>
+    <div class="hero-actions">
+      <a href="#quote" class="btn-primary">Get Instant Quote →</a>
+      <a href="tel:9945095453" class="btn-ghost">📞 Call Now</a>
+    </div>
+    <div class="hero-trust">
+      <span>✔ Licensed</span>
+      <span>✔ Insured</span>
+      <span>✔ GPS Tracked</span>
+      <span>✔ Zero Damage</span>
+    </div>
+  </div>
+  <div class="hero-visual">
+    <div class="float-card card-a">
+      <span class="fc-icon">🚚</span>
+      <div>
+        <div class="fc-title">Live Tracking</div>
+        <div class="fc-sub">Real-time updates</div>
+      </div>
+    </div>
+    <div class="float-card card-b">
+      <span class="fc-icon">⭐</span>
+      <div>
+        <div class="fc-title">4.9 / 5 Rating</div>
+        <div class="fc-sub">1,200+ reviews</div>
+      </div>
+    </div>
+    <div class="float-card card-c">
+      <span class="fc-icon">🛡️</span>
+      <div>
+        <div class="fc-title">100% Insured</div>
+        <div class="fc-sub">Zero damage policy</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- STATS BAR -->
+<section class="stats-bar" id="statsStrip">
+  <div class="stat-item">
+    <div class="stat-top">
+      <span class="stat-number" data-target="1200">0</span>
+      <span class="stat-suffix">+</span>
+    </div>
+    <span class="stat-label">Happy Customers</span>
+  </div>
+  <div class="stat-divider"></div>
+  <div class="stat-item">
+    <div class="stat-top">
+      <span class="stat-number" data-target="8">0</span>
+      <span class="stat-suffix">+</span>
+    </div>
+    <span class="stat-label">Years Experience</span>
+  </div>
+  <div class="stat-divider"></div>
+  <div class="stat-item">
+    <div class="stat-top">
+      <span class="stat-number" data-target="99">0</span>
+      <span class="stat-suffix">%</span>
+    </div>
+    <span class="stat-label">On-Time Delivery</span>
+  </div>
+  <div class="stat-divider"></div>
+  <div class="stat-item">
+    <div class="stat-top">
+      <span class="stat-number" data-target="50">0</span>
+      <span class="stat-suffix">+</span>
+    </div>
+    <span class="stat-label">Cities Covered</span>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee-wrap">
+  <div class="marquee-track">
+    <span>✔ Licensed & Insured</span>
+    <span class="dot">◆</span>
+    <span>✔ Experienced Team</span>
+    <span class="dot">◆</span>
+    <span>✔ Safe Packing</span>
+    <span class="dot">◆</span>
+    <span>✔ On-Time Delivery</span>
+    <span class="dot">◆</span>
+    <span>✔ GPS Tracked Vehicles</span>
+    <span class="dot">◆</span>
+    <span>✔ Zero Damage Guarantee</span>
+    <span class="dot">◆</span>
+    <!-- Duplicate for seamless loop -->
+    <span>✔ Licensed & Insured</span>
+    <span class="dot">◆</span>
+    <span>✔ Experienced Team</span>
+    <span class="dot">◆</span>
+    <span>✔ Safe Packing</span>
+    <span class="dot">◆</span>
+    <span>✔ On-Time Delivery</span>
+    <span class="dot">◆</span>
+    <span>✔ GPS Tracked Vehicles</span>
+    <span class="dot">◆</span>
+    <span>✔ Zero Damage Guarantee</span>
+    <span class="dot">◆</span>
+  </div>
+</div>
+
+<!-- SERVICES SECTION -->
+<section class="services-section" id="services">
+  <div class="section-header reveal">
+    <div class="section-tag">What We Offer</div>
+    <h2>Our Moving Services</h2>
+    <p>Professional, careful, and affordable — tailored to your needs.</p>
+  </div>
+  <div class="services-grid reveal-stagger">
+    <div class="service-card">
+      <div class="sc-icon">🏠</div>
+      <h3>Home Relocation</h3>
+      <p>Safe & secure home shifting with full packing, loading and unpacking at destination.</p>
+      <div class="sc-badge">Most Popular</div>
+    </div>
+    <div class="service-card">
+      <div class="sc-icon">🏢</div>
+      <h3>Office Shifting</h3>
+      <p>Minimal downtime office relocation with IT equipment handling and furniture setup.</p>
+    </div>
+    <div class="service-card">
+      <div class="sc-icon">📍</div>
+      <h3>Local Shifting</h3>
+      <p>Fast & affordable within-Bangalore shifting. Same day delivery available.</p>
+    </div>
+    <div class="service-card">
+      <div class="sc-icon">💪</div>
+      <h3>Loading & Unloading</h3>
+      <p>Trained manpower for heavy furniture and appliance handling with care.</p>
+    </div>
+  </div>
+</section>
+
+<!-- QUOTE SECTION (MULTI-STEP FORM) -->
+<section class="quote-section" id="quote">
+  <div class="quote-wrapper">
+    <div class="quote-left reveal">
+      <div class="section-tag light">Free Estimate</div>
+      <h2>Get Your Instant Moving Quote</h2>
+      <p>4 simple steps. Transparent pricing. No hidden charges.</p>
+      <ul class="quote-perks">
+        <li><span class="perk-check">✔</span> Instant price estimate</li>
+        <li><span class="perk-check">✔</span> No hidden charges</li>
+        <li><span class="perk-check">✔</span> Book via WhatsApp</li>
+        <li><span class="perk-check">✔</span> Free packing materials</li>
+      </ul>
+    </div>
+    <div class="quote-right reveal">
+      <div class="form-card">
+        <div class="step-indicators">
+          <div class="step-dot active" id="dot0">1</div>
+          <div class="step-line"></div>
+          <div class="step-dot" id="dot1">2</div>
+          <div class="step-line"></div>
+          <div class="step-dot" id="dot2">3</div>
+          <div class="step-line"></div>
+          <div class="step-dot" id="dot3">4</div>
+        </div>
+        <div class="progress">
+          <div id="progressBar"></div>
+        </div>
+
+        <!-- STEP 1 -->
+        <div class="form-step active">
+          <div class="step-title">📍 Where are you moving?</div>
+          <label class="field-label">Pickup Location</label>
+          <input id="pickup" placeholder="Enter pickup address" class="field-input">
+          <label class="toggle-row">
+            <span>📱 Use my current location</span>
+            <label class="toggle">
+              <input type="checkbox" id="useCurrentLocation">
+              <span class="slider"></span>
+            </label>
+          </label>
+          <label class="field-label">Drop Location</label>
+          <input id="drop" placeholder="Enter drop address" class="field-input">
+          <div id="map"></div>
+          <div id="distanceInfo"></div>
+          <button class="btn-next" onclick="nextStep()">Continue →</button>
+        </div>
+
+        <!-- STEP 2 -->
+        <div class="form-step">
+          <div class="step-title">🗓️ When are you moving?</div>
+          <div class="row">
+            <div>
+              <label class="field-label">Date</label>
+              <input type="date" id="shiftDate" class="field-input">
+            </div>
+            <div>
+              <label class="field-label">Time</label>
+              <input type="time" id="shiftTime" class="field-input">
+            </div>
+          </div>
+          <label class="field-label">House Type</label>
+          <select id="house" class="field-input">
+            <option value="">Select house size</option>
+            <option value="0">1 RK</option>
+            <option value="1200">1 BHK</option>
+            <option value="2500">2 BHK</option>
+            <option value="4000">3 BHK</option>
+          </select>
+          <label class="field-label">Vehicle Type</label>
+          <select id="vehicle" class="field-input">
+            <option value="">Select vehicle</option>
+            <option value="25">Tata Ace (Small)</option>
+            <option value="40">14 ft Truck (Medium)</option>
+            <option value="50">17 ft Truck (Large)</option>
+            <option value="60">22 ft Truck (XL)</option>
+          </select>
+          <div class="btn-row">
+            <button class="btn-back" onclick="prevStep()">← Back</button>
+            <button class="btn-next" onclick="nextStep()">Continue →</button>
+          </div>
+        </div>
+
+        <!-- STEP 3 -->
+        <div class="form-step">
+          <div class="step-title">🛋️ What are you moving?</div>
+          <div class="furniture-grid">
+            <label class="furniture-card">
+              <input type="checkbox" id="sofaCheck">
+              <div class="fc-body">
+                <span class="fc-emoji">🛋️</span>
+                <span class="fc-name">Sofa</span>
+                <input type="number" id="sofaQty" value="1" min="1" class="fc-qty" onclick="event.stopPropagation()">
+              </div>
+            </label>
+            <label class="furniture-card">
+              <input type="checkbox" id="bedCheck">
+              <div class="fc-body">
+                <span class="fc-emoji">🛏️</span>
+                <span class="fc-name">Bed</span>
+                <input type="number" id="bedQty" value="1" min="1" class="fc-qty" onclick="event.stopPropagation()">
+              </div>
+            </label>
+            <label class="furniture-card">
+              <input type="checkbox" id="fridgeCheck">
+              <div class="fc-body">
+                <span class="fc-emoji">🧊</span>
+                <span class="fc-name">Fridge</span>
+              </div>
+            </label>
+            <label class="furniture-card">
+              <input type="checkbox" id="wmCheck">
+              <div class="fc-body">
+                <span class="fc-emoji">🫧</span>
+                <span class="fc-name">Washing Machine</span>
+              </div>
+            </label>
+          </div>
+          
+          <!-- PHOTO UPLOAD -->
+          <div class="photo-upload-section">
+            <label class="field-label">📸 Upload Item Photos (optional)</label>
+            <div class="photo-upload-area" onclick="document.getElementById('itemPhotos').click()">
+              <label class="photo-upload-label">
+                <input type="file" id="itemPhotos" multiple accept="image/*" onchange="previewPhotos(this)">
+                <span>Click to upload</span> photos of your items for reference
+              </label>
+            </div>
+            <div class="photo-previews-row" id="photoPreviews"></div>
+          </div>
+          <div class="btn-row">
+            <button class="btn-back" onclick="prevStep()">← Back</button>
+            <button class="btn-next" onclick="nextStep()">Continue →</button>
+          </div>
+        </div>
+
+        <!-- STEP 4 -->
+        <div class="form-step">
+          <div class="step-title">🎉 Almost done!</div>
+          <label class="field-label">Your Name</label>
+          <input id="custName" placeholder="Enter your full name" class="field-input">
+          <label class="field-label">Phone Number</label>
+          <input id="custPhone" placeholder="Enter mobile number" class="field-input">
+
+          <!-- PROMO CODE -->
+          <label class="field-label">🏷️ Promo / Referral Code</label>
+          <div class="promo-row">
+            <input type="text" id="promoInput" class="promo-input" placeholder="ENTER CODE">
+            <button class="btn-promo" onclick="applyPromoCode()">Apply</button>
+          </div>
+          <div class="promo-msg" id="promoMsg"></div>
+
+          <div class="price-box">
+            <div class="price-label">Your Estimated Price</div>
+            <div class="price-amount"><span id="livePrice">₹0</span></div>
+            <div id="result" class="price-breakdown"></div>
+            <div class="discount-row" id="discountRow" style="display:none;">🏷️ Promo discount: <strong id="discountAmt"></strong></div>
+            <div class="advance-info">
+              💡 Advance to pay now: <strong><span id="advanceAmount">₹0</span></strong>
+              <span class="advance-note">(10% of total — rest paid on moving day)</span>
+            </div>
+          </div>
+
+          <!-- PAYMENT OPTIONS -->
+          <label class="field-label">Choose Payment</label>
+          <div class="payment-opts">
+            <div class="payment-opt selected" id="optAdvance" onclick="selectPayment('advance')">
+              <div class="po-label">Pay Advance</div>
+              <div class="po-amount" id="optAdvanceAmt">₹0</div>
+              <div class="po-note">10% now, rest on day</div>
+            </div>
+            <div class="payment-opt" id="optFull" onclick="selectPayment('full')">
+              <div class="po-label">Pay Full</div>
+              <div class="po-amount" id="optFullAmt">₹0</div>
+              <div class="po-note">5% discount included</div>
+            </div>
+            <div class="payment-opt" id="optAtDrop" onclick="selectPayment('at_drop')">
+              <div class="po-label">Pay at Drop</div>
+              <div class="po-amount" id="optAtDropAmt">₹0</div>
+              <div class="po-note">Full amount online at delivery</div>
+            </div>
+          </div>
+
+          <div class="btn-row">
+            <button class="btn-back" onclick="prevStep()">← Back</button>
+          </div>
+          <button onclick="startPayment()" class="btn-pay">💳 Pay Advance & Confirm</button>
+          <button onclick="bookWithoutPayment()" class="btn-free-book">📋 Book Now (Pay Later)</button>
+          <button onclick="bookOnWhatsApp()" class="btn-whatsapp-alt">💬 Book via WhatsApp</button>
+          <button onclick="openChecklist()" class="btn-checklist">✅ View Moving Checklist</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- REVIEWS SECTION -->
+<section class="reviews-section" id="reviews">
+  <div class="section-header reveal">
+    <div class="section-tag">Customer Love</div>
+    <h2>What Our Customers Say</h2>
+    <p>Trusted by 1,200+ families across Bangalore.</p>
+  </div>
+  <div class="overall-rating">
+    <div class="or-score">4.9</div>
+    <div>
+      <div class="or-stars">★★★★★</div>
+      <div class="or-label" id="reviewCountLabel">Based on 0 reviews</div>
+    </div>
+  </div>
+  <div class="reviews-grid reveal-stagger" id="reviewsGrid">
+    <!-- Reviews will be loaded dynamically from Firebase -->
+    <div class="review-card">
+      <div class="review-stars">★★★★★</div>
+      <p class="review-text">"Absolutely amazing service! They packed everything carefully and delivered on time. Zero damage!"</p>
+      <div class="review-author">
+        <div class="review-avatar">R</div>
+        <div>
+          <div class="review-name">Rahul Sharma</div>
+          <div class="review-meta">HSR Layout · 2 BHK Move</div>
+        </div>
+      </div>
+    </div>
+    <div class="review-card">
+      <div class="review-stars">★★★★★</div>
+      <p class="review-text">"Used PackZen for office shifting. Minimal downtime, all IT equipment handled perfectly. Highly recommend!"</p>
+      <div class="review-author">
+        <div class="review-avatar">P</div>
+        <div>
+          <div class="review-name">Priya Nair</div>
+          <div class="review-meta">Koramangala · Office Move</div>
+        </div>
+      </div>
+    </div>
+    <div class="review-card">
+      <div class="review-stars">★★★★☆</div>
+      <p class="review-text">"Good service overall. Driver was polite and careful. The GPS tracking feature is super helpful!"</p>
+      <div class="review-author">
+        <div class="review-avatar">A</div>
+        <div>
+          <div class="review-name">Amit Verma</div>
+          <div class="review-meta">Whitefield · 1 BHK Move</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div style="text-align:center; margin-top:28px;">
+    <button class="btn-primary leave-review-btn" onclick="openReviewModal()">⭐ Leave a Review</button>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <div class="footer-logo">📦 Pack<span>Zen</span></div>
+      <p>Bangalore's trusted packers & movers since 2016. Safe, reliable, and affordable.</p>
+    </div>
+    <div class="footer-info">
+      <div class="footer-detail">📍 HSR Layout, Bangalore</div>
+      <div class="footer-detail">📞 <a href="tel:9945095453">9945095453</a></div>
+      <div class="footer-detail">💬 <a href="https://wa.me/919945095453">WhatsApp Us</a></div>
+    </div>
+  </div>
+  <div class="footer-bottom" style="display:flex; flex-direction:column; gap:8px; align-items:center;">
+    <div>
+      <a href="legal.html" style="color:rgba(255,255,255,.5); text-decoration:none; font-size:.8rem; margin:0 12px; transition:color .2s" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,.5)'">Privacy Policy</a>
+      <a href="legal.html" onclick="setTimeout(()=>{document.querySelector('.legal-tab:nth-child(2)').click()},100)" style="color:rgba(255,255,255,.5); text-decoration:none; font-size:.8rem; margin:0 12px; transition:color .2s" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,.5)'">Terms of Service</a>
+      <a href="legal.html" onclick="setTimeout(()=>{document.querySelector('.legal-tab:nth-child(3)').click()},100)" style="color:rgba(255,255,255,.5); text-decoration:none; font-size:.8rem; margin:0 12px; transition:color .2s" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,.5)'">Refund Policy</a>
+    </div>
+  </div>
+  <div class="footer-bottom" style="padding-top:0">© 2026 PackZen Packers & Movers. All rights reserved.</div>
+</footer>
+
+<!-- FLOATING BUTTONS -->
+<a href="tel:9945095453" class="float-call">📞 Call</a>
+<a href="https://wa.me/919945095453" class="float-wa" target="_blank">💬 WhatsApp</a>
+
+<!-- ======================== MODALS ======================== -->
+
+<!-- AUTH MODAL -->
+<div id="authModal" class="modal-overlay" style="display:none;">
+  <div class="modal-box auth-modal-box">
+    <!-- Login Panel -->
+    <div class="auth-panel" id="panelLogin">
+      <button class="modal-x" onclick="closeAuthModal()">✕</button>
+      <div class="auth-logo">📦 PackZen</div>
+      <h2 class="auth-title">Welcome Back</h2>
+      <p class="auth-sub">Login to view your bookings & quotes</p>
+      <label class="field-label">Email Address</label>
+      <input id="loginEmail" type="email" placeholder="your@email.com" class="field-input">
+      <label class="field-label">Password</label>
+      <input id="loginPassword" type="password" placeholder="Enter password" class="field-input">
+      <div id="loginError" class="auth-error"></div>
+      <button class="btn-auth" onclick="loginUser()">Login →</button>
+      <div class="auth-divider"><span>or</span></div>
+      <button class="btn-auth-outline" onclick="switchPanel('panelSignup')">Create New Account</button>
+      <p class="auth-link" onclick="switchPanel('panelRecover')">Forgot password? Recover Account</p>
+    </div>
+    
+    <!-- Signup Panel -->
+    <div class="auth-panel" id="panelSignup" style="display:none;">
+      <button class="modal-x" onclick="closeAuthModal()">✕</button>
+      <div class="auth-logo">📦 PackZen</div>
+      <h2 class="auth-title">Create Account</h2>
+      <p class="auth-sub">Sign up to save quotes & track bookings</p>
+      <label class="field-label">Full Name</label>
+      <input id="signupName" type="text" placeholder="Your full name" class="field-input">
+      <label class="field-label">Email Address</label>
+      <input id="signupEmail" type="email" placeholder="your@email.com" class="field-input">
+      <label class="field-label">Phone Number</label>
+      <div class="phone-row">
+        <span class="phone-prefix">+91</span>
+        <input id="signupPhone" type="tel" placeholder="10-digit mobile" class="field-input phone-input" maxlength="10">
+      </div>
+      <label class="field-label">Password</label>
+      <input id="signupPassword" type="password" placeholder="Min 6 characters" class="field-input">
+      <label class="field-label">Referral Code (optional)</label>
+      <input id="signupReferral" type="text" placeholder="Friend's referral code" class="field-input" style="text-transform:uppercase">
+      <div id="recaptcha-container"></div>
+      <div id="signupError" class="auth-error"></div>
+      <button class="btn-auth" onclick="signupUser()">Send OTP & Register →</button>
+      <p class="auth-link" onclick="switchPanel('panelLogin')">Already have an account? Login</p>
+    </div>
+    
+    <!-- OTP Panel -->
+    <div class="auth-panel" id="panelOTP" style="display:none;">
+      <button class="modal-x" onclick="closeAuthModal()">✕</button>
+      <div class="auth-logo">📱</div>
+      <h2 class="auth-title">Verify Your Phone</h2>
+      <p class="auth-sub" id="otpSubText">Enter the 6-digit OTP sent to your number</p>
+      <div class="otp-boxes">
+        <input class="otp-box" type="tel" maxlength="1" oninput="otpInput(this,0)">
+        <input class="otp-box" type="tel" maxlength="1" oninput="otpInput(this,1)">
+        <input class="otp-box" type="tel" maxlength="1" oninput="otpInput(this,2)">
+        <input class="otp-box" type="tel" maxlength="1" oninput="otpInput(this,3)">
+        <input class="otp-box" type="tel" maxlength="1" oninput="otpInput(this,4)">
+        <input class="otp-box" type="tel" maxlength="1" oninput="otpInput(this,5)">
+      </div>
+      <div id="otpError" class="auth-error"></div>
+      <button class="btn-auth" onclick="verifyOTP()">Verify OTP →</button>
+      <p class="auth-link" onclick="resendOTP()">Resend OTP</p>
+    </div>
+    
+    <!-- Recover Panel -->
+    <div class="auth-panel" id="panelRecover" style="display:none;">
+      <button class="modal-x" onclick="closeAuthModal()">✕</button>
+      <div class="auth-logo">🔑</div>
+      <h2 class="auth-title">Recover Account</h2>
+      <p class="auth-sub">Enter your registered email. We'll send a password reset link.</p>
+      <label class="field-label">Email Address</label>
+      <input id="recoverEmail" type="email" placeholder="your@email.com" class="field-input">
+      <div id="recoverMsg" class="auth-error"></div>
+      <button class="btn-auth" onclick="recoverAccount()">Send Reset Link →</button>
+      <p class="auth-link" onclick="switchPanel('panelLogin')">← Back to Login</p>
+    </div>
+  </div>
+</div>
+
+<!-- DASHBOARD MODAL -->
+<div id="dashboardModal" class="modal-overlay" style="display:none;">
+  <div class="modal-box dashboard-box">
+    <button class="modal-x" onclick="closeDashboard()">✕</button>
+
+    <div class="dashboard-header">
+      <div class="dashboard-avatar" id="dashAvatar">U</div>
+      <div>
+        <div class="dashboard-name" id="dashName">User</div>
+        <div class="dashboard-email" id="dashEmail">user@example.com</div>
+      </div>
+    </div>
+
+    <div class="dash-tabs">
+      <button class="dash-tab active" onclick="switchDashTab('quotes',this)">📋 Quotes</button>
+      <button class="dash-tab" onclick="switchDashTab('bookings',this)">📦 Bookings</button>
+      <button class="dash-tab" onclick="switchDashTab('referral',this)">🎁 Referral</button>
+      <button class="dash-tab" onclick="switchDashTab('profile',this)">👤 Profile</button>
+      <button class="dash-tab" id="adminTabBtn" style="display:none;" onclick="switchDashTab('admin',this)">🛠 Admin</button>
+    </div>
+
+    <!-- Quotes Panel -->
+    <div class="dash-content" id="dashQuotes">
+      <div id="quotesList" class="quotes-list">
+        <div class="dash-empty">No saved quotes yet.</div>
+      </div>
+    </div>
+
+    <!-- Bookings Panel -->
+    <div class="dash-content" id="dashBookings" style="display:none;">
+      <div id="bookingsList" class="quotes-list">
+        <div class="dash-empty">No bookings yet.</div>
+      </div>
+    </div>
+
+    <!-- Referral Panel -->
+    <div class="dash-content" id="dashReferral" style="display:none;">
+      <div class="referral-box">
+        <div class="referral-title">🎁 Refer & Earn</div>
+        <div class="referral-sub">
+          Share your code. Your friend gets ₹500 off, you get ₹500 credit!
+        </div>
+        <div class="referral-code-row">
+          <div class="referral-code-text" id="referralCodeText">LOADING</div>
+          <button class="btn-copy" onclick="copyReferralCode()">Copy</button>
+        </div>
+        <div class="ref-stats">
+          <div class="ref-stat">
+            <div class="ref-stat-val" id="refCount">0</div>
+            <div class="ref-stat-lbl">Referrals</div>
+          </div>
+          <div class="ref-stat">
+            <div class="ref-stat-val" id="refEarned">₹0</div>
+            <div class="ref-stat-lbl">Credits Earned</div>
+          </div>
+          <div class="ref-stat">
+            <div class="ref-stat-val" id="refAvailable">₹0</div>
+            <div class="ref-stat-lbl">Available</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Profile Panel -->
+    <div class="dash-content" id="dashProfile" style="display:none;">
+      <label class="field-label">Full Name</label>
+      <input id="profileName" class="field-input" placeholder="Your name">
+
+      <label class="field-label">Email</label>
+      <input id="profileEmail" class="field-input" disabled>
+
+      <label class="field-label">Phone</label>
+      <input id="profilePhone" class="field-input" disabled>
+
+      <div class="notif-row">
+        <span>📧 Email updates</span>
+        <label class="toggle">
+          <input type="checkbox" id="prefEmail" onchange="savePreferences()">
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <div class="notif-row">
+        <span>📱 SMS updates</span>
+        <label class="toggle">
+          <input type="checkbox" id="prefSMS" onchange="savePreferences()">
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <button class="btn-auth" onclick="saveProfile()" style="margin-top:16px;">
+        Save Profile
+      </button>
+
+      <div id="profileMsg" class="auth-error" style="margin-top:8px;"></div>
+    </div>
+
+    <!-- Admin Panel -->
+    <div class="dash-content" id="dashAdmin" style="display:none;">
+      <h3 style="margin-bottom:16px;">🚚 Create New Driver</h3>
+      <label class="field-label">Driver Name</label>
+      <input id="newDriverName" class="field-input" placeholder="Driver full name">
+      <label class="field-label">Driver Email</label>
+      <input id="newDriverEmail" type="email" class="field-input" placeholder="driver@email.com">
+      <label class="field-label">Driver Password</label>
+      <input id="newDriverPassword" type="password" class="field-input" placeholder="Strong password">
+      <div id="adminMsg" class="auth-error" style="margin-top:10px;"></div>
+      <button class="btn-auth" style="margin-top:14px;" onclick="createDriver()">Create Driver →</button>
+    </div>
+  </div>
+</div>
+
+<!-- TRACKING MODAL -->
+<div id="trackingModal" class="modal-overlay" style="display:none;">
+  <div class="modal-box tracking-box">
+    <button class="modal-x" onclick="closeTrackingModal()">✕</button>
+    <div class="tracking-header">
+      <div style="font-family:'Syne',sans-serif; font-size:1.2rem; font-weight:800; color:var(--text);">📍 Track My Move</div>
+      <div class="tracking-id" id="trackingBookingId">Booking #---</div>
+    </div>
+    <div class="tracking-status-bar">
+      <div class="ts-step"><div class="ts-dot done" id="ts0">✓</div><div class="ts-label">Booked</div></div>
+      <div class="ts-step"><div class="ts-dot" id="ts1">🚛</div><div class="ts-label">Assigned</div></div>
+      <div class="ts-step"><div class="ts-dot" id="ts2">📦</div><div class="ts-label">Packing</div></div>
+      <div class="ts-step"><div class="ts-dot" id="ts3">🚚</div><div class="ts-label">Transit</div></div>
+      <div class="ts-step"><div class="ts-dot" id="ts4">🎉</div><div class="ts-label">Delivered</div></div>
+    </div>
+    <div class="tracking-map-area" id="trackingMapDiv"><span>📍 Driver location appears here once assigned</span></div>
+    <div class="tracking-info">
+      <div class="ti-row"><span class="ti-lbl">Status</span><span class="ti-val" id="trackStatus">Confirmed</span></div>
+      <div class="ti-row"><span class="ti-lbl">Driver</span><span class="ti-val" id="trackDriver">Not yet assigned</span></div>
+      <div class="ti-row"><span class="ti-lbl">Driver Phone</span><span class="ti-val" id="trackDriverPhone">—</span></div>
+      <div class="ti-row"><span class="ti-lbl">Moving Date</span><span class="ti-val" id="trackDate">—</span></div>
+      <div class="ti-row"><span class="ti-lbl">Pickup</span><span class="ti-val" id="trackPickup">—</span></div>
+      <div class="ti-row"><span class="ti-lbl">Drop</span><span class="ti-val" id="trackDrop">—</span></div>
+    </div>
+    <button class="btn-open-chat" onclick="closeTrackingModal();openChatModal()">💬 Chat with Driver</button>
+  </div>
+</div>
+
+<!-- CHAT MODAL -->
+<div id="chatModal" class="modal-overlay" style="display:none;">
+  <div class="modal-box chat-box">
+    <button class="modal-x" style="color:rgba(255,255,255,.8); top:14px; right:14px;" onclick="closeChatModal()">✕</button>
+    <div class="chat-header">
+      <div class="chat-drv-avatar" id="chatDrvAvatar">R</div>
+      <div>
+        <div class="chat-hdr-title" id="chatDrvName">Driver</div>
+        <div class="chat-hdr-sub" id="chatDrvStatus">PackZen Support</div>
+      </div>
+    </div>
+    <div class="chat-messages" id="chatMessages"><div class="chat-empty-msg">No messages yet. Say hello! 👋</div></div>
+    <div class="chat-input-row">
+      <input type="text" class="chat-text-input" id="chatInput" placeholder="Type a message..." onkeydown="if(event.key==='Enter')sendChatMessage()">
+      <button class="btn-send" onclick="sendChatMessage()">Send</button>
+    </div>
+  </div>
+</div>
+
+<!-- CHECKLIST MODAL -->
+<div id="checklistModal" class="modal-overlay" style="display:none;">
+  <div class="modal-box checklist-box">
+    <button class="modal-x" onclick="closeChecklist()">✕</button>
+    <div class="modal-icon">✅</div>
+    <h2 class="modal-title">Moving Checklist</h2>
+    <div class="cl-progress"><div class="cl-progress-bar" id="clProgressBar" style="width:0%"></div></div>
+    <div class="cl-score">Completed: <strong id="clScore">0 / 0</strong> tasks</div>
+    <div id="checklistContent"></div>
+  </div>
+</div>
+
+<!-- REVIEW MODAL -->
+<div id="reviewModal" class="modal-overlay" style="display:none;">
+  <div class="modal-box review-modal-box">
+    <button class="modal-x" onclick="closeReviewModal()">✕</button>
+    <div class="modal-icon">⭐</div>
+    <h2 class="modal-title">Leave a Review</h2>
+    <p class="modal-sub">How was your PackZen experience?</p>
+    <div class="star-row" id="starRow">
+      <button class="star-btn" onclick="setRating(1)">★</button>
+      <button class="star-btn" onclick="setRating(2)">★</button>
+      <button class="star-btn" onclick="setRating(3)">★</button>
+      <button class="star-btn" onclick="setRating(4)">★</button>
+      <button class="star-btn" onclick="setRating(5)">★</button>
+    </div>
+    <label class="field-label">Your Review</label>
+    <textarea id="reviewText" class="field-input" rows="4" placeholder="Tell us about your experience..." style="resize:vertical"></textarea>
+    <label class="field-label">Your Name</label>
+    <input id="reviewName" class="field-input" placeholder="Your name">
+    <div id="reviewMsg" class="auth-error" style="margin-top:10px;"></div>
+    <button class="btn-auth" onclick="submitReview()" style="margin-top:12px;">Submit Review →</button>
+  </div>
+</div>
+
+<!-- PAYMENT SUCCESS MODAL -->
+<div id="paymentModal" class="modal-overlay" style="display:none;">
+  <div class="confirm-card">
+    <!-- Header -->
+    <div class="cc-header">
+      <div class="cc-check-circle">
+        <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+          <circle cx="16" cy="16" r="16" fill="rgba(255,255,255,0.2)"/>
+          <path d="M9 16.5l5 5 9-9" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="cc-header-text">
+        <div class="cc-title" id="ccTitle">Booking Confirmed!</div>
+        <div class="cc-subtitle" id="ccSubtitle">We'll call you within 30 minutes to confirm your slot</div>
+      </div>
+      <button class="cc-close" onclick="closeModal()">✕</button>
+    </div>
+
+    <!-- Booking ID Strip -->
+    <div class="cc-id-strip">
+      <div class="cc-id-left">
+        <div class="cc-id-label">BOOKING ID</div>
+        <div class="cc-id-value" id="bookingIdDisplay">—</div>
+      </div>
+      <button class="cc-copy-btn" onclick="copyBookingId()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+        Copy
+      </button>
+    </div>
+
+    <!-- Status Timeline -->
+    <div class="cc-timeline">
+      <div class="cc-tl-step done">
+        <div class="cc-tl-dot"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div>
+        <div class="cc-tl-line"></div>
+        <div class="cc-tl-label">Booked</div>
+      </div>
+      <div class="cc-tl-step active">
+        <div class="cc-tl-dot">📞</div>
+        <div class="cc-tl-line"></div>
+        <div class="cc-tl-label">Confirming</div>
+      </div>
+      <div class="cc-tl-step">
+        <div class="cc-tl-dot">🚚</div>
+        <div class="cc-tl-line"></div>
+        <div class="cc-tl-label">Assigned</div>
+      </div>
+      <div class="cc-tl-step">
+        <div class="cc-tl-dot">🎉</div>
+        <div class="cc-tl-label">Delivered</div>
+      </div>
+    </div>
+
+    <!-- Move Details Card -->
+    <div class="cc-details">
+      <div class="cc-details-title">Move Details</div>
+      <div class="cc-route">
+        <div class="cc-loc">
+          <div class="cc-loc-dot pickup"></div>
+          <div class="cc-loc-text" id="ccPickup">—</div>
+        </div>
+        <div class="cc-route-line"></div>
+        <div class="cc-loc">
+          <div class="cc-loc-dot drop"></div>
+          <div class="cc-loc-text" id="ccDrop">—</div>
+        </div>
+      </div>
+      <div class="cc-meta-grid">
+        <div class="cc-meta-item">
+          <div class="cc-meta-icon">👤</div>
+          <div><div class="cc-meta-label">Customer</div><div class="cc-meta-val" id="ccName">—</div></div>
+        </div>
+        <div class="cc-meta-item">
+          <div class="cc-meta-icon">📞</div>
+          <div><div class="cc-meta-label">Phone</div><div class="cc-meta-val" id="ccPhone">—</div></div>
+        </div>
+        <div class="cc-meta-item">
+          <div class="cc-meta-icon">📅</div>
+          <div><div class="cc-meta-label">Move Date</div><div class="cc-meta-val" id="ccDate">—</div></div>
+        </div>
+        <div class="cc-meta-item">
+          <div class="cc-meta-icon">🏠</div>
+          <div><div class="cc-meta-label">House Type</div><div class="cc-meta-val" id="ccHouse">—</div></div>
+        </div>
+        <div class="cc-meta-item">
+          <div class="cc-meta-icon">🚛</div>
+          <div><div class="cc-meta-label">Vehicle</div><div class="cc-meta-val" id="ccVehicle">—</div></div>
+        </div>
+        <div class="cc-meta-item">
+          <div class="cc-meta-icon">💰</div>
+          <div><div class="cc-meta-label">Payment</div><div class="cc-meta-val" id="ccPayment">—</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Price Summary -->
+    <div class="cc-price-row">
+      <div>
+        <div class="cc-price-label">Total Estimate</div>
+        <div class="cc-price-note" id="ccPriceNote">Inclusive of all charges</div>
+      </div>
+      <div class="cc-price-amount" id="ccAmount">₹0</div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="cc-actions">
+      <button class="cc-btn-wa" onclick="sendWhatsAppAfterPayment()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.126 1.535 5.858L.057 23.428a.75.75 0 00.916.916l5.57-1.478A11.952 11.952 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.907 0-3.693-.528-5.223-1.447l-.374-.223-3.304.876.877-3.304-.223-.374A9.951 9.951 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
+        Get on WhatsApp
+      </button>
+      <button class="cc-btn-invoice" id="btnInvoice" onclick="downloadInvoice()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        GST Invoice
+      </button>
+    </div>
+    <button class="cc-btn-close" onclick="closeModal()">Close</button>
+  </div>
+</div>
+
+<!-- SCRIPTS -->
+<!-- Environment variables (create this file with your keys) -->
+<script src="env-config.js"></script>
+
+<!-- Firebase Config -->
+<script src="firebase-config.js"></script>
+
+<!-- Razorpay -->
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+<!-- Main Script -->
+<script src="script.js"></script>
+
+<!-- Google Maps loaded with env var -->
+<script>
+  function loadGoogleMaps() {
+    if (!window.ENV || !window.ENV.GOOGLE_MAPS_KEY) {
+      console.error('Google Maps key not configured. Please create env-config.js with your key.');
+      return;
+    }
+    const script = document.createElement('script');
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${window.ENV.GOOGLE_MAPS_KEY}&libraries=places&callback=initAutocomplete`;
+    script.async = true;
+    script.defer = true;
+    document.head.appendChild(script);
+  }
+  
+  // Wait for env to be ready
+  if (window.ENV) {
+    loadGoogleMaps();
+  } else {
+    setTimeout(loadGoogleMaps, 500);
+  }
+</script>
+
+</body>
+</html>
