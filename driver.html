@@ -63,6 +63,17 @@
     .booking-amount{display:flex;justify-content:space-between;align-items:center}
     .ba-lbl{font-size:.82rem;color:var(--text-muted);font-weight:500}
     .ba-val{font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:800;color:var(--primary)}
+    .payment-summary{background:var(--surface2);border-radius:14px;padding:14px;margin-top:14px;border:1px solid var(--border)}
+    .pay-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0}
+    .pay-row:not(:last-child){border-bottom:1px solid var(--border)}
+    .pay-label{font-size:.8rem;color:var(--text-muted);font-weight:500}
+    .pay-value{font-size:.9rem;font-weight:700;color:var(--text)}
+    .pay-value.green{color:var(--accent)}
+    .pay-value.orange{color:#f97316}
+    .collect-banner{background:linear-gradient(135deg,#f97316,#ea580c);border-radius:12px;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;margin-top:10px}
+    .collect-banner.paid-full{background:linear-gradient(135deg,var(--accent),#059669)}
+    .collect-lbl{color:rgba(255,255,255,.85);font-size:.8rem;font-weight:600}
+    .collect-val{color:#fff;font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:800}
 
     /* STATUS BUTTONS */
     .status-section{background:var(--surface);border-radius:18px;border:1px solid var(--border);padding:20px;margin-bottom:16px;box-shadow:var(--shadow-sm);transition:background .3s}
@@ -122,8 +133,43 @@
     .btn-upload-photos:hover{background:var(--accent);color:#fff}
 
     /* TOAST */
-    .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--dark);color:#fff;padding:12px 24px;border-radius:50px;font-size:.88rem;font-weight:600;z-index:9999;opacity:0;transition:opacity .3s,transform .3s;pointer-events:none;white-space:nowrap}
+    .toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--dark);color:#fff;padding:12px 24px;border-radius:50px;font-size:.88rem;font-weight:600;z-index:9999;opacity:0;transition:opacity .3s,transform .3s;pointer-events:none;white-space:nowrap}
     .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+    /* ===== BOTTOM NAV ===== */
+    .bottom-nav{position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);display:none;z-index:100;box-shadow:0 -4px 20px rgba(0,0,0,.1)}
+    .bottom-nav.active{display:flex}
+    .bn-item{flex:1;display:flex;flex-direction:column;align-items:center;padding:10px 4px 14px;cursor:pointer;transition:color .2s;color:var(--text-muted);font-size:.68rem;font-weight:600;gap:3px;border:none;background:none;font-family:'DM Sans',sans-serif}
+    .bn-item.active{color:var(--primary)}
+    .bn-icon{font-size:1.3rem;line-height:1}
+    .driver-app.active{padding-bottom:85px}
+
+    /* ===== TAB SECTIONS ===== */
+    .drv-tab{display:none}
+    .drv-tab.active{display:block}
+
+    /* ===== EARNINGS ===== */
+    .earn-summary{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+    .earn-card{background:var(--surface);border-radius:16px;border:1px solid var(--border);padding:16px;box-shadow:var(--shadow-sm);text-align:center}
+    .earn-card.full{grid-column:1/-1;background:linear-gradient(135deg,var(--primary),#7c3aed);border:none}
+    .earn-card.full .earn-val,.earn-card.full .earn-lbl{color:#fff}
+    .earn-val{font-family:'Syne',sans-serif;font-size:1.7rem;font-weight:800;color:var(--primary);margin-bottom:4px}
+    .earn-val.green{color:var(--accent)}
+    .earn-lbl{font-size:.75rem;color:var(--text-muted);font-weight:600}
+    .earn-period{display:flex;gap:8px;margin-bottom:16px}
+    .earn-period-btn{flex:1;padding:8px;border-radius:30px;border:1.5px solid var(--border);background:var(--surface2);color:var(--text-muted);font-family:'DM Sans',sans-serif;font-size:.8rem;font-weight:600;cursor:pointer;transition:all .2s}
+    .earn-period-btn.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+
+    /* ===== HISTORY ===== */
+    .hist-empty{text-align:center;padding:40px 20px;color:var(--text-muted);font-size:.9rem}
+    .hist-card{background:var(--surface);border-radius:16px;border:1px solid var(--border);padding:16px;margin-bottom:12px;box-shadow:var(--shadow-sm)}
+    .hist-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+    .hist-id{font-family:'Syne',sans-serif;font-size:.85rem;font-weight:800;color:var(--primary)}
+    .hist-badge{background:rgba(0,201,110,.12);color:var(--accent);font-size:.7rem;font-weight:700;padding:3px 10px;border-radius:20px}
+    .hist-route{font-size:.8rem;color:var(--text-muted);margin-bottom:8px;line-height:1.5}
+    .hist-footer{display:flex;justify-content:space-between;align-items:center;padding-top:8px;border-top:1px solid var(--border)}
+    .hist-amount{font-family:'Syne',sans-serif;font-size:1rem;font-weight:800;color:var(--text)}
+    .hist-date{font-size:.75rem;color:var(--text-muted)}
 
     @media(max-width:480px){.driver-app{padding:14px}}
   </style>
@@ -162,6 +208,16 @@
     </div>
   </div>
 
+  <!-- BOTTOM NAV -->
+  <nav class="bottom-nav" id="bottomNav">
+    <button class="bn-item active" onclick="switchTab('job',this)"><span class="bn-icon">📦</span>Current Job</button>
+    <button class="bn-item" onclick="switchTab('history',this)"><span class="bn-icon">📋</span>History</button>
+    <button class="bn-item" onclick="switchTab('earnings',this)"><span class="bn-icon">💰</span>Earnings</button>
+  </nav>
+
+  <!-- TAB: CURRENT JOB -->
+  <div class="drv-tab active" id="tabJob">
+
   <!-- ONLINE TOGGLE -->
   <div class="online-card">
     <div>
@@ -189,6 +245,27 @@
     <div class="booking-amount">
       <div><div class="ba-lbl">Total Amount</div><div class="ba-val" id="bkAmount">₹0</div></div>
       <a id="bkNavigate" href="#" target="_blank" style="background:var(--accent);color:#fff;padding:8px 18px;border-radius:30px;text-decoration:none;font-size:.82rem;font-weight:700">🗺️ Navigate</a>
+    </div>
+
+    <!-- PAYMENT SUMMARY -->
+    <div class="payment-summary">
+      <div class="pay-row">
+        <span class="pay-label">Total Estimate</span>
+        <span class="pay-value" id="payTotal">₹0</span>
+      </div>
+      <div class="pay-row">
+        <span class="pay-label">Already Received</span>
+        <span class="pay-value green" id="payReceived">₹0</span>
+      </div>
+      <div class="pay-row">
+        <span class="pay-label">Payment Type</span>
+        <span class="pay-value" id="payType">—</span>
+      </div>
+    </div>
+    <!-- COLLECT BANNER -->
+    <div class="collect-banner" id="collectBanner">
+      <span class="collect-lbl" id="collectLabel">Collect on Delivery</span>
+      <span class="collect-val" id="collectAmount">₹0</span>
     </div>
   </div>
 
@@ -239,6 +316,46 @@
     </div>
     <div class="delivery-thumbs" id="deliveryThumbs"></div>
     <button class="btn-upload-photos" onclick="saveDeliveryPhotos()">📤 Save & Upload Photos</button>
+  </div>
+
+  </div><!-- end tabJob -->
+
+  <!-- TAB: HISTORY -->
+  <div class="drv-tab" id="tabHistory">
+    <div style="font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:800;color:var(--text);margin-bottom:16px">📋 Completed Jobs</div>
+    <div id="historyList"><div class="hist-empty">⏳ Loading history...</div></div>
+  </div>
+
+  <!-- TAB: EARNINGS -->
+  <div class="drv-tab" id="tabEarnings">
+    <div style="font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:800;color:var(--text);margin-bottom:16px">💰 My Earnings</div>
+
+    <!-- Period Filter -->
+    <div class="earn-period">
+      <button class="earn-period-btn active" onclick="filterEarnings('all',this)">All Time</button>
+      <button class="earn-period-btn" onclick="filterEarnings('month',this)">This Month</button>
+      <button class="earn-period-btn" onclick="filterEarnings('week',this)">This Week</button>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="earn-summary">
+      <div class="earn-card full">
+        <div class="earn-val" id="earnTotal">₹0</div>
+        <div class="earn-lbl">Total Earnings</div>
+      </div>
+      <div class="earn-card">
+        <div class="earn-val green" id="earnJobs">0</div>
+        <div class="earn-lbl">Jobs Done</div>
+      </div>
+      <div class="earn-card">
+        <div class="earn-val" id="earnAvg">₹0</div>
+        <div class="earn-lbl">Avg per Job</div>
+      </div>
+    </div>
+
+    <!-- Per-job breakdown -->
+    <div style="font-family:'Syne',sans-serif;font-size:.85rem;font-weight:700;color:var(--text-muted);margin-bottom:10px;text-transform:uppercase;letter-spacing:.05em">Breakdown</div>
+    <div id="earningsList"><div class="hist-empty">⏳ Loading earnings...</div></div>
   </div>
 
 </div>
@@ -329,6 +446,7 @@ function driverSignOut() {
     if (driverUser) window._firebase.db.collection("users").doc(driverUser.uid).update({ isOnline: false });
     window._firebase.auth.signOut().then(() => {
       document.getElementById("driverApp").classList.remove("active");
+      document.getElementById("bottomNav").classList.remove("active"); // hide bottom nav
       document.getElementById("driverLogin").style.display = "flex";
       driverUser = null;
     });
@@ -338,6 +456,7 @@ function driverSignOut() {
 function showApp(data) {
   document.getElementById("driverLogin").style.display = "none";
   document.getElementById("driverApp").classList.add("active");
+  document.getElementById("bottomNav").classList.add("active"); // show bottom nav
   document.getElementById("drvName").textContent = data.name || "Driver";
   document.getElementById("drvEmail2").textContent = driverUser.email || "";
   document.getElementById("drvAvatar").textContent = (data.name || "D").charAt(0).toUpperCase();
@@ -424,6 +543,35 @@ function showBookingUI(b) {
   const navUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(b.drop||"")}`;
   document.getElementById("bkNavigate").href = navUrl;
   document.getElementById("chatCustomerName").textContent = b.customerName || "Customer";
+
+  // Payment summary
+  const total    = b.total || 0;
+  const paid     = b.paid  || 0;
+  const due      = Math.max(0, total - paid);
+  const paidFull = paid >= total;
+
+  // Payment type label
+  const typeMap = { full: "Paid in Full", advance: "Advance Paid", pay_later: "Pay on Delivery", whatsapp: "Pay on Delivery" };
+  const payTypeLabel = typeMap[b.paymentType] || typeMap[b.source] || (paid > 0 ? "Partial Paid" : "Pay on Delivery");
+
+  document.getElementById("payTotal").textContent    = "₹" + total.toLocaleString();
+  document.getElementById("payReceived").textContent = "₹" + paid.toLocaleString();
+  document.getElementById("payType").textContent     = payTypeLabel;
+
+  // Collect banner
+  const banner = document.getElementById("collectBanner");
+  const collectLabel  = document.getElementById("collectLabel");
+  const collectAmount = document.getElementById("collectAmount");
+
+  if (paidFull) {
+    banner.className = "collect-banner paid-full";
+    collectLabel.textContent  = "✅ Fully Paid — Nothing to Collect";
+    collectAmount.textContent = "₹0";
+  } else {
+    banner.className = "collect-banner";
+    collectLabel.textContent  = "💵 Collect on Delivery";
+    collectAmount.textContent = "₹" + due.toLocaleString();
+  }
 }
 
 /* STATUS STEPS */
@@ -580,6 +728,195 @@ function saveDeliveryPhotos() {
     document.getElementById("deliveryThumbs").innerHTML = "";
     selectedDeliveryPhotos = [];
   }).catch(e => toast("❌ Upload failed: " + e.message));
+}
+
+/* ============================================
+   TAB NAVIGATION
+   ============================================ */
+function switchTab(tab, el) {
+  // Update nav buttons
+  document.querySelectorAll(".bn-item").forEach(b => b.classList.remove("active"));
+  if (el) el.classList.add("active");
+
+  // Show correct tab
+  document.querySelectorAll(".drv-tab").forEach(t => t.classList.remove("active"));
+  document.getElementById("tab" + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add("active");
+
+  // Load data when tab opened
+  if (tab === "history")  loadHistory();
+  if (tab === "earnings") loadEarnings("all");
+}
+
+/* ============================================
+   HISTORY - Completed Jobs
+   ============================================ */
+let allCompletedBookings = [];
+
+function loadHistory() {
+  if (!driverUser) return;
+  const list = document.getElementById("historyList");
+  list.innerHTML = '<div class="hist-empty">⏳ Loading...</div>';
+
+  window._firebase.db.collection("bookings")
+    .where("driverUid", "==", driverUser.uid)
+    .where("status", "==", "delivered")
+    .orderBy("createdAt", "desc")
+    .get()
+    .then(snap => {
+      allCompletedBookings = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      renderHistory(allCompletedBookings);
+    })
+    .catch(e => {
+      list.innerHTML = '<div class="hist-empty">❌ Failed to load history</div>';
+      console.error(e);
+    });
+}
+
+function renderHistory(bookings) {
+  const list = document.getElementById("historyList");
+  if (!bookings.length) {
+    list.innerHTML = '<div class="hist-empty">📭 No completed jobs yet.<br>Complete your first delivery to see history here.</div>';
+    return;
+  }
+  list.innerHTML = bookings.map(b => {
+    const date    = b.createdAt?.toDate ? b.createdAt.toDate().toLocaleDateString("en-IN", { day:"2-digit", month:"short", year:"numeric" }) : (b.date || "—");
+    const pickup  = (b.pickup || "").split(",")[0] || "—";
+    const drop    = (b.drop   || "").split(",")[0] || "—";
+    const total   = b.total || 0;
+    const paid    = b.paid  || 0;
+    const due     = Math.max(0, total - paid);
+    const paidFull = paid >= total;
+    return `
+      <div class="hist-card">
+        <div class="hist-header">
+          <div class="hist-id">${b.bookingRef || ("#" + b.id.slice(-6).toUpperCase())}</div>
+          <div class="hist-badge">✅ Delivered</div>
+        </div>
+        <div class="hist-route">📍 ${pickup}<br>🏁 ${drop}</div>
+        <div style="display:flex;gap:8px;margin:8px 0;flex-wrap:wrap">
+          <span style="background:rgba(0,201,110,.1);color:var(--accent);font-size:.75rem;font-weight:700;padding:3px 10px;border-radius:20px">💚 Received ₹${paid.toLocaleString()}</span>
+          ${!paidFull ? `<span style="background:rgba(249,115,22,.1);color:#f97316;font-size:.75rem;font-weight:700;padding:3px 10px;border-radius:20px">🔶 Collected ₹${due.toLocaleString()}</span>` : '<span style="background:rgba(0,201,110,.1);color:var(--accent);font-size:.75rem;font-weight:700;padding:3px 10px;border-radius:20px">✅ Fully Paid</span>'}
+        </div>
+        <div class="hist-footer">
+          <div class="hist-amount">Total: ₹${total.toLocaleString()}</div>
+          <div class="hist-date">📅 ${date}</div>
+        </div>
+      </div>`;
+  }).join("");
+}
+
+/* ============================================
+   EARNINGS
+   ============================================ */
+let currentEarningsPeriod = "all";
+
+function loadEarnings(period) {
+  if (!driverUser) return;
+  currentEarningsPeriod = period;
+  const list = document.getElementById("earningsList");
+  list.innerHTML = '<div class="hist-empty">⏳ Loading...</div>';
+
+  window._firebase.db.collection("bookings")
+    .where("driverUid", "==", driverUser.uid)
+    .where("status", "==", "delivered")
+    .orderBy("createdAt", "desc")
+    .get()
+    .then(snap => {
+      let bookings = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+
+      // Filter by period
+      const now = new Date();
+      if (period === "week") {
+        const weekAgo = new Date(now - 7 * 24 * 60 * 60 * 1000);
+        bookings = bookings.filter(b => {
+          const d = b.createdAt?.toDate ? b.createdAt.toDate() : null;
+          return d && d >= weekAgo;
+        });
+      } else if (period === "month") {
+        bookings = bookings.filter(b => {
+          const d = b.createdAt?.toDate ? b.createdAt.toDate() : null;
+          return d && d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+        });
+      }
+
+      // Calculate stats
+      const total    = bookings.reduce((s, b) => s + (b.total || 0), 0);
+      const received = bookings.reduce((s, b) => s + (b.paid  || 0), 0);
+      const cash     = bookings.reduce((s, b) => s + Math.max(0, (b.total||0) - (b.paid||0)), 0);
+      const count    = bookings.length;
+      const avg      = count ? Math.round(total / count) : 0;
+
+      document.getElementById("earnTotal").textContent = "₹" + total.toLocaleString();
+      document.getElementById("earnJobs").textContent  = count;
+      document.getElementById("earnAvg").textContent   = "₹" + avg.toLocaleString();
+
+      // Update or create received/cash breakdown cards
+      let recCard = document.getElementById("earnReceived");
+      let cashCard = document.getElementById("earnCash");
+      if (!recCard) {
+        const summary = document.querySelector(".earn-summary");
+        summary.insertAdjacentHTML("beforeend", `
+          <div class="earn-card" style="background:rgba(0,201,110,.08);border-color:rgba(0,201,110,.2)">
+            <div class="earn-val green" id="earnReceived">₹0</div>
+            <div class="earn-lbl">Pre-Paid (Online)</div>
+          </div>
+          <div class="earn-card" style="background:rgba(249,115,22,.08);border-color:rgba(249,115,22,.2)">
+            <div class="earn-val" style="color:#f97316" id="earnCash">₹0</div>
+            <div class="earn-lbl">Cash Collected</div>
+          </div>`);
+        recCard  = document.getElementById("earnReceived");
+        cashCard = document.getElementById("earnCash");
+      }
+      recCard.textContent  = "₹" + received.toLocaleString();
+      cashCard.textContent = "₹" + cash.toLocaleString();
+
+      // Render breakdown
+      if (!bookings.length) {
+        list.innerHTML = '<div class="hist-empty">📭 No earnings for this period.</div>';
+        return;
+      }
+      list.innerHTML = bookings.map(b => {
+        const date    = b.createdAt?.toDate ? b.createdAt.toDate().toLocaleDateString("en-IN", { day:"2-digit", month:"short", year:"numeric" }) : (b.date || "—");
+        const pickup  = (b.pickup || "").split(",")[0] || "—";
+        const drop    = (b.drop   || "").split(",")[0] || "—";
+        const total   = b.total || 0;
+        const paid    = b.paid  || 0;
+        const cash    = Math.max(0, total - paid);
+        const paidFull = paid >= total;
+        return `
+          <div class="hist-card">
+            <div class="hist-header">
+              <div class="hist-id">${b.bookingRef || ("#" + b.id.slice(-6).toUpperCase())}</div>
+              <div class="hist-date">${date}</div>
+            </div>
+            <div class="hist-route">📍 ${pickup} → 🏁 ${drop}</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin:8px 0">
+              <div style="background:var(--surface2);border-radius:8px;padding:6px 8px;text-align:center">
+                <div style="font-size:.65rem;color:var(--text-muted);font-weight:600">TOTAL</div>
+                <div style="font-size:.85rem;font-weight:800;color:var(--text)">₹${total.toLocaleString()}</div>
+              </div>
+              <div style="background:rgba(0,201,110,.08);border-radius:8px;padding:6px 8px;text-align:center">
+                <div style="font-size:.65rem;color:var(--accent);font-weight:600">PRE-PAID</div>
+                <div style="font-size:.85rem;font-weight:800;color:var(--accent)">₹${paid.toLocaleString()}</div>
+              </div>
+              <div style="background:${paidFull ? "rgba(0,201,110,.08)" : "rgba(249,115,22,.08)"};border-radius:8px;padding:6px 8px;text-align:center">
+                <div style="font-size:.65rem;color:${paidFull ? "var(--accent)" : "#f97316"};font-weight:600">${paidFull ? "DONE" : "CASH"}</div>
+                <div style="font-size:.85rem;font-weight:800;color:${paidFull ? "var(--accent)" : "#f97316"}">₹${cash.toLocaleString()}</div>
+              </div>
+            </div>
+          </div>`;
+      }).join("");
+    })
+    .catch(e => {
+      list.innerHTML = '<div class="hist-empty">❌ Failed to load earnings</div>';
+      console.error(e);
+    });
+}
+
+function filterEarnings(period, el) {
+  document.querySelectorAll(".earn-period-btn").forEach(b => b.classList.remove("active"));
+  if (el) el.classList.add("active");
+  loadEarnings(period);
 }
 </script>
 </body>
