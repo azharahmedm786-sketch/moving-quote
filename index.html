@@ -557,7 +557,7 @@
       <div class="dashboard-avatar" id="dashAvatar">U</div>
       <div>
         <div class="dashboard-name" id="dashName">User</div>
-        <div class="dashboard-email" id="dashEmail">user@example.com</div>
+        <div class="dashboard-email" id="dashEmail"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="651016001725001d04081509004b060a08">[email&#160;protected]</a></div>
       </div>
     </div>
 
@@ -869,7 +869,7 @@
 
 <!-- SCRIPTS - ORDER IS CRITICAL -->
 <!-- 1. Environment variables first -->
-<script src="env-config.js"></script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="env-config.js"></script>
 
 <!-- 2. Firebase config second -->
 <script src="firebase-config.js"></script>
@@ -882,22 +882,21 @@
 
 <!-- 5. Google Maps - Load after everything else -->
 <script>
-  // Global function for Google Maps callback
-  window.initAutocomplete = function() {
-    console.log("✅ Google Maps API loaded");
-    // Your existing initAutocomplete function from script.js will handle the rest
-  };
+  // NOTE: Do NOT redefine window.initAutocomplete here.
+  // The real initAutocomplete() lives in script.js and sets up
+  // Places Autocomplete + map listeners. Redefining it here would
+  // overwrite it with an empty stub and break everything.
 
   function loadGoogleMaps() {
     if (!window.ENV || !window.ENV.GOOGLE_MAPS_KEY) {
       console.error('❌ Google Maps key not configured. Check env-config.js');
       return;
     }
-    
-    console.log('📍 Loading Google Maps with key:', window.ENV.GOOGLE_MAPS_KEY.substring(0, 10) + '...');
-    
+
+    console.log('📍 Loading Google Maps...');
+
     const script = document.createElement('script');
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${window.ENV.GOOGLE_MAPS_KEY}&libraries=places&callback=initAutocomplete`;
+    script.src = 'https://maps.googleapis.com/maps/api/js?key=' + window.ENV.GOOGLE_MAPS_KEY + '&libraries=places&callback=initAutocomplete';
     script.async = true;
     script.defer = true;
     script.onload = () => console.log('✅ Google Maps script loaded');
@@ -905,12 +904,8 @@
     document.head.appendChild(script);
   }
 
-  // Wait for everything to be ready
-  if (document.readyState === 'complete') {
-    loadGoogleMaps();
-  } else {
-    window.addEventListener('load', loadGoogleMaps);
-  }
+  // Actually call it!
+  loadGoogleMaps();
 </script>
 
 </body>
