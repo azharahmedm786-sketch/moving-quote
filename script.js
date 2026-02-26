@@ -687,10 +687,14 @@ function calculateQuote(auto = false) {
   if (!houseBase || !vehicleRate)            { if (!auto) alert("Select house & vehicle"); return; }
 
   let furnitureCost = 0;
-  if (document.getElementById("sofaCheck")?.checked)   furnitureCost += 500 * Number(document.getElementById("sofaQty")?.value || 1);
-  if (document.getElementById("bedCheck")?.checked)    furnitureCost += 700 * Number(document.getElementById("bedQty")?.value  || 1);
-  if (document.getElementById("fridgeCheck")?.checked) furnitureCost += FRIDGE_PRICE;
-  if (document.getElementById("wmCheck")?.checked)     furnitureCost += 400;
+  if (document.getElementById("sofaCheck")?.checked)    furnitureCost += 500 * Number(document.getElementById("sofaQty")?.value || 1);
+  if (document.getElementById("bedCheck")?.checked)     furnitureCost += 700 * Number(document.getElementById("bedQty")?.value  || 1);
+  if (document.getElementById("fridgeCheck")?.checked)  furnitureCost += FRIDGE_PRICE;
+  if (document.getElementById("wmCheck")?.checked)      furnitureCost += 400;
+  if (document.getElementById("tvCheck")?.checked)      furnitureCost += 300;
+  if (document.getElementById("acCheck")?.checked)      furnitureCost += 500;
+  if (document.getElementById("wardrobeCheck")?.checked) furnitureCost += 600;
+  if (document.getElementById("diningCheck")?.checked)  furnitureCost += 400;
 
   function applyPrice(km) {
     const total = Math.round(MIN_BASE_PRICE + houseBase + (km * vehicleRate) + furnitureCost);
@@ -1457,24 +1461,29 @@ async function loadReviewsPublic() {
 let currentStep = 0;
 const steps     = document.querySelectorAll(".form-step");
 
+const STEP_LABELS = ["Where are you moving?","When & what type of move?","What are you moving?","Almost done — confirm & book"];
+
 function updateStepDots(n) {
   document.querySelectorAll(".step-dot").forEach((dot, i) => {
     dot.classList.remove("active","done");
-    if (i < n) dot.classList.add("done");
+    if (i < n)  dot.classList.add("done");
     if (i === n) dot.classList.add("active");
   });
   document.querySelectorAll(".step-line").forEach((line, i) => line.classList.toggle("done", i < n));
+  // Update counter + label in header
+  const counter = document.getElementById("stepCurrent");
+  const label   = document.getElementById("stepLabel");
+  if (counter) counter.textContent = n + 1;
+  if (label)   label.textContent   = STEP_LABELS[n] || "";
 }
 
 function showStep(n) {
   steps.forEach(s => s.classList.remove("active"));
   steps[n].classList.add("active");
-  steps[n].style.animation = "none";
-  void steps[n].offsetWidth;
-  steps[n].style.animation = "";
   const pb = document.getElementById("progressBar");
   if (pb) pb.style.width = ((n + 1) / steps.length) * 100 + "%";
   updateStepDots(n);
+  window.scrollTo({ top: document.getElementById("quote")?.offsetTop - 80 || 0, behavior: "smooth" });
   if (n === steps.length - 1) {
     calculateQuote(true);
     autoFillCustomerDetails();
@@ -1504,13 +1513,58 @@ function nextStep() {
   const drop    = document.getElementById("drop");
   const house   = document.getElementById("house");
   const vehicle = document.getElementById("vehicle");
-  if (currentStep === 0 && (!pickup?.value || !drop?.value))   return alert("Enter pickup & drop locations.");
-  if (currentStep === 1 && (!house?.value  || !vehicle?.value)) return alert("Select house type & vehicle.");
+
+  if (currentStep === 0) {
+    let ok = true;
+    if (!pickup?.value.trim()) { shakeField(pickup); showToast("📍 Please enter a pickup location"); ok = false; }
+    else if (!drop?.value.trim())   { shakeField(drop);   showToast("🏁 Please enter a drop location"); ok = false; }
+    if (!ok) return;
+  }
+
+  if (currentStep === 1) {
+    let ok = true;
+    if (!house?.value)   { showToast("🏠 Please select your house type"); ok = false; }
+    else if (!vehicle?.value) { showToast("🚚 Please select a vehicle type"); ok = false; }
+    if (!ok) return;
+  }
+
   if (currentStep < steps.length - 1) { currentStep++; showStep(currentStep); }
 }
 
 function prevStep() {
   if (currentStep > 0) { currentStep--; showStep(currentStep); }
+}
+
+function shakeField(el) {
+  if (!el) return;
+  el.classList.add("error");
+  el.focus();
+  setTimeout(() => el.classList.remove("error"), 600);
+}
+
+// Select card UI (house + vehicle visual selectors)
+function selectCard(el, type, value) {
+  // Update hidden select
+  const select = document.getElementById(type);
+  if (select) select.value = value;
+
+  // Update visual selection
+  const parent = el.closest(type === "house" ? ".select-cards" : ".vehicle-cards");
+  if (parent) parent.querySelectorAll(type === "house" ? ".select-card" : ".vehicle-card")
+    .forEach(c => c.classList.remove("selected"));
+  el.classList.add("selected");
+
+  // Recalculate price if on last step
+  if (currentStep === steps.length - 1) calculateQuote(true);
+}
+
+// Qty +/- buttons for furniture
+function changeQty(id, delta) {
+  const input = document.getElementById(id);
+  if (!input) return;
+  const newVal = Math.max(1, Math.min(9, (parseInt(input.value) || 1) + delta));
+  input.value = newVal;
+  calculateQuote(true);
 }
 
 /* ============================================
@@ -1521,16 +1575,14 @@ function capitalize(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : "";
 // Helper: collect selected furniture as a summary string and cost
 function getFurnitureSummary() {
   const items = [];
-  if (document.getElementById("sofaCheck")?.checked) {
-    const qty = document.getElementById("sofaQty")?.value || 1;
-    items.push(`Sofa x${qty}`);
-  }
-  if (document.getElementById("bedCheck")?.checked) {
-    const qty = document.getElementById("bedQty")?.value || 1;
-    items.push(`Bed x${qty}`);
-  }
-  if (document.getElementById("fridgeCheck")?.checked) items.push("Fridge");
-  if (document.getElementById("wmCheck")?.checked)     items.push("Washing Machine");
+  if (document.getElementById("sofaCheck")?.checked)     items.push(`Sofa x${document.getElementById("sofaQty")?.value||1}`);
+  if (document.getElementById("bedCheck")?.checked)      items.push(`Bed x${document.getElementById("bedQty")?.value||1}`);
+  if (document.getElementById("fridgeCheck")?.checked)   items.push("Fridge");
+  if (document.getElementById("wmCheck")?.checked)       items.push("Washing Machine");
+  if (document.getElementById("tvCheck")?.checked)       items.push("TV");
+  if (document.getElementById("acCheck")?.checked)       items.push("AC");
+  if (document.getElementById("wardrobeCheck")?.checked) items.push("Wardrobe");
+  if (document.getElementById("diningCheck")?.checked)   items.push("Dining Table");
   return items.join(", ") || "";
 }
 
