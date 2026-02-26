@@ -367,7 +367,9 @@ function showShell(name) {
 // Auth state handled by auth guard above
 
 /* LOAD ALL */
-function loadAll() { loadBookings(); loadDrivers(); loadCustomers(); loadReviews(); loadPromos(); loadBroadcastHistory(); }
+function loadAll() {
+  waitFB(() => { loadBookings(); loadDrivers(); loadCustomers(); loadReviews(); loadPromos(); loadBroadcastHistory(); });
+}
 
 function loadBookings() {
   window._firebase.db.collection("bookings").orderBy("createdAt","desc").onSnapshot(snap => {
