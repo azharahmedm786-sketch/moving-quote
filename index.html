@@ -264,39 +264,74 @@
         <div class="step-header">
           <div class="step-header-top">
             <div class="step-counter">
-              <span id="stepCurrent">1</span><span class="step-of">/4</span>
+              <span id="stepCurrent">1</span><span class="step-of">/5</span>
             </div>
-            <div class="step-header-label" id="stepLabel">Where are you moving?</div>
+            <div class="step-header-label" id="stepLabel">What type of move?</div>
           </div>
           <!-- Progress Bar -->
           <div class="step-progress-track">
-            <div class="step-progress-fill" id="progressBar" style="width:25%"></div>
+            <div class="step-progress-fill" id="progressBar" style="width:20%"></div>
           </div>
           <!-- Step Dots -->
           <div class="step-indicators">
             <div class="step-dot active" id="dot0">
-              <span class="dot-num">1</span>
-              <span class="dot-icon">📍</span>
-              <div class="dot-label">Location</div>
+              <span class="dot-icon">🏠</span>
+              <div class="dot-label">Type</div>
             </div>
             <div class="step-line" id="line0"></div>
             <div class="step-dot" id="dot1">
-              <span class="dot-num">2</span>
-              <span class="dot-icon">🗓️</span>
-              <div class="dot-label">Details</div>
+              <span class="dot-icon">📍</span>
+              <div class="dot-label">Location</div>
             </div>
             <div class="step-line" id="line1"></div>
             <div class="step-dot" id="dot2">
-              <span class="dot-num">3</span>
-              <span class="dot-icon">🛋️</span>
-              <div class="dot-label">Items</div>
+              <span class="dot-icon">🗓️</span>
+              <div class="dot-label">Details</div>
             </div>
             <div class="step-line" id="line2"></div>
             <div class="step-dot" id="dot3">
-              <span class="dot-num">4</span>
+              <span class="dot-icon">🛋️</span>
+              <div class="dot-label">Items</div>
+            </div>
+            <div class="step-line" id="line3"></div>
+            <div class="step-dot" id="dot4">
               <span class="dot-icon">✅</span>
               <div class="dot-label">Book</div>
             </div>
+          </div>
+        </div>
+
+        <!-- STEP 0: MOVE TYPE -->
+        <div class="form-step active">
+          <div class="step-body">
+            <p class="step-hint">Tell us about your move so we can give the most accurate quote.</p>
+            <div class="move-type-grid">
+
+              <div class="move-type-card" onclick="selectMoveType(this,'home')">
+                <div class="mt-icon">🏠</div>
+                <div class="mt-label">Home Move</div>
+                <div class="mt-sub">Apartment · Villa · PG</div>
+              </div>
+
+              <div class="move-type-card" onclick="selectMoveType(this,'office')">
+                <div class="mt-icon">🏢</div>
+                <div class="mt-label">Office / Commercial</div>
+                <div class="mt-sub">Office · Shop · Warehouse</div>
+              </div>
+
+              <div class="move-type-card" onclick="selectMoveType(this,'single')">
+                <div class="mt-icon">📦</div>
+                <div class="mt-label">Single Item</div>
+                <div class="mt-sub">Sofa · Fridge · Bike</div>
+              </div>
+
+            </div>
+            <input type="hidden" id="moveType" value="">
+          </div>
+          <div class="step-footer">
+            <button class="btn-next" onclick="nextStep()">
+              Continue <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </button>
           </div>
         </div>
 
@@ -346,78 +381,94 @@
               </div>
             </div>
 
-            <div class="field-group">
-              <label class="field-label"><span class="field-icon">🏠</span> House Type</label>
+            <div class="field-group" id="sizeFieldGroup">
+              <label class="field-label" id="sizeSelectorLabel"><span class="field-icon">🏠</span> <span id="sizeLabelText">House Type</span></label>
               <div class="select-cards" id="houseCards">
-                <div class="select-card" onclick="selectCard(this,'house','0')">
-                  <div class="sc-icon">🏠</div>
-                  <div class="sc-label">1 RK</div>
-                  <div class="sc-sub">Studio</div>
-                  <input type="radio" name="house" value="0" id="house" class="sc-radio" style="display:none">
-                </div>
-                <div class="select-card" onclick="selectCard(this,'house','1200')">
-                  <div class="sc-icon">🏡</div>
-                  <div class="sc-label">1 BHK</div>
-                  <div class="sc-sub">Small</div>
-                  <input type="radio" name="house" value="1200" class="sc-radio" style="display:none">
-                </div>
-                <div class="select-card" onclick="selectCard(this,'house','2500')">
-                  <div class="sc-icon">🏘️</div>
-                  <div class="sc-label">2 BHK</div>
-                  <div class="sc-sub">Medium</div>
-                  <input type="radio" name="house" value="2500" class="sc-radio" style="display:none">
-                </div>
-                <div class="select-card" onclick="selectCard(this,'house','4000')">
-                  <div class="sc-icon">🏰</div>
-                  <div class="sc-label">3 BHK</div>
-                  <div class="sc-sub">Large</div>
-                  <input type="radio" name="house" value="4000" class="sc-radio" style="display:none">
-                </div>
+                <!-- Populated dynamically by JS based on move type -->
               </div>
-              <!-- Hidden select for compatibility -->
               <select id="house" class="field-input" style="display:none">
-                <option value="">Select house size</option>
-                <option value="0">1 RK</option>
-                <option value="1200">1 BHK</option>
-                <option value="2500">2 BHK</option>
-                <option value="4000">3 BHK</option>
+                <option value="">Select size</option>
               </select>
+            </div>
+
+            <!-- FLOOR INFO -->
+            <div class="field-row-2">
+              <div class="field-group">
+                <label class="field-label"><span class="field-icon">🏗️</span> Pickup Floor</label>
+                <select id="pickupFloor" class="field-input">
+                  <option value="0">Ground / 1st</option>
+                  <option value="500">2nd – 4th</option>
+                  <option value="1000">5th – 8th</option>
+                  <option value="1750">9th and above</option>
+                </select>
+              </div>
+              <div class="field-group">
+                <label class="field-label"><span class="field-icon">🏗️</span> Drop Floor</label>
+                <select id="dropFloor" class="field-input">
+                  <option value="0">Ground / 1st</option>
+                  <option value="500">2nd – 4th</option>
+                  <option value="1000">5th – 8th</option>
+                  <option value="1750">9th and above</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- LIFT AVAILABLE -->
+            <div class="field-group">
+              <label class="toggle-row" style="margin:0">
+                <span class="toggle-text">🛗 Lift available at both locations</span>
+                <label class="toggle">
+                  <input type="checkbox" id="liftAvailable">
+                  <span class="slider"></span>
+                </label>
+              </label>
+            </div>
+
+            <!-- PACKING SERVICE -->
+            <div class="field-group">
+              <label class="toggle-row" style="margin:0">
+                <span class="toggle-text">📦 Add professional packing service <span style="color:#16a34a;font-weight:700">+₹3,800</span></span>
+                <label class="toggle">
+                  <input type="checkbox" id="packingService" onchange="calculateQuote(true)">
+                  <span class="slider"></span>
+                </label>
+              </label>
             </div>
 
             <div class="field-group">
               <label class="field-label"><span class="field-icon">🚚</span> Vehicle Type</label>
               <div class="vehicle-cards" id="vehicleCards">
-                <div class="vehicle-card" onclick="selectCard(this,'vehicle','25')">
+                <div class="vehicle-card" onclick="selectCard(this,'vehicle','34')">
                   <div class="vc-icon">🛻</div>
                   <div class="vc-info">
                     <div class="vc-name">Tata Ace</div>
                     <div class="vc-sub">Small load · 1 RK</div>
                   </div>
-                  <div class="vc-rate">₹25/km</div>
+                  <div class="vc-rate">₹34/km</div>
                 </div>
-                <div class="vehicle-card" onclick="selectCard(this,'vehicle','40')">
+                <div class="vehicle-card" onclick="selectCard(this,'vehicle','54')">
                   <div class="vc-icon">🚚</div>
                   <div class="vc-info">
                     <div class="vc-name">14 ft Truck</div>
                     <div class="vc-sub">Medium · 1–2 BHK</div>
                   </div>
-                  <div class="vc-rate">₹40/km</div>
+                  <div class="vc-rate">₹54/km</div>
                 </div>
-                <div class="vehicle-card" onclick="selectCard(this,'vehicle','50')">
+                <div class="vehicle-card" onclick="selectCard(this,'vehicle','69')">
                   <div class="vc-icon">🚛</div>
                   <div class="vc-info">
                     <div class="vc-name">17 ft Truck</div>
                     <div class="vc-sub">Large · 2–3 BHK</div>
                   </div>
-                  <div class="vc-rate">₹50/km</div>
+                  <div class="vc-rate">₹69/km</div>
                 </div>
-                <div class="vehicle-card" onclick="selectCard(this,'vehicle','60')">
+                <div class="vehicle-card" onclick="selectCard(this,'vehicle','88')">
                   <div class="vc-icon">🚜</div>
                   <div class="vc-info">
                     <div class="vc-name">22 ft Truck</div>
                     <div class="vc-sub">XL · 3+ BHK</div>
                   </div>
-                  <div class="vc-rate">₹60/km</div>
+                  <div class="vc-rate">₹88/km</div>
                 </div>
               </div>
               <!-- Hidden select for compatibility -->
@@ -453,7 +504,7 @@
                   <div class="fc-check">✓</div>
                   <span class="fc-emoji">🛋️</span>
                   <span class="fc-name">Sofa</span>
-                  <span class="fc-price">+₹500</span>
+                  <span class="fc-price">+₹2,000</span>
                   <div class="fc-qty-row" onclick="event.stopPropagation()">
                     <button class="qty-btn" onclick="changeQty('sofaQty',-1)">−</button>
                     <input type="number" id="sofaQty" value="1" min="1" max="9" class="fc-qty">
@@ -468,7 +519,7 @@
                   <div class="fc-check">✓</div>
                   <span class="fc-emoji">🛏️</span>
                   <span class="fc-name">Bed</span>
-                  <span class="fc-price">+₹700</span>
+                  <span class="fc-price">+₹1,600</span>
                   <div class="fc-qty-row" onclick="event.stopPropagation()">
                     <button class="qty-btn" onclick="changeQty('bedQty',-1)">−</button>
                     <input type="number" id="bedQty" value="1" min="1" max="9" class="fc-qty">
@@ -483,7 +534,7 @@
                   <div class="fc-check">✓</div>
                   <span class="fc-emoji">🧊</span>
                   <span class="fc-name">Fridge</span>
-                  <span class="fc-price">+₹400</span>
+                  <span class="fc-price">+₹1,450</span>
                 </div>
               </label>
 
@@ -493,7 +544,7 @@
                   <div class="fc-check">✓</div>
                   <span class="fc-emoji">🫧</span>
                   <span class="fc-name">Washing Machine</span>
-                  <span class="fc-price">+₹400</span>
+                  <span class="fc-price">+₹1,200</span>
                 </div>
               </label>
 
@@ -503,7 +554,7 @@
                   <div class="fc-check">✓</div>
                   <span class="fc-emoji">📺</span>
                   <span class="fc-name">TV</span>
-                  <span class="fc-price">+₹300</span>
+                  <span class="fc-price">+₹800</span>
                 </div>
               </label>
 
@@ -513,7 +564,7 @@
                   <div class="fc-check">✓</div>
                   <span class="fc-emoji">❄️</span>
                   <span class="fc-name">AC Unit</span>
-                  <span class="fc-price">+₹500</span>
+                  <span class="fc-price">+₹1,700</span>
                 </div>
               </label>
 
@@ -523,7 +574,7 @@
                   <div class="fc-check">✓</div>
                   <span class="fc-emoji">🚪</span>
                   <span class="fc-name">Wardrobe</span>
-                  <span class="fc-price">+₹600</span>
+                  <span class="fc-price">+₹1,750</span>
                 </div>
               </label>
 
@@ -533,7 +584,7 @@
                   <div class="fc-check">✓</div>
                   <span class="fc-emoji">🪑</span>
                   <span class="fc-name">Dining Table</span>
-                  <span class="fc-price">+₹400</span>
+                  <span class="fc-price">+₹1,200</span>
                 </div>
               </label>
 
