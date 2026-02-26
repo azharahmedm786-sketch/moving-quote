@@ -199,7 +199,8 @@
       <div class="driver-avatar" id="drvAvatar">D</div>
       <div class="app-header-info">
         <h2 id="drvName">Driver</h2>
-        <p id="drvEmail2"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="ee8a9c87988b9cae9e8f8d85948b80c08d8183">[email&#160;protected]</a></p>
+        <p id="drvEmail2"></p>
+        <span id="drvRatingBadge" style="display:none;font-size:.78rem;background:rgba(245,158,11,0.15);color:#d97706;padding:.2rem .6rem;border-radius:20px;font-weight:700;margin-top:.3rem"></span>
       </div>
     </div>
     <div class="header-actions">
@@ -456,11 +457,21 @@ function driverSignOut() {
 function showApp(data) {
   document.getElementById("driverLogin").style.display = "none";
   document.getElementById("driverApp").classList.add("active");
-  document.getElementById("bottomNav").classList.add("active"); // show bottom nav
+  document.getElementById("bottomNav").classList.add("active");
   document.getElementById("drvName").textContent = data.name || "Driver";
   document.getElementById("drvEmail2").textContent = driverUser.email || "";
   document.getElementById("drvAvatar").textContent = (data.name || "D").charAt(0).toUpperCase();
-  // Restore online state
+  // Show rating badge if exists
+  const ratingBadge = document.getElementById("drvRatingBadge");
+  if (ratingBadge) {
+    if (data.avgRating) {
+      ratingBadge.textContent = "⭐ " + data.avgRating.toFixed(1) + " (" + (data.totalRatings||0) + " ratings)";
+      ratingBadge.style.display = "inline-block";
+    } else {
+      ratingBadge.textContent = "⭐ No ratings yet";
+      ratingBadge.style.display = "inline-block";
+    }
+  }
   if (data.isOnline) {
     document.getElementById("onlineToggle").checked = true;
     setOnlineUI(true);
