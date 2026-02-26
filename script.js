@@ -710,10 +710,24 @@ function calculateQuote(auto = false) {
     const dropFloor    = Number(document.getElementById("dropFloor")?.value    || 0);
     const liftAvail    = document.getElementById("liftAvailable")?.checked;
     const packingCost  = document.getElementById("packingService")?.checked ? 3800 : 0;
-    // Floor cost halved if lift available
     const floorCost    = liftAvail ? Math.round((pickupFloor + dropFloor) * 0.4) : (pickupFloor + dropFloor);
-    const total = Math.round(MIN_BASE_PRICE + houseBase + (km * vehicleRate) + furnitureCost + floorCost + packingCost);
-    if (result) result.innerHTML = `Distance: ~${km.toFixed(1)} km &nbsp;|&nbsp; Furniture: ₹${furnitureCost}<br><strong>Total Estimate: ₹${total.toLocaleString()}</strong>`;
+
+    detectAndShowIntercityBadge(km);
+
+    let total;
+    let breakdownHtml;
+    if (km > 80) {
+      // INTERCITY: flat rate by distance band + furniture + packing
+      const baseRate  = getIntercityBase(house?.value || "3950", km);
+      total = Math.round(baseRate + furnitureCost + floorCost + packingCost);
+      const distLabel = km <= 400 ? "up to 400 km" : km <= 600 ? "up to 600 km" : km <= 1000 ? "up to 1000 km" : "1000+ km";
+      breakdownHtml = `🚛 Intercity · ~${Math.round(km)} km (${distLabel})<br>Base: ₹${baseRate.toLocaleString()}${furnitureCost ? ` · Items: ₹${furnitureCost.toLocaleString()}` : ""}${packingCost ? ` · Packing: ₹${packingCost.toLocaleString()}` : ""}<br><strong>Total Estimate: ₹${total.toLocaleString()}</strong>`;
+    } else {
+      // LOCAL: per km rate
+      total = Math.round(MIN_BASE_PRICE + houseBase + (km * vehicleRate) + furnitureCost + floorCost + packingCost);
+      breakdownHtml = `📍 Local · ~${km.toFixed(1)} km${furnitureCost ? ` · Items: ₹${furnitureCost.toLocaleString()}` : ""}<br><strong>Total Estimate: ₹${total.toLocaleString()}</strong>`;
+    }
+    if (result) result.innerHTML = breakdownHtml;
     lastCalculatedTotal = total;
     updatePriceDisplay();
     if (currentUser) saveQuoteToFirestore(total);
@@ -858,6 +872,10 @@ function startPayment() {
     openAuthModal("login");
     return;
   }
+  if (!document.getElementById("tncAccepted")?.checked) {
+    showToast("⚠️ Please accept the Terms & Conditions to proceed.");
+    return;
+  }
   const name  = document.getElementById("custName")?.value?.trim();
   const phone = document.getElementById("custPhone")?.value?.trim();
   if (!name)  return alert("Please enter your name.");
@@ -942,10 +960,15 @@ function onPaymentSuccess(response, name, phone, paid, total) {
       promoDiscount, date: shiftDate?.value||"",
       status: "confirmed",
       source: "payment",
+      isIntercity: isIntercityMove,
       paymentId: response.razorpay_payment_id,
       photos: uploadedPhotos.slice(0,3),
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
-    }).then(docRef => { currentBookingId = docRef.id; })
+    }).then(docRef => {
+      currentBookingId = docRef.id;
+      requestPushPermission();
+      subscribeToBookingNotifications(docRef.id);
+    })
     .catch(e => console.error("Booking save:", e));
   }
 }
@@ -1551,7 +1574,7 @@ function showStep(n) {
   steps[n].classList.add("active");
   const pb = document.getElementById("progressBar");
   if (pb) pb.style.width = ((n + 1) / 5) * 100 + "%";
-  window.scrollTo({ top: document.getElementById("quote")?.offsetTop - 80 || 0, behavior: "smooth" });
+  // Keep page position — don't scroll on step change
   if (n === steps.length - 1) {
     calculateQuote(true);
     autoFillCustomerDetails();
@@ -2003,19 +2026,36 @@ function loadUserBookings() {
       const list = document.getElementById("bookingsList");
       if (!list) return;
       if (snap.empty) { list.innerHTML = '<div class="dash-empty">No bookings yet.</div>'; return; }
-      const statusColors = { confirmed:"#0057ff", assigned:"#7c3aed", packing:"#0ea5e9", transit:"#f97316", delivered:"#00c96e", pending:"#d97706" };
+      const statusColors = { confirmed:"#0057ff", assigned:"#7c3aed", packing:"#0ea5e9", transit:"#f97316", delivered:"#00c96e", pending:"#d97706", cancelled:"#dc2626" };
+      const statusIcons  = { confirmed:"📋", assigned:"🚛", packing:"📦", transit:"🚚", delivered:"✅", cancelled:"❌" };
       list.innerHTML = snap.docs.map(d => {
-        const b = d.data();
+        const b   = d.data();
+        const id  = d.id;
         const color = statusColors[b.status] || "#5a6a8a";
-        const src = b.source === "whatsapp" ? "💬 " : b.paymentType === "pay_later" ? "📋 " : "💳 ";
-        return `<div class="quote-item">
-          <div class="qi-route">${src}${(b.pickup||"?").split(",")[0]} → ${(b.drop||"?").split(",")[0]}</div>
-          <div class="qi-details">
-            <span class="qi-price">₹${(b.total||0).toLocaleString()}</span>
-            <span class="qi-status" style="color:${color}">● ${capitalize(b.status||"confirmed")}</span>
-            ${b.bookingRef ? `<span style="font-size:.75rem;color:#5a6a8a">${b.bookingRef}</span>` : ""}
+        const icon  = statusIcons[b.status]  || "📋";
+        const src   = b.source === "whatsapp" ? "💬 " : b.paymentType === "pay_later" ? "📋 " : "💳 ";
+        const canCancel    = !["packing","transit","delivered","cancelled"].includes(b.status);
+        const canReschedule= !["transit","delivered","cancelled"].includes(b.status);
+        const canRate      = b.status === "delivered" && !b.driverRating;
+        const intercityBadge = b.isIntercity ? `<span class="bk-badge ic">🚛 Intercity</span>` : "";
+        const ratingBadge    = b.driverRating ? `<span class="bk-badge rated">⭐ ${b.driverRating}/5</span>` : "";
+        return `<div class="bk-card">
+          <div class="bk-card-top">
+            <div class="bk-route">${src}${(b.pickup||"?").split(",")[0]} → ${(b.drop||"?").split(",")[0]}</div>
+            <div class="bk-status" style="color:${color}">${icon} ${capitalize(b.status||"confirmed")}</div>
           </div>
-          <div class="qi-date">${b.date||""}</div>
+          <div class="bk-meta">
+            <span>₹${(b.total||0).toLocaleString()}</span>
+            <span>${b.date||"Date TBD"}</span>
+            <span style="font-size:.72rem;color:#5a6a8a">${b.bookingRef||""}</span>
+            ${intercityBadge}${ratingBadge}
+          </div>
+          ${canCancel || canReschedule || canRate ? `
+          <div class="bk-actions">
+            ${canReschedule ? `<button class="bk-btn reschedule" onclick="openRescheduleModal('${id}','${b.bookingRef||id}','${b.date||""}')">📅 Reschedule</button>` : ""}
+            ${canCancel    ? `<button class="bk-btn cancel"    onclick="openCancelModal('${id}','${b.bookingRef||id}','${b.status||""}')">✕ Cancel</button>` : ""}
+            ${canRate      ? `<button class="bk-btn rate"      onclick="openRateDriverModal('${id}','${b.bookingRef||id}','${b.driverName||""}')">⭐ Rate Driver</button>` : ""}
+          </div>` : ""}
         </div>`;
       }).join("");
     }).catch(e => console.error("Bookings load:", e));
@@ -2070,3 +2110,262 @@ function openProfile() {
     switchDashTab("profile", profileTab);
   }, 300);
 }
+/* ============================================================
+   INTERCITY DETECTION & PRICING
+   ============================================================ */
+let isIntercityMove = false;
+
+// Intercity pricing table: base price by house size (value) and distance band
+const INTERCITY_PRICING = {
+  "1750":  { "400": 9000,  "600": 10800, "1000": 17100, "2000": 24000  }, // 1RK
+  "3950":  { "400": 9000,  "600": 10800, "1000": 17100, "2000": 24000  }, // 1BHK
+  "5750":  { "400": 11000, "600": 13200, "1000": 20900, "2000": 28000  }, // 2BHK
+  "7450":  { "400": 13000, "600": 15600, "1000": 24700, "2000": 33000  }, // 3BHK
+  "8350":  { "400": 15500, "600": 18600, "1000": 29450, "2000": 38000  }, // 4BHK
+  "10800": { "400": 18000, "600": 21600, "1000": 34000, "2000": 45000  }, // Villa
+  // Office
+  "5400":  { "400": 10000, "600": 12000, "1000": 19000, "2000": 26000  },
+  "8800":  { "400": 15000, "600": 18000, "1000": 28000, "2000": 38000  },
+  "13700": { "400": 22000, "600": 26000, "1000": 40000, "2000": 55000  },
+  "21550": { "400": 35000, "600": 42000, "1000": 65000, "2000": 90000  },
+};
+
+function getIntercityBase(houseVal, km) {
+  const tiers = INTERCITY_PRICING[String(houseVal)];
+  if (!tiers) return 15000;
+  if (km <= 400)  return tiers["400"];
+  if (km <= 600)  return tiers["600"];
+  if (km <= 1000) return tiers["1000"];
+  return tiers["2000"];
+}
+
+function detectAndShowIntercityBadge(km) {
+  const badge = document.getElementById("intercityBadge");
+  isIntercityMove = km > 80;
+  if (badge) {
+    badge.style.display = isIntercityMove ? "flex" : "none";
+    if (isIntercityMove) {
+      badge.querySelector(".ic-km").textContent = Math.round(km) + " km";
+    }
+  }
+  // Show/hide vehicle selector (not relevant for intercity — truck is assigned by us)
+  const vehicleGroup = document.getElementById("vehicleCardGroup");
+  if (vehicleGroup) vehicleGroup.style.display = isIntercityMove ? "none" : "block";
+}
+
+/* ============================================================
+   BOOKING CANCELLATION
+   ============================================================ */
+function openCancelModal(bookingDocId, bookingRef, status) {
+  if (["packing","transit","delivered"].includes(status)) {
+    showToast("❌ Cannot cancel after packing has started.");
+    return;
+  }
+  document.getElementById("cancelBookingDocId").value = bookingDocId;
+  document.getElementById("cancelBookingRef").textContent = bookingRef || bookingDocId;
+  document.getElementById("cancelReason").value = "";
+  document.getElementById("cancelModal").style.display = "flex";
+}
+
+function closeCancelModal() {
+  document.getElementById("cancelModal").style.display = "none";
+}
+
+async function confirmCancellation() {
+  const docId  = document.getElementById("cancelBookingDocId").value;
+  const reason = document.getElementById("cancelReason").value.trim();
+  if (!reason) { showToast("Please tell us why you're cancelling."); return; }
+  if (!currentUser || !window._firebase) return;
+
+  const btn = document.getElementById("btnConfirmCancel");
+  btn.textContent = "Cancelling..."; btn.disabled = true;
+
+  try {
+    await window._firebase.db.collection("bookings").doc(docId).update({
+      status: "cancelled",
+      cancelReason: reason,
+      cancelledAt: firebase.firestore.FieldValue.serverTimestamp(),
+      cancelledBy: "customer"
+    });
+    closeCancelModal();
+    showToast("✅ Booking cancelled. Refund (if any) in 5–7 business days.");
+    loadUserBookings();
+    // Notify admin via Firestore flag
+    window._firebase.db.collection("cancelRequests").add({
+      bookingDocId: docId, reason, customerUid: currentUser.uid,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    }).catch(()=>{});
+  } catch(e) {
+    showToast("Error: " + e.message);
+  } finally {
+    btn.textContent = "Yes, Cancel Booking"; btn.disabled = false;
+  }
+}
+
+/* ============================================================
+   BOOKING RESCHEDULE
+   ============================================================ */
+function openRescheduleModal(bookingDocId, bookingRef, currentDate) {
+  document.getElementById("rescheduleDocId").value = bookingDocId;
+  document.getElementById("rescheduleBookingRef").textContent = bookingRef || bookingDocId;
+  const dateInput = document.getElementById("rescheduleDate");
+  const timeInput = document.getElementById("rescheduleTime");
+  if (dateInput) dateInput.value = currentDate || "";
+  if (timeInput) timeInput.value = "";
+  document.getElementById("rescheduleModal").style.display = "flex";
+}
+
+function closeRescheduleModal() {
+  document.getElementById("rescheduleModal").style.display = "none";
+}
+
+async function confirmReschedule() {
+  const docId   = document.getElementById("rescheduleDocId").value;
+  const newDate = document.getElementById("rescheduleDate").value;
+  const newTime = document.getElementById("rescheduleTime").value;
+  if (!newDate) { showToast("Please select a new date."); return; }
+  if (!currentUser || !window._firebase) return;
+
+  const btn = document.getElementById("btnConfirmReschedule");
+  btn.textContent = "Saving..."; btn.disabled = true;
+
+  try {
+    await window._firebase.db.collection("bookings").doc(docId).update({
+      date: newDate,
+      time: newTime || "",
+      rescheduledAt: firebase.firestore.FieldValue.serverTimestamp(),
+      rescheduledBy: "customer"
+    });
+    closeRescheduleModal();
+    showToast("✅ Booking rescheduled successfully!");
+    loadUserBookings();
+  } catch(e) {
+    showToast("Error: " + e.message);
+  } finally {
+    btn.textContent = "Confirm Reschedule"; btn.disabled = false;
+  }
+}
+
+/* ============================================================
+   DRIVER RATING
+   ============================================================ */
+let ratingBookingDocId = "";
+let selectedDriverRating = 0;
+
+function openRateDriverModal(bookingDocId, bookingRef, driverName) {
+  ratingBookingDocId = bookingDocId;
+  selectedDriverRating = 0;
+  document.getElementById("rateBookingRef").textContent   = bookingRef || bookingDocId;
+  document.getElementById("rateDriverName").textContent  = driverName || "your driver";
+  document.getElementById("ratingFeedback").value = "";
+  document.getElementById("ratingMsg").textContent = "";
+  // Reset stars
+  document.querySelectorAll(".rate-star").forEach(s => s.classList.remove("active"));
+  document.getElementById("rateDriverModal").style.display = "flex";
+}
+
+function closeRateDriverModal() {
+  document.getElementById("rateDriverModal").style.display = "none";
+}
+
+function selectDriverRating(n) {
+  selectedDriverRating = n;
+  document.querySelectorAll(".rate-star").forEach((s, i) => {
+    s.classList.toggle("active", i < n);
+  });
+}
+
+async function submitDriverRating() {
+  if (!selectedDriverRating) { showToast("Please select a star rating."); return; }
+  if (!currentUser || !window._firebase) return;
+
+  const feedback = document.getElementById("ratingFeedback").value.trim();
+  const btn = document.getElementById("btnSubmitRating");
+  btn.textContent = "Submitting..."; btn.disabled = true;
+
+  try {
+    // Save rating on booking doc
+    await window._firebase.db.collection("bookings").doc(ratingBookingDocId).update({
+      driverRating: selectedDriverRating,
+      driverFeedback: feedback,
+      ratedAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    // Also push to driverRatings collection for aggregation
+    const bookingDoc = await window._firebase.db.collection("bookings").doc(ratingBookingDocId).get();
+    const driverUid = bookingDoc.data()?.driverUid;
+    if (driverUid) {
+      await window._firebase.db.collection("driverRatings").add({
+        driverUid, bookingDocId: ratingBookingDocId,
+        rating: selectedDriverRating, feedback,
+        customerUid: currentUser.uid,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      // Update driver's avg rating
+      const ratingsSnap = await window._firebase.db.collection("driverRatings")
+        .where("driverUid","==",driverUid).get();
+      const ratings = ratingsSnap.docs.map(d => d.data().rating);
+      const avg = ratings.reduce((a,b) => a+b, 0) / ratings.length;
+      await window._firebase.db.collection("drivers").doc(driverUid).update({
+        avgRating: Math.round(avg * 10) / 10,
+        totalRatings: ratings.length
+      }).catch(()=>{});
+    }
+    closeRateDriverModal();
+    showToast("⭐ Thanks for rating your driver!");
+    loadUserBookings();
+  } catch(e) {
+    showToast("Error: " + e.message);
+  } finally {
+    btn.textContent = "Submit Rating"; btn.disabled = false;
+  }
+}
+
+/* ============================================================
+   PUSH NOTIFICATIONS (FCM)
+   ============================================================ */
+async function requestPushPermission() {
+  if (!("Notification" in window)) return;
+  if (!window._firebase?.messaging) return;
+  try {
+    const permission = await Notification.requestPermission();
+    if (permission !== "granted") return;
+    const token = await window._firebase.messaging.getToken({
+      vapidKey: window.ENV?.FCM_VAPID_KEY || ""
+    });
+    if (token && currentUser) {
+      await window._firebase.db.collection("users").doc(currentUser.uid).update({
+        fcmToken: token, fcmUpdatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      console.log("✅ FCM token saved");
+    }
+  } catch(e) { console.warn("FCM token error:", e); }
+}
+
+function showLocalNotification(title, body) {
+  if (Notification.permission === "granted") {
+    new Notification(title, { body, icon: "/favicon.ico" });
+  }
+}
+
+// Subscribe to booking status changes for live push
+function subscribeToBookingNotifications(bookingDocId) {
+  if (!bookingDocId || !window._firebase) return;
+  const statusMessages = {
+    assigned: { title: "🚛 Driver Assigned!", body: "Your driver is on the way to you." },
+    packing:  { title: "📦 Packing Started", body: "Our team is packing your items." },
+    transit:  { title: "🚚 On The Move!", body: "Your goods are in transit." },
+    delivered:{ title: "🎉 Delivered!", body: "Your move is complete. Please rate your driver." },
+    cancelled:{ title: "❌ Booking Cancelled", body: "Your booking has been cancelled." },
+  };
+  let lastStatus = "";
+  window._firebase.db.collection("bookings").doc(bookingDocId).onSnapshot(doc => {
+    if (!doc.exists) return;
+    const status = doc.data().status;
+    if (status && status !== lastStatus && statusMessages[status]) {
+      const { title, body } = statusMessages[status];
+      showLocalNotification(title, body);
+      lastStatus = status;
+    }
+  });
+}
+
