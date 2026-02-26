@@ -105,6 +105,12 @@ document.addEventListener("DOMContentLoaded", () => {
     window._firebase.auth.onAuthStateChanged(user => {
       currentUser = user;
       updateNavForUser(user);
+      if (user) {
+        // Auto-fill booking form with user's saved name & phone
+        window._firebase.db.collection("users").doc(user.uid).get().then(doc => {
+          if (doc.exists) prefillBookingForm(doc.data());
+        });
+      }
     });
   });
 
@@ -375,6 +381,14 @@ function showToast(msg, dur = 3000) {
 /* ============================================
    DASHBOARD
    ============================================ */
+// Pre-fill booking form with logged-in user's name & phone
+function prefillBookingForm(userData) {
+  const nameEl  = document.getElementById("custName");
+  const phoneEl = document.getElementById("custPhone");
+  if (nameEl  && !nameEl.value.trim()  && userData?.name)  nameEl.value  = userData.name;
+  if (phoneEl && !phoneEl.value.trim() && userData?.phone) phoneEl.value = userData.phone.replace("+91","").trim();
+}
+
 async function openDashboard() {
   document.getElementById("userDropdown").classList.remove("open");
 
@@ -730,6 +744,12 @@ function saveLead() {
 }
 
 async function bookOnWhatsApp() {
+  // Require login before booking
+  if (!currentUser) {
+    showToast("👋 Please login or create an account to book.");
+    openAuthModal("login");
+    return;
+  }
   const name  = document.getElementById("custName")?.value?.trim();
   const phone = document.getElementById("custPhone")?.value?.trim();
   if (!name)                       return alert("Please enter your name.");
@@ -752,9 +772,10 @@ async function bookOnWhatsApp() {
       showToast("⏳ Saving booking...");
       const docRef = await window._firebase.db.collection("bookings").add({
         bookingRef,
-        customerUid:  currentUser?.uid || null,
+        customerUid:  currentUser.uid,
         customerName: name, phone, pickup, drop, date,
         house: houseText, vehicle: vehicleText,
+        furniture:    getFurnitureSummary(), // ✅ furniture items
         total:        lastCalculatedTotal,
         paid:         0,
         status:       "confirmed",
@@ -807,6 +828,12 @@ async function bookOnWhatsApp() {
    RAZORPAY PAYMENT
    ============================================ */
 function startPayment() {
+  // Require login before booking
+  if (!currentUser) {
+    showToast("👋 Please login or create an account to book.");
+    openAuthModal("login");
+    return;
+  }
   const name  = document.getElementById("custName")?.value?.trim();
   const phone = document.getElementById("custPhone")?.value?.trim();
   if (!name)  return alert("Please enter your name.");
@@ -876,11 +903,12 @@ function onPaymentSuccess(response, name, phone, paid, total) {
   if (window._firebase) {
     window._firebase.db.collection("bookings").add({
       bookingRef,                              // ✅ fixed: was missing
-      customerUid:  currentUser?.uid || null,
+      customerUid:  currentUser.uid,
       customerName: name, phone,
       pickup: pickup?.value||"", drop: drop?.value||"",
-      house:   houseEl?.options[houseEl?.selectedIndex]?.text    || "",  // ✅ fixed: was missing
-      vehicle: vehicleEl?.options[vehicleEl?.selectedIndex]?.text || "", // ✅ fixed: was missing
+      house:     houseEl?.options[houseEl?.selectedIndex]?.text    || "",
+      vehicle:   vehicleEl?.options[vehicleEl?.selectedIndex]?.text || "",
+      furniture: getFurnitureSummary(), // ✅ furniture items
       total, paid, paymentType: selectedPayment,
       promoDiscount, date: shiftDate?.value||"",
       status: "confirmed",
@@ -1107,6 +1135,26 @@ function updateTrackBanner(b) {
 function dismissTrackBanner() {
   const banner = document.getElementById("trackOrderBanner");
   if (banner) banner.style.display = "none";
+}
+
+// Guest-safe wrappers for track banner buttons
+function openTrackingOrLogin() {
+  if (!currentUser) {
+    // Guest just booked — prompt them to log in to access full tracking
+    showToast("💡 Create an account to track your booking anytime!");
+    openAuthModal("login");
+    return;
+  }
+  openTrackingModal();
+}
+
+function openChatOrLogin() {
+  if (!currentUser) {
+    showToast("💡 Create an account to chat with your driver!");
+    openAuthModal("login");
+    return;
+  }
+  openChatModal();
 }
 
 /* ============================================
@@ -1469,6 +1517,23 @@ function prevStep() {
    HELPERS
    ============================================ */
 function capitalize(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : ""; }
+
+// Helper: collect selected furniture as a summary string and cost
+function getFurnitureSummary() {
+  const items = [];
+  if (document.getElementById("sofaCheck")?.checked) {
+    const qty = document.getElementById("sofaQty")?.value || 1;
+    items.push(`Sofa x${qty}`);
+  }
+  if (document.getElementById("bedCheck")?.checked) {
+    const qty = document.getElementById("bedQty")?.value || 1;
+    items.push(`Bed x${qty}`);
+  }
+  if (document.getElementById("fridgeCheck")?.checked) items.push("Fridge");
+  if (document.getElementById("wmCheck")?.checked)     items.push("Washing Machine");
+  return items.join(", ") || "";
+}
+
 /* ============================================
    ADMIN PANEL (Secure Driver Creation)
    ============================================ */
@@ -1497,39 +1562,35 @@ async function createDriver() {
   }
 
   try {
-    const { auth, db } = window._firebase;
+    const { db } = window._firebase;
 
-    // Create driver account
-    const cred = await auth.createUserWithEmailAndPassword(email, password);
-    const driverUser = cred.user;
+    // ✅ Fixed: Use a secondary Firebase app to create driver WITHOUT logging out admin
+    const secondaryApp = firebase.initializeApp(firebase.app().options, "driverCreation_" + Date.now());
+    const secondaryAuth = secondaryApp.auth();
 
-    // Create Firestore document
-    await db.collection("users").doc(driverUser.uid).set({
-      name: name,
-      email: email,
+    const cred = await secondaryAuth.createUserWithEmailAndPassword(email, password);
+    const driverUid = cred.user.uid;
+
+    // Sign out from secondary app immediately — admin stays logged in
+    await secondaryAuth.signOut();
+    await secondaryApp.delete();
+
+    // Save driver to Firestore
+    await db.collection("users").doc(driverUid).set({
+      name,
+      email,
       role: "driver",
       isOnline: false,
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
     });
 
-    // Call secure Cloud Function to assign driver claim
-    const functions = firebase.app().functions("us-central1");
-    const assignDriverRole = functions.httpsCallable("assignDriverRole");
-
-    await assignDriverRole({ uid: driverUser.uid });
-
     msg.style.color = "#00a357";
-    msg.innerText = "✅ Driver created successfully.";
+    msg.innerText = "✅ Driver created successfully! They can now log in at driver.html";
 
     // Clear fields
     document.getElementById("newDriverName").value = "";
     document.getElementById("newDriverEmail").value = "";
     document.getElementById("newDriverPassword").value = "";
-
-    // IMPORTANT: Re-login admin
-    await auth.signOut();
-    alert("Driver created successfully.\nPlease login again as admin.");
-    window.location.reload();
 
   } catch (error) {
     console.error("Driver creation error:", error);
@@ -1543,6 +1604,12 @@ async function createDriver() {
    BOOK WITHOUT PAYMENT
    ============================================ */
 function bookWithoutPayment() {
+  // Require login before booking
+  if (!currentUser) {
+    showToast("👋 Please login or create an account to book.");
+    openAuthModal("login");
+    return;
+  }
   // Validate name & phone — highlight fields if empty
   const nameEl  = document.getElementById("custName");
   const phoneEl = document.getElementById("custPhone");
@@ -1579,14 +1646,20 @@ function bookWithoutPayment() {
   const btn = document.querySelector(".btn-free-book");
   if (btn) { btn.disabled = true; btn.textContent = "⏳ Saving..."; }
 
+  const houseEl2   = document.getElementById("house");
+  const vehicleEl2 = document.getElementById("vehicle");
+
   window._firebase.db.collection("bookings").add({
     bookingRef,
-    customerUid:  currentUser?.uid || null,
+    customerUid:  currentUser.uid,
     customerName: name,
     phone,
     pickup,
     drop,
     date,
+    house:        houseEl2?.options[houseEl2?.selectedIndex]?.text    || "",
+    vehicle:      vehicleEl2?.options[vehicleEl2?.selectedIndex]?.text || "",
+    furniture:    getFurnitureSummary(), // ✅ furniture items
     total:        lastCalculatedTotal,
     paid:         0,
     paymentType:  "pay_later",
