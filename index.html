@@ -359,6 +359,15 @@
             </div>
             <div id="map"></div>
             <div id="distanceInfo" class="distance-badge"></div>
+
+            <!-- INTERCITY BADGE — shown when distance > 80km -->
+            <div id="intercityBadge" class="intercity-badge" style="display:none">
+              <div class="ic-icon">🚛</div>
+              <div class="ic-info">
+                <div class="ic-title">Intercity Move Detected — <span class="ic-km"></span></div>
+                <div class="ic-sub">Fixed rate pricing applied · No per-km charge · Includes loading & unloading</div>
+              </div>
+            </div>
           </div>
           <div class="step-footer">
             <button class="btn-next" onclick="nextStep()">
@@ -435,7 +444,7 @@
               </label>
             </div>
 
-            <div class="field-group">
+            <div class="field-group" id="vehicleCardGroup">
               <label class="field-label"><span class="field-icon">🚚</span> Vehicle Type</label>
               <div class="vehicle-cards" id="vehicleCards">
                 <div class="vehicle-card" onclick="selectCard(this,'vehicle','34')">
@@ -682,6 +691,12 @@
                 </div>
               </div>
             </div>
+
+            <!-- T&C CHECKBOX -->
+            <label class="tnc-row">
+              <input type="checkbox" id="tncAccepted">
+              <span>I agree to the <a href="legal.html" target="_blank">Terms & Conditions</a> and <a href="legal.html" target="_blank">Privacy Policy</a></span>
+            </label>
 
             <!-- BOOK BUTTONS -->
             <div class="book-actions">
@@ -984,6 +999,104 @@
       <input id="newDriverPassword" type="password" class="field-input" placeholder="Strong password">
       <div id="adminMsg" class="auth-error" style="margin-top:10px;"></div>
       <button class="btn-auth" style="margin-top:14px;" onclick="createDriver()">Create Driver →</button>
+    </div>
+  </div>
+</div>
+
+<!-- CANCEL BOOKING MODAL -->
+<div id="cancelModal" class="modal-overlay" style="display:none;">
+  <div class="modal-box action-modal">
+    <div class="am-header cancel-header">
+      <div class="am-icon">✕</div>
+      <div>
+        <div class="am-title">Cancel Booking</div>
+        <div class="am-ref" id="cancelBookingRef"></div>
+      </div>
+      <button class="modal-close" onclick="closeCancelModal()">✕</button>
+    </div>
+    <div class="am-body">
+      <p class="am-warning">⚠️ Cancellations after driver assignment may incur a <strong>₹300 fee</strong>. Refunds processed in 5–7 business days.</p>
+      <input type="hidden" id="cancelBookingDocId">
+      <label class="field-label">Reason for cancellation <span style="color:#dc2626">*</span></label>
+      <select id="cancelReason" class="field-input">
+        <option value="">Select a reason</option>
+        <option value="Change of plans">Change of plans</option>
+        <option value="Found another service">Found another service</option>
+        <option value="Wrong date entered">Wrong date entered</option>
+        <option value="Price too high">Price too high</option>
+        <option value="Emergency / personal reason">Emergency / personal reason</option>
+        <option value="Other">Other</option>
+      </select>
+    </div>
+    <div class="am-footer">
+      <button class="am-btn-secondary" onclick="closeCancelModal()">Keep Booking</button>
+      <button class="am-btn-danger" id="btnConfirmCancel" onclick="confirmCancellation()">Yes, Cancel Booking</button>
+    </div>
+  </div>
+</div>
+
+<!-- RESCHEDULE MODAL -->
+<div id="rescheduleModal" class="modal-overlay" style="display:none;">
+  <div class="modal-box action-modal">
+    <div class="am-header reschedule-header">
+      <div class="am-icon">📅</div>
+      <div>
+        <div class="am-title">Reschedule Booking</div>
+        <div class="am-ref" id="rescheduleBookingRef"></div>
+      </div>
+      <button class="modal-close" onclick="closeRescheduleModal()">✕</button>
+    </div>
+    <div class="am-body">
+      <input type="hidden" id="rescheduleDocId">
+      <div class="field-row-2">
+        <div class="field-group">
+          <label class="field-label">New Date <span style="color:#dc2626">*</span></label>
+          <input type="date" id="rescheduleDate" class="field-input">
+        </div>
+        <div class="field-group">
+          <label class="field-label">Preferred Time</label>
+          <input type="time" id="rescheduleTime" class="field-input">
+        </div>
+      </div>
+      <p class="am-note">Note: Rescheduling is subject to driver availability. We'll confirm within 2 hours.</p>
+    </div>
+    <div class="am-footer">
+      <button class="am-btn-secondary" onclick="closeRescheduleModal()">Cancel</button>
+      <button class="am-btn-primary" id="btnConfirmReschedule" onclick="confirmReschedule()">Confirm Reschedule</button>
+    </div>
+  </div>
+</div>
+
+<!-- RATE DRIVER MODAL -->
+<div id="rateDriverModal" class="modal-overlay" style="display:none;">
+  <div class="modal-box action-modal">
+    <div class="am-header rate-header">
+      <div class="am-icon">⭐</div>
+      <div>
+        <div class="am-title">Rate Your Driver</div>
+        <div class="am-ref" id="rateBookingRef"></div>
+      </div>
+      <button class="modal-close" onclick="closeRateDriverModal()">✕</button>
+    </div>
+    <div class="am-body">
+      <p class="am-driver-name">How was <strong id="rateDriverName">your driver</strong>?</p>
+      <div class="star-row">
+        <span class="rate-star" onclick="selectDriverRating(1)">★</span>
+        <span class="rate-star" onclick="selectDriverRating(2)">★</span>
+        <span class="rate-star" onclick="selectDriverRating(3)">★</span>
+        <span class="rate-star" onclick="selectDriverRating(4)">★</span>
+        <span class="rate-star" onclick="selectDriverRating(5)">★</span>
+      </div>
+      <div class="star-labels">
+        <span>Poor</span><span>Excellent</span>
+      </div>
+      <label class="field-label" style="margin-top:.8rem">Comments (optional)</label>
+      <textarea id="ratingFeedback" class="field-input" rows="3" placeholder="What did you like or dislike?"></textarea>
+      <div id="ratingMsg" style="font-size:.8rem;margin-top:.4rem;color:#16a34a"></div>
+    </div>
+    <div class="am-footer">
+      <button class="am-btn-secondary" onclick="closeRateDriverModal()">Skip</button>
+      <button class="am-btn-primary" id="btnSubmitRating" onclick="submitDriverRating()">Submit Rating</button>
     </div>
   </div>
 </div>
