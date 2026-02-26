@@ -128,6 +128,7 @@
     <div class="sb-role">Manage</div>
     <div class="nav-item" onclick="showSection('customers',this)"><span class="ni">👥</span> Customers</div>
     <div class="nav-item" onclick="showSection('reviews',this)"><span class="ni">⭐</span> Reviews</div>
+    <div class="nav-item" onclick="showSection('cancels',this)"><span class="ni">✕</span> Cancellations</div>
     <div class="nav-item" onclick="showSection('promos',this)"><span class="ni">🏷️</span> Promo Codes</div>
     <div class="nav-item" onclick="showSection('broadcast',this)"><span class="ni">📢</span> Broadcast</div>
     <div class="sidebar-bottom">
@@ -222,6 +223,19 @@
         <div class="table-hdr"><div class="table-title">Active Promo Codes</div></div>
         <table><thead><tr><th>Code</th><th>Type</th><th>Value</th><th>Used</th><th>Max</th><th>Status</th><th>Action</th></tr></thead>
         <tbody id="promosTable"><tr class="empty-row"><td colspan="7">No promos yet.</td></tr></tbody></table>
+      </div>
+    </div>
+
+
+    <!-- CANCELLATIONS -->
+    <div class="section" id="sectionCancels">
+      <div class="table-card">
+        <div class="table-hdr">
+          <div class="table-title">✕ Cancellation Requests</div>
+          <button class="btn-export" onclick="loadCancelRequests()">🔄 Refresh</button>
+        </div>
+        <table><thead><tr><th>Booking Ref</th><th>Customer</th><th>Reason</th><th>Requested</th><th>Status</th><th>Action</th></tr></thead>
+        <tbody id="cancelsTable"><tr class="empty-row"><td colspan="6">Loading...</td></tr></tbody></table>
       </div>
     </div>
 
@@ -690,9 +704,39 @@ function showSection(name, el) {
   document.querySelectorAll(".nav-item").forEach(n => n.classList.remove("active"));
   document.getElementById("section" + cap(name)).classList.add("active");
   if (el) el.classList.add("active");
-  const titles = { overview:"Overview", bookings:"Bookings", drivers:"Drivers", customers:"Customers", reviews:"Reviews", promos:"Promo Codes", broadcast:"Broadcast" };
+  const titles = { overview:"Overview", bookings:"Bookings", drivers:"Drivers", customers:"Customers", reviews:"Reviews", cancels:"Cancellations", promos:"Promo Codes", broadcast:"Broadcast" };
   document.getElementById("sectionTitle").textContent = titles[name] || cap(name);
   if (name === "overview") renderCharts();
+  if (name === "cancels")  loadCancelRequests();
+}
+
+async function loadCancelRequests() {
+  const tbody = document.getElementById("cancelsTable");
+  if (!tbody || !window._firebase) return;
+  tbody.innerHTML = "<tr><td colspan='6' style='text-align:center;padding:1rem'>Loading...</td></tr>";
+  try {
+    const snap = await window._firebase.db.collection("cancelRequests")
+      .orderBy("createdAt","desc").limit(50).get();
+    if (snap.empty) { tbody.innerHTML = "<tr class='empty-row'><td colspan='6'>No cancellation requests yet.</td></tr>"; return; }
+    tbody.innerHTML = snap.docs.map(d => {
+      const c = d.data();
+      const date = c.createdAt?.toDate?.().toLocaleDateString("en-IN") || "—";
+      return `<tr>
+        <td>${c.bookingDocId||"—"}</td>
+        <td>${c.customerUid?.slice(0,8)||"—"}</td>
+        <td>${c.reason||"—"}</td>
+        <td>${date}</td>
+        <td><span style="color:${c.resolved?'#16a34a':'#dc2626'}">${c.resolved?"✅ Resolved":"⏳ Pending"}</span></td>
+        <td><button onclick="resolveCancelRequest('${d.id}')" style="padding:.3rem .7rem;background:#2563eb;color:white;border:none;border-radius:8px;cursor:pointer;font-size:.75rem">Mark Resolved</button></td>
+      </tr>`;
+    }).join("");
+  } catch(e) { tbody.innerHTML = `<tr><td colspan='6' style='color:red'>Error: ${e.message}</td></tr>`; }
+}
+
+async function resolveCancelRequest(docId) {
+  if (!window._firebase) return;
+  await window._firebase.db.collection("cancelRequests").doc(docId).update({ resolved: true });
+  loadCancelRequests();
 }
 
 function cap(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : ""; }
