@@ -27,8 +27,8 @@ let uploadedPhotos      = []; // base64 strings
 let pendingWhatsAppMsg  = null; // WA message sent when customer clicks the button
 let pendingAdminMsg     = null; // Admin WA message sent when customer clicks the button
 
-const MIN_BASE_PRICE = 1100;
-const FRIDGE_PRICE   = 400;
+const MIN_BASE_PRICE = 1450;
+const FRIDGE_PRICE   = 1450;
 const RAZORPAY_KEY   = "YOUR_RAZORPAY_KEY_ID";
 
 /* ============================================
@@ -117,6 +117,8 @@ document.addEventListener("DOMContentLoaded", () => {
   // Load reviews on page load
   loadReviewsPublic();
   buildChecklist();
+  // Init default size cards (home)
+  setTimeout(() => renderSizeCards("home"), 100);
 });
 
 /* ============================================
@@ -687,17 +689,30 @@ function calculateQuote(auto = false) {
   if (!houseBase || !vehicleRate)            { if (!auto) alert("Select house & vehicle"); return; }
 
   let furnitureCost = 0;
-  if (document.getElementById("sofaCheck")?.checked)    furnitureCost += 500 * Number(document.getElementById("sofaQty")?.value || 1);
-  if (document.getElementById("bedCheck")?.checked)     furnitureCost += 700 * Number(document.getElementById("bedQty")?.value  || 1);
+  if (document.getElementById("sofaCheck")?.checked)    furnitureCost += 2000 * Number(document.getElementById("sofaQty")?.value || 1);
+  if (document.getElementById("bedCheck")?.checked)     furnitureCost += 1600 * Number(document.getElementById("bedQty")?.value  || 1);
   if (document.getElementById("fridgeCheck")?.checked)  furnitureCost += FRIDGE_PRICE;
-  if (document.getElementById("wmCheck")?.checked)      furnitureCost += 400;
-  if (document.getElementById("tvCheck")?.checked)      furnitureCost += 300;
-  if (document.getElementById("acCheck")?.checked)      furnitureCost += 500;
-  if (document.getElementById("wardrobeCheck")?.checked) furnitureCost += 600;
-  if (document.getElementById("diningCheck")?.checked)  furnitureCost += 400;
+  if (document.getElementById("wmCheck")?.checked)      furnitureCost += 1200;
+  if (document.getElementById("tvCheck")?.checked)      furnitureCost += 800;
+  if (document.getElementById("acCheck")?.checked)      furnitureCost += 1700;
+  if (document.getElementById("wardrobeCheck")?.checked) furnitureCost += 1750;
+  if (document.getElementById("diningCheck")?.checked)  furnitureCost += 1200;
+  // Office items
+  if (document.getElementById("deskCheck")?.checked)    furnitureCost += 900  * Number(document.getElementById("deskQty")?.value  || 1);
+  if (document.getElementById("chairCheck")?.checked)   furnitureCost += 350  * Number(document.getElementById("chairQty")?.value || 1);
+  if (document.getElementById("cabinetCheck")?.checked) furnitureCost += 750;
+  if (document.getElementById("serverCheck")?.checked)  furnitureCost += 1250;
+  if (document.getElementById("printerCheck")?.checked) furnitureCost += 600;
+  if (document.getElementById("confCheck")?.checked)    furnitureCost += 1750;
 
   function applyPrice(km) {
-    const total = Math.round(MIN_BASE_PRICE + houseBase + (km * vehicleRate) + furnitureCost);
+    const pickupFloor  = Number(document.getElementById("pickupFloor")?.value  || 0);
+    const dropFloor    = Number(document.getElementById("dropFloor")?.value    || 0);
+    const liftAvail    = document.getElementById("liftAvailable")?.checked;
+    const packingCost  = document.getElementById("packingService")?.checked ? 3800 : 0;
+    // Floor cost halved if lift available
+    const floorCost    = liftAvail ? Math.round((pickupFloor + dropFloor) * 0.4) : (pickupFloor + dropFloor);
+    const total = Math.round(MIN_BASE_PRICE + houseBase + (km * vehicleRate) + furnitureCost + floorCost + packingCost);
     if (result) result.innerHTML = `Distance: ~${km.toFixed(1)} km &nbsp;|&nbsp; Furniture: ₹${furnitureCost}<br><strong>Total Estimate: ₹${total.toLocaleString()}</strong>`;
     lastCalculatedTotal = total;
     updatePriceDisplay();
@@ -778,8 +793,13 @@ async function bookOnWhatsApp() {
         bookingRef,
         customerUid:  currentUser.uid,
         customerName: name, phone, pickup, drop, date,
+        moveType:     selectedMoveType,
         house: houseText, vehicle: vehicleText,
-        furniture:    getFurnitureSummary(), // ✅ furniture items
+        furniture:    getFurnitureSummary(),
+        pickupFloor:  document.getElementById("pickupFloor")?.options[document.getElementById("pickupFloor")?.selectedIndex]?.text || "",
+        dropFloor:    document.getElementById("dropFloor")?.options[document.getElementById("dropFloor")?.selectedIndex]?.text || "",
+        liftAvailable:!!document.getElementById("liftAvailable")?.checked,
+        packingService:!!document.getElementById("packingService")?.checked,
         total:        lastCalculatedTotal,
         paid:         0,
         status:       "confirmed",
@@ -910,9 +930,14 @@ function onPaymentSuccess(response, name, phone, paid, total) {
       customerUid:  currentUser.uid,
       customerName: name, phone,
       pickup: pickup?.value||"", drop: drop?.value||"",
-      house:     houseEl?.options[houseEl?.selectedIndex]?.text    || "",
-      vehicle:   vehicleEl?.options[vehicleEl?.selectedIndex]?.text || "",
-      furniture: getFurnitureSummary(), // ✅ furniture items
+      moveType:     selectedMoveType,
+      house:        houseEl?.options[houseEl?.selectedIndex]?.text    || "",
+      vehicle:      vehicleEl?.options[vehicleEl?.selectedIndex]?.text || "",
+      furniture:    getFurnitureSummary(),
+      pickupFloor:  document.getElementById("pickupFloor")?.options[document.getElementById("pickupFloor")?.selectedIndex]?.text || "",
+      dropFloor:    document.getElementById("dropFloor")?.options[document.getElementById("dropFloor")?.selectedIndex]?.text || "",
+      liftAvailable:!!document.getElementById("liftAvailable")?.checked,
+      packingService:!!document.getElementById("packingService")?.checked,
       total, paid, paymentType: selectedPayment,
       promoDiscount, date: shiftDate?.value||"",
       status: "confirmed",
@@ -1461,7 +1486,44 @@ async function loadReviewsPublic() {
 let currentStep = 0;
 const steps     = document.querySelectorAll(".form-step");
 
-const STEP_LABELS = ["Where are you moving?","When & what type of move?","What are you moving?","Almost done — confirm & book"];
+const STEP_LABELS = ["What type of move?","Where are you moving?","When & what type of move?","What are you moving?","Almost done — confirm & book"];
+let selectedMoveType = "home"; // default
+
+// Move type configs: size options per move type
+const MOVE_TYPE_CONFIG = {
+  home: {
+    sizeLabel: "House Type",
+    icon: "🏠",
+    sizes: [
+      { icon:"🏠", label:"1 RK",  sub:"Studio",  value:"1750" },
+      { icon:"🏡", label:"1 BHK", sub:"Small",   value:"3950" },
+      { icon:"🏘️", label:"2 BHK", sub:"Medium",  value:"5750" },
+      { icon:"🏰", label:"3 BHK", sub:"Large",   value:"7450" },
+      { icon:"🏯", label:"4 BHK", sub:"X-Large", value:"8350" },
+      { icon:"🌇", label:"Villa", sub:"Premium", value:"10800"},
+    ]
+  },
+  office: {
+    sizeLabel: "Office Size",
+    icon: "🏢",
+    sizes: [
+      { icon:"💼", label:"Cabin",    sub:"1–5 desks",   value:"5400" },
+      { icon:"🏢", label:"Small",    sub:"5–15 desks",  value:"8800" },
+      { icon:"🏬", label:"Medium",   sub:"15–30 desks", value:"13700" },
+      { icon:"🏭", label:"Large",    sub:"30+ desks",   value:"21550"},
+    ]
+  },
+  single: {
+    sizeLabel: "Item Type",
+    icon: "📦",
+    sizes: [
+      { icon:"🛋️", label:"Furniture", sub:"Sofa, bed…",   value:"0"   },
+      { icon:"🧊", label:"Appliance", sub:"Fridge, AC…",  value:"0"   },
+      { icon:"🏍️", label:"Bike/Cycle",sub:"Two-wheeler",  value:"500" },
+      { icon:"📦", label:"Boxes",     sub:"Cartons",      value:"0"   },
+    ]
+  }
+};
 
 function updateStepDots(n) {
   document.querySelectorAll(".step-dot").forEach((dot, i) => {
@@ -1475,14 +1537,20 @@ function updateStepDots(n) {
   const label   = document.getElementById("stepLabel");
   if (counter) counter.textContent = n + 1;
   if (label)   label.textContent   = STEP_LABELS[n] || "";
+  // Update dots — now 5 dots (dot0–dot4)
+  document.querySelectorAll(".step-dot").forEach((dot, i) => {
+    dot.classList.remove("active","done");
+    if (i < n)  dot.classList.add("done");
+    if (i === n) dot.classList.add("active");
+  });
+  document.querySelectorAll(".step-line").forEach((line, i) => line.classList.toggle("done", i < n));
 }
 
 function showStep(n) {
   steps.forEach(s => s.classList.remove("active"));
   steps[n].classList.add("active");
   const pb = document.getElementById("progressBar");
-  if (pb) pb.style.width = ((n + 1) / steps.length) * 100 + "%";
-  updateStepDots(n);
+  if (pb) pb.style.width = ((n + 1) / 5) * 100 + "%";
   window.scrollTo({ top: document.getElementById("quote")?.offsetTop - 80 || 0, behavior: "smooth" });
   if (n === steps.length - 1) {
     calculateQuote(true);
@@ -1515,15 +1583,23 @@ function nextStep() {
   const vehicle = document.getElementById("vehicle");
 
   if (currentStep === 0) {
-    let ok = true;
-    if (!pickup?.value.trim()) { shakeField(pickup); showToast("📍 Please enter a pickup location"); ok = false; }
-    else if (!drop?.value.trim())   { shakeField(drop);   showToast("🏁 Please enter a drop location"); ok = false; }
-    if (!ok) return;
+    // Validate move type selected
+    if (!document.getElementById("moveType")?.value) {
+      showToast("👆 Please select your move type to continue");
+      return;
+    }
   }
 
   if (currentStep === 1) {
     let ok = true;
-    if (!house?.value)   { showToast("🏠 Please select your house type"); ok = false; }
+    if (!pickup?.value.trim()) { shakeField(pickup); showToast("📍 Please enter a pickup location"); ok = false; }
+    else if (!drop?.value.trim()) { shakeField(drop); showToast("🏁 Please enter a drop location"); ok = false; }
+    if (!ok) return;
+  }
+
+  if (currentStep === 2) {
+    let ok = true;
+    if (!house?.value)   { showToast("🏠 Please select your " + (selectedMoveType === "office" ? "office size" : "house type")); ok = false; }
     else if (!vehicle?.value) { showToast("🚚 Please select a vehicle type"); ok = false; }
     if (!ok) return;
   }
@@ -1542,19 +1618,97 @@ function shakeField(el) {
   setTimeout(() => el.classList.remove("error"), 600);
 }
 
+// Select move type (step 0)
+function selectMoveType(el, type) {
+  selectedMoveType = type;
+  document.getElementById("moveType").value = type;
+  document.querySelectorAll(".move-type-card").forEach(c => c.classList.remove("selected"));
+  el.classList.add("selected");
+  // Pre-render size cards for step 2
+  renderSizeCards(type);
+}
+
+// Render house/office/item size cards dynamically
+function renderSizeCards(type) {
+  const config  = MOVE_TYPE_CONFIG[type] || MOVE_TYPE_CONFIG.home;
+  const label   = document.getElementById("sizeLabelText");
+  const cards   = document.getElementById("houseCards");
+  const select  = document.getElementById("house");
+  if (label) label.textContent = config.sizeLabel;
+  if (!cards) return;
+
+  cards.innerHTML = config.sizes.map(s => `
+    <div class="select-card" onclick="selectCard(this,'house','${s.value}')">
+      <div class="sc-icon">${s.icon}</div>
+      <div class="sc-label">${s.label}</div>
+      <div class="sc-sub">${s.sub}</div>
+    </div>`).join("");
+
+  // Update hidden select options too
+  if (select) {
+    select.innerHTML = '<option value="">Select size</option>' +
+      config.sizes.map(s => `<option value="${s.value}">${s.label}</option>`).join("");
+  }
+
+  // Also update furniture grid for office vs home
+  renderFurnitureGrid(type);
+}
+
+// Render furniture grid based on move type
+function renderFurnitureGrid(type) {
+  const grid = document.querySelector(".furniture-grid");
+  if (!grid) return;
+
+  const homeFurniture = [
+    { id:"sofaCheck",     emoji:"🛋️", name:"Sofa",           price:2000,  hasQty:true,  qtyId:"sofaQty"  },
+    { id:"bedCheck",      emoji:"🛏️", name:"Bed",            price:1600,  hasQty:true,  qtyId:"bedQty"   },
+    { id:"fridgeCheck",   emoji:"🧊", name:"Fridge",         price:1450,  hasQty:false },
+    { id:"wmCheck",       emoji:"🫧", name:"Washing Machine",price:1200,  hasQty:false },
+    { id:"tvCheck",       emoji:"📺", name:"TV",             price:800,  hasQty:false },
+    { id:"acCheck",       emoji:"❄️", name:"AC Unit",        price:1700,  hasQty:false },
+    { id:"wardrobeCheck", emoji:"🚪", name:"Wardrobe",       price:1750,  hasQty:false },
+    { id:"diningCheck",   emoji:"🪑", name:"Dining Table",   price:1200,  hasQty:false },
+  ];
+
+  const officeFurniture = [
+    { id:"deskCheck",     emoji:"🖥️", name:"Office Desk",    price:900,  hasQty:true,  qtyId:"deskQty"  },
+    { id:"chairCheck",    emoji:"🪑", name:"Chair",          price:350,  hasQty:true,  qtyId:"chairQty" },
+    { id:"cabinetCheck",  emoji:"🗄️", name:"Filing Cabinet", price:750,  hasQty:false },
+    { id:"serverCheck",   emoji:"💾", name:"Server/PC",      price:1250,  hasQty:false },
+    { id:"printerCheck",  emoji:"🖨️", name:"Printer",        price:600,  hasQty:false },
+    { id:"confCheck",     emoji:"📋", name:"Conf. Table",    price:1750,  hasQty:false },
+    { id:"fridgeCheck",   emoji:"🧊", name:"Fridge",         price:1450,  hasQty:false },
+    { id:"acCheck",       emoji:"❄️", name:"AC Unit",        price:1700,  hasQty:false },
+  ];
+
+  const items = type === "office" ? officeFurniture : homeFurniture;
+
+  grid.innerHTML = items.map(item => `
+    <label class="furniture-card">
+      <input type="checkbox" id="${item.id}">
+      <div class="fc-body">
+        <div class="fc-check">✓</div>
+        <span class="fc-emoji">${item.emoji}</span>
+        <span class="fc-name">${item.name}</span>
+        <span class="fc-price">+₹${item.price}</span>
+        ${item.hasQty ? `
+        <div class="fc-qty-row" onclick="event.stopPropagation()">
+          <button class="qty-btn" onclick="changeQty('${item.qtyId}',-1)">−</button>
+          <input type="number" id="${item.qtyId}" value="1" min="1" max="9" class="fc-qty">
+          <button class="qty-btn" onclick="changeQty('${item.qtyId}',1)">+</button>
+        </div>` : ""}
+      </div>
+    </label>`).join("");
+}
+
 // Select card UI (house + vehicle visual selectors)
 function selectCard(el, type, value) {
-  // Update hidden select
   const select = document.getElementById(type);
   if (select) select.value = value;
-
-  // Update visual selection
   const parent = el.closest(type === "house" ? ".select-cards" : ".vehicle-cards");
   if (parent) parent.querySelectorAll(type === "house" ? ".select-card" : ".vehicle-card")
     .forEach(c => c.classList.remove("selected"));
   el.classList.add("selected");
-
-  // Recalculate price if on last step
   if (currentStep === steps.length - 1) calculateQuote(true);
 }
 
@@ -1574,16 +1728,27 @@ function capitalize(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : "";
 
 // Helper: collect selected furniture as a summary string and cost
 function getFurnitureSummary() {
-  const items = [];
-  if (document.getElementById("sofaCheck")?.checked)     items.push(`Sofa x${document.getElementById("sofaQty")?.value||1}`);
-  if (document.getElementById("bedCheck")?.checked)      items.push(`Bed x${document.getElementById("bedQty")?.value||1}`);
-  if (document.getElementById("fridgeCheck")?.checked)   items.push("Fridge");
-  if (document.getElementById("wmCheck")?.checked)       items.push("Washing Machine");
-  if (document.getElementById("tvCheck")?.checked)       items.push("TV");
-  if (document.getElementById("acCheck")?.checked)       items.push("AC");
-  if (document.getElementById("wardrobeCheck")?.checked) items.push("Wardrobe");
-  if (document.getElementById("diningCheck")?.checked)   items.push("Dining Table");
-  return items.join(", ") || "";
+  const checks = [
+    ["sofaCheck",    "sofaQty",  "Sofa"],
+    ["bedCheck",     "bedQty",   "Bed"],
+    ["deskCheck",    "deskQty",  "Desk"],
+    ["chairCheck",   "chairQty", "Chair"],
+    ["fridgeCheck",  null,       "Fridge"],
+    ["wmCheck",      null,       "Washing Machine"],
+    ["tvCheck",      null,       "TV"],
+    ["acCheck",      null,       "AC"],
+    ["wardrobeCheck",null,       "Wardrobe"],
+    ["diningCheck",  null,       "Dining Table"],
+    ["cabinetCheck", null,       "Filing Cabinet"],
+    ["serverCheck",  null,       "Server/PC"],
+    ["printerCheck", null,       "Printer"],
+    ["confCheck",    null,       "Conf. Table"],
+  ];
+  return checks
+    .filter(([id]) => document.getElementById(id)?.checked)
+    .map(([id, qtyId, name]) => qtyId && document.getElementById(qtyId)
+      ? `${name} x${document.getElementById(qtyId).value||1}` : name)
+    .join(", ") || "";
 }
 
 /* ============================================
@@ -1709,9 +1874,14 @@ function bookWithoutPayment() {
     pickup,
     drop,
     date,
+    moveType:     selectedMoveType,
     house:        houseEl2?.options[houseEl2?.selectedIndex]?.text    || "",
     vehicle:      vehicleEl2?.options[vehicleEl2?.selectedIndex]?.text || "",
-    furniture:    getFurnitureSummary(), // ✅ furniture items
+    furniture:    getFurnitureSummary(),
+    pickupFloor:  document.getElementById("pickupFloor")?.options[document.getElementById("pickupFloor")?.selectedIndex]?.text || "",
+    dropFloor:    document.getElementById("dropFloor")?.options[document.getElementById("dropFloor")?.selectedIndex]?.text || "",
+    liftAvailable:!!document.getElementById("liftAvailable")?.checked,
+    packingService:!!document.getElementById("packingService")?.checked,
     total:        lastCalculatedTotal,
     paid:         0,
     paymentType:  "pay_later",
