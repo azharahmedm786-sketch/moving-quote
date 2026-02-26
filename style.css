@@ -3536,3 +3536,65 @@ body.dark-mode .am-warning {
 .bk-btn.rate       { background: rgba(245,158,11,0.12); color: #d97706; }
 .bk-btn:hover      { transform: translateY(-1px); opacity: 0.85; }
 
+/* ============================================================
+   PACKZEN FORM STABILITY PATCH — DO NOT REMOVE
+   Fix: Step Jumping, Height Resize, Button Stretch
+   ============================================================ */
+
+/* Prevent layout jumping between steps */
+.form-card {
+  display: flex;
+  flex-direction: column;
+  min-height: 520px;
+}
+
+/* Keep body consistent height */
+.step-body {
+  flex: 1;
+  min-height: 300px;
+}
+
+/* Prevent footer moving up/down */
+.step-footer {
+  margin-top: auto;
+}
+
+/* Prevent button stretching unevenly */
+.btn-next,
+.btn-back {
+  min-height: 48px;
+}
+
+/* Keep price box stable */
+.price-box {
+  min-height: 120px;
+}
+
+/* Prevent layout shift in payment options */
+.payment-opts {
+  align-items: stretch;
+}
+
+/* Stabilize move type cards */
+.move-type-card {
+  min-height: 140px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* Prevent furniture jump when qty shows */
+.furniture-card {
+  min-height: 120px;
+}
+
+/* Fix mobile form overflow */
+@media (max-width: 768px) {
+  .form-card {
+    min-height: auto;
+  }
+
+  .step-body {
+    min-height: auto;
+  }
+}
