@@ -3326,3 +3326,213 @@ body.dark-mode .move-type-card.selected {
   .mt-icon { font-size: 1.7rem; }
   .mt-label { font-size: 0.72rem; }
 }
+
+/* ============================================================
+   INTERCITY BADGE
+   ============================================================ */
+.intercity-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  background: linear-gradient(135deg, #1e40af, #1d4ed8);
+  border-radius: 14px;
+  padding: 0.9rem 1.1rem;
+  margin-top: 0.8rem;
+  color: white;
+  animation: stepFadeIn 0.4s ease;
+}
+.ic-icon { font-size: 1.6rem; flex-shrink: 0; }
+.ic-title { font-size: 0.85rem; font-weight: 700; }
+.ic-sub   { font-size: 0.72rem; opacity: 0.8; margin-top: 0.15rem; }
+.ic-km    { color: #93c5fd; }
+
+/* ============================================================
+   T&C CHECKBOX ROW
+   ============================================================ */
+.tnc-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  padding: 0.8rem;
+  background: var(--bg-secondary);
+  border-radius: 12px;
+  border: 1px solid var(--border-light);
+  cursor: pointer;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+  margin-bottom: 0.8rem;
+}
+.tnc-row input[type="checkbox"] {
+  width: 16px; height: 16px;
+  flex-shrink: 0; margin-top: 1px; cursor: pointer;
+  accent-color: #2563eb;
+}
+.tnc-row a { color: #2563eb; font-weight: 600; text-decoration: none; }
+.tnc-row a:hover { text-decoration: underline; }
+
+/* ============================================================
+   ACTION MODALS — Cancel / Reschedule / Rate
+   ============================================================ */
+.action-modal {
+  max-width: 460px;
+  width: 92%;
+  border-radius: 24px;
+  overflow: hidden;
+  background: var(--bg-primary);
+}
+
+.am-header {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  padding: 1.3rem 1.5rem;
+  color: white;
+}
+.cancel-header    { background: linear-gradient(135deg, #dc2626, #b91c1c); }
+.reschedule-header{ background: linear-gradient(135deg, #1d4ed8, #2563eb); }
+.rate-header      { background: linear-gradient(135deg, #d97706, #f59e0b); }
+
+.am-icon {
+  width: 40px; height: 40px;
+  background: rgba(255,255,255,0.2);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.1rem; font-weight: 800; flex-shrink: 0;
+}
+.am-title { font-size: 1rem; font-weight: 700; }
+.am-ref   { font-size: 0.75rem; opacity: 0.8; margin-top: 0.1rem; }
+.am-header .modal-close {
+  margin-left: auto; background: rgba(255,255,255,0.2);
+  border: none; color: white; width: 28px; height: 28px;
+  border-radius: 50%; cursor: pointer; font-size: 0.8rem;
+}
+
+.am-body    { padding: 1.3rem 1.5rem; }
+.am-footer  {
+  display: flex; gap: 0.6rem;
+  padding: 0.8rem 1.5rem 1.3rem;
+}
+
+.am-warning {
+  font-size: 0.82rem;
+  color: #92400e;
+  background: #fef3c7;
+  border-radius: 10px;
+  padding: 0.7rem 0.9rem;
+  margin-bottom: 1rem;
+  border: 1px solid #fcd34d;
+}
+body.dark-mode .am-warning {
+  background: rgba(251,191,36,0.1);
+  color: #fcd34d;
+  border-color: rgba(251,191,36,0.3);
+}
+.am-note {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-top: 0.8rem;
+  font-style: italic;
+}
+
+.am-btn-primary {
+  flex: 2; padding: 0.85rem;
+  background: linear-gradient(135deg, #1d4ed8, #2563eb);
+  color: white; border: none; border-radius: 50px;
+  font-weight: 700; font-size: 0.9rem; cursor: pointer;
+  transition: all 0.2s;
+}
+.am-btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(37,99,235,0.3); }
+.am-btn-primary:disabled { opacity: 0.6; transform: none; }
+
+.am-btn-secondary {
+  flex: 1; padding: 0.85rem;
+  background: var(--bg-secondary);
+  color: var(--text-muted);
+  border: 1.5px solid var(--border-light);
+  border-radius: 50px;
+  font-weight: 600; font-size: 0.9rem; cursor: pointer;
+  transition: all 0.2s;
+}
+.am-btn-secondary:hover { background: var(--border-light); }
+
+.am-btn-danger {
+  flex: 2; padding: 0.85rem;
+  background: linear-gradient(135deg, #dc2626, #b91c1c);
+  color: white; border: none; border-radius: 50px;
+  font-weight: 700; font-size: 0.9rem; cursor: pointer;
+  transition: all 0.2s;
+}
+.am-btn-danger:hover  { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(220,38,38,0.3); }
+.am-btn-danger:disabled { opacity: 0.6; transform: none; }
+
+/* ============================================================
+   STAR RATING
+   ============================================================ */
+.am-driver-name { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 0.8rem; }
+.star-row {
+  display: flex; gap: 0.5rem;
+  justify-content: center;
+  margin: 0.5rem 0 0.2rem;
+}
+.rate-star {
+  font-size: 2.4rem;
+  color: var(--border-light);
+  cursor: pointer;
+  transition: all 0.15s;
+  line-height: 1;
+}
+.rate-star:hover,
+.rate-star.active { color: #f59e0b; transform: scale(1.15); }
+.star-labels {
+  display: flex; justify-content: space-between;
+  font-size: 0.7rem; color: var(--text-muted);
+  margin-bottom: 0.5rem; padding: 0 0.2rem;
+}
+
+/* ============================================================
+   BOOKING CARDS IN DASHBOARD
+   ============================================================ */
+.bk-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-light);
+  border-radius: 16px;
+  padding: 1rem 1.1rem;
+  margin-bottom: 0.7rem;
+  transition: box-shadow 0.2s;
+}
+.bk-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.08); }
+
+.bk-card-top {
+  display: flex; align-items: flex-start;
+  justify-content: space-between; gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+.bk-route  { font-size: 0.88rem; font-weight: 700; color: var(--text-primary); flex: 1; }
+.bk-status { font-size: 0.75rem; font-weight: 700; white-space: nowrap; }
+
+.bk-meta {
+  display: flex; flex-wrap: wrap;
+  align-items: center; gap: 0.5rem;
+  font-size: 0.78rem; color: var(--text-muted);
+  margin-bottom: 0.6rem;
+}
+.bk-badge {
+  font-size: 0.65rem; font-weight: 700;
+  padding: 0.15rem 0.5rem; border-radius: 20px;
+}
+.bk-badge.ic    { background: rgba(37,99,235,0.12); color: #2563eb; }
+.bk-badge.rated { background: rgba(245,158,11,0.12); color: #d97706; }
+
+.bk-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+.bk-btn {
+  padding: 0.45rem 0.85rem;
+  border-radius: 20px; border: none;
+  font-size: 0.75rem; font-weight: 700;
+  cursor: pointer; transition: all 0.2s;
+}
+.bk-btn.reschedule { background: rgba(37,99,235,0.1);  color: #2563eb; }
+.bk-btn.cancel     { background: rgba(220,38,38,0.1);  color: #dc2626; }
+.bk-btn.rate       { background: rgba(245,158,11,0.12); color: #d97706; }
+.bk-btn:hover      { transform: translateY(-1px); opacity: 0.85; }
+
