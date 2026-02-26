@@ -24,6 +24,8 @@ let trackingMap         = null;
 let trackingDriverMarker = null;
 let currentBookingId    = null;
 let uploadedPhotos      = []; // base64 strings
+let pendingWhatsAppMsg  = null; // WA message sent when customer clicks the button
+let pendingAdminMsg     = null; // Admin WA message sent when customer clicks the button
 
 const MIN_BASE_PRICE = 1100;
 const FRIDGE_PRICE   = 400;
@@ -775,8 +777,8 @@ async function bookOnWhatsApp() {
         showInvoice:  false
       });
 
-      // 3. Open WhatsApp with full details + booking ID
-      const msg =
+      // 3. Store WhatsApp message — sent only when customer clicks "Get on WhatsApp" button
+      pendingWhatsAppMsg =
         "✅ *New Booking — PackZen*\n" +
         "━━━━━━━━━━━━━━━━━━━━\n" +
         `🔖 *Booking ID:* ${bookingRef}\n` +
@@ -790,7 +792,7 @@ async function bookOnWhatsApp() {
         `💰 *Estimate:* ₹${lastCalculatedTotal.toLocaleString()}\n` +
         "━━━━━━━━━━━━━━━━━━━━\n" +
         "Payment: Cash on moving day";
-      window.open(`https://wa.me/919945095453?text=${encodeURIComponent(msg)}`, "_blank");
+      pendingAdminMsg = pendingWhatsAppMsg; // same message goes to admin
 
     } catch(e) {
       console.error("WA booking save:", e);
@@ -961,10 +963,36 @@ function downloadInvoice() {
 }
 
 function sendWhatsAppAfterPayment() {
+  // If we have a stored pending message (from Pay Later or Book via WhatsApp), use it
+  if (pendingWhatsAppMsg) {
+    window.open(`https://wa.me/919945095453?text=${encodeURIComponent(pendingWhatsAppMsg)}`, "_blank");
+    // Also notify admin after short delay
+    if (pendingAdminMsg && pendingAdminMsg !== pendingWhatsAppMsg) {
+      setTimeout(() => {
+        window.open(`https://wa.me/919945095453?text=${encodeURIComponent(pendingAdminMsg)}`, "_blank");
+      }, 800);
+    }
+    // Clear after sending
+    pendingWhatsAppMsg = null;
+    pendingAdminMsg    = null;
+    return;
+  }
+  // Fallback for Razorpay payment bookings
   const pickup = document.getElementById("pickup");
   const drop   = document.getElementById("drop");
-  const msg = `✅ Booking Confirmed — PackZen\n\nPickup: ${pickup?.value}\nDrop: ${drop?.value}\nTotal: ₹${lastCalculatedTotal.toLocaleString()}\nReceipt: ${paymentReceiptId}`;
-  window.open(`https://wa.me/919945095453?text=${encodeURIComponent(msg)}`, "_blank");
+  const name   = document.getElementById("custName")?.value?.trim() || "—";
+  const phone  = document.getElementById("custPhone")?.value?.trim() || "";
+  const bookingId = document.getElementById("bookingIdDisplay")?.textContent || paymentReceiptId || "—";
+  const msg =
+    `✅ *Booking Confirmed — PackZen* 🚚\n\n` +
+    `📌 *Booking ID:* ${bookingId}\n` +
+    `👤 *Name:* ${name}\n` +
+    `📍 *Pickup:* ${pickup?.value||"—"}\n` +
+    `🏁 *Drop:* ${drop?.value||"—"}\n` +
+    `💰 *Total:* ₹${lastCalculatedTotal.toLocaleString()}\n` +
+    `💳 *Payment ID:* ${paymentReceiptId||"—"}\n\n` +
+    `— PackZen Packers & Movers | 📞 9945095453`;
+  window.open(`https://wa.me/91${phone}?text=${encodeURIComponent(msg)}`, "_blank");
 }
 
 /* ============================================
@@ -1007,7 +1035,79 @@ function showConfirmationCard({ bookingRef, name, phone, pickup, drop, date, hou
   document.getElementById("paymentModal").style.display = "flex";
 }
 
-function closeModal() { document.getElementById("paymentModal").style.display = "none"; }
+function closeModal() {
+  document.getElementById("paymentModal").style.display = "none";
+  // Show track order banner if a booking was just made
+  if (currentBookingId) {
+    showTrackOrderBanner();
+  }
+}
+
+function showTrackOrderBanner() {
+  const banner = document.getElementById("trackOrderBanner");
+  if (!banner) return;
+
+  // Set booking ID
+  const bookingId = document.getElementById("bookingIdDisplay")?.textContent || "—";
+  const tobId = document.getElementById("tobBookingId");
+  if (tobId) tobId.textContent = bookingId;
+
+  banner.style.display = "block";
+
+  // Scroll to top so banner is visible
+  window.scrollTo({ top: 0, behavior: "smooth" });
+
+  // Start live status listener
+  startBannerTracking();
+}
+
+function startBannerTracking() {
+  if (!currentBookingId || !window._firebase) return;
+
+  window._firebase.db.collection("bookings").doc(currentBookingId)
+    .onSnapshot(doc => {
+      if (!doc.exists) return;
+      updateTrackBanner(doc.data());
+    });
+}
+
+function updateTrackBanner(b) {
+  const statusOrder = ["confirmed", "assigned", "packing", "transit", "delivered"];
+  const idx = statusOrder.indexOf(b.status || "confirmed");
+
+  statusOrder.forEach((s, i) => {
+    const step = document.getElementById("tobs" + i);
+    if (!step) return;
+    step.className = "tob-step";
+    if (i < idx)  step.classList.add("done");
+    if (i === idx) step.classList.add("active");
+  });
+
+  // Show driver row once assigned
+  const driverRow = document.getElementById("tobDriverRow");
+  if (b.driverName && driverRow) {
+    document.getElementById("tobDriverName").textContent = "Driver: " + b.driverName;
+    const phoneEl = document.getElementById("tobDriverPhone");
+    if (b.driverPhone) {
+      phoneEl.href = "tel:" + b.driverPhone;
+      phoneEl.textContent = "📞 Call Driver";
+    }
+    driverRow.style.display = "flex";
+  }
+
+  // If delivered, update banner color to green
+  const banner = document.getElementById("trackOrderBanner");
+  if (b.status === "delivered" && banner) {
+    banner.style.background = "linear-gradient(135deg, #15803d, #16a34a)";
+    const title = banner.querySelector(".tob-title");
+    if (title) title.textContent = "🎉 Your Move is Complete!";
+  }
+}
+
+function dismissTrackBanner() {
+  const banner = document.getElementById("trackOrderBanner");
+  if (banner) banner.style.display = "none";
+}
 
 /* ============================================
    TRACKING MODAL
@@ -1085,6 +1185,23 @@ function openChatModal() {
   document.getElementById("userDropdown")?.classList.remove("open");
   if (!currentUser) { openAuthModal("login"); return; }
   document.getElementById("chatModal").style.display = "flex";
+
+  // Set driver name/avatar in chat header if booking data available
+  if (currentBookingId && window._firebase) {
+    window._firebase.db.collection("bookings").doc(currentBookingId).get().then(doc => {
+      if (!doc.exists) return;
+      const b = doc.data();
+      const nameEl   = document.getElementById("chatDrvName");
+      const statusEl = document.getElementById("chatDrvStatus");
+      const avatarEl = document.getElementById("chatDrvAvatar");
+      if (b.driverName) {
+        if (nameEl)   nameEl.textContent   = b.driverName;
+        if (statusEl) statusEl.textContent = b.driverPhone || "Your Driver";
+        if (avatarEl) avatarEl.textContent = b.driverName.charAt(0).toUpperCase();
+      }
+    });
+  }
+
   loadChatMessages();
 }
 
@@ -1116,10 +1233,16 @@ function listenChatMessages() {
       if (snap.empty) { container.innerHTML = '<div class="chat-empty-msg">No messages yet. Say hello! 👋</div>'; return; }
       container.innerHTML = "";
       snap.forEach(d => {
-        const msg = d.data();
+        const msg    = d.data();
         const isMine = msg.senderUid === currentUser?.uid;
-        const time = msg.time?.toDate ? msg.time.toDate().toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"}) : "";
-        container.innerHTML += `<div class="chat-bubble ${isMine?"mine":"theirs"}"><div>${msg.text}</div><div class="chat-time">${time}</div></div>`;
+        const time   = msg.time?.toDate ? msg.time.toDate().toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"}) : "";
+        const senderLabel = (!isMine && msg.senderName) ? `<span class="chat-sender">${msg.senderName}</span>` : "";
+        container.innerHTML += `
+          <div class="chat-bubble ${isMine?"mine":"theirs"}">
+            ${senderLabel}
+            <div>${msg.text}</div>
+            <div class="chat-time">${time}</div>
+          </div>`;
       });
       container.scrollTop = container.scrollHeight;
     });
@@ -1493,8 +1616,8 @@ function bookWithoutPayment() {
       showInvoice:  false
     });
 
-    // Auto-send WhatsApp to CUSTOMER (no confirm prompt)
-    const customerMsg =
+    // Store WhatsApp messages — sent only when customer clicks "Get on WhatsApp" button
+    pendingWhatsAppMsg =
       `✅ *Booking Confirmed — PackZen* 🚚\n\n` +
       `📌 *Booking ID:* ${bookingRef}\n` +
       `👤 *Name:* ${name}\n` +
@@ -1505,21 +1628,14 @@ function bookWithoutPayment() {
       `💳 *Payment:* Pay on moving day\n\n` +
       `Our team will call you shortly to confirm. Save this Booking ID for tracking!\n\n` +
       `— PackZen Packers & Movers | 📞 9945095453`;
-    setTimeout(() => {
-      window.open(`https://wa.me/91${phone}?text=${encodeURIComponent(customerMsg)}`, "_blank");
-    }, 800);
 
-    // Also notify admin on WhatsApp
-    const adminMsg =
+    pendingAdminMsg =
       `🔔 *New Booking (Pay Later)* — PackZen\n\n` +
       `📌 ID: ${bookingRef}\n` +
       `👤 ${name} | 📞 ${phone}\n` +
       `📍 ${pickup} → ${drop}\n` +
       `📅 Date: ${date||"—"}\n` +
       `💰 Estimate: ₹${lastCalculatedTotal.toLocaleString()}`;
-    setTimeout(() => {
-      window.open(`https://wa.me/919945095453?text=${encodeURIComponent(adminMsg)}`, "_blank");
-    }, 1200);
 
     showToast("✅ Booking saved! ID: " + bookingRef);
 
