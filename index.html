@@ -259,180 +259,403 @@
     </div>
     <div class="quote-right reveal">
       <div class="form-card">
-        <div class="step-indicators">
-          <div class="step-dot active" id="dot0">1</div>
-          <div class="step-line"></div>
-          <div class="step-dot" id="dot1">2</div>
-          <div class="step-line"></div>
-          <div class="step-dot" id="dot2">3</div>
-          <div class="step-line"></div>
-          <div class="step-dot" id="dot3">4</div>
-        </div>
-        <div class="progress">
-          <div id="progressBar"></div>
+
+        <!-- STEP HEADER -->
+        <div class="step-header">
+          <div class="step-header-top">
+            <div class="step-counter">
+              <span id="stepCurrent">1</span><span class="step-of">/4</span>
+            </div>
+            <div class="step-header-label" id="stepLabel">Where are you moving?</div>
+          </div>
+          <!-- Progress Bar -->
+          <div class="step-progress-track">
+            <div class="step-progress-fill" id="progressBar" style="width:25%"></div>
+          </div>
+          <!-- Step Dots -->
+          <div class="step-indicators">
+            <div class="step-dot active" id="dot0">
+              <span class="dot-num">1</span>
+              <span class="dot-icon">📍</span>
+              <div class="dot-label">Location</div>
+            </div>
+            <div class="step-line" id="line0"></div>
+            <div class="step-dot" id="dot1">
+              <span class="dot-num">2</span>
+              <span class="dot-icon">🗓️</span>
+              <div class="dot-label">Details</div>
+            </div>
+            <div class="step-line" id="line1"></div>
+            <div class="step-dot" id="dot2">
+              <span class="dot-num">3</span>
+              <span class="dot-icon">🛋️</span>
+              <div class="dot-label">Items</div>
+            </div>
+            <div class="step-line" id="line2"></div>
+            <div class="step-dot" id="dot3">
+              <span class="dot-num">4</span>
+              <span class="dot-icon">✅</span>
+              <div class="dot-label">Book</div>
+            </div>
+          </div>
         </div>
 
-        <!-- STEP 1 -->
+        <!-- STEP 1: LOCATION -->
         <div class="form-step active">
-          <div class="step-title">📍 Where are you moving?</div>
-          <label class="field-label">Pickup Location</label>
-          <input id="pickup" placeholder="Enter pickup address" class="field-input">
-          <label class="toggle-row">
-            <span>📱 Use my current location</span>
-            <label class="toggle">
-              <input type="checkbox" id="useCurrentLocation">
-              <span class="slider"></span>
-            </label>
-          </label>
-          <label class="field-label">Drop Location</label>
-          <input id="drop" placeholder="Enter drop address" class="field-input">
-          <div id="map"></div>
-          <div id="distanceInfo"></div>
-          <button class="btn-next" onclick="nextStep()">Continue →</button>
-        </div>
-
-        <!-- STEP 2 -->
-        <div class="form-step">
-          <div class="step-title">🗓️ When are you moving?</div>
-          <div class="row">
-            <div>
-              <label class="field-label">Date</label>
-              <input type="date" id="shiftDate" class="field-input">
-            </div>
-            <div>
-              <label class="field-label">Time</label>
-              <input type="time" id="shiftTime" class="field-input">
-            </div>
-          </div>
-          <label class="field-label">House Type</label>
-          <select id="house" class="field-input">
-            <option value="">Select house size</option>
-            <option value="0">1 RK</option>
-            <option value="1200">1 BHK</option>
-            <option value="2500">2 BHK</option>
-            <option value="4000">3 BHK</option>
-          </select>
-          <label class="field-label">Vehicle Type</label>
-          <select id="vehicle" class="field-input">
-            <option value="">Select vehicle</option>
-            <option value="25">Tata Ace (Small)</option>
-            <option value="40">14 ft Truck (Medium)</option>
-            <option value="50">17 ft Truck (Large)</option>
-            <option value="60">22 ft Truck (XL)</option>
-          </select>
-          <div class="btn-row">
-            <button class="btn-back" onclick="prevStep()">← Back</button>
-            <button class="btn-next" onclick="nextStep()">Continue →</button>
-          </div>
-        </div>
-
-        <!-- STEP 3 -->
-        <div class="form-step">
-          <div class="step-title">🛋️ What are you moving?</div>
-          <div class="furniture-grid">
-            <label class="furniture-card">
-              <input type="checkbox" id="sofaCheck">
-              <div class="fc-body">
-                <span class="fc-emoji">🛋️</span>
-                <span class="fc-name">Sofa</span>
-                <input type="number" id="sofaQty" value="1" min="1" class="fc-qty" onclick="event.stopPropagation()">
-              </div>
-            </label>
-            <label class="furniture-card">
-              <input type="checkbox" id="bedCheck">
-              <div class="fc-body">
-                <span class="fc-emoji">🛏️</span>
-                <span class="fc-name">Bed</span>
-                <input type="number" id="bedQty" value="1" min="1" class="fc-qty" onclick="event.stopPropagation()">
-              </div>
-            </label>
-            <label class="furniture-card">
-              <input type="checkbox" id="fridgeCheck">
-              <div class="fc-body">
-                <span class="fc-emoji">🧊</span>
-                <span class="fc-name">Fridge</span>
-              </div>
-            </label>
-            <label class="furniture-card">
-              <input type="checkbox" id="wmCheck">
-              <div class="fc-body">
-                <span class="fc-emoji">🫧</span>
-                <span class="fc-name">Washing Machine</span>
-              </div>
-            </label>
-          </div>
-          
-          <!-- PHOTO UPLOAD -->
-          <div class="photo-upload-section">
-            <label class="field-label">📸 Upload Item Photos (optional)</label>
-            <div class="photo-upload-area" onclick="document.getElementById('itemPhotos').click()">
-              <label class="photo-upload-label">
-                <input type="file" id="itemPhotos" multiple accept="image/*" onchange="previewPhotos(this)">
-                <span>Click to upload</span> photos of your items for reference
+          <div class="step-body">
+            <div class="field-group">
+              <label class="field-label">
+                <span class="field-icon">📍</span> Pickup Location
+              </label>
+              <input id="pickup" placeholder="Enter pickup address" class="field-input" autocomplete="off">
+              <label class="toggle-row">
+                <span class="toggle-text">📱 Use my current location</span>
+                <label class="toggle">
+                  <input type="checkbox" id="useCurrentLocation">
+                  <span class="slider"></span>
+                </label>
               </label>
             </div>
-            <div class="photo-previews-row" id="photoPreviews"></div>
+            <div class="field-group">
+              <label class="field-label">
+                <span class="field-icon">🏁</span> Drop Location
+              </label>
+              <input id="drop" placeholder="Enter drop address" class="field-input" autocomplete="off">
+            </div>
+            <div id="map"></div>
+            <div id="distanceInfo" class="distance-badge"></div>
           </div>
-          <div class="btn-row">
-            <button class="btn-back" onclick="prevStep()">← Back</button>
-            <button class="btn-next" onclick="nextStep()">Continue →</button>
+          <div class="step-footer">
+            <button class="btn-next" onclick="nextStep()">
+              Continue <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </button>
           </div>
         </div>
 
-        <!-- STEP 4 -->
+        <!-- STEP 2: DETAILS -->
         <div class="form-step">
-          <div class="step-title">🎉 Almost done!</div>
-          <label class="field-label">Your Name</label>
-          <input id="custName" placeholder="Enter your full name" class="field-input">
-          <label class="field-label">Phone Number</label>
-          <input id="custPhone" placeholder="Enter mobile number" class="field-input">
+          <div class="step-body">
+            <div class="field-row-2">
+              <div class="field-group">
+                <label class="field-label"><span class="field-icon">📅</span> Moving Date</label>
+                <input type="date" id="shiftDate" class="field-input">
+              </div>
+              <div class="field-group">
+                <label class="field-label"><span class="field-icon">🕐</span> Preferred Time</label>
+                <input type="time" id="shiftTime" class="field-input">
+              </div>
+            </div>
 
-          <!-- PROMO CODE -->
-          <label class="field-label">🏷️ Promo / Referral Code</label>
-          <div class="promo-row">
-            <input type="text" id="promoInput" class="promo-input" placeholder="ENTER CODE">
-            <button class="btn-promo" onclick="applyPromoCode()">Apply</button>
-          </div>
-          <div class="promo-msg" id="promoMsg"></div>
+            <div class="field-group">
+              <label class="field-label"><span class="field-icon">🏠</span> House Type</label>
+              <div class="select-cards" id="houseCards">
+                <div class="select-card" onclick="selectCard(this,'house','0')">
+                  <div class="sc-icon">🏠</div>
+                  <div class="sc-label">1 RK</div>
+                  <div class="sc-sub">Studio</div>
+                  <input type="radio" name="house" value="0" id="house" class="sc-radio" style="display:none">
+                </div>
+                <div class="select-card" onclick="selectCard(this,'house','1200')">
+                  <div class="sc-icon">🏡</div>
+                  <div class="sc-label">1 BHK</div>
+                  <div class="sc-sub">Small</div>
+                  <input type="radio" name="house" value="1200" class="sc-radio" style="display:none">
+                </div>
+                <div class="select-card" onclick="selectCard(this,'house','2500')">
+                  <div class="sc-icon">🏘️</div>
+                  <div class="sc-label">2 BHK</div>
+                  <div class="sc-sub">Medium</div>
+                  <input type="radio" name="house" value="2500" class="sc-radio" style="display:none">
+                </div>
+                <div class="select-card" onclick="selectCard(this,'house','4000')">
+                  <div class="sc-icon">🏰</div>
+                  <div class="sc-label">3 BHK</div>
+                  <div class="sc-sub">Large</div>
+                  <input type="radio" name="house" value="4000" class="sc-radio" style="display:none">
+                </div>
+              </div>
+              <!-- Hidden select for compatibility -->
+              <select id="house" class="field-input" style="display:none">
+                <option value="">Select house size</option>
+                <option value="0">1 RK</option>
+                <option value="1200">1 BHK</option>
+                <option value="2500">2 BHK</option>
+                <option value="4000">3 BHK</option>
+              </select>
+            </div>
 
-          <div class="price-box">
-            <div class="price-label">Your Estimated Price</div>
-            <div class="price-amount"><span id="livePrice">₹0</span></div>
-            <div id="result" class="price-breakdown"></div>
-            <div class="discount-row" id="discountRow" style="display:none;">🏷️ Promo discount: <strong id="discountAmt"></strong></div>
-            <div class="advance-info">
-              💡 Advance to pay now: <strong><span id="advanceAmount">₹0</span></strong>
-              <span class="advance-note">(10% of total — rest paid on moving day)</span>
+            <div class="field-group">
+              <label class="field-label"><span class="field-icon">🚚</span> Vehicle Type</label>
+              <div class="vehicle-cards" id="vehicleCards">
+                <div class="vehicle-card" onclick="selectCard(this,'vehicle','25')">
+                  <div class="vc-icon">🛻</div>
+                  <div class="vc-info">
+                    <div class="vc-name">Tata Ace</div>
+                    <div class="vc-sub">Small load · 1 RK</div>
+                  </div>
+                  <div class="vc-rate">₹25/km</div>
+                </div>
+                <div class="vehicle-card" onclick="selectCard(this,'vehicle','40')">
+                  <div class="vc-icon">🚚</div>
+                  <div class="vc-info">
+                    <div class="vc-name">14 ft Truck</div>
+                    <div class="vc-sub">Medium · 1–2 BHK</div>
+                  </div>
+                  <div class="vc-rate">₹40/km</div>
+                </div>
+                <div class="vehicle-card" onclick="selectCard(this,'vehicle','50')">
+                  <div class="vc-icon">🚛</div>
+                  <div class="vc-info">
+                    <div class="vc-name">17 ft Truck</div>
+                    <div class="vc-sub">Large · 2–3 BHK</div>
+                  </div>
+                  <div class="vc-rate">₹50/km</div>
+                </div>
+                <div class="vehicle-card" onclick="selectCard(this,'vehicle','60')">
+                  <div class="vc-icon">🚜</div>
+                  <div class="vc-info">
+                    <div class="vc-name">22 ft Truck</div>
+                    <div class="vc-sub">XL · 3+ BHK</div>
+                  </div>
+                  <div class="vc-rate">₹60/km</div>
+                </div>
+              </div>
+              <!-- Hidden select for compatibility -->
+              <select id="vehicle" class="field-input" style="display:none">
+                <option value="">Select vehicle</option>
+                <option value="25">Tata Ace (Small)</option>
+                <option value="40">14 ft Truck (Medium)</option>
+                <option value="50">17 ft Truck (Large)</option>
+                <option value="60">22 ft Truck (XL)</option>
+              </select>
             </div>
           </div>
+          <div class="step-footer">
+            <button class="btn-back" onclick="prevStep()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg> Back
+            </button>
+            <button class="btn-next" onclick="nextStep()">
+              Continue <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </button>
+          </div>
+        </div>
 
-          <!-- PAYMENT OPTIONS -->
-          <label class="field-label">Choose Payment</label>
-          <div class="payment-opts">
-            <div class="payment-opt selected" id="optAdvance" onclick="selectPayment('advance')">
-              <div class="po-label">Pay Advance</div>
-              <div class="po-amount" id="optAdvanceAmt">₹0</div>
-              <div class="po-note">10% now, rest on day</div>
+        <!-- STEP 3: ITEMS -->
+        <div class="form-step">
+          <div class="step-body">
+            <p class="step-hint">Select items you're moving. This helps us give you an accurate quote.</p>
+            <div class="furniture-grid">
+
+              <!-- With qty -->
+              <label class="furniture-card">
+                <input type="checkbox" id="sofaCheck">
+                <div class="fc-body">
+                  <div class="fc-check">✓</div>
+                  <span class="fc-emoji">🛋️</span>
+                  <span class="fc-name">Sofa</span>
+                  <span class="fc-price">+₹500</span>
+                  <div class="fc-qty-row" onclick="event.stopPropagation()">
+                    <button class="qty-btn" onclick="changeQty('sofaQty',-1)">−</button>
+                    <input type="number" id="sofaQty" value="1" min="1" max="9" class="fc-qty">
+                    <button class="qty-btn" onclick="changeQty('sofaQty',1)">+</button>
+                  </div>
+                </div>
+              </label>
+
+              <label class="furniture-card">
+                <input type="checkbox" id="bedCheck">
+                <div class="fc-body">
+                  <div class="fc-check">✓</div>
+                  <span class="fc-emoji">🛏️</span>
+                  <span class="fc-name">Bed</span>
+                  <span class="fc-price">+₹700</span>
+                  <div class="fc-qty-row" onclick="event.stopPropagation()">
+                    <button class="qty-btn" onclick="changeQty('bedQty',-1)">−</button>
+                    <input type="number" id="bedQty" value="1" min="1" max="9" class="fc-qty">
+                    <button class="qty-btn" onclick="changeQty('bedQty',1)">+</button>
+                  </div>
+                </div>
+              </label>
+
+              <label class="furniture-card">
+                <input type="checkbox" id="fridgeCheck">
+                <div class="fc-body">
+                  <div class="fc-check">✓</div>
+                  <span class="fc-emoji">🧊</span>
+                  <span class="fc-name">Fridge</span>
+                  <span class="fc-price">+₹400</span>
+                </div>
+              </label>
+
+              <label class="furniture-card">
+                <input type="checkbox" id="wmCheck">
+                <div class="fc-body">
+                  <div class="fc-check">✓</div>
+                  <span class="fc-emoji">🫧</span>
+                  <span class="fc-name">Washing Machine</span>
+                  <span class="fc-price">+₹400</span>
+                </div>
+              </label>
+
+              <label class="furniture-card">
+                <input type="checkbox" id="tvCheck">
+                <div class="fc-body">
+                  <div class="fc-check">✓</div>
+                  <span class="fc-emoji">📺</span>
+                  <span class="fc-name">TV</span>
+                  <span class="fc-price">+₹300</span>
+                </div>
+              </label>
+
+              <label class="furniture-card">
+                <input type="checkbox" id="acCheck">
+                <div class="fc-body">
+                  <div class="fc-check">✓</div>
+                  <span class="fc-emoji">❄️</span>
+                  <span class="fc-name">AC Unit</span>
+                  <span class="fc-price">+₹500</span>
+                </div>
+              </label>
+
+              <label class="furniture-card">
+                <input type="checkbox" id="wardrobeCheck">
+                <div class="fc-body">
+                  <div class="fc-check">✓</div>
+                  <span class="fc-emoji">🚪</span>
+                  <span class="fc-name">Wardrobe</span>
+                  <span class="fc-price">+₹600</span>
+                </div>
+              </label>
+
+              <label class="furniture-card">
+                <input type="checkbox" id="diningCheck">
+                <div class="fc-body">
+                  <div class="fc-check">✓</div>
+                  <span class="fc-emoji">🪑</span>
+                  <span class="fc-name">Dining Table</span>
+                  <span class="fc-price">+₹400</span>
+                </div>
+              </label>
+
             </div>
-            <div class="payment-opt" id="optFull" onclick="selectPayment('full')">
-              <div class="po-label">Pay Full</div>
-              <div class="po-amount" id="optFullAmt">₹0</div>
-              <div class="po-note">5% discount included</div>
-            </div>
-            <div class="payment-opt" id="optAtDrop" onclick="selectPayment('at_drop')">
-              <div class="po-label">Pay at Drop</div>
-              <div class="po-amount" id="optAtDropAmt">₹0</div>
-              <div class="po-note">Full amount online at delivery</div>
+
+            <!-- PHOTO UPLOAD -->
+            <div class="photo-upload-section">
+              <label class="field-label"><span class="field-icon">📸</span> Upload Item Photos <span style="font-weight:400;color:var(--text-muted)">(optional)</span></label>
+              <div class="photo-upload-area" onclick="document.getElementById('itemPhotos').click()">
+                <label class="photo-upload-label">
+                  <input type="file" id="itemPhotos" multiple accept="image/*" onchange="previewPhotos(this)">
+                  <div class="upload-icon">📷</div>
+                  <div><span class="upload-link">Tap to upload</span> photos of your items</div>
+                  <div class="upload-sub">Helps driver prepare better</div>
+                </label>
+              </div>
+              <div class="photo-previews-row" id="photoPreviews"></div>
             </div>
           </div>
-
-          <div class="btn-row">
-            <button class="btn-back" onclick="prevStep()">← Back</button>
+          <div class="step-footer">
+            <button class="btn-back" onclick="prevStep()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg> Back
+            </button>
+            <button class="btn-next" onclick="nextStep()">
+              Continue <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </button>
           </div>
-          <button onclick="startPayment()" class="btn-pay">💳 Pay Advance & Confirm</button>
-          <button onclick="bookWithoutPayment()" class="btn-free-book">📋 Book Now (Pay Later)</button>
-          <button onclick="bookOnWhatsApp()" class="btn-whatsapp-alt">💬 Book via WhatsApp</button>
-          <button onclick="openChecklist()" class="btn-checklist">✅ View Moving Checklist</button>
+        </div>
+
+        <!-- STEP 4: BOOK -->
+        <div class="form-step">
+          <div class="step-body">
+
+            <div class="field-row-2">
+              <div class="field-group">
+                <label class="field-label"><span class="field-icon">👤</span> Your Name</label>
+                <input id="custName" placeholder="Full name" class="field-input">
+              </div>
+              <div class="field-group">
+                <label class="field-label"><span class="field-icon">📞</span> Phone Number</label>
+                <input id="custPhone" placeholder="Mobile number" class="field-input" type="tel">
+              </div>
+            </div>
+
+            <!-- PRICE SUMMARY BOX -->
+            <div class="price-box">
+              <div class="price-box-top">
+                <div>
+                  <div class="price-label">Your Estimate</div>
+                  <div id="result" class="price-breakdown"></div>
+                  <div class="discount-row" id="discountRow" style="display:none;">🏷️ Promo: <strong id="discountAmt"></strong></div>
+                </div>
+                <div class="price-amount"><span id="livePrice">₹0</span></div>
+              </div>
+              <div class="advance-info">
+                💡 Advance: <strong><span id="advanceAmount">₹0</span></strong>
+                <span class="advance-note">· 10% now, rest on moving day</span>
+              </div>
+            </div>
+
+            <!-- PROMO CODE -->
+            <div class="field-group">
+              <label class="field-label"><span class="field-icon">🏷️</span> Promo / Referral Code</label>
+              <div class="promo-row">
+                <input type="text" id="promoInput" class="promo-input" placeholder="ENTER CODE">
+                <button class="btn-promo" onclick="applyPromoCode()">Apply</button>
+              </div>
+              <div class="promo-msg" id="promoMsg"></div>
+            </div>
+
+            <!-- PAYMENT OPTIONS -->
+            <div class="field-group">
+              <label class="field-label"><span class="field-icon">💳</span> Choose Payment</label>
+              <div class="payment-opts">
+                <div class="payment-opt selected" id="optAdvance" onclick="selectPayment('advance')">
+                  <div class="po-badge">Popular</div>
+                  <div class="po-icon">💰</div>
+                  <div class="po-label">Advance</div>
+                  <div class="po-amount" id="optAdvanceAmt">₹0</div>
+                  <div class="po-note">10% now · rest on day</div>
+                </div>
+                <div class="payment-opt" id="optFull" onclick="selectPayment('full')">
+                  <div class="po-badge save">Save 5%</div>
+                  <div class="po-icon">✅</div>
+                  <div class="po-label">Pay Full</div>
+                  <div class="po-amount" id="optFullAmt">₹0</div>
+                  <div class="po-note">5% discount</div>
+                </div>
+                <div class="payment-opt" id="optAtDrop" onclick="selectPayment('at_drop')">
+                  <div class="po-badge" style="opacity:0">·</div>
+                  <div class="po-icon">🚚</div>
+                  <div class="po-label">Pay Later</div>
+                  <div class="po-amount" id="optAtDropAmt">₹0</div>
+                  <div class="po-note">Cash on delivery</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- BOOK BUTTONS -->
+            <div class="book-actions">
+              <button onclick="startPayment()" class="btn-pay">
+                💳 Pay & Confirm Booking
+              </button>
+              <button onclick="bookWithoutPayment()" class="btn-free-book">
+                📋 Book Now · Pay Later
+              </button>
+              <button onclick="bookOnWhatsApp()" class="btn-whatsapp-alt">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+                Book via WhatsApp
+              </button>
+              <button onclick="openChecklist()" class="btn-checklist">✅ Moving Checklist</button>
+            </div>
+
+          </div>
+          <div class="step-footer back-only">
+            <button class="btn-back" onclick="prevStep()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg> Back
+            </button>
+          </div>
+        </div>
+
+      </div>
         </div>
       </div>
     </div>
