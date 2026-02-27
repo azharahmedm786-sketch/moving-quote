@@ -1574,7 +1574,12 @@ function showStep(n) {
   steps[n].classList.add("active");
   const pb = document.getElementById("progressBar");
   if (pb) pb.style.width = ((n + 1) / 5) * 100 + "%";
+  updateStepDots(n);
   // Keep page position — don't scroll on step change
+  if (n === 3) {
+    // Entering Items step — always re-render furniture grid for current move type
+    renderFurnitureGrid(selectedMoveType || "home");
+  }
   if (n === steps.length - 1) {
     calculateQuote(true);
     autoFillCustomerDetails();
@@ -1622,8 +1627,8 @@ function nextStep() {
 
   if (currentStep === 2) {
     let ok = true;
-    if (!house?.value)   { showToast("🏠 Please select your " + (selectedMoveType === "office" ? "office size" : "house type")); ok = false; }
-    else if (!vehicle?.value) { showToast("🚚 Please select a vehicle type"); ok = false; }
+    if (!house?.value) { showToast("🏠 Please select your " + (selectedMoveType === "office" ? "office size" : "house type")); ok = false; }
+    else if (!isIntercityMove && !vehicle?.value) { showToast("🚚 Please select a vehicle type"); ok = false; }
     if (!ok) return;
   }
 
