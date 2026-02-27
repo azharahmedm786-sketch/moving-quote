@@ -633,6 +633,8 @@ function showLocation(type) {
   const loc = place.geometry.location;
   if (!map) {
     mapDiv.style.display = "block";
+    mapDiv.style.height  = "200px";
+    mapDiv.style.maxHeight = "200px";
     map = new google.maps.Map(mapDiv, { center: loc, zoom: 14 });
     directionsService  = new google.maps.DirectionsService();
     directionsRenderer = new google.maps.DirectionsRenderer({ map, suppressMarkers: true });
