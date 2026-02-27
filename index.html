@@ -667,23 +667,33 @@
             <!-- PAYMENT OPTIONS -->
             <div class="field-group">
               <label class="field-label"><span class="field-icon">💳</span> Choose Payment</label>
+
+              <!-- ONLINE PAYMENT COMING SOON BANNER -->
+              <div class="coming-soon-banner">
+                <div class="csb-icon">🚀</div>
+                <div class="csb-body">
+                  <div class="csb-title">Online Payment Coming Soon!</div>
+                  <div class="csb-sub">UPI · Cards · Net Banking will be live in 1–2 weeks. For now, book and pay cash on delivery.</div>
+                </div>
+              </div>
+
               <div class="payment-opts">
-                <div class="payment-opt selected" id="optAdvance" onclick="selectPayment('advance')">
-                  <div class="po-badge">Popular</div>
+                <div class="payment-opt po-disabled" id="optAdvance">
+                  <div class="po-badge">Soon</div>
                   <div class="po-icon">💰</div>
                   <div class="po-label">Advance</div>
                   <div class="po-amount" id="optAdvanceAmt">₹0</div>
                   <div class="po-note">10% now · rest on day</div>
                 </div>
-                <div class="payment-opt" id="optFull" onclick="selectPayment('full')">
-                  <div class="po-badge save">Save 5%</div>
+                <div class="payment-opt po-disabled" id="optFull">
+                  <div class="po-badge save">Soon</div>
                   <div class="po-icon">✅</div>
                   <div class="po-label">Pay Full</div>
                   <div class="po-amount" id="optFullAmt">₹0</div>
                   <div class="po-note">5% discount</div>
                 </div>
-                <div class="payment-opt" id="optAtDrop" onclick="selectPayment('at_drop')">
-                  <div class="po-badge" style="opacity:0">·</div>
+                <div class="payment-opt selected" id="optAtDrop" onclick="selectPayment('at_drop')">
+                  <div class="po-badge" style="background:#16a34a">✓ Active</div>
                   <div class="po-icon">🚚</div>
                   <div class="po-label">Pay Later</div>
                   <div class="po-amount" id="optAtDropAmt">₹0</div>
@@ -700,8 +710,8 @@
 
             <!-- BOOK BUTTONS -->
             <div class="book-actions">
-              <button onclick="startPayment()" class="btn-pay">
-                💳 Pay & Confirm Booking
+              <button onclick="bookWithoutPayment()" class="btn-pay">
+                📋 Confirm Booking · Pay on Delivery
               </button>
               <button onclick="bookWithoutPayment()" class="btn-free-book">
                 📋 Book Now · Pay Later
@@ -1097,6 +1107,51 @@
     <div class="am-footer">
       <button class="am-btn-secondary" onclick="closeRateDriverModal()">Skip</button>
       <button class="am-btn-primary" id="btnSubmitRating" onclick="submitDriverRating()">Submit Rating</button>
+    </div>
+  </div>
+</div>
+
+<!-- DAMAGE / CLAIM MODAL -->
+<div id="damageModal" class="modal-overlay" style="display:none;">
+  <div class="modal-box action-modal">
+    <div class="am-header" style="background:linear-gradient(135deg,#7c3aed,#6d28d9)">
+      <div class="am-icon">🔧</div>
+      <div>
+        <div class="am-title">Report Damage / Claim</div>
+        <div class="am-ref" id="damageBookingRef"></div>
+      </div>
+      <button class="modal-close" onclick="closeDamageModal()">✕</button>
+    </div>
+    <div class="am-body">
+      <div class="warn-box">⚠️ Claims must be reported within <strong>24 hours</strong> of delivery. Please attach clear photos of the damaged item(s).</div>
+
+      <label class="field-label" style="margin-top:.5rem">Type of Damage <span style="color:#dc2626">*</span></label>
+      <select id="damageType" class="field-input" style="margin-bottom:.9rem">
+        <option value="">Select damage type</option>
+        <option value="Item broken/cracked">Item broken / cracked</option>
+        <option value="Item scratched/dented">Item scratched / dented</option>
+        <option value="Item missing/lost">Item missing / lost</option>
+        <option value="Water damage">Water damage</option>
+        <option value="Furniture assembly issue">Furniture assembly issue</option>
+        <option value="Other">Other</option>
+      </select>
+
+      <label class="field-label">Describe what happened <span style="color:#dc2626">*</span></label>
+      <textarea id="damageDesc" class="field-input" rows="3" placeholder="Which item was damaged? How did it happen? What is the approximate value?" style="margin-bottom:.9rem"></textarea>
+
+      <label class="field-label">Upload Photos (max 5)</label>
+      <div class="damage-upload-area" onclick="document.getElementById('damagePhotosInput').click()">
+        <div class="dua-icon">📸</div>
+        <div class="dua-text">Tap to upload damage photos</div>
+        <div class="dua-sub">Clear photos help resolve claims faster</div>
+      </div>
+      <input type="file" id="damagePhotosInput" multiple accept="image/*" style="display:none" onchange="previewDamagePhotos(this)">
+      <div id="damagePhotoPreview" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:.6rem"></div>
+      <div id="damageMsg" style="font-size:.8rem;margin-top:.5rem"></div>
+    </div>
+    <div class="am-footer">
+      <button class="am-btn-secondary" onclick="closeDamageModal()">Cancel</button>
+      <button class="am-btn-primary" id="btnSubmitDamage" onclick="submitDamageClaim()" style="background:linear-gradient(135deg,#7c3aed,#6d28d9)">Submit Claim</button>
     </div>
   </div>
 </div>
