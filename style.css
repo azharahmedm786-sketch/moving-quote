@@ -78,6 +78,8 @@ body {
   color: var(--text-primary);
   line-height: 1.6;
   transition: background-color 0.3s ease, color 0.3s ease;
+  overflow-x: hidden;
+  max-width: 100vw;
 }
 
 h1, h2, h3, h4 {
@@ -543,6 +545,7 @@ body.dark-mode .navbar {
 .quote-section {
   padding: var(--space-3xl) var(--space-lg);
   background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+  overflow-x: hidden;
 }
 
 body.dark-mode .quote-section {
@@ -603,6 +606,11 @@ body.dark-mode .quote-section {
   box-shadow: 0 20px 60px rgba(0,0,0,0.12);
   border: 1px solid var(--border-light);
   overflow: hidden;
+  /* Critical: prevent content from blowing out viewport on mobile */
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  min-width: 0;
 }
 
 /* ── Step Header ── */
@@ -750,6 +758,10 @@ body.dark-mode .quote-section {
 .step-body {
   padding: 1.6rem 1.8rem 0.5rem;
   animation: stepFadeIn 0.3s ease;
+  overflow: hidden;
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
 }
 
 @keyframes stepFadeIn {
@@ -761,6 +773,8 @@ body.dark-mode .quote-section {
   display: flex;
   gap: 0.8rem;
   padding: 1rem 1.8rem 1.6rem;
+  box-sizing: border-box;
+  width: 100%;
 }
 
 .step-footer.back-only {
@@ -928,11 +942,11 @@ body.dark-mode .vehicle-card.selected {
 
 .vehicle-card.selected::after {
   content: '✓';
-  position: absolute;
-  right: 1rem;
   font-size: 1rem;
   color: #2563eb;
   font-weight: 800;
+  margin-left: 0.4rem;
+  flex-shrink: 0;
 }
 
 .vc-icon { font-size: 1.6rem; flex-shrink: 0; }
@@ -947,7 +961,8 @@ body.dark-mode .vehicle-card.selected {
   padding: 0.25rem 0.6rem;
   border-radius: 20px;
   flex-shrink: 0;
-  margin-right: 1.2rem;
+  margin-right: 0;  /* was 1.2rem — caused overflow when .selected::after was also present */
+  white-space: nowrap;
 }
 
 /* ── Furniture Grid ── */
@@ -2113,7 +2128,10 @@ body.dark-mode .payment-opt.selected {
     flex-direction: column;
   }
   
-  .btn-next, .btn-back {
+  /* btn-next / btn-back inside .step-footer must NOT be width:100%
+     — they use flex:2/flex:1 inside a flex row. Only override old .btn-row buttons. */
+  .btn-row .btn-next,
+  .btn-row .btn-back {
     width: 100%;
   }
   
@@ -3536,65 +3554,108 @@ body.dark-mode .am-warning {
 .bk-btn.rate       { background: rgba(245,158,11,0.12); color: #d97706; }
 .bk-btn:hover      { transform: translateY(-1px); opacity: 0.85; }
 
+
 /* ============================================================
-   PACKZEN FORM STABILITY PATCH — DO NOT REMOVE
-   Fix: Step Jumping, Height Resize, Button Stretch
+   MOBILE OVERFLOW FIX — Prevent form blowing out viewport
    ============================================================ */
+@media (max-width: 600px) {
+  /* Nuclear option: nothing inside the form section can be wider than viewport */
+  .quote-section {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+    overflow-x: hidden;
+  }
 
-/* Prevent layout jumping between steps */
-.form-card {
-  display: flex;
-  flex-direction: column;
-  min-height: 520px;
-}
-
-/* Keep body consistent height */
-.step-body {
-  flex: 1;
-  min-height: 300px;
-}
-
-/* Prevent footer moving up/down */
-.step-footer {
-  margin-top: auto;
-}
-
-/* Prevent button stretching unevenly */
-.btn-next,
-.btn-back {
-  min-height: 48px;
-}
-
-/* Keep price box stable */
-.price-box {
-  min-height: 120px;
-}
-
-/* Prevent layout shift in payment options */
-.payment-opts {
-  align-items: stretch;
-}
-
-/* Stabilize move type cards */
-.move-type-card {
-  min-height: 140px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
-
-/* Prevent furniture jump when qty shows */
-.furniture-card {
-  min-height: 120px;
-}
-
-/* Fix mobile form overflow */
-@media (max-width: 768px) {
   .form-card {
-    min-height: auto;
+    border-radius: 18px;
   }
 
   .step-body {
-    min-height: auto;
+    padding: 1.2rem 1rem 0.5rem;
   }
+
+  .step-footer {
+    padding: 0.8rem 1rem 1.2rem;
+  }
+
+  .step-header {
+    padding: 1.1rem 1rem 1rem;
+  }
+
+  /* Vehicle cards — ensure they never exceed container */
+  .vehicle-card {
+    padding: 0.75rem 0.8rem;
+    min-width: 0;
+    box-sizing: border-box;
+    width: 100%;
+  }
+
+  .vc-name { font-size: 0.83rem; }
+  .vc-sub  { font-size: 0.68rem; }
+  .vc-rate {
+    font-size: 0.72rem;
+    padding: 0.2rem 0.45rem;
+  }
+
+  /* Toggle rows */
+  .toggle-row {
+    padding: 0.6rem 0.75rem;
+    font-size: 0.82rem;
+    box-sizing: border-box;
+    width: 100%;
+  }
+
+  .toggle-text {
+    font-size: 0.78rem;
+    word-break: break-word;
+  }
+
+  /* Field inputs */
+  .field-input {
+    font-size: 0.9rem;
+    box-sizing: border-box;
+    width: 100%;
+  }
+
+  /* House type / select cards */
+  .select-cards {
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+  }
+
+  .select-card {
+    padding: 0.7rem 0.4rem;
+    min-width: 0;
+  }
+
+  .select-card-icon { font-size: 1.3rem; }
+  .select-card-label { font-size: 0.78rem; }
+  .select-card-sub   { font-size: 0.62rem; }
+
+  /* Navigation buttons — keep side by side, never full width in step-footer */
+  .step-footer .btn-next,
+  .step-footer .btn-back {
+    min-width: 0;
+    padding: 0.8rem 0.6rem;
+    font-size: 0.85rem;
+  }
+
+  /* Move type cards */
+  .move-type-grid {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+
+  /* Furniture grid */
+  .furniture-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  /* Intercity badge */
+  .intercity-badge {
+    padding: 0.7rem 0.8rem;
+  }
+
+  .ic-title { font-size: 0.78rem; }
+  .ic-sub   { font-size: 0.65rem; }
 }
