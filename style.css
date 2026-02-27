@@ -3748,3 +3748,32 @@ body.dark-mode .warn-box {
   border-color: rgba(251,191,36,0.3);
   color: #fcd34d;
 }
+
+/* ============================================================
+   MAP IN BOOKING FORM — constrain height so it never overflows
+   ============================================================ */
+#map {
+  width: 100%;
+  height: 200px;
+  max-height: 200px;
+  border-radius: 14px;
+  overflow: hidden;
+  margin-top: 0.8rem;
+  border: 1.5px solid var(--border-light);
+  box-sizing: border-box;
+  /* If map hasn't loaded yet, show placeholder bg */
+  background: var(--bg-secondary);
+}
+
+/* Hide map entirely if empty (before user enters addresses) */
+#map:empty {
+  display: none;
+}
+
+@media (max-width: 600px) {
+  #map {
+    height: 160px;
+    max-height: 160px;
+    border-radius: 10px;
+  }
+}
