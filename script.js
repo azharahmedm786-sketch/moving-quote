@@ -1587,9 +1587,16 @@ function showStep(n) {
   const pb = document.getElementById("progressBar");
   if (pb) pb.style.width = ((n + 1) / 5) * 100 + "%";
   updateStepDots(n);
-  // Keep page position — don't scroll on step change
+  // When entering Details step — auto-select first vehicle if none selected
+  if (n === 2) {
+    const vehicleSelect = document.getElementById("vehicle");
+    if (!vehicleSelect?.value) {
+      const firstCard = document.querySelector(".vehicle-card");
+      if (firstCard) firstCard.click();
+    }
+  }
+  // Entering Items step — always re-render furniture grid for current move type
   if (n === 3) {
-    // Entering Items step — always re-render furniture grid for current move type
     renderFurnitureGrid(selectedMoveType || "home");
   }
   if (n === steps.length - 1) {
