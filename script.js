@@ -16,7 +16,7 @@ let pendingSignupData   = null;
 let currentUser         = null;
 let otpPurpose          = "signup";
 let promoDiscount       = 0;
-let selectedPayment     = "advance"; // "advance" | "full"
+let selectedPayment     = "at_drop"; // Online payments coming soon — defaulting to pay at drop
 let currentRating       = 0;
 let trackingListener    = null;
 let chatListener        = null;
@@ -822,6 +822,11 @@ async function bookOnWhatsApp() {
         createdAt:    firebase.firestore.FieldValue.serverTimestamp()
       });
       currentBookingId = docRef.id;
+      queueSMS(phone, "booking_confirmed", {
+        name, bookingRef, date,
+        pickup: pickup || "",
+        total: lastCalculatedTotal
+      });
 
       // 2. Show confirmation card
       showConfirmationCard({
@@ -968,6 +973,11 @@ function onPaymentSuccess(response, name, phone, paid, total) {
       currentBookingId = docRef.id;
       requestPushPermission();
       subscribeToBookingNotifications(docRef.id);
+      queueSMS(phone, "booking_confirmed", {
+        name, bookingRef, date: document.getElementById("shiftDate")?.value || "TBD",
+        pickup: document.getElementById("pickup")?.value || "",
+        total: discounted
+      });
     })
     .catch(e => console.error("Booking save:", e));
   }
@@ -1921,6 +1931,11 @@ function bookWithoutPayment() {
   }).then(docRef => {
     currentBookingId = docRef.id;
     if (btn) { btn.disabled = false; btn.textContent = "📋 Book Now (Pay Later)"; }
+    queueSMS(phone, "booking_confirmed", {
+      name, bookingRef, date,
+      pickup: document.getElementById("pickup")?.value || "",
+      total: lastCalculatedTotal
+    });
 
     // Show professional confirmation card
     const houseEl   = document.getElementById("house");
@@ -2042,6 +2057,7 @@ function loadUserBookings() {
         const canCancel    = !["packing","transit","delivered","cancelled"].includes(b.status);
         const canReschedule= !["transit","delivered","cancelled"].includes(b.status);
         const canRate      = b.status === "delivered" && !b.driverRating;
+        const canClaim     = b.status === "delivered" && !b.damageClaimed;
         const intercityBadge = b.isIntercity ? `<span class="bk-badge ic">🚛 Intercity</span>` : "";
         const ratingBadge    = b.driverRating ? `<span class="bk-badge rated">⭐ ${b.driverRating}/5</span>` : "";
         return `<div class="bk-card">
@@ -2055,11 +2071,12 @@ function loadUserBookings() {
             <span style="font-size:.72rem;color:#5a6a8a">${b.bookingRef||""}</span>
             ${intercityBadge}${ratingBadge}
           </div>
-          ${canCancel || canReschedule || canRate ? `
+          ${canCancel || canReschedule || canRate || canClaim ? `
           <div class="bk-actions">
             ${canReschedule ? `<button class="bk-btn reschedule" onclick="openRescheduleModal('${id}','${b.bookingRef||id}','${b.date||""}')">📅 Reschedule</button>` : ""}
             ${canCancel    ? `<button class="bk-btn cancel"    onclick="openCancelModal('${id}','${b.bookingRef||id}','${b.status||""}')">✕ Cancel</button>` : ""}
             ${canRate      ? `<button class="bk-btn rate"      onclick="openRateDriverModal('${id}','${b.bookingRef||id}','${b.driverName||""}')">⭐ Rate Driver</button>` : ""}
+            ${canClaim     ? `<button class="bk-btn claim"     onclick="openDamageModal('${id}','${b.bookingRef||id}')">🔧 Report Damage</button>` : ""}
           </div>` : ""}
         </div>`;
       }).join("");
@@ -2372,5 +2389,205 @@ function subscribeToBookingNotifications(bookingDocId) {
       lastStatus = status;
     }
   });
+  // Wire SMS on status changes
+  setupStatusSMS(bookingDocId, "", "", "");
 }
 
+
+/* ============================================================
+   SMS NOTIFICATIONS via MSG91 (through Firebase Cloud Function)
+   ============================================================
+   HOW IT WORKS:
+   - Browser writes to Firestore /smsQueue collection
+   - Cloud Function (functions/index.js) picks it up and calls MSG91
+   - Auth key stays on server — never exposed in browser
+   ============================================================ */
+
+const SMS_TEMPLATES = {
+  booking_confirmed: (d) =>
+    `Hi ${d.name}, your PackZen booking ${d.bookingRef} is confirmed for ${d.date}! Pickup: ${d.pickup.split(",")[0]}. Est. cost: Rs.${Number(d.total).toLocaleString("en-IN")}. Track: packzen.in. Queries: 9945095453`,
+
+  driver_assigned: (d) =>
+    `Hi ${d.name}, your PackZen driver ${d.driverName} (${d.driverPhone}) is assigned for booking ${d.bookingRef}. Track live on packzen.in. Queries: 9945095453`,
+
+  move_started: (d) =>
+    `Hi ${d.name}, your goods are now in transit for booking ${d.bookingRef}. Track your driver live on packzen.in. ETA will be updated shortly.`,
+
+  delivered: (d) =>
+    `Hi ${d.name}, your PackZen move ${d.bookingRef} is complete! Please rate your driver on packzen.in. Thank you for choosing PackZen!`,
+
+  cancelled: (d) =>
+    `Hi ${d.name}, your PackZen booking ${d.bookingRef} has been cancelled. Refund (if any) will be processed in 5-7 business days. Queries: 9945095453`,
+
+  damage_claim: (d) =>
+    `Hi ${d.name}, your damage claim (ID: ${d.claimId}) for booking ${d.bookingRef} has been received. Our team will respond within 3 business days. Queries: 9945095453`,
+
+  reschedule_confirmed: (d) =>
+    `Hi ${d.name}, your PackZen booking ${d.bookingRef} is rescheduled to ${d.date}. We'll confirm driver assignment 2hrs before. Queries: 9945095453`,
+};
+
+async function queueSMS(phone, templateKey, data) {
+  if (!phone || !window._firebase) return;
+  // Sanitise phone — ensure 91 prefix, no spaces/dashes
+  const mobile = "91" + String(phone).replace(/\D/g, "").slice(-10);
+  if (mobile.length !== 12) { console.warn("SMS: invalid phone", phone); return; }
+
+  const template = SMS_TEMPLATES[templateKey];
+  if (!template) { console.warn("SMS: unknown template", templateKey); return; }
+  const message = template(data);
+
+  try {
+    await window._firebase.db.collection("smsQueue").add({
+      mobile,
+      message,
+      template: templateKey,
+      status: "pending",
+      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      retries: 0
+    });
+    console.log("✅ SMS queued:", templateKey, "→", mobile);
+  } catch(e) {
+    console.error("SMS queue error:", e);
+    // Non-critical — booking already saved, don't surface error to user
+  }
+}
+
+// Call this from admin when assigning a driver
+async function sendDriverAssignedSMS(bookingDocId) {
+  if (!window._firebase) return;
+  const doc = await window._firebase.db.collection("bookings").doc(bookingDocId).get();
+  if (!doc.exists) return;
+  const b = doc.data();
+  queueSMS(b.phone, "driver_assigned", {
+    name: b.customerName || "Customer",
+    bookingRef: b.bookingRef || bookingDocId,
+    driverName: b.driverName || "Driver",
+    driverPhone: b.driverPhone || "9945095453"
+  });
+}
+
+// Auto-SMS on booking status changes (called from subscribeToBookingNotifications)
+function setupStatusSMS(bookingDocId, customerPhone, customerName, bookingRef) {
+  if (!bookingDocId || !window._firebase) return;
+  const statusSMSMap = {
+    transit:   "move_started",
+    delivered: "delivered",
+    cancelled: "cancelled",
+  };
+  let lastStatus = "";
+  window._firebase.db.collection("bookings").doc(bookingDocId).onSnapshot(doc => {
+    if (!doc.exists) return;
+    const b = doc.data();
+    const status = b.status;
+    if (!status || status === lastStatus) return;
+    lastStatus = status;
+    if (statusSMSMap[status]) {
+      queueSMS(b.phone || customerPhone, statusSMSMap[status], {
+        name: b.customerName || customerName,
+        bookingRef: b.bookingRef || bookingRef || bookingDocId,
+        driverName: b.driverName || "",
+        driverPhone: b.driverPhone || "",
+        date: b.date || ""
+      });
+    }
+    // Driver assigned — special case
+    if (status === "assigned" && b.driverName) {
+      queueSMS(b.phone || customerPhone, "driver_assigned", {
+        name: b.customerName || customerName,
+        bookingRef: b.bookingRef || bookingDocId,
+        driverName: b.driverName,
+        driverPhone: b.driverPhone || ""
+      });
+    }
+  });
+}
+
+/* ============================================================
+   DAMAGE / CLAIM FLOW
+   ============================================================ */
+let damageBookingDocId = "";
+let damagePhotos = [];
+
+function openDamageModal(bookingDocId, bookingRef) {
+  damageBookingDocId = bookingDocId;
+  damagePhotos = [];
+  document.getElementById("damageBookingRef").textContent = bookingRef || bookingDocId;
+  document.getElementById("damageType").value = "";
+  document.getElementById("damageDesc").value = "";
+  document.getElementById("damagePhotoPreview").innerHTML = "";
+  document.getElementById("damageMsg").textContent = "";
+  document.getElementById("damageModal").style.display = "flex";
+}
+
+function closeDamageModal() {
+  document.getElementById("damageModal").style.display = "none";
+}
+
+function previewDamagePhotos(input) {
+  const preview = document.getElementById("damagePhotoPreview");
+  preview.innerHTML = "";
+  damagePhotos = [];
+  const files = Array.from(input.files).slice(0, 5);
+  files.forEach(file => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      damagePhotos.push(e.target.result);
+      const img = document.createElement("img");
+      img.src = e.target.result;
+      img.style.cssText = "width:70px;height:70px;object-fit:cover;border-radius:8px;border:2px solid var(--border-light)";
+      preview.appendChild(img);
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+async function submitDamageClaim() {
+  const damageType = document.getElementById("damageType").value;
+  const damageDesc = document.getElementById("damageDesc").value.trim();
+  const msgEl      = document.getElementById("damageMsg");
+
+  if (!damageType) { showToast("Please select the type of damage."); return; }
+  if (!damageDesc) { showToast("Please describe what happened."); return; }
+  if (!currentUser || !window._firebase) return;
+
+  const btn = document.getElementById("btnSubmitDamage");
+  btn.textContent = "Submitting..."; btn.disabled = true;
+
+  try {
+    // Save claim to Firestore
+    const claimRef = await window._firebase.db.collection("damageClaims").add({
+      bookingDocId: damageBookingDocId,
+      customerUid:  currentUser.uid,
+      damageType,
+      description:  damageDesc,
+      photos:       damagePhotos.slice(0, 5),
+      status:       "pending",
+      createdAt:    firebase.firestore.FieldValue.serverTimestamp()
+    });
+
+    // Mark booking as claimed so button disappears
+    await window._firebase.db.collection("bookings").doc(damageBookingDocId).update({
+      damageClaimed:  true,
+      damageClaimId:  claimRef.id,
+      damageClaimedAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+
+    // Queue SMS to customer confirming claim received
+    const bookingDoc = await window._firebase.db.collection("bookings").doc(damageBookingDocId).get();
+    const b = bookingDoc.data();
+    queueSMS(b?.phone || "", "damage_claim", {
+      name:       b?.customerName || "Customer",
+      bookingRef: b?.bookingRef   || damageBookingDocId,
+      claimId:    claimRef.id.slice(0,8).toUpperCase()
+    });
+
+    closeDamageModal();
+    showToast("✅ Claim submitted! We'll respond within 3 business days.");
+    loadUserBookings();
+  } catch(e) {
+    msgEl.textContent = "Error: " + e.message;
+    msgEl.style.color = "#dc2626";
+  } finally {
+    btn.textContent = "Submit Claim"; btn.disabled = false;
+  }
+}
