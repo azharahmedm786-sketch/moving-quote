@@ -129,6 +129,7 @@
     <div class="nav-item" onclick="showSection('customers',this)"><span class="ni">👥</span> Customers</div>
     <div class="nav-item" onclick="showSection('reviews',this)"><span class="ni">⭐</span> Reviews</div>
     <div class="nav-item" onclick="showSection('cancels',this)"><span class="ni">✕</span> Cancellations</div>
+    <div class="nav-item" onclick="showSection('claims',this)"><span class="ni">🔧</span> Damage Claims</div>
     <div class="nav-item" onclick="showSection('promos',this)"><span class="ni">🏷️</span> Promo Codes</div>
     <div class="nav-item" onclick="showSection('broadcast',this)"><span class="ni">📢</span> Broadcast</div>
     <div class="sidebar-bottom">
@@ -236,6 +237,42 @@
         </div>
         <table><thead><tr><th>Booking Ref</th><th>Customer</th><th>Reason</th><th>Requested</th><th>Status</th><th>Action</th></tr></thead>
         <tbody id="cancelsTable"><tr class="empty-row"><td colspan="6">Loading...</td></tr></tbody></table>
+      </div>
+    </div>
+
+    <!-- DAMAGE CLAIMS -->
+    <div class="section" id="sectionClaims">
+      <div class="table-card">
+        <div class="table-hdr">
+          <div class="table-title">🔧 Damage Claims</div>
+          <button class="btn-export" onclick="loadDamageClaims()">🔄 Refresh</button>
+        </div>
+        <table>
+          <thead><tr><th>Claim ID</th><th>Booking</th><th>Type</th><th>Description</th><th>Photos</th><th>Date</th><th>Status</th><th>Action</th></tr></thead>
+          <tbody id="claimsTable"><tr class="empty-row"><td colspan="8">Loading...</td></tr></tbody>
+        </table>
+      </div>
+
+      <!-- Claim detail panel -->
+      <div id="claimDetailPanel" style="display:none;margin-top:1.5rem;">
+        <div class="table-card">
+          <div class="table-hdr">
+            <div class="table-title">📋 Claim Detail</div>
+            <button onclick="document.getElementById('claimDetailPanel').style.display='none'" style="background:none;border:none;font-size:1.2rem;cursor:pointer;color:var(--text-muted)">✕</button>
+          </div>
+          <div style="padding:1rem">
+            <div id="claimDetailContent"></div>
+            <div style="margin-top:1rem">
+              <label style="font-size:.82rem;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:.4rem">Admin Response</label>
+              <textarea id="claimResponseText" rows="3" style="width:100%;padding:.6rem;border:1.5px solid var(--border-light);border-radius:10px;background:var(--bg-secondary);color:var(--text-primary);font-size:.85rem;box-sizing:border-box" placeholder="Describe your resolution (e.g. Approved ₹2,000 compensation / Rejected — insufficient evidence)"></textarea>
+            </div>
+            <div style="display:flex;gap:.7rem;margin-top:.8rem;flex-wrap:wrap">
+              <button onclick="resolveDamageClaim('approved')" style="padding:.55rem 1.1rem;background:#16a34a;color:white;border:none;border-radius:10px;cursor:pointer;font-weight:700;font-size:.82rem">✅ Approve Claim</button>
+              <button onclick="resolveDamageClaim('rejected')" style="padding:.55rem 1.1rem;background:#dc2626;color:white;border:none;border-radius:10px;cursor:pointer;font-weight:700;font-size:.82rem">❌ Reject Claim</button>
+              <button onclick="resolveDamageClaim('investigating')" style="padding:.55rem 1.1rem;background:#d97706;color:white;border:none;border-radius:10px;cursor:pointer;font-weight:700;font-size:.82rem">🔍 Mark Investigating</button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -704,10 +741,85 @@ function showSection(name, el) {
   document.querySelectorAll(".nav-item").forEach(n => n.classList.remove("active"));
   document.getElementById("section" + cap(name)).classList.add("active");
   if (el) el.classList.add("active");
-  const titles = { overview:"Overview", bookings:"Bookings", drivers:"Drivers", customers:"Customers", reviews:"Reviews", cancels:"Cancellations", promos:"Promo Codes", broadcast:"Broadcast" };
+  const titles = { overview:"Overview", bookings:"Bookings", drivers:"Drivers", customers:"Customers", reviews:"Reviews", cancels:"Cancellations", claims:"Damage Claims", promos:"Promo Codes", broadcast:"Broadcast" };
   document.getElementById("sectionTitle").textContent = titles[name] || cap(name);
   if (name === "overview") renderCharts();
   if (name === "cancels")  loadCancelRequests();
+  if (name === "claims")   loadDamageClaims();
+}
+
+let currentClaimDocId = "";
+
+async function loadDamageClaims() {
+  const tbody = document.getElementById("claimsTable");
+  if (!tbody || !window._firebase) return;
+  tbody.innerHTML = "<tr><td colspan='8' style='text-align:center;padding:1rem'>Loading...</td></tr>";
+  try {
+    const snap = await window._firebase.db.collection("damageClaims")
+      .orderBy("createdAt","desc").limit(60).get();
+    if (snap.empty) { tbody.innerHTML = "<tr class='empty-row'><td colspan='8'>No damage claims yet.</td></tr>"; return; }
+    const statusColor = { pending:"#d97706", investigating:"#2563eb", approved:"#16a34a", rejected:"#dc2626" };
+    tbody.innerHTML = snap.docs.map(d => {
+      const c = d.data();
+      const date = c.createdAt?.toDate?.().toLocaleDateString("en-IN") || "—";
+      const photos = c.photos?.length ? `<span style="color:#2563eb;cursor:pointer;font-weight:600" onclick="viewClaimPhotos('${d.id}')">${c.photos.length} photo(s)</span>` : "None";
+      const col = statusColor[c.status] || "#64748b";
+      return `<tr>
+        <td style="font-family:monospace;font-size:.75rem">${d.id.slice(0,8).toUpperCase()}</td>
+        <td>${c.bookingDocId?.slice(0,8) || "—"}</td>
+        <td>${c.damageType || "—"}</td>
+        <td style="max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${c.description || "—"}</td>
+        <td>${photos}</td>
+        <td>${date}</td>
+        <td><span style="color:${col};font-weight:700;font-size:.78rem">${(c.status||"pending").toUpperCase()}</span></td>
+        <td><button onclick="openClaimDetail('${d.id}')" style="padding:.3rem .7rem;background:#7c3aed;color:white;border:none;border-radius:8px;cursor:pointer;font-size:.75rem">Review</button></td>
+      </tr>`;
+    }).join("");
+  } catch(e) { tbody.innerHTML = `<tr><td colspan='8' style='color:red'>Error: ${e.message}</td></tr>`; }
+}
+
+async function openClaimDetail(docId) {
+  currentClaimDocId = docId;
+  const doc = await window._firebase.db.collection("damageClaims").doc(docId).get();
+  if (!doc.exists) return;
+  const c = doc.data();
+  const panel = document.getElementById("claimDetailPanel");
+  const content = document.getElementById("claimDetailContent");
+  const photoHtml = c.photos?.length
+    ? c.photos.map(p => `<img src="${p}" style="width:80px;height:80px;object-fit:cover;border-radius:8px;border:2px solid var(--border-light)">`).join("")
+    : "<span style='color:var(--text-muted);font-size:.82rem'>No photos attached</span>";
+
+  content.innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem 1.2rem;margin-bottom:1rem;font-size:.85rem">
+      <div><span style="color:var(--text-muted)">Claim ID:</span> <strong>${docId.slice(0,8).toUpperCase()}</strong></div>
+      <div><span style="color:var(--text-muted)">Booking:</span> <strong>${c.bookingDocId?.slice(0,8)||"—"}</strong></div>
+      <div><span style="color:var(--text-muted)">Type:</span> <strong>${c.damageType||"—"}</strong></div>
+      <div><span style="color:var(--text-muted)">Status:</span> <strong style="color:#7c3aed">${(c.status||"pending").toUpperCase()}</strong></div>
+    </div>
+    <div style="font-size:.85rem;color:var(--text-secondary);margin-bottom:.9rem;background:var(--bg-secondary);padding:.7rem;border-radius:10px"><strong>Description:</strong><br>${c.description||"—"}</div>
+    ${c.adminResponse ? `<div style="font-size:.82rem;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:.6rem;margin-bottom:.8rem;color:#166534"><strong>Previous response:</strong> ${c.adminResponse}</div>` : ""}
+    <div style="display:flex;gap:6px;flex-wrap:wrap">${photoHtml}</div>
+  `;
+  panel.style.display = "block";
+  panel.scrollIntoView({ behavior:"smooth", block:"start" });
+}
+
+async function resolveDamageClaim(newStatus) {
+  if (!currentClaimDocId || !window._firebase) return;
+  const response = document.getElementById("claimResponseText").value.trim();
+  if (!response) { alert("Please enter an admin response before resolving."); return; }
+  try {
+    await window._firebase.db.collection("damageClaims").doc(currentClaimDocId).update({
+      status: newStatus,
+      adminResponse: response,
+      resolvedAt: firebase.firestore.FieldValue.serverTimestamp(),
+      resolvedBy: firebase.auth().currentUser?.uid || "admin"
+    });
+    toast(`✅ Claim marked as ${newStatus}`);
+    document.getElementById("claimDetailPanel").style.display = "none";
+    loadDamageClaims();
+  } catch(e) { alert("Error: " + e.message); }
+}
 }
 
 async function loadCancelRequests() {
