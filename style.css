@@ -3659,3 +3659,92 @@ body.dark-mode .am-warning {
   .ic-title { font-size: 0.78rem; }
   .ic-sub   { font-size: 0.65rem; }
 }
+
+/* ============================================================
+   COMING SOON BANNER — Payment options
+   ============================================================ */
+.coming-soon-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  background: linear-gradient(135deg, #fef3c7, #fde68a);
+  border: 1.5px solid #fcd34d;
+  border-radius: 14px;
+  padding: 0.9rem 1rem;
+  margin-bottom: 0.9rem;
+}
+body.dark-mode .coming-soon-banner {
+  background: rgba(251,191,36,0.12);
+  border-color: rgba(251,191,36,0.35);
+}
+.csb-icon { font-size: 1.5rem; flex-shrink: 0; }
+.csb-title {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #92400e;
+  margin-bottom: 0.15rem;
+}
+body.dark-mode .csb-title { color: #fcd34d; }
+.csb-sub {
+  font-size: 0.75rem;
+  color: #a16207;
+  line-height: 1.4;
+}
+body.dark-mode .csb-sub { color: #fde68a; }
+
+/* Disabled payment option cards */
+.payment-opt.po-disabled {
+  opacity: 0.4;
+  pointer-events: none;
+  filter: grayscale(0.6);
+  cursor: not-allowed;
+}
+
+/* ============================================================
+   DAMAGE CLAIM MODAL & BUTTON
+   ============================================================ */
+.bk-btn.claim {
+  background: linear-gradient(135deg, #7c3aed, #6d28d9);
+  color: white;
+  border: none;
+}
+.bk-btn.claim:hover { opacity: 0.88; }
+
+.damage-upload-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 1rem;
+  border: 2px dashed var(--border-light);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+  background: var(--bg-secondary);
+  text-align: center;
+}
+.damage-upload-area:hover {
+  border-color: #7c3aed;
+  background: rgba(124,58,237,0.05);
+}
+.dua-icon { font-size: 1.8rem; }
+.dua-text  { font-size: 0.85rem; font-weight: 600; color: var(--text-primary); }
+.dua-sub   { font-size: 0.72rem; color: var(--text-muted); }
+
+/* warn-box used in damage modal — already defined in legal.html inline,
+   add here for index.html context */
+.warn-box {
+  background: #fef3c7;
+  border: 1px solid #fcd34d;
+  border-radius: 12px;
+  padding: 0.8rem 1rem;
+  margin: 0 0 0.8rem;
+  font-size: 0.82rem;
+  color: #92400e;
+  line-height: 1.5;
+}
+body.dark-mode .warn-box {
+  background: rgba(251,191,36,0.1);
+  border-color: rgba(251,191,36,0.3);
+  color: #fcd34d;
+}
