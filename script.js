@@ -1191,28 +1191,99 @@ function toggleConfirmDetails() {
 
 function closeModal() {
   document.getElementById("paymentModal").style.display = "none";
-  // Show track order banner if a booking was just made
+
   if (currentBookingId) {
+    // Show the in-form success state
+    showBookingSuccessState();
+    // Show tracking banner above form
     showTrackOrderBanner();
   }
+}
+
+function showBookingSuccessState() {
+  // Hide all steps, show success state
+  document.querySelectorAll(".form-step").forEach(s => s.style.display = "none");
+  const successEl = document.getElementById("bookingSuccessState");
+  if (successEl) successEl.style.display = "block";
+
+  // Hide step header dots
+  const stepHeader = document.querySelector(".step-header");
+  if (stepHeader) stepHeader.style.display = "none";
+
+  // Set booking ID in success card
+  const bookingId = document.getElementById("bookingIdDisplay")?.textContent || "—";
+  const bsId = document.getElementById("bsBookingId");
+  if (bsId) bsId.textContent = bookingId;
+}
+
+function scrollToTrackBanner() {
+  const banner = document.getElementById("trackOrderBanner");
+  if (banner) {
+    const navH = document.querySelector("nav")?.offsetHeight || 65;
+    const top  = banner.getBoundingClientRect().top + window.scrollY - navH - 8;
+    window.scrollTo({ top, behavior: "smooth" });
+  }
+}
+
+function startNewBooking() {
+  // Hide success state, show steps again
+  const successEl = document.getElementById("bookingSuccessState");
+  if (successEl) successEl.style.display = "none";
+  document.querySelectorAll(".form-step").forEach(s => s.style.display = "");
+  const stepHeader = document.querySelector(".step-header");
+  if (stepHeader) stepHeader.style.display = "";
+  resetBookingForm();
+}
+
+function resetBookingForm() {
+  currentStep = 0;
+  showStep(0);
+
+  ["pickup","drop","house","vehicle","moveType"].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = "";
+  });
+  ["custName","custPhone","promoCode"].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = "";
+  });
+
+  document.querySelectorAll(".move-type-card").forEach(c => c.classList.remove("selected"));
+  document.querySelectorAll(".select-card, .vehicle-card").forEach(c => c.classList.remove("selected"));
+  selectedMoveType = null;
+
+  const mapDiv = document.getElementById("map");
+  if (mapDiv) { mapDiv.style.display = "none"; mapDiv.style.height = "0"; }
+
+  const tc = document.getElementById("agreeTerms");
+  if (tc) tc.checked = false;
+
+  setTimeout(() => renderSizeCards("home"), 100);
 }
 
 function showTrackOrderBanner() {
   const banner = document.getElementById("trackOrderBanner");
   if (!banner) return;
 
-  // Set booking ID
+  // Set booking ID from confirmation card
   const bookingId = document.getElementById("bookingIdDisplay")?.textContent || "—";
   const tobId = document.getElementById("tobBookingId");
   if (tobId) tobId.textContent = bookingId;
 
   banner.style.display = "block";
 
-  // Scroll to top so banner is visible
-  window.scrollTo({ top: 0, behavior: "smooth" });
+  // Scroll so banner is visible just above form
+  setTimeout(() => {
+    const quoteSection = document.getElementById("quote");
+    if (quoteSection) {
+      const navH = document.querySelector("nav")?.offsetHeight || 65;
+      const top  = quoteSection.getBoundingClientRect().top + window.scrollY - navH - 10;
+      window.scrollTo({ top, behavior: "smooth" });
+    }
+  }, 200);
 
-  // Start live status listener
   startBannerTracking();
+}
 }
 
 function startBannerTracking() {
