@@ -2055,12 +2055,20 @@ body.dark-mode .payment-opt.selected {
   transform: translateX(-50%);
   background: var(--primary-gradient);
   color: white;
-  padding: 1rem 2rem;
+  padding: 0.8rem 1.4rem;
   border-radius: 50px;
-  z-index: 9999;
+  z-index: 999999;
   display: none;
   box-shadow: var(--shadow-lg);
   font-weight: 600;
+  font-size: 0.88rem;
+  /* Critical — never wider than screen */
+  max-width: calc(100vw - 2rem);
+  width: max-content;
+  text-align: center;
+  box-sizing: border-box;
+  white-space: normal;
+  word-break: break-word;
 }
 
 .toast-msg.show {
@@ -4110,11 +4118,17 @@ button, .bk-btn, .nav-item, .vehicle-card, .select-card {
   -webkit-tap-highlight-color: transparent;
 }
 
-/* Smooth scrolling everywhere */
-html { scroll-behavior: smooth; }
-
-/* Prevent text size adjustment on rotation */
-html { -webkit-text-size-adjust: 100%; }
+/* Smooth scrolling + overflow lock — nuclear option against horizontal zoom */
+html {
+  scroll-behavior: smooth;
+  overflow-x: hidden;
+  max-width: 100vw;
+  -webkit-text-size-adjust: 100%;
+}
+body {
+  overflow-x: hidden;
+  max-width: 100vw;
+}
 
 /* Better touch scrolling on iOS */
 .step-body, .modal-overlay, .bk-list {
