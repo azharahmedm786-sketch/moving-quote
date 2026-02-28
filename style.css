@@ -215,10 +215,11 @@ body.dark-mode .navbar {
   background: var(--bg-primary);
   border: 1px solid var(--border-light);
   border-radius: 14px;
-  min-width: 200px;
+  min-width: 210px;
   display: none;
-  z-index: 9999;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+  z-index: 999999;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+  overflow: hidden;
 }
 
 .user-dropdown.open {
@@ -759,10 +760,13 @@ body.dark-mode .quote-section {
 .step-body {
   padding: 1.6rem 1.8rem 0.5rem;
   animation: stepFadeIn 0.3s ease;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
   box-sizing: border-box;
   width: 100%;
   min-width: 0;
+  /* Cap height so map never pushes footer off screen on mobile */
+  max-height: 70vh;
 }
 
 @keyframes stepFadeIn {
