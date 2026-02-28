@@ -3,7 +3,7 @@
    Fixed: Mobile Responsive + Dark Mode
    ============================================ */
 
-:root { 
+:root {
   /* Fresh Color Palette - Light Mode */ 
   --primary: #2563eb;
   --primary-light: #3b82f6;
@@ -856,6 +856,7 @@ body.dark-mode .quote-section {
   border-color: #ef4444;
   box-shadow: 0 0 0 4px rgba(239,68,68,0.1);
   animation: shake 0.3s ease;
+  will-change: transform;
 }
 
 @keyframes shake {
@@ -864,9 +865,9 @@ body.dark-mode .quote-section {
   75%      { transform: translateX(4px); }
 }
 
-/* Contain shake within field group so it never causes page overflow */
 .field-group {
   overflow: hidden;
+  will-change: contents;
 }
 
 .field-error-msg {
@@ -2068,8 +2069,11 @@ body.dark-mode .payment-opt.selected {
 .toast-msg {
   position: fixed;
   bottom: 6rem;
-  left: 50%;
-  transform: translateX(-50%);
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  width: fit-content;
+  max-width: calc(100vw - 2rem);
   background: var(--primary-gradient);
   color: white;
   padding: 0.8rem 1.4rem;
@@ -2079,12 +2083,8 @@ body.dark-mode .payment-opt.selected {
   box-shadow: var(--shadow-lg);
   font-weight: 600;
   font-size: 0.88rem;
-  /* Critical — never wider than screen */
-  max-width: calc(100vw - 2rem);
-  width: max-content;
   text-align: center;
   box-sizing: border-box;
-  white-space: normal;
   word-break: break-word;
 }
 
