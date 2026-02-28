@@ -181,7 +181,27 @@ function updateNavForUser(user) {
   }
 }
 
-function toggleUserMenu() { document.getElementById("userDropdown").classList.toggle("open"); }
+function toggleUserMenu() {
+  const dropdown = document.getElementById("userDropdown");
+  const navUser  = document.getElementById("navUser");
+  if (!dropdown || !navUser) return;
+
+  const isOpen = dropdown.classList.contains("open");
+  if (isOpen) {
+    dropdown.classList.remove("open");
+    return;
+  }
+
+  // Position dropdown below the nav-user button
+  const rect = navUser.getBoundingClientRect();
+  dropdown.style.top   = (rect.bottom + 6) + "px";
+  dropdown.style.right = (window.innerWidth - rect.right) + "px";
+  dropdown.classList.add("open");
+}
+
+function closeUserMenu() {
+  document.getElementById("userDropdown")?.classList.remove("open");
+}
 
 /* ============================================
    AUTH MODAL
