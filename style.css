@@ -6,7 +6,7 @@
 :root {
   /* Fresh Color Palette - Light Mode */ 
   --primary: #2563eb;
-  --primary-light: #3b82f6;
+  --primary-light: #3b82f6; 
   --primary-dark: #1d4ed8;
   --primary-gradient: linear-gradient(135deg, #2563eb, #1e40af);
   
