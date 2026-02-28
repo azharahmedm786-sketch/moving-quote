@@ -6,7 +6,7 @@
 :root {
   /* Fresh Color Palette - Light Mode */ 
   --primary: #2563eb;
-  --primary-light: #3b82f6; 
+  --primary-light: #3b82f6;
   --primary-dark: #1d4ed8;
   --primary-gradient: linear-gradient(135deg, #2563eb, #1e40af);
   
@@ -612,6 +612,8 @@ body.dark-mode .quote-section {
   max-width: 100%;
   box-sizing: border-box;
   min-width: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 /* ── Step Header ── */
@@ -783,12 +785,15 @@ body.dark-mode .quote-section {
 .step-footer {
   display: flex;
   gap: 0.8rem;
-  padding: 1rem 1.8rem 1.6rem;
+  padding: 1rem 1.8rem 1.4rem;
   box-sizing: border-box;
   width: 100%;
   max-width: 100%;
   overflow: hidden;
   min-width: 0;
+  height: 80px;
+  flex-shrink: 0;
+  align-items: center;
 }
 
 .step-footer > * {
@@ -1202,11 +1207,12 @@ body.dark-mode .distance-badge {
   flex: 2;
   min-width: 0;
   max-width: 100%;
+  height: 52px;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  padding: 0.9rem 1.5rem;
+  padding: 0 1.5rem;
   background: linear-gradient(135deg, #1d4ed8, #2563eb);
   color: white;
   border: none;
@@ -1228,11 +1234,12 @@ body.dark-mode .distance-badge {
   flex: 1;
   min-width: 0;
   max-width: 100%;
+  height: 52px;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  padding: 0.9rem 1rem;
+  padding: 0 1rem;
   background: var(--bg-secondary);
   color: var(--text-muted);
   border: 1.5px solid var(--border-light);
