@@ -1284,7 +1284,6 @@ function showTrackOrderBanner() {
 
   startBannerTracking();
 }
-}
 
 function startBannerTracking() {
   if (!currentBookingId || !window._firebase) return;
