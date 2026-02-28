@@ -608,13 +608,10 @@ body.dark-mode .quote-section {
   box-shadow: 0 20px 60px rgba(0,0,0,0.12);
   border: 1px solid var(--border-light);
   overflow: hidden;
-  /* Critical: prevent content from blowing out viewport on mobile */
   width: 100%;
   max-width: 100%;
   box-sizing: border-box;
   min-width: 0;
-  /* Contain layout so nothing inside affects page width */
-  contain: layout style;
 }
 
 /* ── Step Header ── */
@@ -1754,10 +1751,16 @@ body.dark-mode .payment-opt.selected {
   backdrop-filter: blur(8px);
   z-index: 99999;
   display: none;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
-  padding: 1rem;
+  padding: 1rem 0.75rem;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   animation: fadeInOverlay 0.3s ease;
+}
+
+@media (min-height: 700px) {
+  .modal-overlay { align-items: center; }
 }
 
 @keyframes fadeInOverlay {
@@ -3821,18 +3824,6 @@ body.dark-mode .warn-box {
 /* ============================================================
    CONFIRMATION CARD — COMPACT + EXPANDABLE (mobile-first)
    ============================================================ */
-
-/* Make modal scrollable on small phones */
-.modal-overlay {
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  align-items: flex-start;
-  padding: 1rem 0.75rem;
-}
-
-@media (min-height: 700px) {
-  .modal-overlay { align-items: center; }
-}
 
 .confirm-card {
   max-width: 460px;
