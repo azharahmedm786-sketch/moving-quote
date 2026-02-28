@@ -62,20 +62,37 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Stats counter
   function animateCounter(el) {
+    if (el.dataset.animated) return; // prevent double animation
+    el.dataset.animated = "1";
     const target = parseInt(el.dataset.target), dur = 2000, start = performance.now();
     function tick(now) {
       const p = Math.min((now - start) / dur, 1);
-      el.textContent = Math.floor((1 - Math.pow(1 - p, 3)) * target).toLocaleString();
+      el.textContent = Math.floor((1 - Math.pow(1 - p, 3)) * target).toLocaleString("en-IN");
       if (p < 1) requestAnimationFrame(tick);
-      else el.textContent = target.toLocaleString();
+      else el.textContent = target.toLocaleString("en-IN");
     }
     requestAnimationFrame(tick);
   }
   const statsObs = new IntersectionObserver((entries) => {
-    entries.forEach(e => { if (e.isIntersecting) { e.target.querySelectorAll(".stat-number").forEach(animateCounter); statsObs.unobserve(e.target); } });
-  }, { threshold: 0.3 });
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.querySelectorAll(".stat-number").forEach(animateCounter);
+        statsObs.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.1 });
   const strip = document.getElementById("statsStrip");
-  if (strip) statsObs.observe(strip);
+  if (strip) {
+    statsObs.observe(strip);
+    // Also fire immediately if already visible on load
+    setTimeout(() => {
+      const rect = strip.getBoundingClientRect();
+      if (rect.top < window.innerHeight) {
+        strip.querySelectorAll(".stat-number").forEach(animateCounter);
+        statsObs.unobserve(strip);
+      }
+    }, 500);
+  }
 
   // Ripple
   document.querySelectorAll("button, .btn-primary, .btn-ghost").forEach(btn => {
