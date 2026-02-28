@@ -32,19 +32,21 @@
         <div class="nav-avatar" id="navAvatar">U</div>
         <span id="navUserName">User</span>
         <span class="nav-arrow">▾</span>
-        <div class="user-dropdown" id="userDropdown">
-          <a href="#" onclick="openDashboard()">📋 My Bookings</a>
-          <a href="#" onclick="openTrackingModal()">📍 Track My Move</a>
-          <a href="#" onclick="openChatModal()">💬 Chat with Driver</a>
-          <a href="#" onclick="openChecklist()">✅ Moving Checklist</a>
-          <a href="#" onclick="openProfile()">👤 Edit Profile</a>
-          <a href="admin.html" id="adminNavLink" style="display:none;">🔐 Admin Panel</a>
-          <a href="#" onclick="signOutUser()">🚪 Sign Out</a>
-        </div>
       </div>
     </div>
   </div>
 </nav>
+
+<!-- USER DROPDOWN — outside navbar so it's never clipped -->
+<div class="user-dropdown" id="userDropdown">
+  <a href="#" onclick="openDashboard();closeUserMenu()">📋 My Bookings</a>
+  <a href="#" onclick="openTrackingModal();closeUserMenu()">📍 Track My Move</a>
+  <a href="#" onclick="openChatModal();closeUserMenu()">💬 Chat with Driver</a>
+  <a href="#" onclick="openChecklist();closeUserMenu()">✅ Moving Checklist</a>
+  <a href="#" onclick="openProfile();closeUserMenu()">👤 Edit Profile</a>
+  <a href="admin.html" id="adminNavLink" style="display:none;">🔐 Admin Panel</a>
+  <a href="#" onclick="signOutUser()">🚪 Sign Out</a>
+</div>
 
 <!-- HERO SECTION -->
 <header class="hero">
