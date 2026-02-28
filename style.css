@@ -3,7 +3,7 @@
    Fixed: Mobile Responsive + Dark Mode
    ============================================ */
 
-:root {
+:root { 
   /* Fresh Color Palette - Light Mode */ 
   --primary: #2563eb;
   --primary-light: #3b82f6;
