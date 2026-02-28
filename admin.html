@@ -388,6 +388,30 @@ function adminLogin() {
   const email = document.getElementById("adminEmail").value.trim();
   const pass  = document.getElementById("adminPass").value;
   const err   = document.getElementById("adminErr");
+  const btn   = document.querySelector("#adminLogin .btn-auth");
+  err.textContent = "";
+  err.style.color = "#ef4444";
+  if (!email || !pass) { err.textContent = "Please enter email and password."; return; }
+  if (btn) { btn.disabled = true; btn.textContent = "Signing in..."; }
+  waitFB(() => {
+    const { auth, db } = window._firebase;
+    auth.signInWithEmailAndPassword(email, pass)
+      .then(cred => db.collection("users").doc(cred.user.uid).get().then(doc => {
+        console.log("Doc exists:", doc.exists, "Data:", JSON.stringify(doc.data()));
+        if (!doc.exists) { auth.signOut(); err.textContent = "User record not found."; return; }
+        if (doc.data().role !== "admin") { auth.signOut(); err.textContent = "Access denied. Role=" + doc.data().role; return; }
+        adminUser = cred.user;
+        showShell(doc.data().name || "Admin");
+      }))
+      .catch(e => { console.error(e); err.textContent = e.message; })
+      .finally(() => { if (btn) { btn.disabled = false; btn.textContent = "Login to Dashboard ->"; } });
+  });
+}
+
+function adminLogin_OLD() {
+  const email = document.getElementById("adminEmail").value.trim();
+  const pass  = document.getElementById("adminPass").value;
+  const err   = document.getElementById("adminErr");
   err.textContent = "";
   waitFB(() => {
     const { auth, db } = window._firebase;
