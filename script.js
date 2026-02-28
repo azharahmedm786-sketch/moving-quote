@@ -862,6 +862,7 @@ async function bookOnWhatsApp() {
         createdAt:    firebase.firestore.FieldValue.serverTimestamp()
       });
       currentBookingId = docRef.id;
+      localStorage.setItem("packzen_active_booking", docRef.id);
       queueSMS(phone, "booking_confirmed", {
         name, bookingRef, date,
         pickup: pickup || "",
@@ -1011,6 +1012,7 @@ function onPaymentSuccess(response, name, phone, paid, total) {
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
     }).then(docRef => {
       currentBookingId = docRef.id;
+      localStorage.setItem("packzen_active_booking", docRef.id);
       requestPushPermission();
       subscribeToBookingNotifications(docRef.id);
       queueSMS(phone, "booking_confirmed", {
@@ -1230,6 +1232,7 @@ function updateTrackBanner(b) {
 
   // Hide banner when delivered or cancelled
   if (b.status === "delivered" || b.status === "cancelled") {
+    localStorage.removeItem("packzen_active_booking");
     setTimeout(() => dismissTrackBanner(), 3000);
   }
 
@@ -1273,24 +1276,45 @@ function updateTrackBanner(b) {
 async function checkAndShowActiveBooking(uid) {
   if (!window._firebase) return;
   try {
+    // First try localStorage for instant restore on refresh
+    const savedId = localStorage.getItem("packzen_active_booking");
+    if (savedId) {
+      const doc = await window._firebase.db.collection("bookings").doc(savedId).get();
+      if (doc.exists) {
+        const b = doc.data();
+        const activeStatuses = ["confirmed","assigned","packing","transit"];
+        if (activeStatuses.includes(b.status) && b.customerUid === uid) {
+          currentBookingId = savedId;
+          const tobId = document.getElementById("tobBookingId");
+          if (tobId) tobId.textContent = b.bookingRef || savedId.slice(0,8).toUpperCase();
+          document.getElementById("trackOrderBanner").style.display = "block";
+          updateTrackBanner(b);
+          startBannerTracking();
+          return;
+        } else {
+          // Booking completed or not theirs — clear storage
+          localStorage.removeItem("packzen_active_booking");
+        }
+      }
+    }
+
+    // Fallback — query Firestore for any active booking
+    // No orderBy to avoid composite index requirement
     const snap = await window._firebase.db.collection("bookings")
       .where("customerUid", "==", uid)
       .where("status", "in", ["confirmed","assigned","packing","transit"])
-      .orderBy("createdAt", "desc")
       .limit(1)
       .get();
     if (snap.empty) return;
-    const doc  = snap.docs[0];
-    const b    = doc.data();
+    const doc = snap.docs[0];
+    const b   = doc.data();
     currentBookingId = doc.id;
-    // Update banner booking ID
+    // Save to localStorage for next refresh
+    localStorage.setItem("packzen_active_booking", doc.id);
     const tobId = document.getElementById("tobBookingId");
     if (tobId) tobId.textContent = b.bookingRef || doc.id.slice(0,8).toUpperCase();
-    // Show banner
     document.getElementById("trackOrderBanner").style.display = "block";
-    // Update banner state
     updateTrackBanner(b);
-    // Start live listener
     startBannerTracking();
   } catch(e) {
     console.warn("Active booking check:", e.message);
@@ -1300,6 +1324,8 @@ async function checkAndShowActiveBooking(uid) {
 function dismissTrackBanner() {
   const banner = document.getElementById("trackOrderBanner");
   if (banner) banner.style.display = "none";
+  // Note: does NOT clear localStorage — banner reappears on next refresh
+  // until booking is actually delivered/cancelled
 }
 
 // Guest-safe wrappers for track banner buttons
@@ -2053,6 +2079,7 @@ function bookWithoutPayment() {
     createdAt:    firebase.firestore.FieldValue.serverTimestamp()
   }).then(docRef => {
     currentBookingId = docRef.id;
+      localStorage.setItem("packzen_active_booking", docRef.id);
     if (btn) { btn.disabled = false; btn.textContent = "📋 Book Now (Pay Later)"; }
     queueSMS(phone, "booking_confirmed", {
       name, bookingRef, date,
