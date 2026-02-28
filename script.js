@@ -6,7 +6,7 @@
    ============================================ */
 
 // ─── State ───────────────────────────────────
-let pickupPlace, dropPlace; 
+let pickupPlace, dropPlace;
 let map, directionsService, directionsRenderer; 
 let pickupMarker, dropMarker;
 let lastCalculatedTotal = 0;
@@ -41,6 +41,18 @@ document.addEventListener("DOMContentLoaded", () => {
     const btn = document.getElementById("themeToggle");
     if (btn) btn.textContent = "☀️";
   }
+
+  // Auto-scroll focused input into view on mobile
+  // Prevents keyboard hiding the field the user just tapped
+  document.addEventListener("focusin", (e) => {
+    const el = e.target;
+    if (!["INPUT","TEXTAREA","SELECT"].includes(el.tagName)) return;
+    // Only on mobile-sized screens
+    if (window.innerWidth > 768) return;
+    setTimeout(() => {
+      el.scrollIntoView({ behavior: "smooth", block: "center" });
+    }, 320); // wait for keyboard to finish animating up
+  });
 
   // Scroll Reveal
   const revealObs = new IntersectionObserver((entries) => {
@@ -1676,6 +1688,19 @@ function showStep(n) {
   const pb = document.getElementById("progressBar");
   if (pb) pb.style.width = ((n + 1) / 5) * 100 + "%";
   updateStepDots(n);
+
+  // Auto-scroll to form top on every step change
+  // Small delay so new step renders before scroll
+  setTimeout(() => {
+    const formCard = document.querySelector(".form-card");
+    if (formCard) {
+      const rect    = formCard.getBoundingClientRect();
+      const navH    = document.querySelector("nav")?.offsetHeight || 65;
+      const scrollY = window.scrollY + rect.top - navH - 12;
+      window.scrollTo({ top: scrollY, behavior: "smooth" });
+    }
+  }, 50);
+
   // When entering Details step — auto-select first vehicle if none selected
   if (n === 2) {
     const vehicleSelect = document.getElementById("vehicle");
