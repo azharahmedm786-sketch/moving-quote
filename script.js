@@ -13,7 +13,7 @@ let lastCalculatedTotal = 0;
 let paymentReceiptId    = "";
 let confirmationResult  = null;
 let pendingSignupData   = null;
-let currentUser         = null; 
+let currentUser         = null;
 let otpPurpose          = "signup";
 let promoDiscount       = 0;
 let selectedPayment     = "at_drop"; // Online payments coming soon — defaulting to pay at drop
@@ -1892,7 +1892,6 @@ function prevStep() {
 function shakeField(el) {
   if (!el) return;
   el.classList.add("error");
-  el.focus();
   setTimeout(() => el.classList.remove("error"), 600);
 }
 
