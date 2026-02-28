@@ -3790,3 +3790,365 @@ body.dark-mode .warn-box {
     border-radius: 10px;
   }
 }
+
+/* ============================================================
+   CONFIRMATION CARD — COMPACT + EXPANDABLE (mobile-first)
+   ============================================================ */
+
+/* Make modal scrollable on small phones */
+.modal-overlay {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  align-items: flex-start;
+  padding: 1rem 0.75rem;
+}
+
+@media (min-height: 700px) {
+  .modal-overlay { align-items: center; }
+}
+
+.confirm-card {
+  max-width: 460px;
+  width: 100%;
+  margin: 0 auto;
+  border-radius: 20px;
+  overflow: hidden;
+  background: var(--bg-primary);
+  box-shadow: 0 25px 60px rgba(0,0,0,0.3);
+  border: 1px solid var(--border-light);
+}
+
+/* Compact summary rows */
+.cc-compact {
+  padding: 0.9rem 1.2rem 0.6rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.cc-compact-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  color: var(--text-primary);
+  flex-wrap: wrap;
+}
+
+.cc-compact-icon { font-size: 1rem; flex-shrink: 0; }
+.cc-compact-val  { font-weight: 600; }
+.cc-compact-note { font-size: 0.75rem; color: var(--text-muted); margin-left: 0.3rem; }
+.cc-amount-inline { color: #16a34a; font-size: 1rem; }
+
+/* Expand toggle button */
+.cc-expand-btn {
+  width: 100%;
+  padding: 0.65rem 1.2rem;
+  background: var(--bg-secondary);
+  border: none;
+  border-bottom: 1px solid var(--border-light);
+  color: var(--blue, #2563eb);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: center;
+  font-family: 'DM Sans', sans-serif;
+  transition: background 0.2s;
+}
+.cc-expand-btn:hover { background: var(--border-light); }
+
+/* Full details section */
+.cc-details {
+  padding: 0.9rem 1.2rem;
+  border-bottom: 1px solid var(--border-light);
+}
+
+/* Action buttons — 3 in a row on mobile */
+.cc-actions {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.8rem 1rem;
+  flex-wrap: wrap;
+}
+
+.cc-btn-wa {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.7rem 0.8rem;
+  background: #16a34a;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+}
+
+.cc-btn-invoice {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.7rem 0.8rem;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  border: 1.5px solid var(--border-light);
+  border-radius: 12px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+}
+
+.cc-btn-close-action {
+  flex: 1;
+  min-width: 0;
+  padding: 0.7rem 0.8rem;
+  background: #fee2e2;
+  color: #dc2626;
+  border: none;
+  border-radius: 12px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+}
+body.dark-mode .cc-btn-close-action {
+  background: rgba(220,38,38,0.15);
+  color: #fca5a5;
+}
+
+/* ============================================================
+   TRACK ORDER BANNER — slim, smart, above form
+   ============================================================ */
+#trackOrderBanner {
+  margin: 0.75rem 1rem;
+}
+
+.tob-inner {
+  background: linear-gradient(135deg, #1e3a8a, #1e40af);
+  border-radius: 16px;
+  padding: 0.9rem 1rem 0.7rem;
+  color: white;
+  box-shadow: 0 4px 20px rgba(30,64,175,0.35);
+}
+
+.tob-top {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  margin-bottom: 0.7rem;
+}
+
+/* Animated pulse dot */
+.tob-pulse {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #4ade80;
+  flex-shrink: 0;
+  animation: tobPulse 1.5s ease-in-out infinite;
+}
+@keyframes tobPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(74,222,128,0.5); }
+  50%       { box-shadow: 0 0 0 6px rgba(74,222,128,0); }
+}
+
+.tob-text { flex: 1; min-width: 0; }
+.tob-title { font-size: 0.82rem; font-weight: 700; opacity: 0.9; }
+.tob-id    { font-size: 0.75rem; opacity: 0.75; margin-top: 0.1rem; }
+
+.tob-status-label {
+  color: #86efac;
+  font-weight: 700;
+}
+
+.tob-top-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-shrink: 0;
+}
+
+.tob-btn-track {
+  padding: 0.35rem 0.8rem;
+  background: rgba(255,255,255,0.15);
+  color: white;
+  border: 1px solid rgba(255,255,255,0.3);
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  white-space: nowrap;
+}
+.tob-btn-track:hover { background: rgba(255,255,255,0.25); }
+
+.tob-dismiss {
+  background: none;
+  border: none;
+  color: rgba(255,255,255,0.6);
+  font-size: 0.85rem;
+  cursor: pointer;
+  padding: 0.2rem 0.4rem;
+  border-radius: 6px;
+  line-height: 1;
+}
+.tob-dismiss:hover { color: white; background: rgba(255,255,255,0.1); }
+
+/* Progress bar */
+.tob-progress-bar {
+  height: 3px;
+  background: rgba(255,255,255,0.15);
+  border-radius: 2px;
+  margin-bottom: 0.6rem;
+  overflow: hidden;
+}
+.tob-progress-fill {
+  height: 100%;
+  background: #4ade80;
+  border-radius: 2px;
+  transition: width 0.5s ease;
+  width: 0%;
+}
+
+/* Steps */
+.tob-steps {
+  display: flex;
+  align-items: flex-start;
+  gap: 0;
+}
+
+.tob-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  position: relative;
+}
+
+.tob-step-dot {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.65rem;
+  color: rgba(255,255,255,0.5);
+  position: relative;
+  z-index: 1;
+  flex-shrink: 0;
+}
+
+.tob-step.done .tob-step-dot  { background: #4ade80; color: #14532d; }
+.tob-step.active .tob-step-dot { background: white; color: #1e40af; animation: tobActivePulse 2s infinite; }
+
+@keyframes tobActivePulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255,255,255,0.4); }
+  50%       { box-shadow: 0 0 0 5px rgba(255,255,255,0); }
+}
+
+.tob-step-line {
+  position: absolute;
+  top: 11px;
+  left: 50%;
+  width: 100%;
+  height: 2px;
+  background: rgba(255,255,255,0.15);
+  z-index: 0;
+}
+.tob-step.done .tob-step-line { background: #4ade80; }
+.tob-step:last-child .tob-step-line { display: none; }
+
+.tob-step-label {
+  font-size: 0.6rem;
+  color: rgba(255,255,255,0.55);
+  margin-top: 0.25rem;
+  text-align: center;
+  line-height: 1.2;
+}
+.tob-step.done .tob-step-label,
+.tob-step.active .tob-step-label { color: white; font-weight: 600; }
+
+.tob-driver {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.6rem;
+  padding-top: 0.6rem;
+  border-top: 1px solid rgba(255,255,255,0.15);
+  font-size: 0.8rem;
+}
+.tob-driver-call {
+  margin-left: auto;
+  color: #86efac;
+  font-weight: 700;
+  text-decoration: none;
+  font-size: 0.78rem;
+}
+
+/* ============================================================
+   GLOBAL MOBILE UX IMPROVEMENTS
+   ============================================================ */
+
+/* Tap targets — minimum 44px for accessibility */
+button, .bk-btn, .nav-item, .vehicle-card, .select-card {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Smooth scrolling everywhere */
+html { scroll-behavior: smooth; }
+
+/* Prevent text size adjustment on rotation */
+html { -webkit-text-size-adjust: 100%; }
+
+/* Better touch scrolling on iOS */
+.step-body, .modal-overlay, .bk-list {
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Input zoom prevention on iOS (font-size >= 16px stops auto-zoom) */
+@media (max-width: 600px) {
+  .field-input, select.field-input, textarea.field-input {
+    font-size: 16px !important;
+  }
+
+  /* Confirmation card actions — stack nicely */
+  .cc-actions {
+    padding: 0.7rem 0.8rem 0.8rem;
+  }
+
+  /* Track banner margin tighter on mobile */
+  #trackOrderBanner {
+    margin: 0.5rem 0.75rem;
+  }
+
+  .tob-step-label { font-size: 0.55rem; }
+
+  /* Modal starts from top on small phones */
+  .confirm-card {
+    border-radius: 16px;
+  }
+
+  /* Better tap size for copy button */
+  .cc-copy-btn {
+    padding: 0.45rem 0.8rem;
+    font-size: 0.8rem;
+  }
+
+  /* Booking cards on mobile */
+  .bk-card {
+    border-radius: 14px;
+  }
+}
+
