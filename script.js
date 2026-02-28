@@ -110,6 +110,12 @@ document.addEventListener("DOMContentLoaded", () => {
         window._firebase.db.collection("users").doc(user.uid).get().then(doc => {
           if (doc.exists) prefillBookingForm(doc.data());
         });
+        // Check for active booking and show track banner
+        checkAndShowActiveBooking(user.uid);
+      } else {
+        // Hide banner on logout
+        const banner = document.getElementById("trackOrderBanner");
+        if (banner) banner.style.display = "none";
       }
     });
   });
@@ -1091,40 +1097,62 @@ function sendWhatsAppAfterPayment() {
    BOOKING CONFIRMATION CARD HELPER
    ============================================ */
 function showConfirmationCard({ bookingRef, name, phone, pickup, drop, date, house, vehicle, total, paymentLabel, paymentNote, source, showInvoice }) {
-  // Booking ID
   const idEl = document.getElementById("bookingIdDisplay");
   if (idEl) idEl.textContent = bookingRef || "—";
 
-  // Header
   const titleEl = document.getElementById("ccTitle");
   const subEl   = document.getElementById("ccSubtitle");
   if (titleEl) titleEl.textContent = source === "whatsapp" ? "Request Sent!" : "Booking Confirmed!";
   if (subEl)   subEl.textContent   = source === "whatsapp"
-    ? "We received your request. Our team will call you shortly."
-    : "We'll call you within 30 minutes to confirm your slot.";
+    ? "Our team will call you shortly."
+    : "We'll call you within 30 minutes.";
 
-  // Route
+  // Compact summary fields
+  const pickupShort = (pickup || "—").split(",")[0];
+  const dropShort   = (drop   || "—").split(",")[0];
+  const pickupShortEl = document.getElementById("ccPickupShort");
+  const dropShortEl   = document.getElementById("ccDropShort");
+  if (pickupShortEl) pickupShortEl.textContent = pickupShort;
+  if (dropShortEl)   dropShortEl.textContent   = dropShort;
+
+  const dateEl = document.getElementById("ccDate");
+  if (dateEl) dateEl.textContent = date || "TBD";
+
+  const amtEl = document.getElementById("ccAmount");
+  if (amtEl) amtEl.textContent = "₹" + (total || 0).toLocaleString("en-IN");
+
+  const noteEl = document.getElementById("ccPriceNote");
+  if (noteEl) noteEl.textContent = paymentNote || "Pay on delivery";
+
+  // Full details fields
   const pickupEl = document.getElementById("ccPickup");
   const dropEl   = document.getElementById("ccDrop");
   if (pickupEl) pickupEl.textContent = pickup || "—";
   if (dropEl)   dropEl.textContent   = drop   || "—";
 
-  // Meta fields
-  const fields = { ccName: name, ccPhone: phone, ccDate: date || "TBD", ccHouse: house || "—", ccVehicle: vehicle || "—", ccPayment: paymentLabel || "—" };
+  const fields = { ccName: name, ccPhone: phone, ccHouse: house || "—", ccVehicle: vehicle || "—", ccPayment: paymentLabel || "Pay on delivery" };
   Object.entries(fields).forEach(([id, val]) => { const el = document.getElementById(id); if (el) el.textContent = val; });
-
-  // Price
-  const amtEl  = document.getElementById("ccAmount");
-  const noteEl = document.getElementById("ccPriceNote");
-  if (amtEl)  amtEl.textContent  = "₹" + (total || 0).toLocaleString();
-  if (noteEl) noteEl.textContent = paymentNote || "Inclusive of all charges";
 
   // Invoice button
   const invBtn = document.getElementById("btnInvoice");
   if (invBtn) invBtn.style.display = showInvoice ? "flex" : "none";
 
-  // Show modal
+  // Reset expand state
+  const fullDetails = document.getElementById("ccFullDetails");
+  const expandBtn   = document.getElementById("ccExpandBtn");
+  if (fullDetails) fullDetails.style.display = "none";
+  if (expandBtn)   expandBtn.textContent = "View Full Details ↓";
+
   document.getElementById("paymentModal").style.display = "flex";
+}
+
+function toggleConfirmDetails() {
+  const fullDetails = document.getElementById("ccFullDetails");
+  const expandBtn   = document.getElementById("ccExpandBtn");
+  if (!fullDetails) return;
+  const isOpen = fullDetails.style.display !== "none";
+  fullDetails.style.display = isOpen ? "none" : "block";
+  if (expandBtn) expandBtn.textContent = isOpen ? "View Full Details ↓" : "Hide Details ↑";
 }
 
 function closeModal() {
@@ -1164,8 +1192,22 @@ function startBannerTracking() {
 }
 
 function updateTrackBanner(b) {
-  const statusOrder = ["confirmed", "assigned", "packing", "transit", "delivered"];
+  const statusOrder  = ["confirmed","assigned","packing","transit","delivered"];
+  const statusLabels = { confirmed:"Confirmed", assigned:"Driver Assigned", packing:"Packing Started", transit:"In Transit 🚚", delivered:"Delivered ✅" };
   const idx = statusOrder.indexOf(b.status || "confirmed");
+
+  // Hide banner when delivered or cancelled
+  if (b.status === "delivered" || b.status === "cancelled") {
+    setTimeout(() => dismissTrackBanner(), 3000);
+  }
+
+  // Update status label
+  const labelEl = document.getElementById("tobStatusLabel");
+  if (labelEl) labelEl.textContent = statusLabels[b.status] || b.status || "Confirmed";
+
+  // Update progress bar fill
+  const fill = document.getElementById("tobProgressFill");
+  if (fill) fill.style.width = ((idx / (statusOrder.length - 1)) * 100) + "%";
 
   statusOrder.forEach((s, i) => {
     const step = document.getElementById("tobs" + i);
@@ -1193,6 +1235,33 @@ function updateTrackBanner(b) {
     banner.style.background = "linear-gradient(135deg, #15803d, #16a34a)";
     const title = banner.querySelector(".tob-title");
     if (title) title.textContent = "🎉 Your Move is Complete!";
+  }
+}
+
+async function checkAndShowActiveBooking(uid) {
+  if (!window._firebase) return;
+  try {
+    const snap = await window._firebase.db.collection("bookings")
+      .where("customerUid", "==", uid)
+      .where("status", "in", ["confirmed","assigned","packing","transit"])
+      .orderBy("createdAt", "desc")
+      .limit(1)
+      .get();
+    if (snap.empty) return;
+    const doc  = snap.docs[0];
+    const b    = doc.data();
+    currentBookingId = doc.id;
+    // Update banner booking ID
+    const tobId = document.getElementById("tobBookingId");
+    if (tobId) tobId.textContent = b.bookingRef || doc.id.slice(0,8).toUpperCase();
+    // Show banner
+    document.getElementById("trackOrderBanner").style.display = "block";
+    // Update banner state
+    updateTrackBanner(b);
+    // Start live listener
+    startBannerTracking();
+  } catch(e) {
+    console.warn("Active booking check:", e.message);
   }
 }
 
