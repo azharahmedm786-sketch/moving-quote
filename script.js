@@ -426,13 +426,17 @@ function signOutUser() {
    TOAST
    ============================================ */
 function showToast(msg, dur = 3000) {
-  const existing = document.getElementById("toastMsg");
-  if (existing) existing.remove();
-  const t = document.createElement("div");
-  t.id = "toastMsg"; t.className = "toast-msg"; t.textContent = msg;
-  document.body.appendChild(t);
-  setTimeout(() => t.classList.add("show"), 10);
-  setTimeout(() => { t.classList.remove("show"); setTimeout(() => t.remove(), 400); }, dur);
+  let t = document.getElementById("toastMsg");
+  if (!t) {
+    t = document.createElement("div");
+    t.id = "toastMsg";
+    t.className = "toast-msg";
+    document.body.appendChild(t);
+  }
+  t.textContent = msg;
+  t.classList.add("show");
+  clearTimeout(t._hideTimer);
+  t._hideTimer = setTimeout(() => t.classList.remove("show"), dur);
 }
 
 /* ============================================
