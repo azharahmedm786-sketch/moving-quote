@@ -884,8 +884,6 @@ async function resolveDamageClaim(newStatus) {
     loadDamageClaims();
   } catch(e) { alert("Error: " + e.message); }
 }
-}
-
 async function loadCancelRequests() {
   const tbody = document.getElementById("cancelsTable");
   if (!tbody || !window._firebase) return;
