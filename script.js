@@ -784,10 +784,44 @@ function calculateQuote(auto = false) {
       const distLabel = km <= 400 ? "up to 400 km" : km <= 600 ? "up to 600 km" : km <= 1000 ? "up to 1000 km" : "1000+ km";
       breakdownHtml = `🚛 Intercity · ~${Math.round(km)} km (${distLabel})<br>Base: ₹${baseRate.toLocaleString()}${furnitureCost ? ` · Items: ₹${furnitureCost.toLocaleString()}` : ""}${packingCost ? ` · Packing: ₹${packingCost.toLocaleString()}` : ""}<br><strong>Total Estimate: ₹${total.toLocaleString()}</strong>`;
     } else {
-      // LOCAL: per km rate
-      total = Math.round(MIN_BASE_PRICE + houseBase + (km * vehicleRate) + furnitureCost + floorCost + packingCost);
-      breakdownHtml = `📍 Local · ~${km.toFixed(1)} km${furnitureCost ? ` · Items: ₹${furnitureCost.toLocaleString()}` : ""}<br><strong>Total Estimate: ₹${total.toLocaleString()}</strong>`;
+
+  // ================================
+  // PORTER-STYLE LOCAL PRICING
+  // ================================
+
+  if (vehicle?.value === "19ft") {
+
+    if (km <= 25) {
+      total = 9000;
+    } else {
+      total = 9000 + ((km - 25) * 40);
     }
+
+  } else if (vehicle?.value === "14ft") {
+
+    if (km <= 25) {
+      total = 6500;
+    } else {
+      total = 6500 + ((km - 25) * 35);
+    }
+
+  } else if (vehicle?.value === "7ft") {
+
+    if (km <= 25) {
+      total = 3500;
+    } else {
+      total = 3500 + ((km - 25) * 25);
+    }
+
+  } else {
+    total = 5000; // fallback safety
+  }
+
+  // Add packing cost only
+  total = Math.round(total + packingCost);
+
+  breakdownHtml = `📍 Local · ~${km.toFixed(1)} km<br><strong>Total Estimate: ₹${total.toLocaleString()}</strong>`;
+}
     if (result) result.innerHTML = breakdownHtml;
     lastCalculatedTotal = total;
     updatePriceDisplay();
