@@ -789,34 +789,17 @@ function calculateQuote(auto = false) {
   // PORTER-STYLE LOCAL PRICING
   // ================================
 
-  if (vehicle?.value === "19ft") {
+ const vehicleVal = Number(vehicle?.value || 0);
 
-    if (km <= 25) {
-      total = 9000;
-    } else {
-      total = 9000 + ((km - 25) * 40);
-    }
-
-  } else if (vehicle?.value === "14ft") {
-
-    if (km <= 25) {
-      total = 6500;
-    } else {
-      total = 6500 + ((km - 25) * 35);
-    }
-
-  } else if (vehicle?.value === "7ft") {
-
-    if (km <= 25) {
-      total = 3500;
-    } else {
-      total = 3500 + ((km - 25) * 25);
-    }
-
-  } else {
-    total = 5000; // fallback safety
-  }
-
+if (vehicleVal >= 8000) {        // 19ft
+  total = km <= 25 ? 9000 : 9000 + ((km - 25) * 40);
+}
+else if (vehicleVal >= 5000) {   // 14ft
+  total = km <= 25 ? 6500 : 6500 + ((km - 25) * 35);
+}
+else {                           // 7ft or small
+  total = km <= 25 ? 3500 : 3500 + ((km - 25) * 25);
+}
   // Add packing cost only
   total = Math.round(total + packingCost);
 
