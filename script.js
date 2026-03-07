@@ -642,9 +642,12 @@ function initAutocomplete() {
 }
 
 function attachAutoCalculation() {
-  ["house","vehicle","sofaCheck","sofaQty","bedCheck","bedQty","fridgeCheck","wmCheck"].forEach(id => {
+  // Listen to house, vehicle, lift, floor changes
+  ["house","vehicle","pickupFloor","dropFloor","liftAvailable","cartonQty"].forEach(id => {
     document.getElementById(id)?.addEventListener("change", () => calculateQuote(true));
   });
+  // Listen to furniture checkboxes via event delegation on the grid
+  document.querySelector(".furniture-grid")?.addEventListener("change", () => calculateQuote(true));
 }
 
 function showLocation(type) {
@@ -711,25 +714,32 @@ function calculateQuote(auto = false) {
   const vehicleRate = Number(vehicle?.value || 0);
   if (!houseBase || (!isIntercityMove && !vehicleRate)) { if (!auto) alert("Select house & vehicle"); return; }
 
-  // COUNT ITEMS: ₹150 per item selected (flat rate regardless of item type or vehicle)
+  // ₹150 only for Living Room and Bedroom items
+  const chargedItems = [
+    "sofaCheck","tvCheck","tvUnitCheck","coffeeCheck","acCheck",       // Living Room
+    "bedCheck","wardrobeCheck","dressingCheck","sideTableCheck"        // Bedroom
+  ];
+  // Kitchen and Other items are free (no charge)
   let itemCount = 0;
-  ["sofaCheck","bedCheck","fridgeCheck","wmCheck","tvCheck","acCheck","wardrobeCheck","diningCheck",
-   "deskCheck","chairCheck","cabinetCheck","serverCheck","printerCheck","confCheck"].forEach(id => {
+  chargedItems.forEach(id => {
     if (document.getElementById(id)?.checked) itemCount++;
   });
-  const furnitureCost = itemCount * 150;
+  const cartonQty   = parseInt(document.getElementById("cartonQty")?.value || 0);
+  const cartonCost  = cartonQty * 50;
+  const furnitureCost = (itemCount * 150) + cartonCost;
 
   function applyPrice(km) {
+    // HTML floor dropdown values are already rupee costs (0, 500, 1000, 1750)
+    // Use them directly — do NOT multiply again
     const pickupFloor  = Number(document.getElementById("pickupFloor")?.value  || 0);
     const dropFloor    = Number(document.getElementById("dropFloor")?.value    || 0);
     const liftAvail    = document.getElementById("liftAvailable")?.checked;
-    const packingCost  = document.getElementById("packingService")?.checked ? 500 : 0;
+    const packingCost  = 0; // Packing service removed
 
-    // FIX: Floor cost calculation is now consistent for both local and intercity.
-    // Per-floor charge is ₹200 without lift, ₹100 with lift (per floor).
+    // With lift: 50% off floor charges
     const floorCost = liftAvail
-      ? (pickupFloor + dropFloor) * 100
-      : (pickupFloor + dropFloor) * 200;
+      ? Math.round((pickupFloor + dropFloor) * 0.5)
+      : (pickupFloor + dropFloor);
 
     detectAndShowIntercityBadge(km);
 
@@ -748,9 +758,9 @@ function calculateQuote(auto = false) {
       breakdownHtml =
         `🚛 Intercity · ~${Math.round(km)} km (${distLabel})<br>` +
         `Base: ₹${baseRate.toLocaleString()}` +
-        `${furnitureCost ? ` · Items (${itemCount} × ₹150): ₹${furnitureCost.toLocaleString()}` : ""}` +
-        `${floorCost     ? ` · Floor: ₹${floorCost.toLocaleString()}`     : ""}` +
-        `${packingCost   ? ` · Packing: ₹${packingCost.toLocaleString()}` : ""}` +
+        `${itemCount    ? ` · Living/Bedroom items (${itemCount} × ₹150): ₹${(itemCount*150).toLocaleString()}` : ""}` +
+        `${cartonQty    ? ` · Cartons (${cartonQty} × ₹50): ₹${cartonCost.toLocaleString()}`   : ""}` +
+        `${floorCost    ? ` · Floor: ₹${floorCost.toLocaleString()}`                             : ""}` +
         `<br><strong>Total Estimate: ₹${total.toLocaleString()}</strong>`;
     } else {
       // ===================================================
@@ -784,10 +794,10 @@ function calculateQuote(auto = false) {
       breakdownHtml =
         `📍 Local · ~${km.toFixed(1)} km<br>` +
         `Base fare: ₹${baseFare.toLocaleString()}` +
-        `${km > 25      ? ` · Extra km: ₹${Math.round((km-25)*perKmRate).toLocaleString()}` : ""}` +
-        `${furnitureCost ? ` · Items (${itemCount} × ₹150): ₹${furnitureCost.toLocaleString()}` : ""}` +
-        `${floorCost     ? ` · Floor: ₹${floorCost.toLocaleString()}`                        : ""}` +
-        `${packingCost   ? ` · Packing: ₹${packingCost.toLocaleString()}`                    : ""}` +
+        `${km > 25      ? ` · Extra km: ₹${Math.round((km-25)*perKmRate).toLocaleString()}`     : ""}` +
+        `${itemCount    ? ` · Living/Bedroom items (${itemCount} × ₹150): ₹${(itemCount*150).toLocaleString()}`: ""}` +
+        `${cartonQty    ? ` · Cartons (${cartonQty} × ₹50): ₹${cartonCost.toLocaleString()}`  : ""}` +
+        `${floorCost    ? ` · Floor: ₹${floorCost.toLocaleString()}`                            : ""}` +
         `<br><strong>Total Estimate: ₹${total.toLocaleString()}</strong>`;
     }
 
@@ -878,7 +888,7 @@ async function bookOnWhatsApp() {
         pickupFloor:  document.getElementById("pickupFloor")?.options[document.getElementById("pickupFloor")?.selectedIndex]?.text || "",
         dropFloor:    document.getElementById("dropFloor")?.options[document.getElementById("dropFloor")?.selectedIndex]?.text || "",
         liftAvailable:!!document.getElementById("liftAvailable")?.checked,
-        packingService:!!document.getElementById("packingService")?.checked,
+        packingService: false, // removed feature
         total:        discountedTotal,   // FIX: save discounted total
         originalTotal: lastCalculatedTotal,
         paid:         0,
@@ -1024,7 +1034,7 @@ function onPaymentSuccess(response, name, phone, paid, total) {
       pickupFloor:  document.getElementById("pickupFloor")?.options[document.getElementById("pickupFloor")?.selectedIndex]?.text || "",
       dropFloor:    document.getElementById("dropFloor")?.options[document.getElementById("dropFloor")?.selectedIndex]?.text || "",
       liftAvailable:!!document.getElementById("liftAvailable")?.checked,
-      packingService:!!document.getElementById("packingService")?.checked,
+      packingService: false, // removed feature
       total,                           // FIX: this is already the discounted total
       originalTotal: lastCalculatedTotal,
       paid, paymentType: selectedPayment,
@@ -1878,50 +1888,151 @@ function renderSizeCards(type) {
   renderFurnitureGrid(type);
 }
 
+const FURNITURE_CATEGORIES = {
+  home: [
+    {
+      id: "cat-living", icon: "🛋️", label: "Living Room",
+      items: [
+        { id:"sofaCheck",     emoji:"🛋️", name:"Sofa"         },
+        { id:"tvCheck",       emoji:"📺", name:"TV"           },
+        { id:"tvUnitCheck",   emoji:"🗄️", name:"TV Unit"      },
+        { id:"coffeeCheck",   emoji:"☕", name:"Coffee Table" },
+        { id:"acCheck",       emoji:"❄️", name:"AC Unit"      },
+      ]
+    },
+    {
+      id: "cat-bedroom", icon: "🛏️", label: "Bedroom",
+      items: [
+        { id:"bedCheck",      emoji:"🛏️", name:"Bed"          },
+        { id:"wardrobeCheck", emoji:"🚪", name:"Wardrobe"     },
+        { id:"dressingCheck", emoji:"🪞", name:"Dressing Table"},
+        { id:"sideTableCheck",emoji:"🪑", name:"Side Table"   },
+      ]
+    },
+    {
+      id: "cat-kitchen", icon: "🍳", label: "Kitchen",
+      items: [
+        { id:"fridgeCheck",   emoji:"🧊", name:"Fridge"           },
+        { id:"wmCheck",       emoji:"🫧", name:"Washing Machine"  },
+        { id:"microwaveCheck",emoji:"📦", name:"Microwave"        },
+        { id:"chimneyCheck",  emoji:"🔧", name:"Chimney"          },
+        { id:"diningCheck",   emoji:"🪑", name:"Dining Table+Chairs"},
+      ]
+    },
+    {
+      id: "cat-other", icon: "📦", label: "Other Items",
+      items: [
+        { id:"bikeCheck",     emoji:"🏍️", name:"Bike/Scooter"  },
+        { id:"cycleCheck",    emoji:"🚲", name:"Cycle"         },
+        { id:"plantCheck",    emoji:"🪴", name:"Large Plants"  },
+        { id:"gymCheck",      emoji:"🏋️", name:"Gym Equipment" },
+      ]
+    }
+  ],
+  office: [
+    {
+      id: "cat-workstation", icon: "🖥️", label: "Workstation",
+      items: [
+        { id:"deskCheck",     emoji:"🖥️", name:"Office Desk"      },
+        { id:"chairCheck",    emoji:"🪑", name:"Chair"            },
+        { id:"serverCheck",   emoji:"💾", name:"Server/PC"        },
+        { id:"printerCheck",  emoji:"🖨️", name:"Printer"          },
+      ]
+    },
+    {
+      id: "cat-cabin", icon: "🏢", label: "Cabin / Meeting",
+      items: [
+        { id:"confCheck",     emoji:"📋", name:"Conference Table" },
+        { id:"cabinetCheck",  emoji:"🗄️", name:"Filing Cabinet"   },
+        { id:"whiteboardCheck",emoji:"📝",name:"Whiteboard"       },
+      ]
+    },
+    {
+      id: "cat-appliances", icon: "❄️", label: "Appliances",
+      items: [
+        { id:"fridgeCheck",   emoji:"🧊", name:"Fridge"           },
+        { id:"acCheck",       emoji:"❄️", name:"AC Unit"          },
+        { id:"wmCheck",       emoji:"🫧", name:"Washing Machine"  },
+      ]
+    },
+    {
+      id: "cat-other", icon: "📦", label: "Other Items",
+      items: [
+        { id:"plantCheck",    emoji:"🪴", name:"Large Plants"     },
+        { id:"gymCheck",      emoji:"🏋️", name:"Gym Equipment"    },
+      ]
+    }
+  ]
+};
+
 function renderFurnitureGrid(type) {
   const grid = document.querySelector(".furniture-grid");
   if (!grid) return;
 
-  const homeFurniture = [
-    { id:"sofaCheck",     emoji:"🛋️", name:"Sofa",           price:150, hasQty:false },
-    { id:"bedCheck",      emoji:"🛏️", name:"Bed",            price:150, hasQty:false },
-    { id:"fridgeCheck",   emoji:"🧊", name:"Fridge",         price:150, hasQty:false },
-    { id:"wmCheck",       emoji:"🫧", name:"Washing Machine",price:150, hasQty:false },
-    { id:"tvCheck",       emoji:"📺", name:"TV",             price:150, hasQty:false },
-    { id:"acCheck",       emoji:"❄️", name:"AC Unit",        price:150, hasQty:false },
-    { id:"wardrobeCheck", emoji:"🚪", name:"Wardrobe",       price:150, hasQty:false },
-    { id:"diningCheck",   emoji:"🪑", name:"Dining Table",   price:150, hasQty:false },
-  ];
+  const categories = FURNITURE_CATEGORIES[type] || FURNITURE_CATEGORIES.home;
 
-  const officeFurniture = [
-    { id:"deskCheck",     emoji:"🖥️", name:"Office Desk",    price:150, hasQty:false },
-    { id:"chairCheck",    emoji:"🪑", name:"Chair",          price:150, hasQty:false },
-    { id:"cabinetCheck",  emoji:"🗄️", name:"Filing Cabinet", price:150, hasQty:false },
-    { id:"serverCheck",   emoji:"💾", name:"Server/PC",      price:150, hasQty:false },
-    { id:"printerCheck",  emoji:"🖨️", name:"Printer",        price:150, hasQty:false },
-    { id:"confCheck",     emoji:"📋", name:"Conf. Table",    price:150, hasQty:false },
-    { id:"fridgeCheck",   emoji:"🧊", name:"Fridge",         price:150, hasQty:false },
-    { id:"acCheck",       emoji:"❄️", name:"AC Unit",        price:150, hasQty:false },
-  ];
-
-  const items = type === "office" ? officeFurniture : homeFurniture;
-
-  grid.innerHTML = items.map(item => `
+  const itemCard = (item) => `
     <label class="furniture-card">
-      <input type="checkbox" id="${item.id}">
+      <input type="checkbox" id="${item.id}" onchange="calculateQuote(true)">
       <div class="fc-body">
         <div class="fc-check">✓</div>
         <span class="fc-emoji">${item.emoji}</span>
         <span class="fc-name">${item.name}</span>
-        <span class="fc-price">+₹${item.price}</span>
-        ${item.hasQty ? `
-        <div class="fc-qty-row" onclick="event.stopPropagation()">
-          <button class="qty-btn" onclick="changeQty('${item.qtyId}',-1)">−</button>
-          <input type="number" id="${item.qtyId}" value="1" min="1" max="9" class="fc-qty">
-          <button class="qty-btn" onclick="changeQty('${item.qtyId}',1)">+</button>
-        </div>` : ""}
+        <span class="fc-price">+₹150</span>
       </div>
-    </label>`).join("");
+    </label>`;
+
+  const categoryBlock = (cat) => `
+    <div class="fc-category">
+      <div class="fc-category-header" onclick="toggleFurnitureCategory('${cat.id}')">
+        <span class="fc-cat-icon">${cat.icon}</span>
+        <span class="fc-cat-label">${cat.label}</span>
+        <span class="fc-cat-arrow" id="arrow-${cat.id}">▸</span>
+      </div>
+      <div class="fc-category-items" id="${cat.id}" style="display:none">
+        ${cat.items.map(itemCard).join("")}
+      </div>
+    </div>`;
+
+  // Carton box section
+  const cartonSection = `
+    <div class="fc-category">
+      <div class="fc-category-header" onclick="toggleFurnitureCategory('cat-carton')">
+        <span class="fc-cat-icon">📦</span>
+        <span class="fc-cat-label">Carton Boxes (Our Service)</span>
+        <span class="fc-cat-arrow" id="arrow-cat-carton">▸</span>
+      </div>
+      <div class="fc-category-items" id="cat-carton" style="display:none">
+        <div class="carton-box-row">
+          <span class="carton-label">📦 How many carton boxes do you need?</span>
+          <div class="carton-qty-wrap">
+            <button class="qty-btn" onclick="changeCartonQty(-1)">−</button>
+            <input type="number" id="cartonQty" value="0" min="0" max="50" class="fc-qty" onchange="calculateQuote(true)">
+            <button class="qty-btn" onclick="changeCartonQty(1)">+</button>
+          </div>
+          <span class="carton-price-note">₹50 per box</span>
+        </div>
+      </div>
+    </div>`;
+
+  grid.innerHTML = categories.map(categoryBlock).join("") + cartonSection;
+}
+
+function toggleFurnitureCategory(id) {
+  const panel = document.getElementById(id);
+  const arrow = document.getElementById("arrow-" + id);
+  if (!panel) return;
+  const isOpen = panel.style.display !== "none";
+  panel.style.display = isOpen ? "none" : "flex";
+  if (arrow) arrow.textContent = isOpen ? "▸" : "▾";
+}
+
+function changeCartonQty(delta) {
+  const input = document.getElementById("cartonQty");
+  if (!input) return;
+  const newVal = Math.max(0, Math.min(50, (parseInt(input.value) || 0) + delta));
+  input.value = newVal;
+  calculateQuote(true);
 }
 
 function selectCard(el, type, value) {
@@ -1949,26 +2060,38 @@ function capitalize(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : "";
 
 function getFurnitureSummary() {
   const checks = [
-    ["sofaCheck",    "sofaQty",  "Sofa"],
-    ["bedCheck",     "bedQty",   "Bed"],
-    ["deskCheck",    "deskQty",  "Desk"],
-    ["chairCheck",   "chairQty", "Chair"],
-    ["fridgeCheck",  null,       "Fridge"],
-    ["wmCheck",      null,       "Washing Machine"],
-    ["tvCheck",      null,       "TV"],
-    ["acCheck",      null,       "AC"],
-    ["wardrobeCheck",null,       "Wardrobe"],
-    ["diningCheck",  null,       "Dining Table"],
-    ["cabinetCheck", null,       "Filing Cabinet"],
-    ["serverCheck",  null,       "Server/PC"],
-    ["printerCheck", null,       "Printer"],
-    ["confCheck",    null,       "Conf. Table"],
+    ["sofaCheck",      "Sofa"],
+    ["bedCheck",       "Bed"],
+    ["tvCheck",        "TV"],
+    ["tvUnitCheck",    "TV Unit"],
+    ["coffeeCheck",    "Coffee Table"],
+    ["acCheck",        "AC Unit"],
+    ["wardrobeCheck",  "Wardrobe"],
+    ["dressingCheck",  "Dressing Table"],
+    ["sideTableCheck", "Side Table"],
+    ["fridgeCheck",    "Fridge"],
+    ["wmCheck",        "Washing Machine"],
+    ["microwaveCheck", "Microwave"],
+    ["chimneyCheck",   "Chimney"],
+    ["diningCheck",    "Dining Table"],
+    ["bikeCheck",      "Bike/Scooter"],
+    ["cycleCheck",     "Cycle"],
+    ["plantCheck",     "Large Plants"],
+    ["gymCheck",       "Gym Equipment"],
+    ["deskCheck",      "Office Desk"],
+    ["chairCheck",     "Chair"],
+    ["cabinetCheck",   "Filing Cabinet"],
+    ["serverCheck",    "Server/PC"],
+    ["printerCheck",   "Printer"],
+    ["confCheck",      "Conf. Table"],
+    ["whiteboardCheck","Whiteboard"],
   ];
-  return checks
+  const items = checks
     .filter(([id]) => document.getElementById(id)?.checked)
-    .map(([id, qtyId, name]) => qtyId && document.getElementById(qtyId)
-      ? `${name} x${document.getElementById(qtyId).value||1}` : name)
-    .join(", ") || "";
+    .map(([, name]) => name);
+  const cartonQty = parseInt(document.getElementById("cartonQty")?.value || 0);
+  if (cartonQty > 0) items.push(`Carton Boxes x${cartonQty}`);
+  return items.join(", ") || "";
 }
 
 /* ============================================
@@ -2062,7 +2185,7 @@ function bookWithoutPayment() {
 
   if (!window._firebase) { showToast("⚠️ Service not ready. Try again."); return; }
 
-  const btn = document.querySelector(".btn-free-book");
+  const btn = document.querySelector(".btn-pay");
   if (btn) { btn.disabled = true; btn.textContent = "⏳ Saving..."; }
 
   const houseEl2   = document.getElementById("house");
@@ -2086,7 +2209,7 @@ function bookWithoutPayment() {
     pickupFloor:  document.getElementById("pickupFloor")?.options[document.getElementById("pickupFloor")?.selectedIndex]?.text || "",
     dropFloor:    document.getElementById("dropFloor")?.options[document.getElementById("dropFloor")?.selectedIndex]?.text || "",
     liftAvailable:!!document.getElementById("liftAvailable")?.checked,
-    packingService:!!document.getElementById("packingService")?.checked,
+    packingService: false, // removed feature
     total:        discountedTotal,   // FIX: was lastCalculatedTotal (pre-discount)
     originalTotal: lastCalculatedTotal,
     paid:         0,
@@ -2099,7 +2222,7 @@ function bookWithoutPayment() {
   }).then(docRef => {
     currentBookingId = docRef.id;
     localStorage.setItem("packzen_active_booking", docRef.id);
-    if (btn) { btn.disabled = false; btn.textContent = "📋 Book Now (Pay Later)"; }
+    if (btn) { btn.disabled = false; btn.textContent = "📋 Confirm Booking · Pay on Delivery"; }
     queueSMS(phone, "booking_confirmed", {
       name, bookingRef, date,
       pickup: document.getElementById("pickup")?.value || "",
@@ -2145,7 +2268,7 @@ function bookWithoutPayment() {
     showToast("✅ Booking saved! ID: " + bookingRef);
 
   }).catch(e => {
-    if (btn) { btn.disabled = false; btn.textContent = "📋 Book Now (Pay Later)"; }
+    if (btn) { btn.disabled = false; btn.textContent = "📋 Confirm Booking · Pay on Delivery"; }
     showToast("❌ Booking failed: " + e.message);
     console.error("bookWithoutPayment error:", e);
   });
