@@ -18,9 +18,7 @@
 <nav class="navbar">
   <div class="nav-inner">
    <a href="index.html" class="logo-wrap">
-  <img src="assets/logo/packzen-logo.png"
-       class="logo-img"
-       alt="PackZen Logo">
+  <img src="assets/logo/packzen-logo.png" class="logo-img" alt="PackZen Logo">
 </a>
     <div class="nav-links">
       <a href="#services">Services</a>
@@ -37,7 +35,7 @@
   </div>
 </nav>
 
-<!-- USER DROPDOWN — outside navbar so it's never clipped -->
+<!-- USER DROPDOWN -->
 <div class="user-dropdown" id="userDropdown">
   <a href="#" onclick="openDashboard();closeUserMenu()">📋 My Bookings</a>
   <a href="#" onclick="openTrackingModal();closeUserMenu()">📍 Track My Move</a>
@@ -131,31 +129,18 @@
 <!-- MARQUEE -->
 <div class="marquee-wrap">
   <div class="marquee-track">
-    <span>✔ Licensed & Insured</span>
-    <span class="dot">◆</span>
-    <span>✔ Experienced Team</span>
-    <span class="dot">◆</span>
-    <span>✔ Safe Packing</span>
-    <span class="dot">◆</span>
-    <span>✔ On-Time Delivery</span>
-    <span class="dot">◆</span>
-    <span>✔ GPS Tracked Vehicles</span>
-    <span class="dot">◆</span>
-    <span>✔ Zero Damage Guarantee</span>
-    <span class="dot">◆</span>
-    <!-- Duplicate for seamless loop -->
-    <span>✔ Licensed & Insured</span>
-    <span class="dot">◆</span>
-    <span>✔ Experienced Team</span>
-    <span class="dot">◆</span>
-    <span>✔ Safe Packing</span>
-    <span class="dot">◆</span>
-    <span>✔ On-Time Delivery</span>
-    <span class="dot">◆</span>
-    <span>✔ GPS Tracked Vehicles</span>
-    <span class="dot">◆</span>
-    <span>✔ Zero Damage Guarantee</span>
-    <span class="dot">◆</span>
+    <span>✔ Licensed & Insured</span><span class="dot">◆</span>
+    <span>✔ Experienced Team</span><span class="dot">◆</span>
+    <span>✔ Safe Packing</span><span class="dot">◆</span>
+    <span>✔ On-Time Delivery</span><span class="dot">◆</span>
+    <span>✔ GPS Tracked Vehicles</span><span class="dot">◆</span>
+    <span>✔ Zero Damage Guarantee</span><span class="dot">◆</span>
+    <span>✔ Licensed & Insured</span><span class="dot">◆</span>
+    <span>✔ Experienced Team</span><span class="dot">◆</span>
+    <span>✔ Safe Packing</span><span class="dot">◆</span>
+    <span>✔ On-Time Delivery</span><span class="dot">◆</span>
+    <span>✔ GPS Tracked Vehicles</span><span class="dot">◆</span>
+    <span>✔ Zero Damage Guarantee</span><span class="dot">◆</span>
   </div>
 </div>
 
@@ -191,8 +176,7 @@
   </div>
 </section>
 
-<!-- QUOTE SECTION (MULTI-STEP FORM) -->
-<!-- TRACK ORDER BANNER — shown after booking is confirmed and modal closed -->
+<!-- TRACK ORDER BANNER -->
 <div id="trackOrderBanner" style="display:none;">
   <div class="tob-inner">
     <div class="tob-top">
@@ -206,8 +190,6 @@
         <button class="tob-dismiss" onclick="dismissTrackBanner()">✕</button>
       </div>
     </div>
-
-    <!-- Slim progress bar -->
     <div class="tob-progress-bar">
       <div class="tob-progress-fill" id="tobProgressFill"></div>
     </div>
@@ -237,8 +219,6 @@
         <div class="tob-step-label">Delivered</div>
       </div>
     </div>
-
-    <!-- Driver info row (shown once assigned) -->
     <div class="tob-driver" id="tobDriverRow" style="display:none;">
       <span class="tob-driver-icon">🚚</span>
       <span id="tobDriverName">Driver assigned</span>
@@ -247,6 +227,7 @@
   </div>
 </div>
 
+<!-- QUOTE SECTION -->
 <section class="quote-section" id="quote">
   <div class="quote-wrapper">
     <div class="quote-left reveal">
@@ -271,11 +252,9 @@
             </div>
             <div class="step-header-label" id="stepLabel">What type of move?</div>
           </div>
-          <!-- Progress Bar -->
           <div class="step-progress-track">
             <div class="step-progress-fill" id="progressBar" style="width:20%"></div>
           </div>
-          <!-- Step Dots -->
           <div class="step-indicators">
             <div class="step-dot active" id="dot0">
               <span class="dot-icon">🏠</span>
@@ -309,25 +288,21 @@
           <div class="step-body">
             <p class="step-hint">Tell us about your move so we can give the most accurate quote.</p>
             <div class="move-type-grid">
-
               <div class="move-type-card" onclick="selectMoveType(this,'home')">
                 <div class="mt-icon">🏠</div>
                 <div class="mt-label">Home Move</div>
                 <div class="mt-sub">Apartment · Villa · PG</div>
               </div>
-
               <div class="move-type-card" onclick="selectMoveType(this,'office')">
                 <div class="mt-icon">🏢</div>
                 <div class="mt-label">Office / Commercial</div>
                 <div class="mt-sub">Office · Shop · Warehouse</div>
               </div>
-
               <div class="move-type-card" onclick="selectMoveType(this,'single')">
                 <div class="mt-icon">📦</div>
                 <div class="mt-label">Single Item</div>
                 <div class="mt-sub">Sofa · Fridge · Bike</div>
               </div>
-
             </div>
             <input type="hidden" id="moveType" value="">
           </div>
@@ -362,8 +337,6 @@
             </div>
             <div id="map"></div>
             <div id="distanceInfo" class="distance-badge"></div>
-
-            <!-- INTERCITY BADGE — shown when distance > 80km -->
             <div id="intercityBadge" class="intercity-badge" style="display:none">
               <div class="ic-icon">🚛</div>
               <div class="ic-info">
@@ -395,9 +368,7 @@
 
             <div class="field-group" id="sizeFieldGroup">
               <label class="field-label" id="sizeSelectorLabel"><span class="field-icon">🏠</span> <span id="sizeLabelText">House Type</span></label>
-              <div class="select-cards" id="houseCards">
-                <!-- Populated dynamically by JS based on move type -->
-              </div>
+              <div class="select-cards" id="houseCards"></div>
               <select id="house" class="field-input" style="display:none">
                 <option value="">Select size</option>
               </select>
@@ -407,20 +378,20 @@
             <div class="field-row-2">
               <div class="field-group">
                 <label class="field-label"><span class="field-icon">🏗️</span> Pickup Floor</label>
-                <select id="pickupFloor" class="field-input">
-                  <option value="0">Ground / 1st</option>
-                  <option value="500">2nd – 4th</option>
-                  <option value="1000">5th – 8th</option>
-                  <option value="1750">9th and above</option>
+                <select id="pickupFloor" class="field-input" onchange="calculateQuote(true)">
+                  <option value="0">Ground / 1st (free)</option>
+                  <option value="500">2nd – 4th (+₹500)</option>
+                  <option value="1000">5th – 8th (+₹1,000)</option>
+                  <option value="1750">9th and above (+₹1,750)</option>
                 </select>
               </div>
               <div class="field-group">
                 <label class="field-label"><span class="field-icon">🏗️</span> Drop Floor</label>
-                <select id="dropFloor" class="field-input">
-                  <option value="0">Ground / 1st</option>
-                  <option value="500">2nd – 4th</option>
-                  <option value="1000">5th – 8th</option>
-                  <option value="1750">9th and above</option>
+                <select id="dropFloor" class="field-input" onchange="calculateQuote(true)">
+                  <option value="0">Ground / 1st (free)</option>
+                  <option value="500">2nd – 4th (+₹500)</option>
+                  <option value="1000">5th – 8th (+₹1,000)</option>
+                  <option value="1750">9th and above (+₹1,750)</option>
                 </select>
               </div>
             </div>
@@ -428,25 +399,15 @@
             <!-- LIFT AVAILABLE -->
             <div class="field-group">
               <label class="toggle-row" style="margin:0">
-                <span class="toggle-text">🛗 Lift available at both locations</span>
+                <span class="toggle-text">🛗 Lift available at both locations <span style="color:#16a34a;font-size:.8rem">(50% off floor charges)</span></span>
                 <label class="toggle">
-                  <input type="checkbox" id="liftAvailable">
+                  <input type="checkbox" id="liftAvailable" onchange="calculateQuote(true)">
                   <span class="slider"></span>
                 </label>
               </label>
             </div>
 
-            <!-- PACKING SERVICE -->
-            <div class="field-group">
-              <label class="toggle-row" style="margin:0">
-                <span class="toggle-text">📦 Add professional packing service <span style="color:#16a34a;font-weight:700">+₹3,800</span></span>
-                <label class="toggle">
-                  <input type="checkbox" id="packingService" onchange="calculateQuote(true)">
-                  <span class="slider"></span>
-                </label>
-              </label>
-            </div>
-
+            <!-- VEHICLE TYPE -->
             <div class="field-group" id="vehicleCardGroup">
               <label class="field-label"><span class="field-icon">🚚</span> Vehicle Type</label>
               <div class="vehicle-cards" id="vehicleCards">
@@ -456,7 +417,7 @@
                     <div class="vc-name">Tata Ace</div>
                     <div class="vc-sub">Small load · 1 RK</div>
                   </div>
-                  <div class="vc-rate">₹34/km</div>
+                  <div class="vc-rate">₹1,999</div>
                 </div>
                 <div class="vehicle-card" onclick="selectCard(this,'vehicle','54')">
                   <div class="vc-icon">🚚</div>
@@ -464,7 +425,7 @@
                     <div class="vc-name">14 ft Truck</div>
                     <div class="vc-sub">Medium · 1–2 BHK</div>
                   </div>
-                  <div class="vc-rate">₹54/km</div>
+                  <div class="vc-rate">₹4,500</div>
                 </div>
                 <div class="vehicle-card" onclick="selectCard(this,'vehicle','69')">
                   <div class="vc-icon">🚛</div>
@@ -472,7 +433,7 @@
                     <div class="vc-name">17 ft Truck</div>
                     <div class="vc-sub">Large · 2–3 BHK</div>
                   </div>
-                  <div class="vc-rate">₹69/km</div>
+                  <div class="vc-rate">₹6,000</div>
                 </div>
                 <div class="vehicle-card" onclick="selectCard(this,'vehicle','88')">
                   <div class="vc-icon">🚜</div>
@@ -480,10 +441,9 @@
                     <div class="vc-name">22 ft Truck</div>
                     <div class="vc-sub">XL · 3+ BHK</div>
                   </div>
-                  <div class="vc-rate">₹88/km</div>
+                  <div class="vc-rate">₹7,500</div>
                 </div>
               </div>
-              <!-- Hidden select for compatibility -->
               <select id="vehicle" class="field-input" style="display:none">
                 <option value="">Select vehicle</option>
                 <option value="34">Tata Ace (Small)</option>
@@ -506,101 +466,9 @@
         <!-- STEP 3: ITEMS -->
         <div class="form-step">
           <div class="step-body">
-            <p class="step-hint">Select items you're moving. This helps us give you an accurate quote.</p>
-            <div class="furniture-grid">
-
-              <!-- With qty -->
-              <label class="furniture-card">
-                <input type="checkbox" id="sofaCheck">
-                <div class="fc-body">
-                  <div class="fc-check">✓</div>
-                  <span class="fc-emoji">🛋️</span>
-                  <span class="fc-name">Sofa</span>
-                  <span class="fc-price">+₹2,000</span>
-                  <div class="fc-qty-row" onclick="event.stopPropagation()">
-                    <button class="qty-btn" onclick="changeQty('sofaQty',-1)">−</button>
-                    <input type="number" id="sofaQty" value="1" min="1" max="9" class="fc-qty">
-                    <button class="qty-btn" onclick="changeQty('sofaQty',1)">+</button>
-                  </div>
-                </div>
-              </label>
-
-              <label class="furniture-card">
-                <input type="checkbox" id="bedCheck">
-                <div class="fc-body">
-                  <div class="fc-check">✓</div>
-                  <span class="fc-emoji">🛏️</span>
-                  <span class="fc-name">Bed</span>
-                  <span class="fc-price">+₹1,600</span>
-                  <div class="fc-qty-row" onclick="event.stopPropagation()">
-                    <button class="qty-btn" onclick="changeQty('bedQty',-1)">−</button>
-                    <input type="number" id="bedQty" value="1" min="1" max="9" class="fc-qty">
-                    <button class="qty-btn" onclick="changeQty('bedQty',1)">+</button>
-                  </div>
-                </div>
-              </label>
-
-              <label class="furniture-card">
-                <input type="checkbox" id="fridgeCheck">
-                <div class="fc-body">
-                  <div class="fc-check">✓</div>
-                  <span class="fc-emoji">🧊</span>
-                  <span class="fc-name">Fridge</span>
-                  <span class="fc-price">+₹1,450</span>
-                </div>
-              </label>
-
-              <label class="furniture-card">
-                <input type="checkbox" id="wmCheck">
-                <div class="fc-body">
-                  <div class="fc-check">✓</div>
-                  <span class="fc-emoji">🫧</span>
-                  <span class="fc-name">Washing Machine</span>
-                  <span class="fc-price">+₹1,200</span>
-                </div>
-              </label>
-
-              <label class="furniture-card">
-                <input type="checkbox" id="tvCheck">
-                <div class="fc-body">
-                  <div class="fc-check">✓</div>
-                  <span class="fc-emoji">📺</span>
-                  <span class="fc-name">TV</span>
-                  <span class="fc-price">+₹800</span>
-                </div>
-              </label>
-
-              <label class="furniture-card">
-                <input type="checkbox" id="acCheck">
-                <div class="fc-body">
-                  <div class="fc-check">✓</div>
-                  <span class="fc-emoji">❄️</span>
-                  <span class="fc-name">AC Unit</span>
-                  <span class="fc-price">+₹1,700</span>
-                </div>
-              </label>
-
-              <label class="furniture-card">
-                <input type="checkbox" id="wardrobeCheck">
-                <div class="fc-body">
-                  <div class="fc-check">✓</div>
-                  <span class="fc-emoji">🚪</span>
-                  <span class="fc-name">Wardrobe</span>
-                  <span class="fc-price">+₹1,750</span>
-                </div>
-              </label>
-
-              <label class="furniture-card">
-                <input type="checkbox" id="diningCheck">
-                <div class="fc-body">
-                  <div class="fc-check">✓</div>
-                  <span class="fc-emoji">🪑</span>
-                  <span class="fc-name">Dining Table</span>
-                  <span class="fc-price">+₹1,200</span>
-                </div>
-              </label>
-
-            </div>
+            <p class="step-hint">Select items you're moving. Living room & bedroom items: <strong>+₹150 each</strong>. Kitchen & other items: <strong>free</strong>. Carton boxes: <strong>₹50 each</strong>.</p>
+            <!-- Furniture grid is populated dynamically by renderFurnitureGrid() in script.js -->
+            <div class="furniture-grid"></div>
 
             <!-- PHOTO UPLOAD -->
             <div class="photo-upload-section">
@@ -671,7 +539,6 @@
             <div class="field-group">
               <label class="field-label"><span class="field-icon">💳</span> Choose Payment</label>
 
-              <!-- ONLINE PAYMENT COMING SOON BANNER -->
               <div class="coming-soon-banner">
                 <div class="csb-icon">🚀</div>
                 <div class="csb-body">
@@ -693,7 +560,7 @@
                   <div class="po-icon">✅</div>
                   <div class="po-label">Pay Full</div>
                   <div class="po-amount" id="optFullAmt">₹0</div>
-                  <div class="po-note">5% discount</div>
+                  <div class="po-note">7% discount</div><!-- FIX: was 5% -->
                 </div>
                 <div class="payment-opt selected" id="optAtDrop" onclick="selectPayment('at_drop')">
                   <div class="po-badge" style="background:#16a34a">✓ Active</div>
@@ -705,7 +572,7 @@
               </div>
             </div>
 
-            <!-- T&C CHECKBOX -->
+            <!-- T&C -->
             <label class="tnc-row">
               <input type="checkbox" id="tncAccepted">
               <span>I agree to the <a href="legal.html" target="_blank">Terms & Conditions</a> and <a href="legal.html" target="_blank">Privacy Policy</a></span>
@@ -738,17 +605,11 @@
             <div class="bs-title">Booking Confirmed!</div>
             <div class="bs-subtitle">Your move is scheduled. Track it live above.</div>
             <div class="bs-id">Booking ID: <strong id="bsBookingId">—</strong></div>
-            <button class="bs-track-btn" onclick="scrollToTrackBanner()">
-              📦 Track My Booking ↑
-            </button>
-            <button class="bs-new-btn" onclick="startNewBooking()">
-              + Make Another Booking
-            </button>
+            <button class="bs-track-btn" onclick="scrollToTrackBanner()">📦 Track My Booking ↑</button>
+            <button class="bs-new-btn" onclick="startNewBooking()">+ Make Another Booking</button>
           </div>
         </div>
 
-      </div>
-        </div>
       </div>
     </div>
   </div>
@@ -769,7 +630,6 @@
     </div>
   </div>
   <div class="reviews-grid reveal-stagger" id="reviewsGrid">
-    <!-- Reviews will be loaded dynamically from Firebase -->
     <div class="review-card">
       <div class="review-stars">★★★★★</div>
       <p class="review-text">"Absolutely amazing service! They packed everything carefully and delivered on time. Zero damage!"</p>
@@ -824,9 +684,9 @@
   </div>
   <div class="footer-bottom" style="display:flex; flex-direction:column; gap:8px; align-items:center;">
     <div>
-      <a href="legal.html" style="color:rgba(255,255,255,.5); text-decoration:none; font-size:.8rem; margin:0 12px; transition:color .2s" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,.5)'">Privacy Policy</a>
-      <a href="legal.html" onclick="setTimeout(()=>{document.querySelector('.legal-tab:nth-child(2)').click()},100)" style="color:rgba(255,255,255,.5); text-decoration:none; font-size:.8rem; margin:0 12px; transition:color .2s" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,.5)'">Terms of Service</a>
-      <a href="legal.html" onclick="setTimeout(()=>{document.querySelector('.legal-tab:nth-child(3)').click()},100)" style="color:rgba(255,255,255,.5); text-decoration:none; font-size:.8rem; margin:0 12px; transition:color .2s" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,.5)'">Refund Policy</a>
+      <a href="legal.html" style="color:rgba(255,255,255,.5); text-decoration:none; font-size:.8rem; margin:0 12px;">Privacy Policy</a>
+      <a href="legal.html" style="color:rgba(255,255,255,.5); text-decoration:none; font-size:.8rem; margin:0 12px;">Terms of Service</a>
+      <a href="legal.html" style="color:rgba(255,255,255,.5); text-decoration:none; font-size:.8rem; margin:0 12px;">Refund Policy</a>
     </div>
   </div>
   <div class="footer-bottom" style="padding-top:0">© 2026 PackZen Packers & Movers. All rights reserved.</div>
@@ -841,7 +701,6 @@
 <!-- AUTH MODAL -->
 <div id="authModal" class="modal-overlay" style="display:none;">
   <div class="modal-box auth-modal-box">
-    <!-- Login Panel -->
     <div class="auth-panel" id="panelLogin">
       <button class="modal-x" onclick="closeAuthModal()">✕</button>
       <div class="auth-logo">📦 PackZen</div>
@@ -857,8 +716,6 @@
       <button class="btn-auth-outline" onclick="switchPanel('panelSignup')">Create New Account</button>
       <p class="auth-link" onclick="switchPanel('panelRecover')">Forgot password? Recover Account</p>
     </div>
-    
-    <!-- Signup Panel -->
     <div class="auth-panel" id="panelSignup" style="display:none;">
       <button class="modal-x" onclick="closeAuthModal()">✕</button>
       <div class="auth-logo">📦 PackZen</div>
@@ -882,8 +739,6 @@
       <button class="btn-auth" onclick="signupUser()">Send OTP & Register →</button>
       <p class="auth-link" onclick="switchPanel('panelLogin')">Already have an account? Login</p>
     </div>
-    
-    <!-- OTP Panel -->
     <div class="auth-panel" id="panelOTP" style="display:none;">
       <button class="modal-x" onclick="closeAuthModal()">✕</button>
       <div class="auth-logo">📱</div>
@@ -901,8 +756,6 @@
       <button class="btn-auth" onclick="verifyOTP()">Verify OTP →</button>
       <p class="auth-link" onclick="resendOTP()">Resend OTP</p>
     </div>
-    
-    <!-- Recover Panel -->
     <div class="auth-panel" id="panelRecover" style="display:none;">
       <button class="modal-x" onclick="closeAuthModal()">✕</button>
       <div class="auth-logo">🔑</div>
@@ -921,15 +774,13 @@
 <div id="dashboardModal" class="modal-overlay" style="display:none;">
   <div class="modal-box dashboard-box">
     <button class="modal-x" onclick="closeDashboard()">✕</button>
-
     <div class="dashboard-header">
       <div class="dashboard-avatar" id="dashAvatar">U</div>
       <div>
         <div class="dashboard-name" id="dashName">User</div>
-        <div class="dashboard-email" id="dashEmail"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="651016001725001d04081509004b060a08">[email&#160;protected]</a></div>
+        <div class="dashboard-email" id="dashEmail"></div>
       </div>
     </div>
-
     <div class="dash-tabs">
       <button class="dash-tab active" onclick="switchDashTab('quotes',this)">📋 Quotes</button>
       <button class="dash-tab" onclick="switchDashTab('bookings',this)">📦 Bookings</button>
@@ -937,84 +788,45 @@
       <button class="dash-tab" onclick="switchDashTab('profile',this)">👤 Profile</button>
       <button class="dash-tab" id="adminTabBtn" style="display:none;" onclick="switchDashTab('admin',this)">🛠 Admin</button>
     </div>
-
-    <!-- Quotes Panel -->
     <div class="dash-content" id="dashQuotes">
-      <div id="quotesList" class="quotes-list">
-        <div class="dash-empty">No saved quotes yet.</div>
-      </div>
+      <div id="quotesList" class="quotes-list"><div class="dash-empty">No saved quotes yet.</div></div>
     </div>
-
-    <!-- Bookings Panel -->
     <div class="dash-content" id="dashBookings" style="display:none;">
-      <div id="bookingsList" class="quotes-list">
-        <div class="dash-empty">No bookings yet.</div>
-      </div>
+      <div id="bookingsList" class="quotes-list"><div class="dash-empty">No bookings yet.</div></div>
     </div>
-
-    <!-- Referral Panel -->
     <div class="dash-content" id="dashReferral" style="display:none;">
       <div class="referral-box">
         <div class="referral-title">🎁 Refer & Earn</div>
-        <div class="referral-sub">
-          Share your code. Your friend gets ₹500 off, you get ₹500 credit!
-        </div>
+        <div class="referral-sub">Share your code. Your friend gets ₹500 off, you get ₹500 credit!</div>
         <div class="referral-code-row">
           <div class="referral-code-text" id="referralCodeText">LOADING</div>
           <button class="btn-copy" onclick="copyReferralCode()">Copy</button>
         </div>
         <div class="ref-stats">
-          <div class="ref-stat">
-            <div class="ref-stat-val" id="refCount">0</div>
-            <div class="ref-stat-lbl">Referrals</div>
-          </div>
-          <div class="ref-stat">
-            <div class="ref-stat-val" id="refEarned">₹0</div>
-            <div class="ref-stat-lbl">Credits Earned</div>
-          </div>
-          <div class="ref-stat">
-            <div class="ref-stat-val" id="refAvailable">₹0</div>
-            <div class="ref-stat-lbl">Available</div>
-          </div>
+          <div class="ref-stat"><div class="ref-stat-val" id="refCount">0</div><div class="ref-stat-lbl">Referrals</div></div>
+          <div class="ref-stat"><div class="ref-stat-val" id="refEarned">₹0</div><div class="ref-stat-lbl">Credits Earned</div></div>
+          <div class="ref-stat"><div class="ref-stat-val" id="refAvailable">₹0</div><div class="ref-stat-lbl">Available</div></div>
         </div>
       </div>
     </div>
-
-    <!-- Profile Panel -->
     <div class="dash-content" id="dashProfile" style="display:none;">
       <label class="field-label">Full Name</label>
       <input id="profileName" class="field-input" placeholder="Your name">
-
       <label class="field-label">Email</label>
       <input id="profileEmail" class="field-input" disabled>
-
       <label class="field-label">Phone</label>
       <input id="profilePhone" class="field-input" disabled>
-
       <div class="notif-row">
         <span>📧 Email updates</span>
-        <label class="toggle">
-          <input type="checkbox" id="prefEmail" onchange="savePreferences()">
-          <span class="slider"></span>
-        </label>
+        <label class="toggle"><input type="checkbox" id="prefEmail" onchange="savePreferences()"><span class="slider"></span></label>
       </div>
-
       <div class="notif-row">
         <span>📱 SMS updates</span>
-        <label class="toggle">
-          <input type="checkbox" id="prefSMS" onchange="savePreferences()">
-          <span class="slider"></span>
-        </label>
+        <label class="toggle"><input type="checkbox" id="prefSMS" onchange="savePreferences()"><span class="slider"></span></label>
       </div>
-
-      <button class="btn-auth" onclick="saveProfile()" style="margin-top:16px;">
-        Save Profile
-      </button>
-
+      <button class="btn-auth" onclick="saveProfile()" style="margin-top:16px;">Save Profile</button>
       <div id="profileMsg" class="auth-error" style="margin-top:8px;"></div>
     </div>
-
-    <!-- Admin Panel -->
     <div class="dash-content" id="dashAdmin" style="display:none;">
       <h3 style="margin-bottom:16px;">🚚 Create New Driver</h3>
       <label class="field-label">Driver Name</label>
@@ -1029,15 +841,12 @@
   </div>
 </div>
 
-<!-- CANCEL BOOKING MODAL -->
+<!-- CANCEL MODAL -->
 <div id="cancelModal" class="modal-overlay" style="display:none;">
   <div class="modal-box action-modal">
     <div class="am-header cancel-header">
       <div class="am-icon">✕</div>
-      <div>
-        <div class="am-title">Cancel Booking</div>
-        <div class="am-ref" id="cancelBookingRef"></div>
-      </div>
+      <div><div class="am-title">Cancel Booking</div><div class="am-ref" id="cancelBookingRef"></div></div>
       <button class="modal-close" onclick="closeCancelModal()">✕</button>
     </div>
     <div class="am-body">
@@ -1066,10 +875,7 @@
   <div class="modal-box action-modal">
     <div class="am-header reschedule-header">
       <div class="am-icon">📅</div>
-      <div>
-        <div class="am-title">Reschedule Booking</div>
-        <div class="am-ref" id="rescheduleBookingRef"></div>
-      </div>
+      <div><div class="am-title">Reschedule Booking</div><div class="am-ref" id="rescheduleBookingRef"></div></div>
       <button class="modal-close" onclick="closeRescheduleModal()">✕</button>
     </div>
     <div class="am-body">
@@ -1098,10 +904,7 @@
   <div class="modal-box action-modal">
     <div class="am-header rate-header">
       <div class="am-icon">⭐</div>
-      <div>
-        <div class="am-title">Rate Your Driver</div>
-        <div class="am-ref" id="rateBookingRef"></div>
-      </div>
+      <div><div class="am-title">Rate Your Driver</div><div class="am-ref" id="rateBookingRef"></div></div>
       <button class="modal-close" onclick="closeRateDriverModal()">✕</button>
     </div>
     <div class="am-body">
@@ -1113,9 +916,7 @@
         <span class="rate-star" onclick="selectDriverRating(4)">★</span>
         <span class="rate-star" onclick="selectDriverRating(5)">★</span>
       </div>
-      <div class="star-labels">
-        <span>Poor</span><span>Excellent</span>
-      </div>
+      <div class="star-labels"><span>Poor</span><span>Excellent</span></div>
       <label class="field-label" style="margin-top:.8rem">Comments (optional)</label>
       <textarea id="ratingFeedback" class="field-input" rows="3" placeholder="What did you like or dislike?"></textarea>
       <div id="ratingMsg" style="font-size:.8rem;margin-top:.4rem;color:#16a34a"></div>
@@ -1127,20 +928,16 @@
   </div>
 </div>
 
-<!-- DAMAGE / CLAIM MODAL -->
+<!-- DAMAGE MODAL -->
 <div id="damageModal" class="modal-overlay" style="display:none;">
   <div class="modal-box action-modal">
     <div class="am-header" style="background:linear-gradient(135deg,#7c3aed,#6d28d9)">
       <div class="am-icon">🔧</div>
-      <div>
-        <div class="am-title">Report Damage / Claim</div>
-        <div class="am-ref" id="damageBookingRef"></div>
-      </div>
+      <div><div class="am-title">Report Damage / Claim</div><div class="am-ref" id="damageBookingRef"></div></div>
       <button class="modal-close" onclick="closeDamageModal()">✕</button>
     </div>
     <div class="am-body">
       <div class="warn-box">⚠️ Claims must be reported within <strong>24 hours</strong> of delivery. Please attach clear photos of the damaged item(s).</div>
-
       <label class="field-label" style="margin-top:.5rem">Type of Damage <span style="color:#dc2626">*</span></label>
       <select id="damageType" class="field-input" style="margin-bottom:.9rem">
         <option value="">Select damage type</option>
@@ -1151,10 +948,8 @@
         <option value="Furniture assembly issue">Furniture assembly issue</option>
         <option value="Other">Other</option>
       </select>
-
       <label class="field-label">Describe what happened <span style="color:#dc2626">*</span></label>
       <textarea id="damageDesc" class="field-input" rows="3" placeholder="Which item was damaged? How did it happen? What is the approximate value?" style="margin-bottom:.9rem"></textarea>
-
       <label class="field-label">Upload Photos (max 5)</label>
       <div class="damage-upload-area" onclick="document.getElementById('damagePhotosInput').click()">
         <div class="dua-icon">📸</div>
@@ -1203,7 +998,6 @@
 <!-- CHAT MODAL -->
 <div id="chatModal" class="modal-overlay" style="display:none;">
   <div class="modal-box chat-box">
-    <!-- Header -->
     <div class="chat-header">
       <div class="chat-drv-avatar" id="chatDrvAvatar">🚚</div>
       <div style="flex:1">
@@ -1212,13 +1006,9 @@
       </div>
       <button class="chat-close-btn" onclick="closeChatModal()">✕</button>
     </div>
-
-    <!-- Messages -->
     <div class="chat-messages" id="chatMessages">
       <div class="chat-empty-msg">💬 No messages yet.<br>Your driver will appear here once assigned.</div>
     </div>
-
-    <!-- Input -->
     <div class="chat-input-row">
       <input type="text" class="chat-text-input" id="chatInput" placeholder="Type a message..." onkeydown="if(event.key==='Enter')sendChatMessage()">
       <button class="btn-send" onclick="sendChatMessage()">
@@ -1268,14 +1058,10 @@
 
 <!-- PAYMENT SUCCESS MODAL -->
 <div class="confirm-logo-wrap">
-  <img src="assets/logo/packzen-logo.png"
-       class="confirm-logo"
-       alt="PackZen">
+  <img src="assets/logo/packzen-logo.png" class="confirm-logo" alt="PackZen">
 </div>
 <div id="paymentModal" class="modal-overlay" style="display:none;">
   <div class="confirm-card">
-
-    <!-- Header -->
     <div class="cc-header">
       <div class="cc-check-circle">
         <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
@@ -1289,8 +1075,6 @@
       </div>
       <button class="cc-close" onclick="closeModal()">✕</button>
     </div>
-
-    <!-- Booking ID Strip -->
     <div class="cc-id-strip">
       <div class="cc-id-left">
         <div class="cc-id-label">BOOKING ID</div>
@@ -1301,8 +1085,6 @@
         Copy
       </button>
     </div>
-
-    <!-- Compact Summary (always visible) -->
     <div class="cc-compact">
       <div class="cc-compact-row">
         <span class="cc-compact-icon">📅</span>
@@ -1320,24 +1102,12 @@
         <span class="cc-compact-note" id="ccPriceNote">Pay on delivery</span>
       </div>
     </div>
-
-    <!-- Expand toggle -->
-    <button class="cc-expand-btn" id="ccExpandBtn" onclick="toggleConfirmDetails()">
-      View Full Details ↓
-    </button>
-
-    <!-- Full Details (collapsible) -->
+    <button class="cc-expand-btn" id="ccExpandBtn" onclick="toggleConfirmDetails()">View Full Details ↓</button>
     <div class="cc-details" id="ccFullDetails" style="display:none;">
       <div class="cc-route">
-        <div class="cc-loc">
-          <div class="cc-loc-dot pickup"></div>
-          <div class="cc-loc-text" id="ccPickup">—</div>
-        </div>
+        <div class="cc-loc"><div class="cc-loc-dot pickup"></div><div class="cc-loc-text" id="ccPickup">—</div></div>
         <div class="cc-route-line"></div>
-        <div class="cc-loc">
-          <div class="cc-loc-dot drop"></div>
-          <div class="cc-loc-text" id="ccDrop">—</div>
-        </div>
+        <div class="cc-loc"><div class="cc-loc-dot drop"></div><div class="cc-loc-text" id="ccDrop">—</div></div>
       </div>
       <div class="cc-meta-grid">
         <div class="cc-meta-item">
@@ -1362,8 +1132,6 @@
         </div>
       </div>
     </div>
-
-    <!-- Action Buttons -->
     <div class="cc-actions">
       <button class="cc-btn-wa" onclick="sendWhatsAppAfterPayment()">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.126 1.535 5.858L.057 23.428a.75.75 0 00.916.916l5.57-1.478A11.952 11.952 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.907 0-3.693-.528-5.223-1.447l-.374-.223-3.304.876.877-3.304-.223-.374A9.951 9.951 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
@@ -1375,52 +1143,29 @@
       </button>
       <button class="cc-btn-close-action" onclick="closeModal()">✕ Close</button>
     </div>
-
   </div>
 </div>
 
-<!-- SCRIPTS - ORDER IS CRITICAL -->
-<!-- 1. Environment variables first -->
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="env-config.js"></script>
-
-<!-- 2. Firebase config second -->
+<!-- SCRIPTS -->
+<script src="env-config.js"></script>
 <script src="firebase-config.js"></script>
-
-<!-- 3. Razorpay third -->
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-
-<!-- 4. Main script fourth -->
 <script src="script.js"></script>
-
-<!-- 5. Google Maps - Load after everything else -->
 <script>
-  // NOTE: Do NOT redefine window.initAutocomplete here.
-  // The real initAutocomplete() lives in script.js and sets up
-  // Places Autocomplete + map listeners. Redefining it here would
-  // overwrite it with an empty stub and break everything.
-
   function loadGoogleMaps() {
     if (!window.ENV || !window.ENV.GOOGLE_MAPS_KEY) {
       console.error('❌ Google Maps key not configured. Check env-config.js');
       return;
     }
-
-    console.log('📍 Loading Google Maps...');
-
     const script = document.createElement('script');
     script.src = 'https://maps.googleapis.com/maps/api/js?key=' + window.ENV.GOOGLE_MAPS_KEY + '&libraries=places&callback=initAutocomplete';
     script.async = true;
     script.defer = true;
-    script.onload = () => console.log('✅ Google Maps script loaded');
-    script.onerror = (err) => console.error('❌ Google Maps failed to load:', err);
     document.head.appendChild(script);
   }
-
-  // Actually call it!
   loadGoogleMaps();
 </script>
 
-<!-- Toast — always in DOM, shown via opacity not display -->
 <div id="toastMsg" class="toast-msg"></div>
 </body>
 </html>
