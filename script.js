@@ -32,6 +32,14 @@ const FRIDGE_PRICE   = 150;
 const RAZORPAY_KEY   = "YOUR_RAZORPAY_KEY_ID";
 
 /* ============================================
+   UTILITY — debounce
+   ============================================ */
+function debounce(fn, ms) {
+  let timer;
+  return (...args) => { clearTimeout(timer); timer = setTimeout(() => fn(...args), ms); };
+}
+
+/* ============================================
    PAGE LOAD
    ============================================ */
 document.addEventListener("DOMContentLoaded", () => {
@@ -146,6 +154,62 @@ document.addEventListener("DOMContentLoaded", () => {
   loadReviewsPublic();
   buildChecklist();
   setTimeout(() => renderSizeCards("home"), 100);
+
+  // ─── Inject furniture category styles ───
+  if (!document.getElementById('pz-fc-styles')) {
+    const s = document.createElement('style');
+    s.id = 'pz-fc-styles';
+    s.textContent = `
+      .furniture-grid { display:flex; flex-direction:column; gap:8px; }
+      .fc-category { border:1px solid rgba(255,255,255,0.08); border-radius:12px; overflow:hidden; }
+      .fc-category-header {
+        display:flex; align-items:center; gap:10px; padding:12px 16px;
+        background:rgba(255,255,255,0.04); cursor:pointer;
+        transition:background .2s; user-select:none;
+      }
+      .fc-category-header:hover { background:rgba(255,255,255,0.08); }
+      .fc-cat-icon { font-size:1.1rem; }
+      .fc-cat-label { flex:1; font-weight:600; font-size:.9rem; color:var(--text,#fff); }
+      .fc-cat-arrow { font-size:.8rem; color:var(--text-muted,#aaa); transition:transform .2s; }
+      .fc-category-items {
+        display:none; flex-wrap:wrap; gap:8px; padding:12px;
+        background:rgba(255,255,255,0.02);
+      }
+      .furniture-card {
+        display:flex; flex-direction:column; align-items:center;
+        width:80px; cursor:pointer; position:relative;
+      }
+      .furniture-card input[type=checkbox] { position:absolute; opacity:0; width:0; height:0; }
+      .fc-body {
+        display:flex; flex-direction:column; align-items:center; gap:4px;
+        padding:10px 6px; border-radius:10px; width:100%; text-align:center;
+        border:2px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03);
+        transition:all .2s; position:relative;
+      }
+      .furniture-card input:checked ~ .fc-body {
+        border-color:#3b82f6; background:rgba(59,130,246,0.15);
+      }
+      .fc-check {
+        position:absolute; top:4px; right:4px; width:16px; height:16px;
+        background:#3b82f6; border-radius:50%; font-size:9px; color:#fff;
+        display:flex; align-items:center; justify-content:center;
+        opacity:0; transform:scale(0); transition:all .15s;
+      }
+      .furniture-card input:checked ~ .fc-body .fc-check { opacity:1; transform:scale(1); }
+      .fc-emoji { font-size:1.5rem; line-height:1; }
+      .fc-name { font-size:.72rem; font-weight:500; color:var(--text,#fff); line-height:1.2; }
+      .fc-price { font-size:.68rem; color:#22c55e; font-weight:600; display:none; }
+      .carton-box-row {
+        display:flex; align-items:center; flex-wrap:wrap; gap:10px; padding:4px 0;
+        width:100%;
+      }
+      .carton-label { font-size:.85rem; color:var(--text,#fff); flex:1; min-width:160px; }
+      .carton-qty-wrap { display:flex; align-items:center; gap:6px; }
+      .carton-price-note { font-size:.8rem; color:#22c55e; font-weight:600; }
+    `;
+    document.head.appendChild(s);
+  }
+
 });
 
 /* ============================================
@@ -1700,7 +1764,8 @@ async function loadReviewsPublic() {
         html += `<div class="review-card"><div class="review-stars">${"★".repeat(r.rating)}${"☆".repeat(5-r.rating)}</div><p class="review-text">"${r.text}"</p><div class="review-author"><div class="review-avatar">${r.name.charAt(0).toUpperCase()}</div><div><div class="review-name">${r.name}</div><div class="review-meta">${r.date||""}</div></div></div></div>`;
       });
       if (grid) grid.innerHTML = html;
-    } catch (e) { console.log("Reviews load:", e.message); }
+    } catch (e) {
+ }
   });
 }
 
@@ -1971,26 +2036,30 @@ function renderFurnitureGrid(type) {
 
   const categories = FURNITURE_CATEGORIES[type] || FURNITURE_CATEGORIES.home;
 
-  const itemCard = (item) => `
+  const FREE_CATS = ["cat-kitchen","cat-other","cat-appliances"];
+  const itemCard = (item, catId) => {
+    const isFree = FREE_CATS.includes(catId);
+    return `
     <label class="furniture-card">
-      <input type="checkbox" id="${item.id}" onchange="calculateQuote(true)">
+      <input type="checkbox" id="${item.id}" onchange="calculateQuote(true)" aria-label="${item.name}">
       <div class="fc-body">
         <div class="fc-check">✓</div>
         <span class="fc-emoji">${item.emoji}</span>
         <span class="fc-name">${item.name}</span>
-        <span class="fc-price">+₹150</span>
+        <span class="fc-price" style="${isFree ? 'color:#94a3b8' : ''}">${isFree ? 'FREE' : '+₹150'}</span>
       </div>
     </label>`;
+  };
 
   const categoryBlock = (cat) => `
     <div class="fc-category">
       <div class="fc-category-header" onclick="toggleFurnitureCategory('${cat.id}')">
         <span class="fc-cat-icon">${cat.icon}</span>
         <span class="fc-cat-label">${cat.label}</span>
-        <span class="fc-cat-arrow" id="arrow-${cat.id}">▸</span>
+        <span class="fc-cat-arrow" id="arrow-${cat.id}">▾</span>
       </div>
-      <div class="fc-category-items" id="${cat.id}" style="display:none">
-        ${cat.items.map(itemCard).join("")}
+      <div class="fc-category-items" id="${cat.id}" style="display:flex">
+        ${cat.items.map(item => itemCard(item, cat.id)).join("")}
       </div>
     </div>`;
 
@@ -2000,9 +2069,9 @@ function renderFurnitureGrid(type) {
       <div class="fc-category-header" onclick="toggleFurnitureCategory('cat-carton')">
         <span class="fc-cat-icon">📦</span>
         <span class="fc-cat-label">Carton Boxes (Our Service)</span>
-        <span class="fc-cat-arrow" id="arrow-cat-carton">▸</span>
+        <span class="fc-cat-arrow" id="arrow-cat-carton">▾</span>
       </div>
-      <div class="fc-category-items" id="cat-carton" style="display:none">
+      <div class="fc-category-items" id="cat-carton" style="display:flex">
         <div class="carton-box-row">
           <span class="carton-label">📦 How many carton boxes do you need?</span>
           <div class="carton-qty-wrap">
@@ -2641,7 +2710,6 @@ async function requestPushPermission() {
       await window._firebase.db.collection("users").doc(currentUser.uid).update({
         fcmToken: token, fcmUpdatedAt: firebase.firestore.FieldValue.serverTimestamp()
       });
-      console.log("✅ FCM token saved");
     }
   } catch(e) { console.warn("FCM token error:", e); }
 }
@@ -2716,7 +2784,6 @@ async function queueSMS(phone, templateKey, data) {
       createdAt: firebase.firestore.FieldValue.serverTimestamp(),
       retries: 0
     });
-    console.log("✅ SMS queued:", templateKey, "→", mobile);
   } catch(e) {
     console.error("SMS queue error:", e);
   }
