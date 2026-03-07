@@ -27,8 +27,8 @@ let uploadedPhotos      = []; // base64 strings
 let pendingWhatsAppMsg  = null; // WA message sent when customer clicks the button
 let pendingAdminMsg     = null; // Admin WA message sent when customer clicks the button
 
-const MIN_BASE_PRICE = 1450;
-const FRIDGE_PRICE   = 1450;
+const MIN_BASE_PRICE = 1999;
+const FRIDGE_PRICE   = 150;
 const RAZORPAY_KEY   = "YOUR_RAZORPAY_KEY_ID";
 
 /* ============================================
@@ -530,7 +530,7 @@ function updatePriceDisplay() {
   if (!priceEl) return;
 
   const discounted = Math.max(lastCalculatedTotal - promoDiscount, 0);
-  const fullDiscount = Math.round(discounted * 0.05);
+  const fullDiscount = Math.round(discounted * 0.07);
   const fullAmount = discounted - fullDiscount;
 
   const optAtDrop = document.getElementById("optAtDropAmt");
@@ -711,28 +711,19 @@ function calculateQuote(auto = false) {
   const vehicleRate = Number(vehicle?.value || 0);
   if (!houseBase || (!isIntercityMove && !vehicleRate)) { if (!auto) alert("Select house & vehicle"); return; }
 
-  let furnitureCost = 0;
-  if (document.getElementById("sofaCheck")?.checked)    furnitureCost += 2000 * Number(document.getElementById("sofaQty")?.value || 1);
-  if (document.getElementById("bedCheck")?.checked)     furnitureCost += 1600 * Number(document.getElementById("bedQty")?.value  || 1);
-  if (document.getElementById("fridgeCheck")?.checked)  furnitureCost += FRIDGE_PRICE;
-  if (document.getElementById("wmCheck")?.checked)      furnitureCost += 1200;
-  if (document.getElementById("tvCheck")?.checked)      furnitureCost += 800;
-  if (document.getElementById("acCheck")?.checked)      furnitureCost += 1700;
-  if (document.getElementById("wardrobeCheck")?.checked) furnitureCost += 1750;
-  if (document.getElementById("diningCheck")?.checked)  furnitureCost += 1200;
-  // Office items
-  if (document.getElementById("deskCheck")?.checked)    furnitureCost += 900  * Number(document.getElementById("deskQty")?.value  || 1);
-  if (document.getElementById("chairCheck")?.checked)   furnitureCost += 350  * Number(document.getElementById("chairQty")?.value || 1);
-  if (document.getElementById("cabinetCheck")?.checked) furnitureCost += 750;
-  if (document.getElementById("serverCheck")?.checked)  furnitureCost += 1250;
-  if (document.getElementById("printerCheck")?.checked) furnitureCost += 600;
-  if (document.getElementById("confCheck")?.checked)    furnitureCost += 1750;
+  // COUNT ITEMS: ₹150 per item selected (flat rate regardless of item type or vehicle)
+  let itemCount = 0;
+  ["sofaCheck","bedCheck","fridgeCheck","wmCheck","tvCheck","acCheck","wardrobeCheck","diningCheck",
+   "deskCheck","chairCheck","cabinetCheck","serverCheck","printerCheck","confCheck"].forEach(id => {
+    if (document.getElementById(id)?.checked) itemCount++;
+  });
+  const furnitureCost = itemCount * 150;
 
   function applyPrice(km) {
     const pickupFloor  = Number(document.getElementById("pickupFloor")?.value  || 0);
     const dropFloor    = Number(document.getElementById("dropFloor")?.value    || 0);
     const liftAvail    = document.getElementById("liftAvailable")?.checked;
-    const packingCost  = document.getElementById("packingService")?.checked ? 3800 : 0;
+    const packingCost  = document.getElementById("packingService")?.checked ? 500 : 0;
 
     // FIX: Floor cost calculation is now consistent for both local and intercity.
     // Per-floor charge is ₹200 without lift, ₹100 with lift (per floor).
@@ -757,7 +748,7 @@ function calculateQuote(auto = false) {
       breakdownHtml =
         `🚛 Intercity · ~${Math.round(km)} km (${distLabel})<br>` +
         `Base: ₹${baseRate.toLocaleString()}` +
-        `${furnitureCost ? ` · Items: ₹${furnitureCost.toLocaleString()}` : ""}` +
+        `${furnitureCost ? ` · Items (${itemCount} × ₹150): ₹${furnitureCost.toLocaleString()}` : ""}` +
         `${floorCost     ? ` · Floor: ₹${floorCost.toLocaleString()}`     : ""}` +
         `${packingCost   ? ` · Packing: ₹${packingCost.toLocaleString()}` : ""}` +
         `<br><strong>Total Estimate: ₹${total.toLocaleString()}</strong>`;
@@ -774,16 +765,16 @@ function calculateQuote(auto = false) {
 
       // Vehicle values match HTML: 88=22ft XL, 69=17ft Large, 54=14ft Medium, 34=Tata Ace
       if (vehicleVal === 88) {         // 22ft Truck (XL) — 3+ BHK
-        baseFare   = 9000;
+        baseFare   = 7500;
         perKmRate  = 40;
       } else if (vehicleVal === 69) {  // 17ft Truck (Large) — 2–3 BHK
-        baseFare   = 7500;
+        baseFare   = 6000;
         perKmRate  = 35;
       } else if (vehicleVal === 54) {  // 14ft Truck (Medium) — 1–2 BHK
-        baseFare   = 6500;
+        baseFare   = 4500;
         perKmRate  = 35;
       } else {                         // Tata Ace (34) — 1 RK / small load
-        baseFare   = 3999;
+        baseFare   = 1999;
         perKmRate  = 25;
       }
 
@@ -794,7 +785,7 @@ function calculateQuote(auto = false) {
         `📍 Local · ~${km.toFixed(1)} km<br>` +
         `Base fare: ₹${baseFare.toLocaleString()}` +
         `${km > 25      ? ` · Extra km: ₹${Math.round((km-25)*perKmRate).toLocaleString()}` : ""}` +
-        `${furnitureCost ? ` · Items: ₹${furnitureCost.toLocaleString()}`                    : ""}` +
+        `${furnitureCost ? ` · Items (${itemCount} × ₹150): ₹${furnitureCost.toLocaleString()}` : ""}` +
         `${floorCost     ? ` · Floor: ₹${floorCost.toLocaleString()}`                        : ""}` +
         `${packingCost   ? ` · Packing: ₹${packingCost.toLocaleString()}`                    : ""}` +
         `<br><strong>Total Estimate: ₹${total.toLocaleString()}</strong>`;
@@ -974,7 +965,7 @@ function startPayment() {
 
   let payAmount;
   if (selectedPayment === "full") {
-    payAmount = Math.round(discounted * 0.95); // 5% discount for full payment
+    payAmount = Math.round(discounted * 0.93); // 7% discount for full payment
   } else {
     payAmount = Math.round(discounted * 0.10); // 10% advance
   }
@@ -983,7 +974,7 @@ function startPayment() {
   const rzp = new Razorpay({
     key: RAZORPAY_KEY, amount: payAmount * 100, currency: "INR",
     name: "PackZen Packers & Movers",
-    description: selectedPayment === "full" ? `Full Payment (5% off applied)` : `Advance 10% of ₹${discounted.toLocaleString()}`,
+    description: selectedPayment === "full" ? `Full Payment (7% off applied)` : `Advance 10% of ₹${discounted.toLocaleString()}`,
     receipt: paymentReceiptId,
     prefill: { name, contact: phone },
     theme: { color: "#0057ff" },
@@ -1892,25 +1883,25 @@ function renderFurnitureGrid(type) {
   if (!grid) return;
 
   const homeFurniture = [
-    { id:"sofaCheck",     emoji:"🛋️", name:"Sofa",           price:2000,  hasQty:true,  qtyId:"sofaQty"  },
-    { id:"bedCheck",      emoji:"🛏️", name:"Bed",            price:1600,  hasQty:true,  qtyId:"bedQty"   },
-    { id:"fridgeCheck",   emoji:"🧊", name:"Fridge",         price:1450,  hasQty:false },
-    { id:"wmCheck",       emoji:"🫧", name:"Washing Machine",price:1200,  hasQty:false },
-    { id:"tvCheck",       emoji:"📺", name:"TV",             price:800,   hasQty:false },
-    { id:"acCheck",       emoji:"❄️", name:"AC Unit",        price:1700,  hasQty:false },
-    { id:"wardrobeCheck", emoji:"🚪", name:"Wardrobe",       price:1750,  hasQty:false },
-    { id:"diningCheck",   emoji:"🪑", name:"Dining Table",   price:1200,  hasQty:false },
+    { id:"sofaCheck",     emoji:"🛋️", name:"Sofa",           price:150, hasQty:false },
+    { id:"bedCheck",      emoji:"🛏️", name:"Bed",            price:150, hasQty:false },
+    { id:"fridgeCheck",   emoji:"🧊", name:"Fridge",         price:150, hasQty:false },
+    { id:"wmCheck",       emoji:"🫧", name:"Washing Machine",price:150, hasQty:false },
+    { id:"tvCheck",       emoji:"📺", name:"TV",             price:150, hasQty:false },
+    { id:"acCheck",       emoji:"❄️", name:"AC Unit",        price:150, hasQty:false },
+    { id:"wardrobeCheck", emoji:"🚪", name:"Wardrobe",       price:150, hasQty:false },
+    { id:"diningCheck",   emoji:"🪑", name:"Dining Table",   price:150, hasQty:false },
   ];
 
   const officeFurniture = [
-    { id:"deskCheck",     emoji:"🖥️", name:"Office Desk",    price:900,  hasQty:true,  qtyId:"deskQty"  },
-    { id:"chairCheck",    emoji:"🪑", name:"Chair",          price:350,  hasQty:true,  qtyId:"chairQty" },
-    { id:"cabinetCheck",  emoji:"🗄️", name:"Filing Cabinet", price:750,  hasQty:false },
-    { id:"serverCheck",   emoji:"💾", name:"Server/PC",      price:1250, hasQty:false },
-    { id:"printerCheck",  emoji:"🖨️", name:"Printer",        price:600,  hasQty:false },
-    { id:"confCheck",     emoji:"📋", name:"Conf. Table",    price:1750, hasQty:false },
-    { id:"fridgeCheck",   emoji:"🧊", name:"Fridge",         price:1450, hasQty:false },
-    { id:"acCheck",       emoji:"❄️", name:"AC Unit",        price:1700, hasQty:false },
+    { id:"deskCheck",     emoji:"🖥️", name:"Office Desk",    price:150, hasQty:false },
+    { id:"chairCheck",    emoji:"🪑", name:"Chair",          price:150, hasQty:false },
+    { id:"cabinetCheck",  emoji:"🗄️", name:"Filing Cabinet", price:150, hasQty:false },
+    { id:"serverCheck",   emoji:"💾", name:"Server/PC",      price:150, hasQty:false },
+    { id:"printerCheck",  emoji:"🖨️", name:"Printer",        price:150, hasQty:false },
+    { id:"confCheck",     emoji:"📋", name:"Conf. Table",    price:150, hasQty:false },
+    { id:"fridgeCheck",   emoji:"🧊", name:"Fridge",         price:150, hasQty:false },
+    { id:"acCheck",       emoji:"❄️", name:"AC Unit",        price:150, hasQty:false },
   ];
 
   const items = type === "office" ? officeFurniture : homeFurniture;
