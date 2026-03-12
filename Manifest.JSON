@@ -1,0 +1,42 @@
+{
+  "name": "PackZen Packers & Movers",
+  "short_name": "PackZen",
+  "description": "Bangalore's trusted packers and movers. Get instant quotes, book online, track your move.",
+  "start_url": "/moving-quote/",
+  "scope": "/moving-quote/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#050d1a",
+  "theme_color": "#3b82f6",
+  "lang": "en-IN",
+  "categories": ["logistics", "business", "lifestyle"],
+  "icons": [
+    {
+      "src": "assets/logo/packzen-logo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "assets/logo/packzen-logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Get Quote",
+      "short_name": "Quote",
+      "description": "Get an instant moving quote",
+      "url": "/moving-quote/#quote",
+      "icons": [{ "src": "assets/logo/packzen-logo.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Call Us",
+      "short_name": "Call",
+      "description": "Call PackZen directly",
+      "url": "tel:9945095453"
+    }
+  ]
+}
