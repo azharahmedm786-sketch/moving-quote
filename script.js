@@ -29,7 +29,7 @@ let pendingAdminMsg     = null; // Admin WA message sent when customer clicks th
 
 const MIN_BASE_PRICE = 1999;
 const FRIDGE_PRICE   = 150;
-const RAZORPAY_KEY   = "YOUR_RAZORPAY_KEY_ID";
+const RAZORPAY_KEY   = window.ENV.RAZORPAY_KEY;
 
 /* ============================================
    UTILITY — debounce
