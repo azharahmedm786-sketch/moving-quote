@@ -499,19 +499,17 @@ alt="PackZen Packers and Movers Bangalore">
             </div>
             <div class="field-group">
               <label class="field-label"><span class="field-icon">💳</span> Choose Payment</label>
-              <div class="coming-soon-banner">
-                <div class="csb-icon">🚀</div>
                 <div class="csb-body">
                   <div class="csb-title">Online Payment Coming Soon!</div>
                   <div class="csb-sub">UPI · Cards · Net Banking will be live in 1–2 weeks. For now, book and pay cash on delivery.</div>
                 </div>
               </div>
               <div class="payment-opts">
-                <div class="payment-opt po-disabled" id="optAdvance">
+                <div class="payment-opt" id="optAdvance" onclick="selectPayment('advance')">
                   <div class="po-badge">Soon</div><div class="po-icon">💰</div><div class="po-label">Advance</div>
                   <div class="po-amount" id="optAdvanceAmt">₹0</div><div class="po-note">10% now · rest on day</div>
                 </div>
-                <div class="payment-opt po-disabled" id="optFull">
+               <div class="payment-opt" id="optFull" onclick="selectPayment('full')">
                   <div class="po-badge save">Soon</div><div class="po-icon">✅</div><div class="po-label">Pay Full</div>
                   <div class="po-amount" id="optFullAmt">₹0</div><div class="po-note">7% discount</div>
                 </div>
