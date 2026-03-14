@@ -1,11 +1,11 @@
+# Sitemap location
 # PackZen Packers & Movers — robots.txt
+
 User-agent: *
 Allow: /
 
-# Block admin panel from indexing 
-Disallow: /moving-quote/admin.html
-Disallow: /moving-quote/env-config.js
-Disallow: /moving-quote/firebase-config.js
+Disallow: /admin.html
+Disallow: /env-config.js
+Disallow: /firebase-config.js
 
-# Sitemap location
-Sitemap: https://azharahmedm786-sketch.github.io/moving-quote/sitemap.xml
+Sitemap: https://packzenblr.in/sitemap.xml
