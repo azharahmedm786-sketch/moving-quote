@@ -2,7 +2,7 @@
 User-agent: *
 Allow: /
 
-# Block admin panel from indexing
+# Block admin panel from indexing 
 Disallow: /moving-quote/admin.html
 Disallow: /moving-quote/env-config.js
 Disallow: /moving-quote/firebase-config.js
