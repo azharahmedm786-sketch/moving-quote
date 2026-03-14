@@ -3,7 +3,7 @@
   "short_name": "PackZen",
   "description": "Bangalore's trusted packers and movers. Get instant quotes, book online, track your move.",
   "start_url": "/moving-quote/",
-  "scope": "/moving-quote/",
+  "scope": "/moving-quote/", 
   "display": "standalone",
   "orientation": "portrait-primary",
   "background_color": "#050d1a",
