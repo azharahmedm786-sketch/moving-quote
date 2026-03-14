@@ -11,6 +11,7 @@ const DYNAMIC_CACHE = `${CACHE_VERSION}-dynamic`;
 const STATIC_ASSETS = [
   '/moving-quote/',
   '/moving-quote/index.html',
+'/moving-quote/offline.html',
   '/moving-quote/style.css',
   '/moving-quote/script.js',
   '/moving-quote/manifest.json',
