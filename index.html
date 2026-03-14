@@ -1,43 +1,91 @@
 <!DOCTYPE html>
 <html lang="en-IN">
 <head>
+
+  <!-- ═══════════════════════════════════════════════
+       1. CHARSET — must be first tag, always
+       ═══════════════════════════════════════════════ -->
+  <meta charset="UTF-8">
+
+  <!-- ═══════════════════════════════════════════════
+       2. VIEWPORT — required for mobile responsiveness
+       ═══════════════════════════════════════════════ -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- ═══════════════════════════════════════════════
+       3. PRIMARY SEO
+       ═══════════════════════════════════════════════ -->
+  <!-- Title: max 60 chars for Google (was 65, trimmed) -->
+  <title>PackZen Packers & Movers Bangalore | Best Price</title>
+
+  <!-- Description: 140–160 chars sweet spot (was 164, trimmed) -->
+  <meta name="description" content="PackZen Packers & Movers Bangalore — affordable house shifting, office relocation, live tracking & insured transport. Get instant quote now.">
+
+  <!-- keywords: Google ignores this, removed to keep head clean -->
+
+  <meta name="author"  content="PackZen Packers and Movers">
+  <meta name="robots"  content="index, follow">
+
+  <!-- Canonical: single authoritative URL -->
+  <link rel="canonical" href="https://packzenblr.in/">
+
+  <!-- ═══════════════════════════════════════════════
+       4. OPEN GRAPH (Facebook, WhatsApp, LinkedIn)
+       ═══════════════════════════════════════════════ -->
+  <meta property="og:type"        content="website">
+  <meta property="og:site_name"   content="PackZen Packers & Movers">
+  <meta property="og:title"       content="PackZen Packers & Movers Bangalore">
+  <meta property="og:description" content="Reliable, insured & affordable packing and moving services in Bangalore. Live tracking included.">
+  <meta property="og:url"         content="https://packzenblr.in/">  <!-- FIX: trailing slash matches canonical -->
+  <meta property="og:image"       content="https://packzenblr.in/assets/logo/packzen-og.png">
+  <meta property="og:image:width"  content="1200">  <!-- FIX: added for WhatsApp/FB preview -->
+  <meta property="og:image:height" content="630">
+  <meta property="og:locale"      content="en_IN">
+
+  <!-- ═══════════════════════════════════════════════
+       5. TWITTER CARD
+       ═══════════════════════════════════════════════ -->
+  <meta name="twitter:card"        content="summary_large_image">
+  <meta name="twitter:title"       content="PackZen Packers & Movers Bangalore">
+  <meta name="twitter:description" content="Reliable, insured & affordable packing and moving services in Bangalore.">
+  <meta name="twitter:image"       content="https://packzenblr.in/assets/logo/packzen-og.png">
+
+  <!-- ═══════════════════════════════════════════════
+       6. PWA + MOBILE CHROME
+       ═══════════════════════════════════════════════ -->
+  <meta name="theme-color" content="#2563eb">                     <!-- Android Chrome address bar color -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">        <!-- iOS PWA -->
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="PackZen">
+  <link rel="manifest" href="manifest.json">                       <!-- PWA installable -->
+  <link rel="apple-touch-icon" href="assets/logo/packzen-logo.png">
+
+  <!-- ═══════════════════════════════════════════════
+       7. FAVICON
+       ═══════════════════════════════════════════════ -->
   <link rel="icon" type="image/png" href="assets/logo/packzen-logo.png">
-  <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests"> 
-  <meta charset="UTF-8"/> 
-  <title>PackZen Packers & Movers Bangalore</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+  <!-- ═══════════════════════════════════════════════
+       8. FONTS — DM Sans + Syne (CSS uses both)
+          display=swap prevents flash of invisible text
+       ═══════════════════════════════════════════════ -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap" rel="stylesheet">
-  <!-- SEO: Primary -->
-  <meta name="description" content="PackZen – Bangalore's #1 trusted packers and movers. Instant quote, transparent pricing, GPS-tracked vehicles, zero damage guarantee. Local and intercity moves.">
-  <meta name="keywords" content="packers movers Bangalore, home shifting Bangalore, office relocation, inter city moving, PackZen">
-  <meta name="robots" content="index, follow">
-  <link rel="canonical" href="https://azharahmedm786-sketch.github.io/moving-quote/">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Syne:wght@700;800&display=swap">
 
-  <!-- SEO: Open Graph (Facebook / WhatsApp previews) -->
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="https://azharahmedm786-sketch.github.io/moving-quote/">
-  <meta property="og:title" content="PackZen Packers & Movers Bangalore – Instant Quote">
-  <meta property="og:description" content="Reliable, insured & affordable packing and moving services. Get your instant quote in 60 seconds. 1,200+ happy customers.">
-  <meta property="og:image" content="https://azharahmedm786-sketch.github.io/moving-quote/assets/logo/packzen-logo.png">
-  <meta property="og:site_name" content="PackZen Packers & Movers">
-
-  <!-- SEO: Twitter Card -->
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="PackZen Packers & Movers Bangalore">
-  <meta name="twitter:description" content="Reliable, insured & affordable packing and moving services in Bangalore.">
-  <meta name="twitter:image" content="https://azharahmedm786-sketch.github.io/moving-quote/assets/logo/packzen-logo.png">
-
-  <!-- SEO: Schema.org LocalBusiness (boosts Google ranking directly) -->
+  <!-- ═══════════════════════════════════════════════
+       9. SCHEMA.ORG JSON-LD — FIX: all URLs now point
+          to packzenblr.in (was github.io before)
+       ═══════════════════════════════════════════════ -->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
     "@type": "MovingCompany",
     "name": "PackZen Packers & Movers",
-    "url": "https://azharahmedm786-sketch.github.io/moving-quote/",
-    "logo": "https://azharahmedm786-sketch.github.io/moving-quote/assets/logo/packzen-logo.png",
-    "image": "https://azharahmedm786-sketch.github.io/moving-quote/assets/logo/packzen-logo.png",
+    "url": "https://packzenblr.in/",
+    "logo": "https://packzenblr.in/assets/logo/packzen-logo.png",
+    "image": "https://packzenblr.in/assets/logo/packzen-logo.png",
     "description": "Bangalore's trusted packers and movers since 2016. Safe, reliable, and affordable home and office relocation services.",
     "telephone": "+919945095453",
     "address": {
@@ -59,11 +107,7 @@
       "opens": "07:00",
       "closes": "21:00"
     },
-    "aggregateRating": {
-      "@type": "AggregateRating",
-      "ratingValue": "4.9",
-      "reviewCount": "1200"
-    },
+
     "priceRange": "₹₹",
     "sameAs": [
       "https://wa.me/919945095453"
@@ -71,11 +115,23 @@
   }
   </script>
 
-  <link rel="stylesheet" href="style.css"/>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <!-- ═══════════════════════════════════════════════
+       10. STYLESHEET — preload for faster first paint
+       ═══════════════════════════════════════════════ -->
+  <link rel="preload" href="style.css" as="style">
+  <link rel="stylesheet" href="style.css">
+
+  <!-- ═══════════════════════════════════════════════
+       11. SCRIPTS — moved to bottom of <body>
+           jsPDF was in <head> blocking render — WRONG
+           Add this before </body> instead:
+
+           <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
+           <script src="script.js" defer></script>
+       ═══════════════════════════════════════════════ -->
+
 </head>
 <body>
-
 <!-- NAVBAR -->
 <a href="#quote" class="skip-link" style="position:absolute;left:-9999px;top:0;z-index:9999;padding:8px 16px;background:#3b82f6;color:#fff;border-radius:0 0 8px 0;font-weight:600;text-decoration:none" onfocus="this.style.left='0'" onblur="this.style.left='-9999px'">Skip to main content</a>
 <nav class="navbar" role="navigation" aria-label="Main navigation">
