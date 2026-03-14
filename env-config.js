@@ -3,4 +3,6 @@ window.ENV = {
     
     // Firebase Auth key - NO referrer restrictions
     FIREBASE_AUTH_KEY: 'AIzaSyCNZdOeUlwlI9kwkzD05R1xEy8EyuP8VJo'
+  // env-config.js
+  RAZORPAY_KEY: "rzp_live_SR6N14UYbYB42e"
 };
