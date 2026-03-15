@@ -29,7 +29,7 @@ let pendingAdminMsg     = null; // Admin WA message sent when customer clicks th
 
 const MIN_BASE_PRICE = 1999;
 const FRIDGE_PRICE   = 150;
-const RAZORPAY_KEY   = "YOUR_RAZORPAY_KEY_ID";
+const RAZORPAY_KEY   = (window.ENV && window.ENV.RAZORPAY_KEY) || "";
 
 /* ============================================
    UTILITY — debounce
@@ -618,12 +618,18 @@ function selectPayment(type) {
   document.getElementById("optAdvance").classList.toggle("selected", type === "advance");
   document.getElementById("optFull").classList.toggle("selected", type === "full");
   document.getElementById("optAtDrop")?.classList.toggle("selected", type === "at_drop");
-  const payBtn = document.querySelector(".btn-pay");
-  if (payBtn) {
-    if (type === "advance")  payBtn.textContent = "💳 Pay Advance & Confirm";
-    if (type === "full")     payBtn.textContent = "💳 Pay Full & Confirm";
-    if (type === "at_drop")  payBtn.textContent = "📋 Book Now — Pay at Drop";
+  // Update the Pay Online button label (second .btn-pay), not the Pay on Delivery button
+  const payOnlineBtn = document.getElementById("btnPayOnline");
+  if (payOnlineBtn) {
+    if (type === "advance") payOnlineBtn.textContent = "💳 Pay Advance (10%) & Confirm";
+    if (type === "full")    payOnlineBtn.textContent = "💳 Pay Full Amount & Confirm";
+    if (type === "at_drop") payOnlineBtn.textContent = "💳 Pay Online";
   }
+}
+
+// Called from HTML onclick — routes to startPayment()
+function startRazorpayPayment() {
+  startPayment();
 }
 
 /* ============================================
@@ -1025,8 +1031,8 @@ function startPayment() {
   if (!phone || phone.length < 10) return alert("Please enter a valid phone number.");
   if (lastCalculatedTotal === 0)   return alert("Price not calculated yet.");
 
-  if (RAZORPAY_KEY === "YOUR_RAZORPAY_KEY_ID") {
-    alert("⚠️ Razorpay not activated yet.\n\nUse 'Book via WhatsApp Only' for now.");
+  if (!RAZORPAY_KEY) {
+    alert("⚠️ Razorpay key not found. Please check your env-config.js and ensure RAZORPAY_KEY is set.");
     return;
   }
 
