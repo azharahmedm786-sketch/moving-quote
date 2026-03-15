@@ -102,6 +102,14 @@
 
   <!-- New sections styles -->
   <style>
+    /* HERO UPDATES */
+    .hero-desc { font-size:.9rem; color:var(--text-muted,#ccc); line-height:1.7; margin:10px 0 14px; max-width:480px; }
+    .hero-checklist { display:flex; flex-direction:column; gap:6px; margin-bottom:16px; }
+    .hero-checklist span { font-size:.85rem; color:var(--text-muted,#ccc); }
+    .hero-cta-text { font-size:.88rem; color:var(--text-muted,#bbb); margin-bottom:16px; }
+    .btn-wa-hero { background:rgba(37,211,102,0.15) !important; border-color:rgba(37,211,102,0.4) !important; color:#25d366 !important; }
+    .btn-wa-hero:hover { background:rgba(37,211,102,0.25) !important; }
+
     /* TRUST SIGNALS BAR */
     .trust-signals-section { padding: 24px 20px; background: rgba(59,130,246,0.06); border-top: 1px solid rgba(59,130,246,0.15); border-bottom: 1px solid rgba(59,130,246,0.15); }
     .ts-inner { max-width: 900px; margin: 0 auto; display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 12px 0; }
@@ -113,30 +121,63 @@
     @media(max-width:600px){ .ts-divider{display:none;} .ts-badge{padding:8px 16px;} }
 
     /* PRICING TABLE */
-    .pricing-section { padding: 72px 20px; max-width: 1100px; margin: 0 auto; }
-    .pricing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 20px; margin-top: 40px; }
-    .price-card { background: var(--card-bg, rgba(255,255,255,0.04)); border: 1px solid var(--border-light, rgba(255,255,255,0.1)); border-radius: 16px; padding: 28px 24px; position: relative; transition: transform .2s, box-shadow .2s; }
-    .price-card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(0,0,0,0.3); }
-    .price-card.popular { border-color: #3b82f6; box-shadow: 0 0 0 1px #3b82f6; }
-    .pc-popular-badge { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: #3b82f6; color: #fff; font-size: .72rem; font-weight: 700; padding: 4px 14px; border-radius: 20px; white-space: nowrap; }
-    .pc-icon { font-size: 2rem; margin-bottom: 10px; }
-    .pc-type { font-weight: 700; font-size: 1.05rem; color: var(--text, #fff); margin-bottom: 6px; }
-    .pc-range { font-size: 1.5rem; font-weight: 800; color: #3b82f6; margin-bottom: 4px; }
-    .pc-note { font-size: .78rem; color: var(--text-muted, #aaa); margin-bottom: 16px; }
-    .pc-features { list-style: none; padding: 0; margin: 0 0 20px; display: flex; flex-direction: column; gap: 6px; }
-    .pc-features li { font-size: .82rem; color: var(--text-muted, #ccc); }
-    .pc-btn { display: block; text-align: center; background: linear-gradient(135deg,#3b82f6,#2563eb); color: #fff; padding: 10px; border-radius: 10px; font-weight: 600; font-size: .85rem; text-decoration: none; transition: opacity .2s; }
-    .pc-btn:hover { opacity: .85; }
-    .pricing-disclaimer { text-align: center; font-size: .8rem; color: var(--text-muted, #aaa); margin-top: 24px; }
+    .pricing-section { padding: 72px 20px; max-width: 760px; margin: 0 auto; }
+    .pricing-table-wrap { margin-top:36px; }
+    .pricing-table { width:100%; border-collapse:collapse; border-radius:16px; overflow:hidden; }
+    .pricing-table thead tr { background:linear-gradient(135deg,#3b82f6,#2563eb); }
+    .pricing-table thead th { padding:14px 20px; text-align:left; font-size:.9rem; font-weight:700; color:#fff; }
+    .pricing-table tbody tr { border-bottom:1px solid rgba(255,255,255,0.07); transition:background .15s; }
+    .pricing-table tbody tr:hover { background:rgba(59,130,246,0.08); }
+    .pricing-table tbody tr:last-child { border-bottom:none; }
+    .pricing-table td { padding:14px 20px; font-size:.88rem; color:var(--text,#fff); }
+    .pricing-table td:last-child { font-weight:700; color:#3b82f6; }
+    .pricing-note { font-size:.82rem; color:var(--text-muted,#aaa); margin-top:16px; padding:12px 16px; background:rgba(255,255,255,0.04); border-radius:10px; border-left:3px solid #3b82f6; }
+
+    /* HOW IT WORKS */
+    .hiw-section { padding:72px 20px; background:rgba(255,255,255,0.02); }
+    .hiw-steps { max-width:1100px; margin:40px auto 0; display:flex; align-items:flex-start; justify-content:center; flex-wrap:wrap; gap:8px; }
+    .hiw-step { flex:1; min-width:180px; max-width:220px; text-align:center; padding:24px 16px; background:var(--card-bg,rgba(255,255,255,0.04)); border:1px solid var(--border-light,rgba(255,255,255,0.08)); border-radius:16px; position:relative; }
+    .hiw-num { position:absolute; top:-14px; left:50%; transform:translateX(-50%); background:#3b82f6; color:#fff; width:28px; height:28px; border-radius:50%; font-size:.8rem; font-weight:800; display:flex; align-items:center; justify-content:center; }
+    .hiw-icon { font-size:2rem; margin:8px 0 12px; }
+    .hiw-step h3 { font-size:.9rem; font-weight:700; color:var(--text,#fff); margin-bottom:8px; }
+    .hiw-step p { font-size:.8rem; color:var(--text-muted,#bbb); line-height:1.6; }
+    .hiw-connector { font-size:1.4rem; color:#3b82f6; font-weight:700; padding:0 4px; align-self:center; }
+    @media(max-width:700px){ .hiw-connector{display:none;} .hiw-steps{gap:16px;} }
 
     /* WHY CHOOSE US */
-    .why-section { padding: 72px 20px; background: rgba(255,255,255,0.02); }
+    .why-section { padding: 72px 20px; }
     .why-grid { max-width: 1000px; margin: 40px auto 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); gap: 20px; }
     .why-card { background: var(--card-bg, rgba(255,255,255,0.04)); border: 1px solid var(--border-light, rgba(255,255,255,0.08)); border-radius: 16px; padding: 28px 24px; transition: transform .2s; }
     .why-card:hover { transform: translateY(-3px); }
     .why-icon { font-size: 2rem; margin-bottom: 12px; }
     .why-card h3 { font-size: 1rem; font-weight: 700; color: var(--text, #fff); margin-bottom: 8px; }
     .why-card p { font-size: .85rem; color: var(--text-muted, #bbb); line-height: 1.6; }
+
+    /* FAQ */
+    .faq-section { padding:72px 20px; max-width:760px; margin:0 auto; }
+    .faq-list { margin-top:36px; display:flex; flex-direction:column; gap:12px; }
+    .faq-item { border:1px solid var(--border-light,rgba(255,255,255,0.1)); border-radius:12px; overflow:hidden; }
+    .faq-q { width:100%; background:var(--card-bg,rgba(255,255,255,0.04)); border:none; text-align:left; padding:16px 20px; font-size:.9rem; font-weight:600; color:var(--text,#fff); cursor:pointer; display:flex; justify-content:space-between; align-items:center; gap:12px; transition:background .2s; }
+    .faq-q:hover { background:rgba(255,255,255,0.07); }
+    .faq-arrow { font-size:.9rem; color:#3b82f6; transition:transform .25s; flex-shrink:0; }
+    .faq-a { max-height:0; overflow:hidden; font-size:.85rem; color:var(--text-muted,#bbb); line-height:1.7; transition:max-height .3s ease, padding .3s ease; padding:0 20px; }
+    .faq-item.open .faq-arrow { transform:rotate(180deg); }
+    .faq-item.open .faq-a { max-height:200px; padding:12px 20px 16px; }
+    .faq-item.open .faq-q { background:rgba(59,130,246,0.08); }
+
+    /* FINAL CTA */
+    .final-cta-section { padding:72px 20px; background:linear-gradient(135deg,rgba(37,99,235,0.15),rgba(59,130,246,0.08)); border-top:1px solid rgba(59,130,246,0.2); border-bottom:1px solid rgba(59,130,246,0.2); }
+    .final-cta-inner { max-width:640px; margin:0 auto; text-align:center; }
+    .fcta-emoji { font-size:3rem; margin-bottom:16px; }
+    .final-cta-inner h2 { font-size:1.8rem; font-weight:800; color:var(--text,#fff); margin-bottom:12px; }
+    .final-cta-inner p { font-size:.9rem; color:var(--text-muted,#ccc); line-height:1.7; margin-bottom:8px; }
+    .fcta-sub { margin-bottom:28px !important; }
+    .fcta-actions { display:flex; flex-wrap:wrap; gap:12px; justify-content:center; }
+    .fcta-btn { padding:13px 24px; border-radius:12px; font-weight:700; font-size:.9rem; text-decoration:none; transition:transform .2s, opacity .2s; }
+    .fcta-btn:hover { transform:translateY(-2px); opacity:.9; }
+    .fcta-call { background:linear-gradient(135deg,#2563eb,#3b82f6); color:#fff; }
+    .fcta-wa { background:linear-gradient(135deg,#16a34a,#22c55e); color:#fff; }
+    .fcta-quote { background:rgba(255,255,255,0.1); color:var(--text,#fff); border:1px solid rgba(255,255,255,0.2); }
   </style>
 
 </head>
@@ -187,11 +228,20 @@ alt="PackZen Packers and Movers Bangalore">
   <div class="blob blob-3"></div>
   <div class="hero-content">
     <div class="hero-badge">🏆 Bangalore's #1 Trusted Movers</div>
-    <h1 class="hero-title">Affordable Packers &amp; Movers<br><span class="hero-accent">in Bangalore</span></h1>
-    <p class="hero-sub">Zero Damage · Live Tracking · Instant Quote — Trusted by 1,200+ families across Bangalore.</p>
+    <h1 class="hero-title">Reliable Packers &amp; Movers<br><span class="hero-accent">in Bangalore 🚛</span></h1>
+    <p class="hero-sub">Safe, Affordable &amp; Hassle-Free House Shifting</p>
+    <p class="hero-desc">Moving homes shouldn't be stressful. With <strong>PackZen Packers &amp; Movers</strong>, you get professional packing, careful handling, and real-time move tracking — all at transparent prices.</p>
+    <div class="hero-checklist">
+      <span>✔ Experienced moving team</span>
+      <span>✔ Premium packing materials</span>
+      <span>✔ GPS vehicle tracking</span>
+      <span>✔ Affordable pricing with no hidden charges</span>
+    </div>
+    <p class="hero-cta-text">Get your <strong>instant moving estimate</strong> and book your move in minutes.</p>
     <div class="hero-actions">
-      <a href="#quote" class="btn-primary" aria-label="Get instant moving quote">Get Instant Quote →</a>
+      <a href="#quote" class="btn-primary" aria-label="Get instant moving quote">📦 Get Instant Quote →</a>
       <a href="tel:9945095453" class="btn-ghost">📞 Call Now</a>
+      <a href="https://wa.me/919945095453?text=Hello%20PackZen%2C%20I%20need%20a%20moving%20quote" class="btn-ghost btn-wa-hero" target="_blank">💬 WhatsApp Us</a>
     </div>
     <div class="hero-trust">
       <span>✔ Licensed &amp; Insured</span>
@@ -318,61 +368,65 @@ alt="PackZen Packers and Movers Bangalore">
 <section class="pricing-section reveal" id="pricing">
   <div class="section-header">
     <div class="section-tag">Transparent Pricing</div>
-    <h2>How Much Does Moving Cost?</h2>
-    <p>Approximate price ranges — final quote depends on distance &amp; items. No hidden charges.</p>
+    <h2>Estimated Moving Charges 💰</h2>
+    <p>We believe in <strong>transparent pricing</strong> so you always know what to expect.</p>
   </div>
-  <div class="pricing-grid reveal-stagger">
-    <div class="price-card">
-      <div class="pc-icon">🏠</div>
-      <div class="pc-type">1 RK / 1 BHK</div>
-      <div class="pc-range">₹2,000 – ₹5,000</div>
-      <div class="pc-note">Local Bangalore move</div>
-      <ul class="pc-features">
-        <li>✔ Packing &amp; unpacking</li>
-        <li>✔ Tata Ace / small truck</li>
-        <li>✔ 2–4 hrs typical</li>
-      </ul>
-      <a href="#quote" class="pc-btn">Get Exact Quote →</a>
-    </div>
-    <div class="price-card popular">
-      <div class="pc-popular-badge">Most Popular</div>
-      <div class="pc-icon">🏡</div>
-      <div class="pc-type">2 BHK</div>
-      <div class="pc-range">₹4,500 – ₹9,000</div>
-      <div class="pc-note">Local Bangalore move</div>
-      <ul class="pc-features">
-        <li>✔ Full packing service</li>
-        <li>✔ 14–17 ft truck</li>
-        <li>✔ 4–6 hrs typical</li>
-      </ul>
-      <a href="#quote" class="pc-btn">Get Exact Quote →</a>
-    </div>
-    <div class="price-card">
-      <div class="pc-icon">🏘️</div>
-      <div class="pc-type">3 BHK &amp; Above</div>
-      <div class="pc-range">₹7,500 – ₹15,000</div>
-      <div class="pc-note">Local Bangalore move</div>
-      <ul class="pc-features">
-        <li>✔ Full packing service</li>
-        <li>✔ 17–22 ft truck</li>
-        <li>✔ 6–8 hrs typical</li>
-      </ul>
-      <a href="#quote" class="pc-btn">Get Exact Quote →</a>
-    </div>
-    <div class="price-card">
-      <div class="pc-icon">🚛</div>
-      <div class="pc-type">Intercity Move</div>
-      <div class="pc-range">₹8,000 – ₹25,000</div>
-      <div class="pc-note">Bangalore to other cities</div>
-      <ul class="pc-features">
-        <li>✔ Fixed rate, no per-km charge</li>
-        <li>✔ Insured transit</li>
-        <li>✔ Door-to-door delivery</li>
-      </ul>
-      <a href="#quote" class="pc-btn">Get Exact Quote →</a>
+  <div class="pricing-table-wrap reveal">
+    <table class="pricing-table">
+      <thead>
+        <tr><th>Move Type</th><th>Estimated Price</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>1 BHK Local Move</td><td>₹2,500 – ₹5,000</td></tr>
+        <tr><td>2 BHK Local Move</td><td>₹4,500 – ₹8,000</td></tr>
+        <tr><td>3 BHK Local Move</td><td>₹7,000 – ₹12,000</td></tr>
+        <tr><td>Office Relocation</td><td>Custom Quote</td></tr>
+        <tr><td>Intercity Moves</td><td>Based on distance</td></tr>
+      </tbody>
+    </table>
+    <p class="pricing-note">💡 Final price depends on distance, inventory size, floor access and packing requirements.</p>
+    <div style="text-align:center;margin-top:24px;">
+      <a href="#quote" class="btn-primary">Get Your Exact Quote →</a>
     </div>
   </div>
-  <p class="pricing-disclaimer">* Prices are estimates. Final quote is calculated instantly based on your pickup, drop &amp; items. Use the quote form above for an accurate price.</p>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="hiw-section reveal" id="how-it-works">
+  <div class="section-header">
+    <div class="section-tag">Simple Process</div>
+    <h2>How Your Move Works 📦</h2>
+    <p>We've made house shifting simple and stress-free in just 4 steps.</p>
+  </div>
+  <div class="hiw-steps reveal-stagger">
+    <div class="hiw-step">
+      <div class="hiw-num">1</div>
+      <div class="hiw-icon">📋</div>
+      <h3>Get an Instant Quote</h3>
+      <p>Enter your pickup and drop details to receive a quick, accurate estimate instantly.</p>
+    </div>
+    <div class="hiw-connector">→</div>
+    <div class="hiw-step">
+      <div class="hiw-num">2</div>
+      <div class="hiw-icon">📅</div>
+      <h3>Confirm Your Booking</h3>
+      <p>Choose your moving date and secure your slot. Our team will confirm within 30 minutes.</p>
+    </div>
+    <div class="hiw-connector">→</div>
+    <div class="hiw-step">
+      <div class="hiw-num">3</div>
+      <div class="hiw-icon">📦</div>
+      <h3>Professional Packing &amp; Loading</h3>
+      <p>Our trained team carefully packs and loads your belongings with premium materials.</p>
+    </div>
+    <div class="hiw-connector">→</div>
+    <div class="hiw-step">
+      <div class="hiw-num">4</div>
+      <div class="hiw-icon">🎉</div>
+      <h3>Safe Transport &amp; Delivery</h3>
+      <p>Your items are transported safely with live tracking and delivered on time, every time.</p>
+    </div>
+  </div>
 </section>
 
 <!-- WHY CHOOSE US -->
@@ -746,22 +800,83 @@ alt="PackZen Packers and Movers Bangalore">
   <div class="reviews-grid reveal-stagger" id="reviewsGrid">
     <div class="review-card">
       <div class="review-stars">★★★★★</div>
-      <p class="review-text">"Absolutely amazing service! They packed everything carefully and delivered on time. Zero damage!"</p>
-      <div class="review-author"><div class="review-avatar">R</div><div><div class="review-name">Rahul Sharma</div><div class="review-meta">HSR Layout · 2 BHK Move</div></div></div>
+      <p class="review-text">"PackZen made our house shifting smooth and stress-free. The team packed everything carefully and delivered on time. Highly recommended!"</p>
+      <div class="review-author"><div class="review-avatar">R</div><div><div class="review-name">Rahul S</div><div class="review-meta">Whitefield · House Move</div></div></div>
     </div>
     <div class="review-card">
       <div class="review-stars">★★★★★</div>
-      <p class="review-text">"Used PackZen for office shifting. Minimal downtime, all IT equipment handled perfectly. Highly recommend!"</p>
-      <div class="review-author"><div class="review-avatar">P</div><div><div class="review-name">Priya Nair</div><div class="review-meta">Koramangala · Office Move</div></div></div>
+      <p class="review-text">"Very professional movers. Pricing was transparent and the staff handled furniture with great care. Will definitely use again!"</p>
+      <div class="review-author"><div class="review-avatar">S</div><div><div class="review-name">Sneha K</div><div class="review-meta">HSR Layout · 2 BHK Move</div></div></div>
     </div>
     <div class="review-card">
-      <div class="review-stars">★★★★☆</div>
-      <p class="review-text">"Good service overall. Driver was polite and careful. The GPS tracking feature is super helpful!"</p>
-      <div class="review-author"><div class="review-avatar">A</div><div><div class="review-name">Amit Verma</div><div class="review-meta">Whitefield · 1 BHK Move</div></div></div>
+      <div class="review-stars">★★★★★</div>
+      <p class="review-text">"Great experience with PackZen. Booking was simple and the team was punctual and efficient. No damage to any items!"</p>
+      <div class="review-author"><div class="review-avatar">A</div><div><div class="review-name">Ahmed R</div><div class="review-meta">Electronic City · 1 BHK Move</div></div></div>
     </div>
   </div>
   <div style="text-align:center; margin-top:28px;">
     <button class="btn-primary leave-review-btn" onclick="openReviewModal()">⭐ Leave a Review</button>
+  </div>
+</section>
+
+<!-- FAQ SECTION -->
+<section class="faq-section reveal" id="faq">
+  <div class="section-header">
+    <div class="section-tag">Got Questions?</div>
+    <h2>Frequently Asked Questions ❓</h2>
+    <p>Everything you need to know before booking your move.</p>
+  </div>
+  <div class="faq-list reveal">
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">
+        How early should I book my move?
+        <span class="faq-arrow">▾</span>
+      </button>
+      <div class="faq-a">We recommend booking at least 1–3 days in advance to secure your preferred moving date, especially on weekends.</div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">
+        Do you provide packing materials?
+        <span class="faq-arrow">▾</span>
+      </button>
+      <div class="faq-a">Yes. Our team brings high-quality packing materials including bubble wrap, carton boxes, and protective sheets for safe transportation of all your items.</div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">
+        Are my belongings insured during the move?
+        <span class="faq-arrow">▾</span>
+      </button>
+      <div class="faq-a">Yes. All moves are fully insured. Insurance options are available for additional protection during transit. In the rare event of damage, we cover the cost — no questions asked.</div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">
+        Do you move fragile items like TVs and glass?
+        <span class="faq-arrow">▾</span>
+      </button>
+      <div class="faq-a">Absolutely. Fragile items like TVs, mirrors, and glassware are packed using special protective materials and handled with extra care by our trained team.</div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">
+        Can I reschedule my booking?
+        <span class="faq-arrow">▾</span>
+      </button>
+      <div class="faq-a">Yes, rescheduling is possible depending on availability. You can reschedule directly from your dashboard or call us and we'll confirm the new slot within 2 hours.</div>
+    </div>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section class="final-cta-section reveal">
+  <div class="final-cta-inner">
+    <div class="fcta-emoji">🚛</div>
+    <h2>Ready to Move Without Stress?</h2>
+    <p>Let <strong>PackZen Packers &amp; Movers</strong> handle the heavy lifting while you focus on settling into your new home.</p>
+    <p class="fcta-sub">Get your <strong>instant moving estimate today</strong> and experience a smoother way to move.</p>
+    <div class="fcta-actions">
+      <a href="tel:9945095453" class="fcta-btn fcta-call">📞 Call Now</a>
+      <a href="https://wa.me/919945095453?text=Hello%20PackZen%2C%20I%20need%20a%20moving%20quote" class="fcta-btn fcta-wa" target="_blank">💬 WhatsApp Us</a>
+      <a href="#quote" class="fcta-btn fcta-quote">📦 Get Instant Quote</a>
+    </div>
   </div>
 </section>
 
@@ -1236,6 +1351,15 @@ alt="PackZen Packers and Movers Bangalore">
     document.head.appendChild(s);
   }
   loadGoogleMaps();
+</script>
+
+<script>
+function toggleFaq(btn) {
+  const item = btn.parentElement;
+  const isOpen = item.classList.contains('open');
+  document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+  if (!isOpen) item.classList.add('open');
+}
 </script>
 
 <div id="toastMsg" class="toast-msg"></div>
