@@ -179,6 +179,7 @@ body.dark-mode .navbar { background: rgba(5, 8, 20, 0.98); }
 .logo-img {
   height: 42px; width: auto; max-width: 145px;
   object-fit: contain; object-position: left center; display: block;
+  mix-blend-mode: screen; /* removes white background on dark navbar */
 }
 @media (max-width: 480px) { .logo-img { height: 34px; max-width: 115px; } }
 
