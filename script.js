@@ -222,14 +222,6 @@ function waitForFirebase(cb, tries = 0) {
 }
 
 /* ============================================
-   THEME TOGGLE
-   ============================================ */
-function toggleTheme() {
-  const isDark = document.body.classList.toggle("dark-mode");
-  const btn = document.getElementById("themeToggle");
-  if (btn) btn.textContent = isDark ? "☀️" : "🌙";
-  localStorage.setItem("packzen-theme", isDark ? "dark" : "light");
-}
 
 /* ============================================
    NAV
