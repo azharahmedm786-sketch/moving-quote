@@ -211,13 +211,13 @@ body.dark-mode .navbar { background: #06101f; }
   display: flex; align-items: center;
   padding: 90px 2.5rem 5rem;
   overflow: hidden; color: white;
-  background: linear-gradient(150deg, rgba(6,14,36,0.60) 0%, rgba(12,27,58,0.55) 50%, rgba(15,37,84,0.60) 100%);
+  background: url('https://raw.githubusercontent.com/azharahmedm786-sketch/moving-quote/main/images/hero-bg.jpg') center/cover no-repeat;
 }
 .hero::before {
   content: '';
   position: absolute; inset: 0;
-  background: url('https://raw.githubusercontent.com/azharahmedm786-sketch/moving-quote/main/images/hero-bg.jpg') center/cover no-repeat;
-  opacity: 0.55; z-index: -1;
+  background: linear-gradient(150deg, rgba(6,14,36,0.72) 0%, rgba(12,27,58,0.65) 50%, rgba(15,37,84,0.72) 100%);
+  z-index: 0;
 }
 /* Diagonal orange slice at bottom */
 .hero::after {
@@ -424,20 +424,28 @@ body.dark-mode .stats-bar { background: var(--bg-secondary); }
 }
 .service-card {
   background: white; border-radius: var(--radius-xl);
-  padding: 2.25rem 1.75rem; box-shadow: var(--shadow-md);
+  padding: 0; box-shadow: var(--shadow-md);
   transition: all 0.35s cubic-bezier(0.34,1.2,0.64,1);
   border: 1px solid var(--border-light); position: relative; overflow: hidden;
   border-top: 3px solid transparent;
+  display: flex; flex-direction: column;
 }
 .service-card img {
-  width: calc(100% + 3.5rem);
-  max-width: calc(100% + 3.5rem);
-  height: 180px;
+  width: 100%;
+  height: 200px;
   object-fit: cover;
-  border-radius: calc(var(--radius-xl) - 2px) calc(var(--radius-xl) - 2px) 0 0;
-  margin: -2.25rem -1.75rem 1.25rem -1.75rem;
   display: block;
+  border-radius: 0;
+  flex-shrink: 0;
 }
+.service-card .sc-icon,
+.service-card h3,
+.service-card p,
+.service-card .sc-badge {
+  padding-left: 1.75rem;
+  padding-right: 1.75rem;
+}
+.service-card .sc-icon { padding-top: 1.25rem; }
 body.dark-mode .service-card { background: var(--bg-secondary); }
 .service-card::before {
   content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
@@ -457,12 +465,12 @@ body.dark-mode .service-card { background: var(--bg-secondary); }
 .service-card:hover::after { bottom: -20px; right: -20px; }
 .sc-icon { font-size: 2.8rem; margin-bottom: 1.1rem; display: block; }
 .service-card h3 { font-size: 1.15rem; margin-bottom: 0.65rem; color: var(--text-primary); }
-.service-card p { color: var(--text-muted); font-size: 0.88rem; line-height: 1.65; }
+.service-card p { color: var(--text-muted); font-size: 0.88rem; line-height: 1.65; padding-bottom: 1.5rem; }
 .sc-badge {
   display: inline-block; background: var(--gold-gradient);
   color: white; padding: 0.25rem 0.9rem;
   border-radius: var(--radius-pill); font-size: 0.65rem; font-weight: 800;
-  margin-top: 1rem; text-transform: uppercase; letter-spacing: 0.7px;
+  margin-top: 1rem; margin-bottom: 1.5rem; text-transform: uppercase; letter-spacing: 0.7px;
   box-shadow: 0 4px 12px rgba(234,88,12,0.30);
 }
 
