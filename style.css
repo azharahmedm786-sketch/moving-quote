@@ -219,7 +219,7 @@ body.dark-mode .navbar { background: #06101f; }
 .hero::before {
   content: '';
   position: absolute; inset: 0;
-  background: url('https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=1600&q=70&auto=format&fit=crop') center/cover no-repeat;
+  background: url('https://raw.githubusercontent.com/azharahmedm786-sketch/moving-quote/main/images/hero-bg.jpg') center/cover no-repeat;
   opacity: 0.04; z-index: 0;
 }
 /* Diagonal orange slice at bottom */
@@ -432,6 +432,15 @@ body.dark-mode .stats-bar { background: var(--bg-secondary); }
   border: 1px solid var(--border-light); position: relative; overflow: hidden;
   border-top: 3px solid transparent;
 }
+.service-card img {
+  width: calc(100% + 3.5rem);
+  max-width: calc(100% + 3.5rem);
+  height: 180px;
+  object-fit: cover;
+  border-radius: calc(var(--radius-xl) - 2px) calc(var(--radius-xl) - 2px) 0 0;
+  margin: -2.25rem -1.75rem 1.25rem -1.75rem;
+  display: block;
+}
 body.dark-mode .service-card { background: var(--bg-secondary); }
 .service-card::before {
   content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
@@ -579,7 +588,7 @@ body.dark-mode .why-section { background: var(--bg-primary); }
 
 /* Process section */
 .process-section { padding: var(--space-3xl) var(--space-lg); background: var(--primary-gradient); position: relative; overflow: hidden; }
-.process-section::before { content: ''; position: absolute; inset: 0; background: url('https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=1400&q=60&auto=format&fit=crop') center/cover no-repeat; opacity: 0.04; }
+.process-section::before { content: ''; position: absolute; inset: 0; background: url('https://raw.githubusercontent.com/azharahmedm786-sketch/moving-quote/main/images/services-bg.jpg') center/cover no-repeat; opacity: 0.04; }
 .process-section .section-header h2 { color: white; }
 .process-section .section-header p  { color: rgba(255,255,255,0.7); }
 .process-steps { display: grid; grid-template-columns: repeat(4,1fr); gap: 1.5rem; max-width: 1100px; margin: 0 auto; position: relative; z-index: 1; }
