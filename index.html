@@ -11,735 +11,1743 @@
 /* =============================================
    PACKZEN — CORPORATE PROFESSIONAL v5.0
    Corporate Blue + White + Gold Trust
-   CSS integrated from Mycssfile.txt
    ============================================= */
 
-*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; } [cite: 1, 415]
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
 :root {
-  --navy:        #0f2557; [cite: 2, 416]
-  --blue:        #1e40af; [cite: 2, 416]
-  --blue-mid:    #2563eb; [cite: 2, 416]
-  --blue-light:  #3b82f6; [cite: 2, 416]
-  --gold:        #b45309; [cite: 2, 416]
-  --gold-mid:    #d97706; [cite: 2, 416]
-  --gold-bright: #f59e0b; [cite: 3, 417]
-  --gold-pale:   #fef3c7; [cite: 3, 417]
-  --white:       #ffffff; [cite: 3, 417]
-  --off-white:   #f8faff; [cite: 3, 417]
-  --slate-50:    #f8fafc; [cite: 3, 417]
-  --slate-100:   #f1f5f9; [cite: 3, 417]
-  --slate-200:   #e2e8f0; [cite: 3, 417]
-  --slate-300:   #cbd5e1; [cite: 3, 417]
-  --slate-500:   #64748b; [cite: 3, 417]
-  --slate-700:   #334155; [cite: 3, 417]
-  --slate-900:   #0f172a; [cite: 4, 418]
-  --green:       #059669; [cite: 4, 418]
-  --green-light: #d1fae5; [cite: 4, 418]
-  --red:         #dc2626; [cite: 4, 418]
+  --navy:        #0f2557;
+  --blue:        #1e40af;
+  --blue-mid:    #2563eb;
+  --blue-light:  #3b82f6;
+  --gold:        #b45309;
+  --gold-mid:    #d97706;
+  --gold-bright: #f59e0b;
+  --gold-pale:   #fef3c7;
+  --white:       #ffffff;
+  --off-white:   #f8faff;
+  --slate-50:    #f8fafc;
+  --slate-100:   #f1f5f9;
+  --slate-200:   #e2e8f0;
+  --slate-300:   #cbd5e1;
+  --slate-500:   #64748b;
+  --slate-700:   #334155;
+  --slate-900:   #0f172a;
+  --green:       #059669;
+  --green-light: #d1fae5;
+  --red:         #dc2626;
 
-  --shadow-sm:  0 1px 3px rgba(15,37,87,0.08), 0 1px 2px rgba(15,37,87,0.04); [cite: 4, 418]
-  --shadow-md:  0 4px 16px rgba(15,37,87,0.10), 0 2px 4px rgba(15,37,87,0.06); [cite: 5, 419]
-  --shadow-lg:  0 10px 40px rgba(15,37,87,0.14), 0 4px 8px rgba(15,37,87,0.08); [cite: 5, 419]
-  --shadow-xl:  0 20px 60px rgba(15,37,87,0.18), 0 8px 16px rgba(15,37,87,0.10); [cite: 6, 420]
-  --shadow-gold: 0 8px 32px rgba(180,83,9,0.22); [cite: 6, 420]
-  --grad-blue:  linear-gradient(135deg, #0f2557 0%, #1e40af 50%, #2563eb 100%); [cite: 7, 421]
-  --grad-gold:  linear-gradient(135deg, #b45309 0%, #d97706 60%, #f59e0b 100%); [cite: 7, 421]
-  --grad-hero:  linear-gradient(160deg, #0f2557 0%, #1e3a8a 40%, #1e40af 70%, #2563eb 100%); [cite: 8, 422]
+  --shadow-sm:  0 1px 3px rgba(15,37,87,0.08), 0 1px 2px rgba(15,37,87,0.04);
+  --shadow-md:  0 4px 16px rgba(15,37,87,0.10), 0 2px 4px rgba(15,37,87,0.06);
+  --shadow-lg:  0 10px 40px rgba(15,37,87,0.14), 0 4px 8px rgba(15,37,87,0.08);
+  --shadow-xl:  0 20px 60px rgba(15,37,87,0.18), 0 8px 16px rgba(15,37,87,0.10);
+  --shadow-gold: 0 8px 32px rgba(180,83,9,0.22);
 
-  --radius-sm:   6px; [cite: 8, 422]
-  --radius-md:   12px; [cite: 8, 422]
-  --radius-lg:   18px; [cite: 8, 422]
-  --radius-xl:   24px; [cite: 8, 422]
-  --radius-pill: 100px; [cite: 8, 422]
+  --grad-blue:  linear-gradient(135deg, #0f2557 0%, #1e40af 50%, #2563eb 100%);
+  --grad-gold:  linear-gradient(135deg, #b45309 0%, #d97706 60%, #f59e0b 100%);
+  --grad-hero:  linear-gradient(160deg, #0f2557 0%, #1e3a8a 40%, #1e40af 70%, #2563eb 100%);
+
+  --radius-sm:   6px;
+  --radius-md:   12px;
+  --radius-lg:   18px;
+  --radius-xl:   24px;
+  --radius-pill: 100px;
 }
 
-html { scroll-behavior: smooth; } [cite: 9, 423]
+html { scroll-behavior: smooth; }
 
 body {
-  font-family: 'DM Sans', sans-serif; [cite: 9, 423]
-  background: var(--white); [cite: 9, 423]
-  color: var(--slate-900); [cite: 9, 423]
-  line-height: 1.6; [cite: 9, 423]
-  overflow-x: hidden; [cite: 9, 423]
+  font-family: 'DM Sans', sans-serif;
+  background: var(--white);
+  color: var(--slate-900);
+  line-height: 1.6;
+  overflow-x: hidden;
 }
 
-h1, h2, h3 { font-family: 'DM Serif Display', serif; font-weight: 400; line-height: 1.15; } [cite: 10, 424]
+h1, h2, h3 { font-family: 'DM Serif Display', serif; font-weight: 400; line-height: 1.15; }
 
 /* =============================================
-   TOPBAR
+   TOPBAR — Announcement strip
    ============================================= */
 .topbar {
-  background: var(--navy); [cite: 11, 425]
-  padding: 0.5rem 1.5rem; [cite: 11, 425]
-  display: flex; [cite: 11, 425]
-  align-items: center; [cite: 11, 425]
-  justify-content: center; [cite: 12, 425]
-  gap: 1.5rem; [cite: 12, 426]
-  flex-wrap: wrap; [cite: 12, 426]
+  background: var(--navy);
+  padding: 0.5rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
 }
 .topbar-item {
-  display: flex; [cite: 12, 426]
-  align-items: center; [cite: 12, 426]
-  gap: 0.4rem; [cite: 12, 426]
-  font-size: 0.75rem; [cite: 12, 426]
-  font-weight: 600; [cite: 12, 426]
-  color: rgba(255,255,255,0.82); [cite: 13, 426]
-  letter-spacing: 0.3px; [cite: 13, 427]
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: rgba(255,255,255,0.82);
+  letter-spacing: 0.3px;
 }
-.topbar-item .dot { color: var(--gold-bright); font-size: 0.5rem; } [cite: 13, 427]
-.topbar-item strong { color: #fcd34d; } [cite: 13, 427]
+.topbar-item .dot { color: var(--gold-bright); font-size: 0.5rem; }
+.topbar-item strong { color: #fcd34d; }
 
 /* =============================================
    NAVBAR
    ============================================= */
 .navbar {
-  position: sticky; [cite: 14, 428]
-  top: 0; [cite: 14, 428]
-  z-index: 100; [cite: 14, 428]
-  background: var(--white); [cite: 14, 428]
-  border-bottom: 1px solid var(--slate-200); [cite: 14, 428]
-  box-shadow: var(--shadow-sm); [cite: 15, 429]
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--white);
+  border-bottom: 1px solid var(--slate-200);
+  box-shadow: var(--shadow-sm);
 }
 .nav-inner {
-  max-width: 1200px; [cite: 15, 429]
-  margin: 0 auto; [cite: 15, 429]
-  padding: 0 2rem; [cite: 15, 429]
-  height: 70px; [cite: 15, 429]
-  display: flex; [cite: 15, 429]
-  align-items: center; [cite: 15, 429]
-  justify-content: space-between; [cite: 16, 430]
-  gap: 2rem; [cite: 16, 430]
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
 }
 .nav-logo {
-  display: flex; [cite: 16, 430]
-  align-items: center; [cite: 16, 430]
-  gap: 0.6rem; [cite: 16, 430]
-  text-decoration: none; [cite: 16, 430]
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  text-decoration: none;
 }
 .logo-box {
-  width: 38px; [cite: 16, 430]
-  height: 38px; [cite: 17, 431]
-  background: var(--grad-blue); [cite: 17, 431]
-  border-radius: var(--radius-md); [cite: 17, 431]
-  display: flex; [cite: 17, 431]
-  align-items: center; [cite: 17, 431]
-  justify-content: center; [cite: 17, 431]
-  font-size: 1.1rem; [cite: 17, 431]
+  width: 38px;
+  height: 38px;
+  background: var(--grad-blue);
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
 }
 .logo-text {
-  font-family: 'DM Serif Display', serif; [cite: 18, 432]
-  font-size: 1.4rem; [cite: 18, 432]
-  color: var(--navy); [cite: 18, 432]
-  letter-spacing: -0.5px; [cite: 18, 432]
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.4rem;
+  color: var(--navy);
+  letter-spacing: -0.5px;
 }
-.logo-text span { color: var(--blue-mid); } [cite: 18, 432]
+.logo-text span { color: var(--blue-mid); }
 .logo-tagline {
-  font-size: 0.6rem; [cite: 19, 433]
-  color: var(--slate-500); [cite: 19, 433]
-  font-weight: 700; [cite: 19, 433]
-  letter-spacing: 1px; [cite: 19, 433]
-  text-transform: uppercase; [cite: 19, 433]
-  display: block; [cite: 19, 433]
-  margin-top: -2px; [cite: 19, 433]
+  font-size: 0.6rem;
+  color: var(--slate-500);
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  display: block;
+  margin-top: -2px;
 }
 
 .nav-links {
-  display: flex; [cite: 20, 434]
-  align-items: center; [cite: 20, 434]
-  gap: 2rem; [cite: 20, 434]
+  display: flex;
+  align-items: center;
+  gap: 2rem;
 }
 .nav-links a {
-  color: var(--slate-700); [cite: 20, 434]
-  text-decoration: none; [cite: 20, 434]
-  font-size: 0.88rem; [cite: 20, 434]
-  font-weight: 600; [cite: 21, 435]
-  transition: color 0.2s; [cite: 21, 435]
+  color: var(--slate-700);
+  text-decoration: none;
+  font-size: 0.88rem;
+  font-weight: 600;
+  transition: color 0.2s;
 }
-.nav-links a:hover { color: var(--blue-mid); } [cite: 21, 435]
+.nav-links a:hover { color: var(--blue-mid); }
 
 .nav-cta-group {
-  display: flex; [cite: 21, 435]
-  align-items: center; [cite: 21, 435]
-  gap: 0.75rem; [cite: 21, 435]
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
 }
 .btn-call {
-  display: flex; [cite: 22, 436]
-  align-items: center; [cite: 22, 436]
-  gap: 0.4rem; [cite: 22, 436]
-  color: var(--navy); [cite: 22, 436]
-  font-weight: 700; [cite: 22, 436]
-  font-size: 0.88rem; [cite: 22, 436]
-  text-decoration: none; [cite: 22, 436]
-  padding: 0.5rem 1rem; [cite: 22, 436]
-  border: 2px solid var(--slate-200); [cite: 23, 437]
-  border-radius: var(--radius-pill); [cite: 23, 437]
-  transition: all 0.2s; [cite: 23, 437]
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--navy);
+  font-weight: 700;
+  font-size: 0.88rem;
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+  border: 2px solid var(--slate-200);
+  border-radius: var(--radius-pill);
+  transition: all 0.2s;
 }
-.btn-call:hover { border-color: var(--blue-mid); color: var(--blue-mid); } [cite: 23, 437]
+.btn-call:hover { border-color: var(--blue-mid); color: var(--blue-mid); }
 .btn-quote {
-  background: var(--grad-blue); [cite: 24, 438]
-  color: white; [cite: 24, 438]
-  text-decoration: none; [cite: 24, 438]
-  font-weight: 700; [cite: 24, 438]
-  font-size: 0.88rem; [cite: 24, 438]
-  padding: 0.6rem 1.4rem; [cite: 24, 438]
-  border-radius: var(--radius-pill); [cite: 24, 438]
-  box-shadow: 0 4px 14px rgba(30,64,175,0.35); [cite: 25, 439]
-  transition: all 0.25s; [cite: 25, 439]
-  white-space: nowrap; [cite: 25, 439]
+  background: var(--grad-blue);
+  color: white;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 0.88rem;
+  padding: 0.6rem 1.4rem;
+  border-radius: var(--radius-pill);
+  box-shadow: 0 4px 14px rgba(30,64,175,0.35);
+  transition: all 0.25s;
+  white-space: nowrap;
 }
-.btn-quote:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(30,64,175,0.45); } [cite: 25, 439]
+.btn-quote:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(30,64,175,0.45); }
 
 /* =============================================
-   TRUST STRIP
+   TRUST STRIP — right below navbar
    ============================================= */
 .trust-strip {
-  background: var(--off-white); [cite: 26, 440]
-  border-bottom: 1px solid var(--slate-200); [cite: 26, 440]
-  padding: 0.6rem 1.5rem; [cite: 27, 440]
+  background: var(--off-white);
+  border-bottom: 1px solid var(--slate-200);
+  padding: 0.6rem 1.5rem;
 }
 .trust-strip-inner {
-  max-width: 1200px; [cite: 27, 441]
-  margin: 0 auto; [cite: 27, 441]
-  display: flex; [cite: 27, 441]
-  align-items: center; [cite: 27, 441]
-  justify-content: center; [cite: 27, 441]
-  gap: 0; [cite: 27, 441]
-  flex-wrap: wrap; [cite: 28, 441]
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  flex-wrap: wrap;
 }
 .ts-pill {
-  display: flex; [cite: 28, 442]
-  align-items: center; [cite: 28, 442]
-  gap: 0.4rem; [cite: 28, 442]
-  padding: 0.3rem 1.25rem; [cite: 28, 442]
-  font-size: 0.75rem; [cite: 28, 442]
-  font-weight: 700; [cite: 28, 442]
-  color: var(--slate-700); [cite: 28, 442]
-  border-right: 1px solid var(--slate-200); [cite: 29, 443]
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 1.25rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--slate-700);
+  border-right: 1px solid var(--slate-200);
 }
-.ts-pill:last-child { border-right: none; } [cite: 29, 443]
-.ts-pill .ts-ico { font-size: 0.9rem; } [cite: 29, 443]
-.ts-pill.verified { color: var(--green); } [cite: 29, 443]
-.ts-pill.gold-txt { color: var(--gold); } [cite: 30, 444]
+.ts-pill:last-child { border-right: none; }
+.ts-pill .ts-ico { font-size: 0.9rem; }
+.ts-pill.verified { color: var(--green); }
+.ts-pill.gold-txt { color: var(--gold); }
 
 /* =============================================
    HERO
    ============================================= */
 .hero {
-  background: var(--grad-hero); [cite: 30, 444]
-  padding: 80px 2rem 90px; [cite: 30, 444]
-  position: relative; [cite: 31, 445]
-  overflow: hidden; [cite: 31, 445]
-  color: white; [cite: 31, 445]
+  background: var(--grad-hero);
+  padding: 80px 2rem 90px;
+  position: relative;
+  overflow: hidden;
+  color: white;
 }
 .hero::before {
-  content: ''; [cite: 31, 445]
-  position: absolute; [cite: 31, 445]
-  inset: 0; [cite: 31, 445]
+  content: '';
+  position: absolute;
+  inset: 0;
   background-image:
     radial-gradient(circle at 80% 20%, rgba(37,99,235,0.25) 0%, transparent 50%),
-    radial-gradient(circle at 20% 80%, rgba(245,158,11,0.08) 0%, transparent 50%); [cite: 32, 446]
-  pointer-events: none; [cite: 32, 446]
+    radial-gradient(circle at 20% 80%, rgba(245,158,11,0.08) 0%, transparent 50%);
+  pointer-events: none;
 }
+
+/* Subtle grid overlay */
 .hero::after {
-  content: ''; [cite: 33, 447]
-  position: absolute; [cite: 33, 447]
-  inset: 0; [cite: 33, 447]
+  content: '';
+  position: absolute;
+  inset: 0;
   background-image:
     linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px); [cite: 34, 447]
-  background-size: 60px 60px; [cite: 34, 448]
-  pointer-events: none; [cite: 34, 448]
+    linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+  background-size: 60px 60px;
+  pointer-events: none;
 }
+
 .hero-inner {
-  max-width: 1200px; [cite: 34, 448]
-  margin: 0 auto; [cite: 35, 448]
-  position: relative; [cite: 35, 448]
-  z-index: 2; [cite: 35, 448]
-  display: grid; [cite: 35, 448]
-  grid-template-columns: 1fr 420px; [cite: 35, 449]
-  gap: 4rem; [cite: 35, 449]
-  align-items: center; [cite: 35, 449]
+  max-width: 1200px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: 1fr 420px;
+  gap: 4rem;
+  align-items: center;
 }
-@media (max-width: 1000px) {
-  .hero-inner { grid-template-columns: 1fr; } [cite: 36, 449]
-  .hero-right { display: none; } [cite: 36, 450]
-}
+@media (max-width: 1000px) { .hero-inner { grid-template-columns: 1fr; } .hero-right { display: none; } }
 
 .hero-eyebrow {
-  display: inline-flex; [cite: 36, 450]
-  align-items: center; [cite: 37, 450]
-  gap: 0.5rem; [cite: 37, 450]
-  background: rgba(245,158,11,0.15); [cite: 37, 450]
-  border: 1px solid rgba(245,158,11,0.35); [cite: 37, 451]
-  color: #fcd34d; [cite: 37, 451]
-  padding: 0.4rem 1rem; [cite: 37, 451]
-  border-radius: var(--radius-pill); [cite: 37, 451]
-  font-size: 0.72rem; [cite: 37, 451]
-  font-weight: 700; [cite: 38, 451]
-  letter-spacing: 1px; [cite: 38, 451]
-  text-transform: uppercase; [cite: 38, 451]
-  margin-bottom: 1.25rem; [cite: 38, 452]
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(245,158,11,0.15);
+  border: 1px solid rgba(245,158,11,0.35);
+  color: #fcd34d;
+  padding: 0.4rem 1rem;
+  border-radius: var(--radius-pill);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 1.25rem;
 }
 .eyebrow-dot {
-  width: 6px; [cite: 38, 452]
-  height: 6px; [cite: 38, 452]
-  background: #fcd34d; [cite: 38, 452]
-  border-radius: 50%; [cite: 38, 452]
-  animation: pulse 2s ease-in-out infinite; [cite: 39, 452]
+  width: 6px;
+  height: 6px;
+  background: #fcd34d;
+  border-radius: 50%;
+  animation: pulse 2s ease-in-out infinite;
 }
-@keyframes pulse {
-  0%,100% { opacity: 1; transform: scale(1); } [cite: 39, 453]
-  50% { opacity: 0.5; transform: scale(0.8); } [cite: 39, 453]
-}
+@keyframes pulse { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(0.8); } }
 
 .hero h1 {
-  font-size: clamp(2.5rem, 5vw, 3.8rem); [cite: 40, 454]
-  color: white; [cite: 40, 454]
-  margin-bottom: 1.25rem; [cite: 40, 454]
-  letter-spacing: -0.02em; [cite: 40, 454]
-  line-height: 1.1; [cite: 40, 454]
+  font-size: clamp(2.5rem, 5vw, 3.8rem);
+  color: white;
+  margin-bottom: 1.25rem;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
 }
-.hero h1 em { font-style: italic; color: #fcd34d; } [cite: 41, 455]
+.hero h1 em {
+  font-style: italic;
+  color: #fcd34d;
+}
 .hero-sub {
-  font-size: 1rem; [cite: 41, 455]
-  color: rgba(255,255,255,0.75); [cite: 41, 455]
-  max-width: 520px; [cite: 41, 455]
-  line-height: 1.75; [cite: 41, 455]
-  margin-bottom: 2rem; [cite: 42, 456]
+  font-size: 1rem;
+  color: rgba(255,255,255,0.75);
+  max-width: 520px;
+  line-height: 1.75;
+  margin-bottom: 2rem;
 }
 
 .hero-trust-badges {
-  display: flex; [cite: 42, 456]
-  flex-wrap: wrap; [cite: 42, 456]
-  gap: 0.6rem; [cite: 42, 456]
-  margin-bottom: 2.25rem; [cite: 42, 456]
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-bottom: 2.25rem;
 }
 .htb {
-  display: flex; [cite: 42, 456]
-  align-items: center; [cite: 43, 457]
-  gap: 0.4rem; [cite: 43, 457]
-  background: rgba(255,255,255,0.09); [cite: 43, 457]
-  border: 1px solid rgba(255,255,255,0.16); [cite: 43, 457]
-  backdrop-filter: blur(8px); [cite: 43, 457]
-  padding: 0.4rem 0.9rem; [cite: 43, 457]
-  border-radius: var(--radius-pill); [cite: 43, 457]
-  font-size: 0.75rem; [cite: 43, 457]
-  font-weight: 700; [cite: 43, 457]
-  color: rgba(255,255,255,0.9); [cite: 44, 458]
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: rgba(255,255,255,0.09);
+  border: 1px solid rgba(255,255,255,0.16);
+  backdrop-filter: blur(8px);
+  padding: 0.4rem 0.9rem;
+  border-radius: var(--radius-pill);
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: rgba(255,255,255,0.9);
 }
-.htb.green { border-color: rgba(52,211,153,0.4); color: #6ee7b7; } [cite: 44, 458]
-.htb.gold  { border-color: rgba(245,158,11,0.4); color: #fcd34d; } [cite: 44, 458]
+.htb.green { border-color: rgba(52,211,153,0.4); color: #6ee7b7; }
+.htb.gold  { border-color: rgba(245,158,11,0.4); color: #fcd34d; }
 
 .hero-actions {
-  display: flex; [cite: 45, 459]
-  gap: 1rem; [cite: 45, 459]
-  flex-wrap: wrap; [cite: 45, 459]
-  align-items: center; [cite: 45, 459]
-  margin-bottom: 2.5rem; [cite: 45, 459]
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-bottom: 2.5rem;
 }
 .btn-hero-primary {
-  background: var(--grad-gold); [cite: 45, 459]
-  color: var(--navy); [cite: 45, 459]
-  font-weight: 800; [cite: 46, 460]
-  font-size: 0.95rem; [cite: 46, 460]
-  padding: 0.9rem 2rem; [cite: 46, 460]
-  border-radius: var(--radius-pill); [cite: 46, 460]
-  text-decoration: none; [cite: 46, 460]
-  box-shadow: var(--shadow-gold); [cite: 46, 460]
-  transition: all 0.25s; [cite: 46, 460]
-  display: flex; [cite: 46, 460]
-  align-items: center; [cite: 46, 460]
-  gap: 0.5rem; [cite: 47, 461]
-  white-space: nowrap; [cite: 47, 461]
+  background: var(--grad-gold);
+  color: var(--navy);
+  font-weight: 800;
+  font-size: 0.95rem;
+  padding: 0.9rem 2rem;
+  border-radius: var(--radius-pill);
+  text-decoration: none;
+  box-shadow: var(--shadow-gold);
+  transition: all 0.25s;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  white-space: nowrap;
 }
-.btn-hero-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(180,83,9,0.35); } [cite: 47, 461]
+.btn-hero-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(180,83,9,0.35); }
 .btn-hero-ghost {
-  color: white; [cite: 47, 461]
-  font-weight: 600; [cite: 48, 462]
-  font-size: 0.9rem; [cite: 48, 462]
-  padding: 0.9rem 1.75rem; [cite: 48, 462]
-  border-radius: var(--radius-pill); [cite: 48, 462]
-  text-decoration: none; [cite: 48, 462]
-  border: 2px solid rgba(255,255,255,0.28); [cite: 48, 462]
-  backdrop-filter: blur(8px); [cite: 48, 462]
-  transition: all 0.25s; [cite: 48, 462]
-  white-space: nowrap; [cite: 49, 462]
-  display: flex; [cite: 49, 462]
-  align-items: center; [cite: 49, 462]
-  gap: 0.4rem; [cite: 49, 462]
+  color: white;
+  font-weight: 600;
+  font-size: 0.9rem;
+  padding: 0.9rem 1.75rem;
+  border-radius: var(--radius-pill);
+  text-decoration: none;
+  border: 2px solid rgba(255,255,255,0.28);
+  backdrop-filter: blur(8px);
+  transition: all 0.25s;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
 }
-.btn-hero-ghost:hover { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.5); } [cite: 49, 462]
+.btn-hero-ghost:hover { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.5); }
 
 .hero-stats {
-  display: flex; [cite: 49, 462]
-  gap: 2.5rem; [cite: 50, 462]
-  flex-wrap: wrap; [cite: 50, 462]
+  display: flex;
+  gap: 2.5rem;
+  flex-wrap: wrap;
 }
 .hstat {
-  display: flex; [cite: 50, 462]
-  flex-direction: column; [cite: 51, 462]
-  gap: 0.1rem; [cite: 51, 462]
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
 }
 .hstat-num {
-  font-family: 'DM Serif Display', serif; [cite: 51, 462]
-  font-size: 1.8rem; [cite: 51, 462]
-  color: white; [cite: 51, 462]
-  line-height: 1; [cite: 51, 462]
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.8rem;
+  color: white;
+  line-height: 1;
 }
-.hstat-num span { color: #fcd34d; } [cite: 51, 462]
+.hstat-num span { color: #fcd34d; }
 .hstat-label {
-  font-size: 0.72rem; [cite: 52, 462]
-  font-weight: 600; [cite: 52, 462]
-  color: rgba(255,255,255,0.55); [cite: 52, 462]
-  text-transform: uppercase; [cite: 52, 462]
-  letter-spacing: 0.8px; [cite: 52, 462]
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: rgba(255,255,255,0.55);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
 }
 .hstat-divider {
-  width: 1px; [cite: 52, 462]
-  background: rgba(255,255,255,0.12); [cite: 52, 462]
-  align-self: stretch; [cite: 53, 462]
+  width: 1px;
+  background: rgba(255,255,255,0.12);
+  align-self: stretch;
 }
 
 /* Hero right — floating cards */
 .hero-right {
-  display: flex; [cite: 53, 462]
-  flex-direction: column; [cite: 53, 462]
-  gap: 1rem; [cite: 53, 462]
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 }
 .hero-card {
-  background: rgba(255,255,255,0.07); [cite: 54, 462]
-  backdrop-filter: blur(20px); [cite: 54, 462]
-  border: 1px solid rgba(255,255,255,0.14); [cite: 54, 462]
-  border-radius: var(--radius-lg); [cite: 54, 462]
-  padding: 1.1rem 1.4rem; [cite: 54, 462]
-  display: flex; [cite: 54, 462]
-  align-items: center; [cite: 54, 462]
-  gap: 1rem; [cite: 55, 462]
-  animation: floatUp 6s ease-in-out infinite; [cite: 55, 462]
+  background: rgba(255,255,255,0.07);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255,255,255,0.14);
+  border-radius: var(--radius-lg);
+  padding: 1.1rem 1.4rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  animation: floatUp 6s ease-in-out infinite;
 }
-.hero-card:nth-child(2) { animation-delay: 2s; margin-left: 2rem; } [cite: 55, 462]
-.hero-card:nth-child(3) { animation-delay: 4s; } [cite: 55, 462]
-@keyframes floatUp { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } } [cite: 56, 462]
+.hero-card:nth-child(2) { animation-delay: 2s; margin-left: 2rem; }
+.hero-card:nth-child(3) { animation-delay: 4s; }
+@keyframes floatUp { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
 
 .hcard-icon {
-  width: 44px; [cite: 56, 462]
-  height: 44px; [cite: 57, 462]
-  background: rgba(255,255,255,0.12); [cite: 57, 462]
-  border-radius: var(--radius-md); [cite: 57, 462]
-  display: flex; [cite: 57, 462]
-  align-items: center; [cite: 57, 462]
-  justify-content: center; [cite: 57, 462]
-  font-size: 1.3rem; [cite: 57, 462]
-  flex-shrink: 0; [cite: 57, 462]
+  width: 44px;
+  height: 44px;
+  background: rgba(255,255,255,0.12);
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  flex-shrink: 0;
 }
-.hcard-title { font-weight: 700; font-size: 0.9rem; color: white; } [cite: 58, 462]
-.hcard-sub { font-size: 0.72rem; color: rgba(255,255,255,0.6); margin-top: 0.1rem; } [cite: 58, 462]
+.hcard-title { font-weight: 700; font-size: 0.9rem; color: white; }
+.hcard-sub { font-size: 0.72rem; color: rgba(255,255,255,0.6); margin-top: 0.1rem; }
 .hcard-badge {
-  margin-left: auto; [cite: 59, 462]
-  background: rgba(52,211,153,0.2); [cite: 59, 462]
-  border: 1px solid rgba(52,211,153,0.4); [cite: 59, 462]
-  color: #6ee7b7; [cite: 59, 462]
-  font-size: 0.65rem; [cite: 59, 462]
-  font-weight: 800; [cite: 59, 462]
-  padding: 0.2rem 0.6rem; [cite: 59, 462]
-  border-radius: var(--radius-pill); [cite: 60, 462]
-  white-space: nowrap; [cite: 60, 462]
+  margin-left: auto;
+  background: rgba(52,211,153,0.2);
+  border: 1px solid rgba(52,211,153,0.4);
+  color: #6ee7b7;
+  font-size: 0.65rem;
+  font-weight: 800;
+  padding: 0.2rem 0.6rem;
+  border-radius: var(--radius-pill);
+  white-space: nowrap;
 }
 
 /* =============================================
    SECTION BASICS
    ============================================= */
-.section-wrap { max-width: 1200px; margin: 0 auto; padding: 0 2rem; } [cite: 60, 462]
-.section-header { text-align: center; margin-bottom: 3.5rem; } [cite: 61, 462]
+.section-wrap { max-width: 1200px; margin: 0 auto; padding: 0 2rem; }
+.section-header { text-align: center; margin-bottom: 3.5rem; }
 .section-eyebrow {
-  display: inline-block; [cite: 61, 462]
-  background: rgba(30,64,175,0.07); [cite: 61, 462]
-  color: var(--blue); [cite: 61, 462]
-  border: 1px solid rgba(30,64,175,0.18); [cite: 62, 462]
-  padding: 0.3rem 1rem; [cite: 62, 462]
-  border-radius: var(--radius-pill); [cite: 62, 462]
-  font-size: 0.7rem; [cite: 62, 462]
-  font-weight: 700; [cite: 62, 462]
-  letter-spacing: 1.2px; [cite: 62, 462]
-  text-transform: uppercase; [cite: 62, 462]
-  margin-bottom: 0.875rem; [cite: 62, 462]
+  display: inline-block;
+  background: rgba(30,64,175,0.07);
+  color: var(--blue);
+  border: 1px solid rgba(30,64,175,0.18);
+  padding: 0.3rem 1rem;
+  border-radius: var(--radius-pill);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  margin-bottom: 0.875rem;
 }
 .section-header h2 {
-  font-size: clamp(1.9rem, 4vw, 2.75rem); [cite: 63, 462]
-  color: var(--navy); [cite: 63, 462]
-  margin-bottom: 0.75rem; [cite: 63, 462]
-  letter-spacing: -0.02em; [cite: 63, 462]
+  font-size: clamp(1.9rem, 4vw, 2.75rem);
+  color: var(--navy);
+  margin-bottom: 0.75rem;
+  letter-spacing: -0.02em;
 }
 .section-header p {
-  color: var(--slate-500); [cite: 63, 462]
-  font-size: 1rem; [cite: 64, 462]
-  max-width: 520px; [cite: 64, 462]
-  margin: 0 auto; [cite: 64, 462]
-  line-height: 1.7; [cite: 64, 462]
+  color: var(--slate-500);
+  font-size: 1rem;
+  max-width: 520px;
+  margin: 0 auto;
+  line-height: 1.7;
 }
 
 /* =============================================
    SERVICES SECTION
    ============================================= */
-.services-section { padding: 90px 2rem; background: var(--off-white); position: relative; } [cite: 64, 462]
-.services-section::before {
-  content: ''; [cite: 65, 462]
-  position: absolute; [cite: 65, 462]
-  top: 0; [cite: 65, 462]
-  left: 0; [cite: 65, 462]
-  right: 0; [cite: 65, 462]
-  height: 4px; [cite: 65, 462]
-  background: var(--grad-gold); [cite: 66, 462]
+.services-section {
+  padding: 90px 2rem;
+  background: var(--off-white);
+  position: relative;
 }
-.services-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.5rem; } [cite: 66, 462]
+.services-section::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+  background: var(--grad-gold);
+}
+
+.services-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.5rem;
+}
+
 .service-card {
-  background: var(--white); [cite: 66, 462]
-  border-radius: var(--radius-xl); [cite: 66, 462]
-  padding: 2.25rem 2rem; [cite: 67, 462]
-  border: 1px solid var(--slate-200); [cite: 67, 462]
-  box-shadow: var(--shadow-md); [cite: 67, 462]
-  transition: all 0.3s cubic-bezier(0.34,1.1,0.64,1); [cite: 67, 462]
-  position: relative; [cite: 67, 462]
-  overflow: hidden; [cite: 67, 462]
-  cursor: pointer; [cite: 67, 462]
+  background: var(--white);
+  border-radius: var(--radius-xl);
+  padding: 2.25rem 2rem;
+  border: 1px solid var(--slate-200);
+  box-shadow: var(--shadow-md);
+  transition: all 0.3s cubic-bezier(0.34,1.1,0.64,1);
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
 }
 .service-card::before {
-  content: ''; [cite: 68, 462]
-  position: absolute; [cite: 68, 462]
-  top: 0; [cite: 68, 462]
-  left: 0; [cite: 68, 462]
-  right: 0; [cite: 68, 462]
-  height: 3px; [cite: 68, 462]
-  background: var(--grad-blue); [cite: 68, 462]
-  transform: scaleX(0); [cite: 68, 462]
-  transform-origin: left; [cite: 69, 462]
-  transition: transform 0.3s ease; [cite: 69, 462]
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: var(--grad-blue);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s ease;
 }
-.service-card:hover::before { transform: scaleX(1); } [cite: 69, 462]
-.service-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-xl); border-color: rgba(30,64,175,0.15); } [cite: 69, 462]
+.service-card:hover::before { transform: scaleX(1); }
+.service-card:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--shadow-xl);
+  border-color: rgba(30,64,175,0.15);
+}
+
 .sc-icon-wrap {
-  width: 60px; [cite: 70, 462]
-  height: 60px; [cite: 70, 462]
-  background: linear-gradient(135deg, #eff6ff, #dbeafe); [cite: 70, 462]
-  border-radius: var(--radius-lg); [cite: 70, 462]
-  display: flex; [cite: 70, 462]
-  align-items: center; [cite: 70, 462]
-  justify-content: center; [cite: 70, 462]
-  font-size: 1.7rem; [cite: 71, 462]
-  margin-bottom: 1.25rem; [cite: 71, 462]
-  border: 1px solid #bfdbfe; [cite: 71, 462]
+  width: 60px;
+  height: 60px;
+  background: linear-gradient(135deg, #eff6ff, #dbeafe);
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.7rem;
+  margin-bottom: 1.25rem;
+  border: 1px solid #bfdbfe;
 }
 .service-card h3 {
-  font-family: 'DM Sans', sans-serif; [cite: 71, 462]
-  font-size: 1rem; [cite: 71, 462]
-  font-weight: 700; [cite: 71, 462]
-  color: var(--navy); [cite: 72, 462]
-  margin-bottom: 0.6rem; [cite: 72, 462]
+  font-family: 'DM Sans', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--navy);
+  margin-bottom: 0.6rem;
 }
 .service-card p {
-  font-size: 0.87rem; [cite: 72, 462]
-  color: var(--slate-500); [cite: 72, 462]
-  line-height: 1.65; [cite: 72, 462]
-  margin-bottom: 1.25rem; [cite: 72, 462]
+  font-size: 0.87rem;
+  color: var(--slate-500);
+  line-height: 1.65;
+  margin-bottom: 1.25rem;
+}
+.sc-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.sc-badge {
+  font-size: 0.68rem;
+  font-weight: 800;
+  padding: 0.25rem 0.75rem;
+  border-radius: var(--radius-pill);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.sc-badge.popular { background: var(--gold-pale); color: var(--gold); border: 1px solid rgba(180,83,9,0.2); }
+.sc-badge.fast    { background: #dcfce7; color: #15803d; border: 1px solid rgba(21,128,61,0.2); }
+.sc-badge.new     { background: #ede9fe; color: #7c3aed; border: 1px solid rgba(124,58,237,0.2); }
+.sc-arrow {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--off-white);
+  border: 1px solid var(--slate-200);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  color: var(--blue);
+  transition: all 0.2s;
+}
+.service-card:hover .sc-arrow { background: var(--blue); color: white; border-color: var(--blue); }
+
+/* =============================================
+   TRUST / CERTIFICATIONS SECTION
+   ============================================= */
+.trust-section {
+  padding: 60px 2rem;
+  background: var(--white);
+  border-top: 1px solid var(--slate-100);
+  border-bottom: 1px solid var(--slate-100);
+}
+.trust-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+.trust-header {
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+.trust-header h3 {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--slate-500);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+}
+
+.trust-badges-grid {
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 2.5rem;
+}
+.trust-badge-card {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+  padding: 1rem 1.5rem;
+  background: var(--off-white);
+  border: 1px solid var(--slate-200);
+  border-radius: var(--radius-lg);
+  min-width: 180px;
+  transition: all 0.2s;
+}
+.trust-badge-card:hover { border-color: var(--blue-light); box-shadow: var(--shadow-md); transform: translateY(-2px); }
+.tbc-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  flex-shrink: 0;
+}
+.tbc-icon.blue   { background: #dbeafe; }
+.tbc-icon.green  { background: #dcfce7; }
+.tbc-icon.gold   { background: #fef3c7; }
+.tbc-icon.purple { background: #ede9fe; }
+.tbc-title { font-size: 0.82rem; font-weight: 700; color: var(--navy); }
+.tbc-sub   { font-size: 0.7rem; color: var(--slate-500); margin-top: 0.1rem; }
+
+.payment-section {
+  background: var(--slate-50);
+  border-radius: var(--radius-xl);
+  padding: 1.5rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  border: 1px solid var(--slate-200);
+}
+.payment-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+.payment-lock {
+  width: 40px;
+  height: 40px;
+  background: var(--grad-blue);
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+}
+.payment-title { font-weight: 700; font-size: 0.9rem; color: var(--navy); }
+.payment-sub   { font-size: 0.75rem; color: var(--slate-500); margin-top: 0.1rem; }
+.payment-icons {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+.pi {
+  background: var(--white);
+  border: 1px solid var(--slate-200);
+  border-radius: var(--radius-sm);
+  padding: 0.4rem 0.75rem;
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: var(--slate-700);
+  letter-spacing: 0.5px;
+}
+.pi.visa    { color: #1a1f71; }
+.pi.master  { color: #eb001b; }
+.pi.upi     { color: #097939; }
+.pi.gpay    { color: #4285f4; }
+.pi.razorpay{ color: #528FF0; }
+
+/* =============================================
+   PRICING SECTION
+   ============================================= */
+.pricing-section {
+  padding: 90px 2rem;
+  background: var(--navy);
+  position: relative;
+  overflow: hidden;
+}
+.pricing-section::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(circle at 10% 50%, rgba(37,99,235,0.2) 0%, transparent 50%),
+    radial-gradient(circle at 90% 50%, rgba(245,158,11,0.08) 0%, transparent 50%);
+  pointer-events: none;
+}
+.pricing-section .section-eyebrow { background: rgba(252,211,77,0.1); color: #fcd34d; border-color: rgba(252,211,77,0.3); }
+.pricing-section .section-header h2 { color: white; }
+.pricing-section .section-header p  { color: rgba(255,255,255,0.6); }
+
+.pricing-table-wrap {
+  position: relative;
+  z-index: 1;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  backdrop-filter: blur(12px);
+}
+
+.pricing-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.pricing-table thead tr {
+  background: var(--grad-gold);
+}
+.pricing-table thead th {
+  padding: 1rem 1.5rem;
+  text-align: left;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: var(--navy);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+}
+.pricing-table tbody tr {
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  transition: background 0.15s;
+}
+.pricing-table tbody tr:last-child { border-bottom: none; }
+.pricing-table tbody tr:hover { background: rgba(255,255,255,0.04); }
+.pricing-table td {
+  padding: 1.1rem 1.5rem;
+  font-size: 0.9rem;
+  color: rgba(255,255,255,0.85);
+}
+.pricing-table td:first-child { font-weight: 600; }
+.price-val {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.05rem;
+  color: #fcd34d;
+  font-style: italic;
+}
+.price-tag {
+  display: inline-block;
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 0.15rem 0.5rem;
+  border-radius: var(--radius-pill);
+  margin-left: 0.4rem;
+  vertical-align: middle;
+}
+.tag-popular { background: rgba(245,158,11,0.2); color: #fcd34d; border: 1px solid rgba(245,158,11,0.3); }
+.tag-custom  { background: rgba(59,130,246,0.2); color: #93c5fd; border: 1px solid rgba(59,130,246,0.3); }
+
+.pricing-footer {
+  padding: 1.25rem 1.5rem;
+  background: rgba(255,255,255,0.03);
+  border-top: 1px solid rgba(255,255,255,0.08);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+.pricing-note {
+  font-size: 0.8rem;
+  color: rgba(255,255,255,0.5);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.pricing-note-icon { font-size: 0.9rem; }
+
+.btn-pricing-cta {
+  background: var(--grad-gold);
+  color: var(--navy);
+  font-weight: 800;
+  font-size: 0.88rem;
+  padding: 0.75rem 1.75rem;
+  border-radius: var(--radius-pill);
+  text-decoration: none;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+.btn-pricing-cta:hover { transform: translateY(-2px); box-shadow: var(--shadow-gold); }
+
+/* =============================================
+   AWARDS & CERTIFICATIONS
+   ============================================= */
+.awards-section {
+  padding: 70px 2rem;
+  background: var(--off-white);
+}
+.awards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.25rem;
+}
+.award-card {
+  background: var(--white);
+  border: 1px solid var(--slate-200);
+  border-radius: var(--radius-lg);
+  padding: 1.75rem 1.5rem;
+  text-align: center;
+  transition: all 0.25s;
+  box-shadow: var(--shadow-sm);
+}
+.award-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); border-color: rgba(30,64,175,0.15); }
+.award-icon { font-size: 2.2rem; margin-bottom: 0.875rem; display: block; }
+.award-title {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--navy);
+  margin-bottom: 0.3rem;
+}
+.award-sub { font-size: 0.72rem; color: var(--slate-500); line-height: 1.4; }
+.award-year {
+  display: inline-block;
+  margin-top: 0.75rem;
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--blue);
+  background: #dbeafe;
+  padding: 0.2rem 0.6rem;
+  border-radius: var(--radius-pill);
 }
 
 /* =============================================
-   FLOATING BUTTONS
+   REVIEWS SECTION
+   ============================================= */
+.reviews-section {
+  padding: 90px 2rem;
+  background: var(--white);
+}
+
+.rating-overview {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3rem;
+  margin-bottom: 3.5rem;
+  padding: 2rem 2.5rem;
+  background: var(--grad-blue);
+  border-radius: var(--radius-xl);
+  max-width: 720px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 3.5rem;
+  box-shadow: 0 12px 40px rgba(15,37,87,0.25);
+  flex-wrap: wrap;
+}
+.ro-score {
+  text-align: center;
+}
+.ro-num {
+  font-family: 'DM Serif Display', serif;
+  font-size: 4rem;
+  color: white;
+  line-height: 1;
+  margin-bottom: 0.25rem;
+}
+.ro-stars { color: #fcd34d; font-size: 1.1rem; letter-spacing: 2px; margin-bottom: 0.25rem; }
+.ro-label { font-size: 0.75rem; color: rgba(255,255,255,0.6); font-weight: 600; }
+.ro-divider { width: 1px; height: 60px; background: rgba(255,255,255,0.15); }
+.ro-stat { text-align: center; }
+.ro-stat-val { font-family: 'DM Serif Display', serif; font-size: 1.6rem; color: white; line-height: 1; margin-bottom: 0.25rem; }
+.ro-stat-val span { color: #fcd34d; }
+.ro-stat-label { font-size: 0.72rem; color: rgba(255,255,255,0.6); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+
+.reviews-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2.5rem;
+}
+.review-card {
+  background: var(--off-white);
+  border: 1px solid var(--slate-200);
+  border-radius: var(--radius-xl);
+  padding: 1.75rem;
+  transition: all 0.3s;
+  position: relative;
+}
+.review-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); border-color: rgba(30,64,175,0.12); }
+
+.review-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+.review-avatar-wrap { display: flex; align-items: center; gap: 0.75rem; }
+.review-avatar {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: var(--grad-blue);
+  color: white;
+  font-weight: 800;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.rv-name { font-weight: 700; font-size: 0.92rem; color: var(--navy); }
+.rv-meta { font-size: 0.72rem; color: var(--slate-500); margin-top: 0.1rem; }
+.rv-stars { color: var(--gold-bright); font-size: 0.9rem; letter-spacing: 1px; }
+
+.review-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  background: #dcfce7;
+  color: #15803d;
+  border: 1px solid rgba(21,128,61,0.2);
+  font-size: 0.62rem;
+  font-weight: 800;
+  padding: 0.2rem 0.6rem;
+  border-radius: var(--radius-pill);
+  white-space: nowrap;
+}
+
+.review-text {
+  font-size: 0.88rem;
+  color: var(--slate-700);
+  line-height: 1.7;
+  font-style: italic;
+  margin-bottom: 1rem;
+  position: relative;
+  padding-left: 1.1rem;
+}
+.review-text::before {
+  content: '"';
+  position: absolute;
+  left: 0;
+  top: -4px;
+  font-family: 'DM Serif Display', serif;
+  font-size: 2rem;
+  color: var(--blue-light);
+  line-height: 1;
+}
+
+.review-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 0.875rem;
+  border-top: 1px solid var(--slate-200);
+}
+.rv-service { font-size: 0.72rem; font-weight: 700; color: var(--blue); background: #dbeafe; padding: 0.2rem 0.6rem; border-radius: var(--radius-pill); }
+.rv-date   { font-size: 0.7rem; color: var(--slate-500); }
+
+.reviews-verified-strip {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+  padding: 1.25rem 2rem;
+  background: var(--off-white);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--slate-200);
+  flex-wrap: wrap;
+}
+.rvs-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--slate-700);
+}
+.rvs-item .rvs-ico { font-size: 1rem; }
+
+/* =============================================
+   FOOTER
+   ============================================= */
+.footer {
+  background: var(--navy);
+  color: rgba(255,255,255,0.65);
+  padding: 4rem 2rem 0;
+  position: relative;
+}
+.footer::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+  background: var(--grad-gold);
+}
+
+.footer-grid {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1.4fr;
+  gap: 3rem;
+  padding-bottom: 3rem;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+@media (max-width: 900px) { .footer-grid { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 600px) { .footer-grid { grid-template-columns: 1fr; } }
+
+.footer-brand-col {}
+.footer-logo-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 1rem;
+}
+.footer-logo-box {
+  width: 34px;
+  height: 34px;
+  background: var(--grad-blue);
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+}
+.footer-brand-name {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.3rem;
+  color: white;
+}
+.footer-brand-name span { color: var(--gold-bright); }
+.footer-desc {
+  font-size: 0.85rem;
+  line-height: 1.75;
+  color: rgba(255,255,255,0.5);
+  margin-bottom: 1.5rem;
+  max-width: 280px;
+}
+.footer-contact-item {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.6rem;
+  font-size: 0.83rem;
+}
+.fci-icon { font-size: 0.9rem; flex-shrink: 0; }
+.fci-val  { color: rgba(255,255,255,0.75); }
+.fci-val a { color: #fcd34d; text-decoration: none; }
+.fci-val a:hover { color: white; }
+
+.footer-col-title {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: rgba(255,255,255,0.4);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-bottom: 1.1rem;
+}
+.footer-link-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+.footer-link-list a {
+  color: rgba(255,255,255,0.6);
+  text-decoration: none;
+  font-size: 0.85rem;
+  transition: color 0.2s;
+}
+.footer-link-list a:hover { color: white; }
+
+.footer-trust-col {}
+.footer-cert {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.6rem 0.875rem;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: var(--radius-md);
+  margin-bottom: 0.5rem;
+}
+.fcert-icon { font-size: 1.1rem; flex-shrink: 0; }
+.fcert-title { font-size: 0.75rem; font-weight: 700; color: rgba(255,255,255,0.82); }
+.fcert-sub   { font-size: 0.65rem; color: rgba(255,255,255,0.4); margin-top: 0.05rem; }
+
+.footer-bottom-bar {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1.5rem 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+.footer-copy {
+  font-size: 0.78rem;
+  color: rgba(255,255,255,0.28);
+}
+.footer-legal-links {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+.footer-legal-links a {
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.3);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.footer-legal-links a:hover { color: rgba(255,255,255,0.7); }
+
+/* =============================================
+   FLOATING BTNS
    ============================================= */
 .float-call {
-  position: fixed; bottom: 5.5rem; right: 1.5rem;
-  background: var(--grad-blue); color: white;
-  padding: 0.7rem 1.3rem; border-radius: var(--radius-pill);
-  text-decoration: none; font-weight: 700; font-size: 0.85rem;
+  position: fixed;
+  bottom: 1.5rem;
+  left: 1.5rem;
+  background: var(--grad-blue);
+  color: white;
+  padding: 0.7rem 1.3rem;
+  border-radius: var(--radius-pill);
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 0.85rem;
   box-shadow: 0 6px 20px rgba(30,64,175,0.35);
-  z-index: 999; display: flex; align-items: center; gap: 0.4rem; transition: all 0.25s;
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  transition: all 0.25s;
 }
 .float-wa {
-  position: fixed; bottom: 1.5rem; right: 1.5rem;
-  background: linear-gradient(135deg, #25D366, #1da851); color: white;
-  padding: 0.7rem 1.3rem; border-radius: var(--radius-pill);
-  text-decoration: none; font-weight: 700; font-size: 0.85rem;
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  background: linear-gradient(135deg, #25D366, #1da851);
+  color: white;
+  padding: 0.7rem 1.3rem;
+  border-radius: var(--radius-pill);
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 0.85rem;
   box-shadow: 0 6px 20px rgba(29,168,81,0.35);
-  z-index: 999; display: flex; align-items: center; gap: 0.4rem; transition: all 0.25s;
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  transition: all 0.25s;
 }
 .float-call:hover, .float-wa:hover { transform: translateY(-3px); }
 
-/* =============================================
-   RESPONSIVE
-   ============================================= */
-@media (max-width: 768px) {
-  .nav-links { display: none; }
-  .hero { padding: 60px 1.25rem 70px; }
-  .nav-cta-group .btn-call { display: none; }
-  .nav-inner { padding: 0 1.25rem; height: 64px; }
-  .logo-text { font-size: 1.2rem; }
-  .logo-box { width: 34px; height: 34px; font-size: 1rem; }
-  .hero h1 { font-size: 2.1rem; }
-  .trust-strip { display: none; }
-  .services-grid { grid-template-columns: 1fr; }
-  .footer-inner { grid-template-columns: 1fr; gap: 2.5rem; }
+/* Divider wave */
+.wave-divider {
+  line-height: 0;
+  background: var(--off-white);
 }
+.wave-divider svg { display: block; width: 100%; }
 </style>
 </head>
 <body>
 
-  <div class="topbar">
-    <div class="topbar-item"><span class="dot">●</span> No Hidden Costs</div>
-    <div class="topbar-item"><span class="dot">●</span> 100% Transit Insurance</div>
-    <div class="topbar-item"><span class="dot">●</span> ISO Certified Professionals</div>
-    <div class="topbar-item">GST Invoices Available: <strong>SAVE 18%</strong></div>
-  </div>
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="topbar-item"><span class="ts-ico">🚀</span> <strong>New in Bangalore</strong> — 100+ Homes Moved in Just 2 Months!</div>
+  <div class="topbar-item dot">◆</div>
+  <div class="topbar-item"><span class="ts-ico">📞</span> <strong>9945095453</strong> — Available 7AM–9PM</div>
+  <div class="topbar-item dot">◆</div>
+  <div class="topbar-item"><span class="ts-ico">✉️</span> <a href="mailto:support@packzenblr.in" style="color:#fcd34d;text-decoration:none;font-weight:700;">support@packzenblr.in</a></div>
+  <div class="topbar-item dot">◆</div>
+  <div class="topbar-item"><span>🛡️</span> All Moves <strong>100% Insured</strong></div>
+</div>
 
-  <nav class="navbar">
-    <div class="nav-inner">
-      <a href="#" class="nav-logo">
-        <div class="logo-box">📦</div>
+<!-- NAVBAR -->
+<nav class="navbar">
+  <div class="nav-inner">
+    <a href="#" class="nav-logo">
+      <div class="logo-box">📦</div>
+      <div>
+        <div class="logo-text">Pack<span>Zen</span></div>
+        <div class="logo-tagline">Packers &amp; Movers</div>
+      </div>
+    </a>
+    <nav class="nav-links">
+      <a href="#">Services</a>
+      <a href="#">Pricing</a>
+      <a href="#">Reviews</a>
+      <a href="#">Track Move</a>
+    </nav>
+    <div class="nav-cta-group">
+      <a href="tel:9945095453" class="btn-call">📞 Call Now</a>
+      <a href="#" class="btn-quote">Get Free Quote →</a>
+    </div>
+  </div>
+</nav>
+
+<!-- TRUST STRIP -->
+<div class="trust-strip">
+  <div class="trust-strip-inner">
+    <div class="ts-pill verified"><span class="ts-ico">🚀</span> Launched 2025 — Growing Fast</div>
+    <div class="ts-pill verified"><span class="ts-ico">🛡️</span> Every Move Fully Insured</div>
+    <div class="ts-pill"><span class="ts-ico">📍</span> GPS Live Tracking</div>
+    <div class="ts-pill gold-txt"><span class="ts-ico">⭐</span> 4.9/5 — 100+ Happy Families</div>
+    <div class="ts-pill verified"><span class="ts-ico">🔒</span> Secure Online Payments</div>
+    <div class="ts-pill"><span class="ts-ico">💚</span> Zero Damage. Zero Complaints.</div>
+  </div>
+</div>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-left">
+      <div class="hero-eyebrow">
+        <div class="eyebrow-dot"></div>
+        Bangalore's Newest & Most Trusted Moving Startup
+      </div>
+      <h1>100+ Homes Moved.<br><em>Safely. Affordably.</em><br>In Just 2 Months.</h1>
+      <p class="hero-sub">We're PackZen — a fresh moving startup in Bangalore built on one promise: treat every home like our own. No damage. No hidden charges. Just a smooth, stress-free move every single time.</p>
+
+      <div class="hero-trust-badges">
+        <div class="htb green">✅ Zero Damage Policy</div>
+        <div class="htb gold">⭐ 4.9/5 Rating</div>
+        <div class="htb">📍 GPS Live Track</div>
+        <div class="htb">🛡️ 100% Insured</div>
+        <div class="htb">🔒 Secure Payment</div>
+      </div>
+
+      <div class="hero-actions">
+        <a href="#" class="btn-hero-primary">📦 Get Instant Quote →</a>
+        <a href="tel:9945095453" class="btn-hero-ghost">📞 Call: 9945095453</a>
+        <a href="#" class="btn-hero-ghost" style="background:rgba(37,211,102,0.12); border-color:rgba(37,211,102,0.35); color:#6ee7b7;">💬 WhatsApp</a>
+      </div>
+
+      <div class="hero-stats">
+        <div class="hstat">
+          <div class="hstat-num">100<span>+</span></div>
+          <div class="hstat-label">Homes Moved</div>
+        </div>
+        <div class="hstat-divider"></div>
+        <div class="hstat">
+          <div class="hstat-num">2<span> mo</span></div>
+          <div class="hstat-label">Since Launch</div>
+        </div>
+        <div class="hstat-divider"></div>
+        <div class="hstat">
+          <div class="hstat-num">0<span>%</span></div>
+          <div class="hstat-label">Damage Rate</div>
+        </div>
+        <div class="hstat-divider"></div>
+        <div class="hstat">
+          <div class="hstat-num">4.9<span>★</span></div>
+          <div class="hstat-label">Google Rating</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero-right">
+      <div class="hero-card">
+        <div class="hcard-icon">🚚</div>
         <div>
-          <div class="logo-text">Pack<span>Zen</span></div>
-          <div class="logo-tagline">Premium Moving Solutions</div>
+          <div class="hcard-title">Live GPS Tracking</div>
+          <div class="hcard-sub">Track your move in real-time</div>
         </div>
-      </a>
-
-      <div class="nav-links">
-        <a href="#services">Services</a>
-        <a href="#why-us">Why PackZen</a>
-        <a href="#process">Process</a>
-        <a href="#reviews">Reviews</a>
+        <div class="hcard-badge">● LIVE</div>
       </div>
-
-      <div class="nav-cta-group">
-        <a href="tel:+91XXXXXXXXXX" class="btn-call">
-          <span>📞</span> +91 XXXXX XXXXX
-        </a>
-        <a href="#quote" class="btn-quote">Get Free Quote</a>
+      <div class="hero-card">
+        <div class="hcard-icon">🛡️</div>
+        <div>
+          <div class="hcard-title">100% Insured Move</div>
+          <div class="hcard-sub">Zero damage guarantee</div>
+        </div>
+        <div class="hcard-badge">VERIFIED</div>
+      </div>
+      <div class="hero-card">
+        <div class="hcard-icon">⭐</div>
+        <div>
+          <div class="hcard-title">4.9 / 5 Rating</div>
+          <div class="hcard-sub">Based on 1,200+ reviews</div>
+        </div>
+        <div class="hcard-badge">TOP RATED</div>
+      </div>
+      <div class="hero-card">
+        <div class="hcard-icon">🔒</div>
+        <div>
+          <div class="hcard-title">Secure Payments</div>
+          <div class="hcard-sub">UPI, Card, Net Banking</div>
+        </div>
+        <div class="hcard-badge">SAFE</div>
       </div>
     </div>
-  </nav>
+  </div>
+</section>
 
-  <div class="trust-strip">
-    <div class="trust-strip-inner">
-      <div class="ts-pill verified">
-        <span class="ts-ico">✓</span> Google Verified Partner
+<!-- SERVICES -->
+<section class="services-section">
+  <div class="section-wrap">
+    <div class="section-header">
+      <div class="section-eyebrow">What We Offer</div>
+      <h2>Professional Moving Services</h2>
+      <p>From a single item to a full 3BHK — we handle every move with care, speed, and transparency.</p>
+    </div>
+    <div class="services-grid">
+      <div class="service-card">
+        <div class="sc-icon-wrap">🏠</div>
+        <h3>Home Relocation</h3>
+        <p>Complete house shifting with professional packing, secure loading, GPS tracking, and safe delivery at destination.</p>
+        <div class="sc-footer">
+          <span class="sc-badge popular">⭐ Most Popular</span>
+          <div class="sc-arrow">→</div>
+        </div>
       </div>
-      <div class="ts-pill">
-        <span class="ts-ico">⭐</span> 4.9/5 Average Rating
+      <div class="service-card">
+        <div class="sc-icon-wrap">🏢</div>
+        <h3>Office Relocation</h3>
+        <p>Minimal downtime corporate moves with IT equipment handling, server shifting, and full furniture reassembly.</p>
+        <div class="sc-footer">
+          <span class="sc-badge new">🏢 Business</span>
+          <div class="sc-arrow">→</div>
+        </div>
       </div>
-      <div class="ts-pill">
-        <span class="ts-ico">📍</span> Serving 50+ Major Cities
+      <div class="service-card">
+        <div class="sc-icon-wrap">📍</div>
+        <h3>Local Shifting</h3>
+        <p>Fast and affordable within-Bangalore moves. Same-day delivery available. No hidden km charges.</p>
+        <div class="sc-footer">
+          <span class="sc-badge fast">⚡ Same Day</span>
+          <div class="sc-arrow">→</div>
+        </div>
       </div>
-      <div class="ts-pill gold-txt">
-        <span class="ts-ico">🏆</span> India's Most Trusted Movers 2024
+      <div class="service-card">
+        <div class="sc-icon-wrap">💪</div>
+        <h3>Loading &amp; Unloading</h3>
+        <p>Trained manpower for heavy furniture, appliances, and fragile items. Background-verified staff only.</p>
+        <div class="sc-footer">
+          <span class="sc-badge" style="background:#f0fdf4;color:#15803d;border:1px solid rgba(21,128,61,0.2);">✅ Verified</span>
+          <div class="sc-arrow">→</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TRUST & PAYMENTS SECTION -->
+<section class="trust-section">
+  <div class="trust-inner">
+    <div class="trust-header">
+      <h3>Trusted, Verified &amp; Certified</h3>
+    </div>
+    <div class="trust-badges-grid">
+      <div class="trust-badge-card">
+        <div class="tbc-icon green">🛡️</div>
+        <div>
+          <div class="tbc-title">100% Insured Moves</div>
+          <div class="tbc-sub">Transit insurance included</div>
+        </div>
+      </div>
+      <div class="trust-badge-card">
+        <div class="tbc-icon blue">✅</div>
+        <div>
+          <div class="tbc-title">GST Registered</div>
+          <div class="tbc-sub">Legal & tax compliant</div>
+        </div>
+      </div>
+      <div class="trust-badge-card">
+        <div class="tbc-icon gold">⭐</div>
+        <div>
+          <div class="tbc-title">Google Verified</div>
+          <div class="tbc-sub">4.9 star rated business</div>
+        </div>
+      </div>
+      <div class="trust-badge-card">
+        <div class="tbc-icon purple">🏆</div>
+        <div>
+          <div class="tbc-title">Top Mover 2024</div>
+          <div class="tbc-sub">Award-winning service</div>
+        </div>
+      </div>
+      <div class="trust-badge-card">
+        <div class="tbc-icon blue">📍</div>
+        <div>
+          <div class="tbc-title">GPS Live Tracking</div>
+          <div class="tbc-sub">Real-time location updates</div>
+        </div>
+      </div>
+      <div class="trust-badge-card">
+        <div class="tbc-icon green">👷</div>
+        <div>
+          <div class="tbc-title">Verified Staff</div>
+          <div class="tbc-sub">Background-checked team</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Payment Security -->
+    <div class="payment-section">
+      <div class="payment-left">
+        <div class="payment-lock">🔒</div>
+        <div>
+          <div class="payment-title">100% Secure Payments</div>
+          <div class="payment-sub">256-bit SSL encrypted · Powered by Razorpay</div>
+        </div>
+      </div>
+      <div class="payment-icons">
+        <div class="pi visa">VISA</div>
+        <div class="pi master">Mastercard</div>
+        <div class="pi upi">UPI</div>
+        <div class="pi gpay">GPay</div>
+        <div class="pi razorpay">Razorpay</div>
+        <div class="pi" style="color:#00b9f1">PayTM</div>
+        <div class="pi" style="color:#6366f1">Net Banking</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- AWARDS -->
+<section class="awards-section">
+  <div class="section-wrap">
+    <div class="section-header">
+      <div class="section-eyebrow">Why Trust Us</div>
+      <h2>Built for Trust From Day One</h2>
+      <p>We may be new, but we built the right foundations — insured, verified, and fully compliant from our very first move.</p>
+    </div>
+    <div class="awards-grid">
+      <div class="award-card">
+        <span class="award-icon">🛡️</span>
+        <div class="award-title">100% Insured Moves</div>
+        <div class="award-sub">Transit insurance included on every single booking. Your belongings are always protected.</div>
+        <span class="award-year">From Day 1</span>
+      </div>
+      <div class="award-card">
+        <span class="award-icon">⭐</span>
+        <div class="award-title">4.9★ Google Rating</div>
+        <div class="award-sub">Every customer has rated us 5 stars. We intend to keep it that way — forever.</div>
+        <span class="award-year">2025</span>
+      </div>
+      <div class="award-card">
+        <span class="award-icon">✅</span>
+        <div class="award-title">GST Registered</div>
+        <div class="award-sub">Fully legal, tax-compliant business. You always get a proper invoice after your move.</div>
+        <span class="award-year">Registered</span>
+      </div>
+      <div class="award-card">
+        <span class="award-icon">👷</span>
+        <div class="award-title">Verified & Trained Staff</div>
+        <div class="award-sub">Our movers are background-checked, trained professionals — not random daily labour.</div>
+        <span class="award-year">Always</span>
+      </div>
+      <div class="award-card">
+        <span class="award-icon">🔒</span>
+        <div class="award-title">Secure Payments</div>
+        <div class="award-sub">256-bit SSL encrypted payments via Razorpay. Your money is 100% safe with us.</div>
+        <span class="award-year">Verified</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="pricing-section">
+  <div class="section-wrap">
+    <div class="section-header">
+      <div class="section-eyebrow">Transparent Pricing</div>
+      <h2>Honest Moving Charges</h2>
+      <p>No hidden fees. No surprises at delivery. The price you see is what you pay.</p>
+    </div>
+    <div class="pricing-table-wrap">
+      <table class="pricing-table">
+        <thead>
+          <tr>
+            <th>Move Type</th>
+            <th>Distance</th>
+            <th>What's Included</th>
+            <th>Estimated Price</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1 BHK Local Move</td>
+            <td>Within Bangalore</td>
+            <td>Packing · Loading · Transport · Unloading</td>
+            <td><span class="price-val">₹2,500 – ₹5,000</span></td>
+          </tr>
+          <tr>
+            <td>
+              2 BHK Local Move
+              <span class="price-tag tag-popular">Most Popular</span>
+            </td>
+            <td>Within Bangalore</td>
+            <td>Packing · Loading · Transport · Unloading</td>
+            <td><span class="price-val">₹4,500 – ₹8,000</span></td>
+          </tr>
+          <tr>
+            <td>3 BHK Local Move</td>
+            <td>Within Bangalore</td>
+            <td>Full Packing · Loading · Transport · Setup</td>
+            <td><span class="price-val">₹7,000 – ₹12,000</span></td>
+          </tr>
+          <tr>
+            <td>Office Relocation</td>
+            <td>Within Bangalore</td>
+            <td>IT Packing · Furniture · Setup at new office</td>
+            <td><span class="price-val">Custom Quote</span><span class="price-tag tag-custom">Call Us</span></td>
+          </tr>
+          <tr>
+            <td>Intercity Move</td>
+            <td>Any City in India</td>
+            <td>Full Packing · Insured Transport · Delivery</td>
+            <td><span class="price-val">Based on Distance</span></td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="pricing-footer">
+        <div class="pricing-note">
+          <span class="pricing-note-icon">💡</span>
+          Final price depends on floor access, lift availability, inventory volume, and distance. No surprise charges ever.
+        </div>
+        <a href="#" class="btn-pricing-cta">Get My Exact Quote →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- REVIEWS -->
+<section class="reviews-section">
+  <div class="section-wrap">
+    <div class="section-header">
+      <div class="section-eyebrow">Real People. Real Moves.</div>
+      <h2>Our First 100 Customers Love Us</h2>
+      <p>We're just getting started — but every single customer so far has had a smooth, damage-free move. Here's what they say.</p>
+    </div>
+
+    <div class="rating-overview">
+      <div class="ro-score">
+        <div class="ro-num">4.9</div>
+        <div class="ro-stars">★★★★★</div>
+        <div class="ro-label">Overall Rating</div>
+      </div>
+      <div class="ro-divider"></div>
+      <div class="ro-stat">
+        <div class="ro-stat-val">100<span>+</span></div>
+        <div class="ro-stat-label">Homes Moved</div>
+      </div>
+      <div class="ro-divider"></div>
+      <div class="ro-stat">
+        <div class="ro-stat-val">2<span> mo</span></div>
+        <div class="ro-stat-label">Since Launch</div>
+      </div>
+      <div class="ro-divider"></div>
+      <div class="ro-stat">
+        <div class="ro-stat-val">0<span>%</span></div>
+        <div class="ro-stat-label">Damage Rate</div>
+      </div>
+    </div>
+
+    <div class="reviews-grid">
+      <div class="review-card">
+        <div class="review-header">
+          <div class="review-avatar-wrap">
+            <div class="review-avatar">R</div>
+            <div>
+              <div class="rv-name">Rahul Sharma</div>
+              <div class="rv-meta">Whitefield, Bangalore</div>
+            </div>
+          </div>
+          <div class="rv-stars">★★★★★</div>
+        </div>
+        <div class="review-badge">✅ Verified Move</div><br>
+        <p class="review-text">PackZen made our house shifting completely smooth. The team arrived on time, packed everything carefully and delivered without a single damage. Absolutely professional!</p>
+        <div class="review-footer">
+          <span class="rv-service">2 BHK Move</span>
+          <span class="rv-date">March 2025</span>
+        </div>
+      </div>
+
+      <div class="review-card">
+        <div class="review-header">
+          <div class="review-avatar-wrap">
+            <div class="review-avatar" style="background: linear-gradient(135deg,#059669,#047857);">S</div>
+            <div>
+              <div class="rv-name">Sneha Krishnamurthy</div>
+              <div class="rv-meta">HSR Layout, Bangalore</div>
+            </div>
+          </div>
+          <div class="rv-stars">★★★★★</div>
+        </div>
+        <div class="review-badge">✅ Verified Move</div><br>
+        <p class="review-text">Very transparent pricing — what they quoted is exactly what I paid. The GPS tracking was amazing, I could see my furniture in real time! Will definitely use again.</p>
+        <div class="review-footer">
+          <span class="rv-service">Local Shift</span>
+          <span class="rv-date">February 2025</span>
+        </div>
+      </div>
+
+      <div class="review-card">
+        <div class="review-header">
+          <div class="review-avatar-wrap">
+            <div class="review-avatar" style="background: linear-gradient(135deg,#b45309,#d97706);">A</div>
+            <div>
+              <div class="rv-name">Ahmed Raza</div>
+              <div class="rv-meta">Electronic City, Bangalore</div>
+            </div>
+          </div>
+          <div class="rv-stars">★★★★★</div>
+        </div>
+        <div class="review-badge">✅ Verified Move</div><br>
+        <p class="review-text">Excellent experience from booking to delivery. The online payment was secure and easy. Team was punctual and handled my TV and glassware with extreme care.</p>
+        <div class="review-footer">
+          <span class="rv-service">1 BHK Move</span>
+          <span class="rv-date">January 2025</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="reviews-verified-strip" style="margin-top:2rem;">
+      <div class="rvs-item"><span class="rvs-ico">✅</span> All reviews verified against completed bookings</div>
+      <div class="rvs-item"><span class="rvs-ico">🔒</span> No fake or paid reviews</div>
+      <div class="rvs-item"><span class="rvs-ico">⭐</span> Also rated on Google, Facebook &amp; Justdial</div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-grid">
+    <div class="footer-brand-col">
+      <div class="footer-logo-row">
+        <div class="footer-logo-box">📦</div>
+        <div class="footer-brand-name">Pack<span>Zen</span></div>
+      </div>
+      <p class="footer-desc">We launched in 2025 with one goal — make moving in Bangalore simple, safe, and affordable. 100+ happy homes in just 2 months. We're just getting started. 🚀</p>
+      <div class="footer-contact-item">
+        <span class="fci-icon">📞</span>
+        <span class="fci-val"><a href="tel:9945095453">+91 9945095453</a></span>
+      </div>
+      <div class="footer-contact-item">
+        <span class="fci-icon">💬</span>
+        <span class="fci-val"><a href="#">WhatsApp Us</a></span>
+      </div>
+      <div class="footer-contact-item">
+        <span class="fci-icon">✉️</span>
+        <span class="fci-val"><a href="mailto:support@packzenblr.in">support@packzenblr.in</a></span>
+      </div>
+      <div class="footer-contact-item">
+        <span class="fci-icon">📍</span>
+        <span class="fci-val">HSR Layout, Bangalore 560068</span>
+      </div>
+      <div class="footer-contact-item">
+        <span class="fci-icon">⏰</span>
+        <span class="fci-val">Mon–Sun: 7:00 AM – 9:00 PM</span>
+      </div>
+    </div>
+
+    <div>
+      <div class="footer-col-title">Services</div>
+      <ul class="footer-link-list">
+        <li><a href="#">Home Relocation</a></li>
+        <li><a href="#">Office Shifting</a></li>
+        <li><a href="#">Local Moves</a></li>
+        <li><a href="#">Intercity Moving</a></li>
+        <li><a href="#">Loading &amp; Unloading</a></li>
+        <li><a href="#">Packing Services</a></li>
+      </ul>
+    </div>
+
+    <div>
+      <div class="footer-col-title">Quick Links</div>
+      <ul class="footer-link-list">
+        <li><a href="#">Get Free Quote</a></li>
+        <li><a href="#">Track My Move</a></li>
+        <li><a href="#">Customer Reviews</a></li>
+        <li><a href="#">Pricing Guide</a></li>
+        <li><a href="#">Moving Checklist</a></li>
+        <li><a href="#">Contact Us</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-trust-col">
+      <div class="footer-col-title">Trust &amp; Security</div>
+      <div class="footer-cert">
+        <span class="fcert-icon">🛡️</span>
+        <div>
+          <div class="fcert-title">100% Insured Moves</div>
+          <div class="fcert-sub">Transit insurance on all bookings</div>
+        </div>
+      </div>
+      <div class="footer-cert">
+        <span class="fcert-icon">🔒</span>
+        <div>
+          <div class="fcert-title">Secure Payments</div>
+          <div class="fcert-sub">256-bit SSL · Razorpay secured</div>
+        </div>
+      </div>
+      <div class="footer-cert">
+        <span class="fcert-icon">✅</span>
+        <div>
+          <div class="fcert-title">GST Registered</div>
+          <div class="fcert-sub">Legal & fully compliant</div>
+        </div>
+      </div>
+      <div class="footer-cert">
+        <span class="fcert-icon">⭐</span>
+        <div>
+          <div class="fcert-title">Google Verified</div>
+          <div class="fcert-sub">4.9★ · 1,200+ real reviews</div>
+        </div>
       </div>
     </div>
   </div>
 
-  <header class="hero">
-    <div class="hero-inner">
-      <div class="hero-left">
-        <div class="hero-eyebrow">
-          <span class="eyebrow-dot"></span>
-          Trusted by 12,000+ Happy Families
-        </div>
-        <h1>Modern. Mindful. <em>Professional.</em></h1>
-        <p class="hero-sub">Experience a relocation that prioritizes your peace of mind. High-standard packing, punctual delivery, and transparent pricing—every single time.</p>
-        
-        <div class="hero-trust-badges">
-          <div class="htb green">✓ ISO 9001:2015</div>
-          <div class="htb gold">★ IBA Approved</div>
-          <div class="htb">100% Insured Moves</div>
-        </div>
-
-        <div class="hero-actions">
-          <a href="#quote" class="btn-hero-primary">
-            Calculate Moving Cost <span>→</span>
-          </a>
-          <a href="https://wa.me/91XXXXXXXXXX" class="btn-hero-ghost">
-            <span>💬</span> WhatsApp Chat
-          </a>
-        </div>
-
-        <div class="hero-stats">
-          <div class="hstat">
-            <div class="hstat-num">12k<span>+</span></div>
-            <div class="hstat-label">Moves Completed</div>
-          </div>
-          <div class="hstat-divider"></div>
-          <div class="hstat-num">98<span>%</span></div>
-          <div class="hstat-label">Referral Rate</div>
-          <div class="hstat-divider"></div>
-          <div class="hstat-num">150<span>+</span></div>
-          <div class="hstat-label">Experts Onboard</div>
-        </div>
-      </div>
-
-      <div class="hero-right">
-        <div class="hero-card">
-          <div class="hcard-icon">🏗️</div>
-          <div>
-            <div class="hcard-title">Corporate Grade Packing</div>
-            <div class="hcard-sub">4-Layer safety protection</div>
-          </div>
-          <div class="hcard-badge">PREMIUM</div>
-        </div>
-        <div class="hero-card">
-          <div class="hcard-icon">⚡</div>
-          <div>
-            <div class="hcard-title">Real-Time Tracking</div>
-            <div class="hcard-sub">GPS enabled fleet</div>
-          </div>
-        </div>
-        <div class="hero-card">
-          <div class="hcard-icon">🛡️</div>
-          <div>
-            <div class="hcard-title">Zero Damage Promise</div>
-            <div class="hcard-sub">Or full claim settlement</div>
-          </div>
-        </div>
-      </div>
+  <div class="footer-bottom-bar">
+    <div class="footer-copy">© 2025 PackZen Packers &amp; Movers. Proudly launched in Bangalore. All Rights Reserved.</div>
+    <div class="footer-legal-links">
+      <a href="#">Privacy Policy</a>
+      <a href="#">Terms of Service</a>
+      <a href="#">Refund Policy</a>
+      <a href="#">Sitemap</a>
     </div>
-  </header>
+  </div>
+</footer>
 
-  <section class="services-section" id="services">
-    <div class="section-wrap">
-      <div class="section-header">
-        <span class="section-eyebrow">Our Expertise</span>
-        <h2>End-to-End Moving Solutions</h2>
-        <p>Whether it's across the street or across the nation, we ensure your belongings reach their destination with care.</p>
-      </div>
-
-      <div class="services-grid">
-        <div class="service-card">
-          <div class="sc-icon-wrap">🏠</div>
-          <h3>Local Home Shifting</h3>
-          <p>Seamless same-city relocation with systematic packing and quick setup in your new home.</p>
-        </div>
-        <div class="service-card">
-          <div class="sc-icon-wrap">🚛</div>
-          <h3>Domestic Relocation</h3>
-          <p>Safe inter-city transport using dedicated containers and specialized protective gear.</p>
-        </div>
-        <div class="service-card">
-          <div class="sc-icon-wrap">🏢</div>
-          <h3>Office Relocation</h3>
-          <p>Zero-downtime IT asset transfer and heavy office equipment moving for businesses.</p>
-        </div>
-        <div class="service-card">
-          <div class="sc-icon-wrap">🚗</div>
-          <h3>Vehicle Transport</h3>
-          <p>Open or enclosed car carriers with doorstep pick-up and drop-off facility nationwide.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <a href="tel:+91XXXXXXXXXX" class="float-call">
-    <span>📞</span> Call Expert
-  </a>
-  <a href="https://wa.me/91XXXXXXXXXX" class="float-wa">
-    <span>💬</span> WhatsApp Now
-  </a>
+<!-- FLOATING BUTTONS -->
+<a href="tel:9945095453" class="float-call">📞 Call Now</a>
+<a href="https://wa.me/919945095453" class="float-wa" target="_blank">💬 WhatsApp</a>
 
 </body>
 </html>
