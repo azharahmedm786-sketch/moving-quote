@@ -211,16 +211,13 @@ body.dark-mode .navbar { background: #06101f; }
   display: flex; align-items: center;
   padding: 90px 2.5rem 5rem;
   overflow: hidden; color: white;
-  background:
-    radial-gradient(ellipse 80% 60% at 80% 50%, rgba(26,86,219,0.25) 0%, transparent 70%),
-    radial-gradient(ellipse 60% 80% at 10% 80%, rgba(234,88,12,0.12) 0%, transparent 60%),
-    linear-gradient(150deg, #060e24 0%, #0c1b3a 35%, #0f2554 65%, #0c1b3a 100%);
+  background: linear-gradient(150deg, rgba(6,14,36,0.60) 0%, rgba(12,27,58,0.55) 50%, rgba(15,37,84,0.60) 100%);
 }
 .hero::before {
   content: '';
   position: absolute; inset: 0;
   background: url('https://raw.githubusercontent.com/azharahmedm786-sketch/moving-quote/main/images/hero-bg.jpg') center/cover no-repeat;
-  opacity: 0.25; z-index: 0;
+  opacity: 0.55; z-index: -1;
 }
 /* Diagonal orange slice at bottom */
 .hero::after {
