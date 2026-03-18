@@ -216,7 +216,7 @@ body.dark-mode .navbar { background: #06101f; }
 .hero::before {
   content: '';
   position: absolute; inset: 0;
-  background: linear-gradient(150deg, rgba(6,14,36,0.72) 0%, rgba(12,27,58,0.65) 50%, rgba(15,37,84,0.72) 100%);
+  background: linear-gradient(150deg, rgba(6,14,36,0.88) 0%, rgba(12,27,58,0.82) 50%, rgba(15,37,84,0.88) 100%);
   z-index: 0;
 }
 /* Diagonal orange slice at bottom */
@@ -1312,6 +1312,20 @@ body.dark-mode .why-section { background: var(--bg-primary); }
 .reveal-stagger.visible .service-card:nth-child(2), .reveal-stagger.visible .review-card:nth-child(2), .reveal-stagger.visible .why-card:nth-child(2) { opacity: 1; transform: none; transition-delay: 0.15s; }
 .reveal-stagger.visible .service-card:nth-child(3), .reveal-stagger.visible .review-card:nth-child(3), .reveal-stagger.visible .why-card:nth-child(3) { opacity: 1; transform: none; transition-delay: 0.25s; }
 .reveal-stagger.visible .service-card:nth-child(4), .reveal-stagger.visible .review-card:nth-child(4), .reveal-stagger.visible .why-card:nth-child(4) { opacity: 1; transform: none; transition-delay: 0.35s; }
+
+/* ✅ FALLBACK — always show cards even if JS scroll observer doesn't fire */
+@media (max-width: 9999px) {
+  .reveal-stagger .service-card,
+  .reveal-stagger .review-card,
+  .reveal-stagger .why-card {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  .reveal {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
 
 /* ============================================
    RESPONSIVE
