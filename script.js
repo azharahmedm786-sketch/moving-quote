@@ -462,6 +462,78 @@ function resendOTP() {
   if (otpPurpose === "signup") switchPanel("panelSignup");
 }
 
+
+//////////////////////////////////////////////////////////
+// RESET PASSWORD OTP SYSTEM
+//////////////////////////////////////////////////////////
+
+let resetConfirmation = null;
+let resetNewPassword = null;
+
+async function sendResetOTP() {
+
+  const phone = document.getElementById("resetPhone").value.trim();
+  const password = document.getElementById("resetNewPassword").value;
+
+  if (phone.length !== 10) {
+    alert("Enter valid phone number");
+    return;
+  }
+
+  if (password.length < 6) {
+    alert("Password must be at least 6 characters");
+    return;
+  }
+
+  const fullPhone = "+91" + phone;
+
+  const recaptcha = new firebase.auth.RecaptchaVerifier(
+    'recaptcha-reset',
+    { size: 'invisible' }
+  );
+
+  try {
+
+    resetConfirmation = await firebase.auth().signInWithPhoneNumber(
+      fullPhone,
+      recaptcha
+    );
+
+    resetNewPassword = password;
+
+    switchPanel("panelResetOTP");
+
+  } catch (err) {
+
+    alert("OTP failed: " + err.message);
+
+  }
+
+}
+
+async function verifyResetOTP() {
+
+  const otp = document.getElementById("resetOTP").value;
+
+  try {
+
+    const result = await resetConfirmation.confirm(otp);
+    const user = result.user;
+
+    await user.updatePassword(resetNewPassword);
+
+    alert("Password reset successful");
+
+    switchPanel("panelLogin");
+
+  } catch (err) {
+
+    alert("Invalid OTP");
+
+  }
+
+}
+
 /* ============================================
    LOGIN
    ============================================ */
