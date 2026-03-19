@@ -945,6 +945,34 @@ alt="PackZen Packers and Movers Bangalore">
       <div class="auth-divider"><span>or</span></div>
       <button class="btn-auth-outline" onclick="switchPanel('panelSignup')">Create New Account</button>
       <p class="auth-link" onclick="switchPanel('panelRecover')">Forgot password? Recover Account</p>
+      <div class="auth-panel" id="panelRecover" style="display:none;">
+
+<h2 class="auth-title">Reset Password</h2>
+
+<label>Phone Number</label>
+<div class="phone-row">
+<span class="phone-prefix">+91</span>
+<input id="resetPhone" type="tel" placeholder="10 digit mobile" maxlength="10">
+</div>
+
+<label>New Password</label>
+<input id="resetNewPassword" type="password" placeholder="New password">
+
+<button class="btn-auth" onclick="sendResetOTP()">Send OTP</button>
+
+<div id="recaptcha-reset"></div>
+        <div class="auth-panel" id="panelResetOTP" style="display:none;">
+        </div>
+<h2 class="auth-title">Verify OTP</h2>
+
+<input id="resetOTP" type="text" placeholder="Enter 6 digit OTP" class="field-input">
+
+<button class="btn-auth" onclick="verifyResetOTP()">Verify OTP & Reset Password</button>
+
+</div>
+        
+
+</div>
     </div>
     <div class="auth-panel" id="panelSignup" style="display:none;">
       <button class="modal-x" onclick="closeAuthModal()">✕</button>
