@@ -383,6 +383,7 @@
 
 <!-- Auto-login guard: shows shell if already logged in as admin -->
 <script>
+const _ADMIN_EMAILS_GUARD = ["admin@packzen.com","support@packzenblr.in","azharahmedm786@gmail.com","moveeasyblr@gmail.com"];
 document.addEventListener("DOMContentLoaded", () => {
   function waitForFirebase(cb, tries = 0) {
     if (window._firebase) { cb(); return; }
@@ -393,13 +394,21 @@ document.addEventListener("DOMContentLoaded", () => {
     const { auth, db } = window._firebase;
     auth.onAuthStateChanged(async (user) => {
       if (!user) return;
+      const userEmail = (user.email || "").toLowerCase();
       try {
         const snap = await db.collection("users").doc(user.uid).get();
-        const data = snap.data();
-        if (data && data.role === "admin") {
-          setTimeout(() => { if (typeof showShell === "function") showShell(data.name || "Admin"); }, 100);
+        const data = snap.data() || {};
+        if (data.role === "admin" || _ADMIN_EMAILS_GUARD.includes(userEmail)) {
+          if (typeof adminUser !== "undefined") adminUser = user;
+          setTimeout(() => { if (typeof showShell === "function") showShell(data.name || user.displayName || "Admin"); }, 150);
         }
-      } catch (error) { console.error("Admin auth check failed:", error); }
+      } catch (error) {
+        // Firestore rules may block read — fall back to email check
+        if (_ADMIN_EMAILS_GUARD.includes(userEmail)) {
+          if (typeof adminUser !== "undefined") adminUser = user;
+          setTimeout(() => { if (typeof showShell === "function") showShell(user.displayName || "Admin"); }, 150);
+        }
+      }
     });
   });
 });
@@ -446,9 +455,17 @@ function waitFB(cb, n=0) {
   setTimeout(() => waitFB(cb, n+1), 200);
 }
 
+/* ── ADMIN EMAILS — add your admin email(s) here ── */
+const ADMIN_EMAILS = [
+  "admin@packzen.com",
+  "support@packzenblr.in",
+  "azharahmedm786@gmail.com",
+  "moveeasyblr@gmail.com"
+];
+
 /* ── LOGIN ── */
 function adminLogin() {
-  const email = document.getElementById("adminEmail").value.trim();
+  const email = document.getElementById("adminEmail").value.trim().toLowerCase();
   const pass  = document.getElementById("adminPass").value;
   const err   = document.getElementById("adminErr");
   const btn   = document.querySelector("#adminLogin .btn-auth");
@@ -462,26 +479,62 @@ function adminLogin() {
     auth.signInWithEmailAndPassword(email, pass)
       .then(cred => {
         adminUser = cred.user;
+        const userEmail = cred.user.email?.toLowerCase() || "";
+
         db.collection("users").doc(cred.user.uid).get()
-          .then(doc => {
+          .then(async doc => {
             const role = doc.exists ? doc.data()?.role : null;
-            if (role === "admin" || email === "admin@packzen.com") {
-              showShell(doc.exists ? (doc.data()?.name || "Admin") : "Admin");
+            const name = doc.exists ? (doc.data()?.name || "Admin") : "Admin";
+
+            // ✅ Allow login if: role === "admin" OR email is in ADMIN_EMAILS list
+            if (role === "admin" || ADMIN_EMAILS.includes(userEmail)) {
+
+              // Auto-fix: if email is in ADMIN_EMAILS but role isn't set yet, set it now
+              if (ADMIN_EMAILS.includes(userEmail) && role !== "admin") {
+                try {
+                  if (doc.exists) {
+                    await db.collection("users").doc(cred.user.uid).update({ role: "admin" });
+                  } else {
+                    await db.collection("users").doc(cred.user.uid).set({
+                      name: cred.user.displayName || "Admin",
+                      email: userEmail,
+                      role: "admin",
+                      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                  }
+                  console.log("Admin role set in Firestore ✅");
+                } catch(e) {
+                  console.warn("Could not set admin role:", e.message);
+                }
+              }
+
+              showShell(name);
             } else {
               auth.signOut(); adminUser = null;
-              err.textContent = "Access denied. Admin role required.";
+              err.textContent = "Access denied. Your account does not have admin permissions.";
             }
           })
           .catch(() => {
-            if (email === "admin@packzen.com") { showShell("Admin"); }
-            else { auth.signOut(); err.textContent = "Could not verify role. Try again."; }
+            // Firestore read failed (security rules) — fall back to email check only
+            if (ADMIN_EMAILS.includes(userEmail)) {
+              showShell(cred.user.displayName || "Admin");
+            } else {
+              auth.signOut(); adminUser = null;
+              err.textContent = "Could not verify admin role. Please contact support.";
+            }
           });
       })
       .catch(e => {
-        if (e.code === "auth/wrong-password" || e.code === "auth/invalid-credential") err.textContent = "Wrong password. Please try again.";
-        else if (e.code === "auth/user-not-found") err.textContent = "No account found with this email.";
-        else if (e.code === "auth/invalid-email")  err.textContent = "Invalid email address.";
-        else err.textContent = e.message;
+        if (e.code === "auth/wrong-password" || e.code === "auth/invalid-credential")
+          err.textContent = "Wrong password. Please try again.";
+        else if (e.code === "auth/user-not-found")
+          err.textContent = "No account found with this email.";
+        else if (e.code === "auth/invalid-email")
+          err.textContent = "Invalid email address.";
+        else if (e.code === "auth/too-many-requests")
+          err.textContent = "Too many attempts. Please wait a few minutes.";
+        else
+          err.textContent = e.message;
       })
       .finally(() => { if (btn) { btn.disabled = false; btn.textContent = "Login to Dashboard →"; } });
   });
