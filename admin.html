@@ -100,7 +100,24 @@
     .bulk-textarea:focus{border-color:var(--primary)}
     .toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--dark);color:#fff;padding:12px 24px;border-radius:50px;font-size:.9rem;font-weight:600;z-index:99999;opacity:0;transition:opacity .3s,transform .3s;pointer-events:none;white-space:nowrap}
     .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-    @media(max-width:768px){.admin-shell.active{flex-direction:column}.sidebar{position:static;width:100%;flex-direction:row;padding:10px;height:auto;flex-wrap:nowrap;overflow-x:auto}.admin-main{margin-left:0}.sidebar-logo,.sb-role,.sidebar-bottom{display:none}.nav-item{padding:8px 12px;font-size:.78rem;border-left:none;border-bottom:3px solid transparent}.nav-item.active{border-left:none;border-bottom-color:var(--primary)}.chart-row{grid-template-columns:1fr}}
+
+    /* ── Driver form inputs inside table-card ── */
+    .driver-form-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:14px}
+    .driver-form-grid input,.driver-form-grid select{padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:.88rem;background:var(--surface2);color:var(--text);outline:none;width:100%}
+    .driver-form-grid input:focus,.driver-form-grid select:focus{border-color:var(--primary)}
+    .driver-form-actions{display:flex;align-items:flex-end}
+    #adminDriverMsg{min-height:18px;font-size:.83rem;margin-top:6px;font-weight:600}
+
+    @media(max-width:768px){
+      .admin-shell.active{flex-direction:column}
+      .sidebar{position:static;width:100%;flex-direction:row;padding:10px;height:auto;flex-wrap:nowrap;overflow-x:auto}
+      .admin-main{margin-left:0}
+      .sidebar-logo,.sb-role,.sidebar-bottom{display:none}
+      .nav-item{padding:8px 12px;font-size:.78rem;border-left:none;border-bottom:3px solid transparent}
+      .nav-item.active{border-left:none;border-bottom-color:var(--primary)}
+      .chart-row{grid-template-columns:1fr}
+      .driver-form-grid{grid-template-columns:1fr}
+    }
   </style>
 </head>
 <body>
@@ -183,9 +200,56 @@
       </div>
     </div>
 
-    <!-- DRIVERS -->
+    <!-- DRIVERS — includes Create Driver form -->
     <div class="section" id="sectionDrivers">
-      <div id="driversList"><div style="text-align:center;color:var(--text-muted);padding:40px;">Loading drivers...</div></div>
+
+      <!-- ✅ CREATE DRIVER FORM -->
+      <div class="table-card" style="margin-bottom:20px;">
+        <div class="table-hdr">
+          <div class="table-title">🚚 Create New Driver Account</div>
+        </div>
+        <div style="padding:20px;">
+          <div class="driver-form-grid">
+            <div>
+              <label class="field-label" style="margin-top:0">Full Name <span style="color:#dc2626">*</span></label>
+              <input id="newDriverName" placeholder="Driver full name" autocomplete="off">
+            </div>
+            <div>
+              <label class="field-label" style="margin-top:0">Email Address <span style="color:#dc2626">*</span></label>
+              <input id="newDriverEmail" type="email" placeholder="driver@email.com" autocomplete="off">
+            </div>
+            <div>
+              <label class="field-label" style="margin-top:0">Phone Number</label>
+              <input id="newDriverPhone" type="tel" placeholder="10-digit mobile" maxlength="10">
+            </div>
+            <div>
+              <label class="field-label" style="margin-top:0">Vehicle Type</label>
+              <select id="newDriverVehicle">
+                <option value="">Select vehicle</option>
+                <option value="Tata Ace">🛻 Tata Ace (Small)</option>
+                <option value="14 ft Truck">🚚 14 ft Truck (Medium)</option>
+                <option value="17 ft Truck">🚛 17 ft Truck (Large)</option>
+                <option value="22 ft Truck">🚜 22 ft Truck (XL)</option>
+              </select>
+            </div>
+            <div>
+              <label class="field-label" style="margin-top:0">Temporary Password <span style="color:#dc2626">*</span></label>
+              <input id="newDriverPassword" type="password" placeholder="Min 6 characters" autocomplete="new-password">
+            </div>
+            <div class="driver-form-actions">
+              <button class="btn-primary-sm" onclick="adminCreateDriver()" style="width:100%;padding:12px;font-size:.9rem;">
+                ✅ Create Driver Account
+              </button>
+            </div>
+          </div>
+          <div id="adminDriverMsg"></div>
+        </div>
+      </div>
+
+      <!-- DRIVERS LIST -->
+      <div id="driversList">
+        <div style="text-align:center;color:var(--text-muted);padding:40px;">Loading drivers...</div>
+      </div>
     </div>
 
     <!-- CUSTOMERS -->
@@ -227,7 +291,6 @@
       </div>
     </div>
 
-
     <!-- CANCELLATIONS -->
     <div class="section" id="sectionCancels">
       <div class="table-card">
@@ -252,8 +315,6 @@
           <tbody id="claimsTable"><tr class="empty-row"><td colspan="8">Loading...</td></tr></tbody>
         </table>
       </div>
-
-      <!-- Claim detail panel -->
       <div id="claimDetailPanel" style="display:none;margin-top:1.5rem;">
         <div class="table-card">
           <div class="table-hdr">
@@ -263,8 +324,8 @@
           <div style="padding:1rem">
             <div id="claimDetailContent"></div>
             <div style="margin-top:1rem">
-              <label style="font-size:.82rem;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:.4rem">Admin Response</label>
-              <textarea id="claimResponseText" rows="3" style="width:100%;padding:.6rem;border:1.5px solid var(--border-light);border-radius:10px;background:var(--bg-secondary);color:var(--text-primary);font-size:.85rem;box-sizing:border-box" placeholder="Describe your resolution (e.g. Approved ₹2,000 compensation / Rejected — insufficient evidence)"></textarea>
+              <label style="font-size:.82rem;font-weight:600;color:var(--text-muted);display:block;margin-bottom:.4rem">Admin Response</label>
+              <textarea id="claimResponseText" rows="3" style="width:100%;padding:.6rem;border:1.5px solid var(--border);border-radius:10px;background:var(--surface2);color:var(--text);font-size:.85rem;box-sizing:border-box" placeholder="Describe your resolution (e.g. Approved ₹2,000 compensation / Rejected — insufficient evidence)"></textarea>
             </div>
             <div style="display:flex;gap:.7rem;margin-top:.8rem;flex-wrap:wrap">
               <button onclick="resolveDamageClaim('approved')" style="padding:.55rem 1.1rem;background:#16a34a;color:white;border:none;border-radius:10px;cursor:pointer;font-weight:700;font-size:.82rem">✅ Approve Claim</button>
@@ -317,11 +378,10 @@
 
 <div class="toast" id="adminToast"></div>
 
-<!-- env-config.js MUST load first — firebase-config.js depends on window.ENV.FIREBASE_AUTH_KEY -->
 <script src="env-config.js"></script>
 <script src="firebase-config.js"></script>
 
-<!-- Admin Auth Guard: Auto-shows shell if already logged in as admin -->
+<!-- Auto-login guard: shows shell if already logged in as admin -->
 <script>
 document.addEventListener("DOMContentLoaded", () => {
   function waitForFirebase(cb, tries = 0) {
@@ -332,16 +392,14 @@ document.addEventListener("DOMContentLoaded", () => {
   waitForFirebase(() => {
     const { auth, db } = window._firebase;
     auth.onAuthStateChanged(async (user) => {
-      if (!user) return; // Not logged in — show login form
+      if (!user) return;
       try {
         const snap = await db.collection("users").doc(user.uid).get();
         const data = snap.data();
         if (data && data.role === "admin") {
           setTimeout(() => { if (typeof showShell === "function") showShell(data.name || "Admin"); }, 100);
         }
-      } catch (error) {
-        console.error("Admin auth check failed:", error);
-      }
+      } catch (error) { console.error("Admin auth check failed:", error); }
     });
   });
 });
@@ -352,13 +410,12 @@ let adminUser = null, allBookings = [], allDrivers = [], allCustomers = [], allR
 let assigningId = null;
 let bookingsChart = null, revenueChart = null;
 
-/* ADMIN GUARD — re-checks role before any sensitive write */
 function requireAdmin(cb) {
   if (!adminUser) { toast("⚠️ Not logged in as admin."); return; }
   cb();
 }
 
-/* THEME */
+/* ── THEME ── */
 function toggleAdminTheme() {
   document.body.classList.toggle("dark");
   document.querySelector(".theme-btn").textContent = document.body.classList.contains("dark") ? "☀️" : "🌙";
@@ -369,18 +426,17 @@ if (localStorage.getItem("packzen-theme") === "dark") {
   setTimeout(() => { const b = document.querySelector(".theme-btn"); if(b) b.textContent = "☀️"; }, 100);
 }
 
-/* TOAST */
+/* ── TOAST ── */
 function toast(msg, dur=3000) {
   const t = document.getElementById("adminToast");
   t.textContent = msg; t.classList.add("show");
   setTimeout(() => t.classList.remove("show"), dur);
 }
 
-/* FIREBASE */
+/* ── FIREBASE HELPER ── */
 function waitFB(cb, n=0) {
   if (window._firebase) { cb(); return; }
   if (n > 30) {
-    // Firebase never loaded — show error
     const err = document.getElementById("adminErr");
     if (err) err.textContent = "Firebase failed to load. Check your internet connection and refresh.";
     const btn = document.querySelector("#adminLogin .btn-auth");
@@ -390,14 +446,13 @@ function waitFB(cb, n=0) {
   setTimeout(() => waitFB(cb, n+1), 200);
 }
 
-/* LOGIN */
+/* ── LOGIN ── */
 function adminLogin() {
   const email = document.getElementById("adminEmail").value.trim();
   const pass  = document.getElementById("adminPass").value;
   const err   = document.getElementById("adminErr");
   const btn   = document.querySelector("#adminLogin .btn-auth");
-  err.textContent = "";
-  err.style.color = "#ef4444";
+  err.textContent = ""; err.style.color = "#ef4444";
 
   if (!email || !pass) { err.textContent = "Please enter email and password."; return; }
   if (btn) { btn.disabled = true; btn.textContent = "Signing in..."; }
@@ -407,61 +462,28 @@ function adminLogin() {
     auth.signInWithEmailAndPassword(email, pass)
       .then(cred => {
         adminUser = cred.user;
-        // Try Firestore check first, but fall back to just letting admin email in
         db.collection("users").doc(cred.user.uid).get()
           .then(doc => {
             const role = doc.exists ? doc.data()?.role : null;
-            if (role === "admin" || email === "admin@packzen.com" || email === cred.user.email) {
+            if (role === "admin" || email === "admin@packzen.com") {
               showShell(doc.exists ? (doc.data()?.name || "Admin") : "Admin");
             } else {
-              auth.signOut();
-              adminUser = null;
-              err.textContent = "Access denied.";
+              auth.signOut(); adminUser = null;
+              err.textContent = "Access denied. Admin role required.";
             }
           })
           .catch(() => {
-            // Firestore read failed (rules) — allow login if auth succeeded
-            // Only allow if it's the known admin email
-            if (email === "admin@packzen.com") {
-              showShell("Admin");
-            } else {
-              auth.signOut();
-              err.textContent = "Could not verify role. Try again.";
-            }
+            if (email === "admin@packzen.com") { showShell("Admin"); }
+            else { auth.signOut(); err.textContent = "Could not verify role. Try again."; }
           });
       })
       .catch(e => {
-        console.error("Login error:", e);
-        if (e.code === "auth/wrong-password" || e.code === "auth/invalid-credential") {
-          err.textContent = "Wrong password. Please try again.";
-        } else if (e.code === "auth/user-not-found") {
-          err.textContent = "No account found with this email.";
-        } else if (e.code === "auth/invalid-email") {
-          err.textContent = "Invalid email address.";
-        } else {
-          err.textContent = e.message;
-        }
+        if (e.code === "auth/wrong-password" || e.code === "auth/invalid-credential") err.textContent = "Wrong password. Please try again.";
+        else if (e.code === "auth/user-not-found") err.textContent = "No account found with this email.";
+        else if (e.code === "auth/invalid-email")  err.textContent = "Invalid email address.";
+        else err.textContent = e.message;
       })
-      .finally(() => {
-        if (btn) { btn.disabled = false; btn.textContent = "Login to Dashboard →"; }
-      });
-  });
-}
-
-function adminLogin_OLD() {
-  const email = document.getElementById("adminEmail").value.trim();
-  const pass  = document.getElementById("adminPass").value;
-  const err   = document.getElementById("adminErr");
-  err.textContent = "";
-  waitFB(() => {
-    const { auth, db } = window._firebase;
-    auth.signInWithEmailAndPassword(email, pass)
-      .then(cred => db.collection("users").doc(cred.user.uid).get().then(doc => {
-        if (!doc.exists || doc.data().role !== "admin") { auth.signOut(); err.textContent = "Access denied."; return; }
-        adminUser = cred.user;
-        showShell(doc.data().name || "Admin");
-      }))
-      .catch(e => { err.textContent = e.message; });
+      .finally(() => { if (btn) { btn.disabled = false; btn.textContent = "Login to Dashboard →"; } });
   });
 }
 
@@ -469,6 +491,7 @@ function adminSignOut() {
   waitFB(() => window._firebase.auth.signOut().then(() => {
     document.getElementById("adminShell").classList.remove("active");
     document.getElementById("adminLogin").style.display = "flex";
+    adminUser = null;
   }));
 }
 
@@ -479,9 +502,7 @@ function showShell(name) {
   loadAll();
 }
 
-// Auth state handled by auth guard above
-
-/* LOAD ALL */
+/* ── LOAD ALL ── */
 function loadAll() {
   waitFB(() => { loadBookings(); loadDrivers(); loadCustomers(); loadReviews(); loadPromos(); loadBroadcastHistory(); });
 }
@@ -529,19 +550,19 @@ function loadBroadcastHistory() {
   });
 }
 
-/* STATS */
+/* ── STATS ── */
 function updateStats() {
   document.getElementById("statTotal").textContent     = allBookings.length;
   document.getElementById("statPending").textContent   = allBookings.filter(b => !b.driverUid && b.status !== "delivered").length;
   document.getElementById("statProgress").textContent  = allBookings.filter(b => ["assigned","packing","transit"].includes(b.status)).length;
   document.getElementById("statDelivered").textContent = allBookings.filter(b => b.status === "delivered").length;
   const rev = allBookings.reduce((s, b) => s + (b.total || 0), 0);
-  document.getElementById("statRevenue").textContent = "₹" + (rev >= 100000 ? (rev/100000).toFixed(1)+"L" : rev.toLocaleString());
+  document.getElementById("statRevenue").textContent = "₹" + (rev >= 100000 ? (rev/100000).toFixed(1)+"L" : rev.toLocaleString("en-IN"));
   const ratings = allReviews.filter(r => r.rating).map(r => r.rating);
   document.getElementById("statRating").textContent = ratings.length ? (ratings.reduce((a,b)=>a+b,0)/ratings.length).toFixed(1)+"★" : "—";
 }
 
-/* CHARTS */
+/* ── CHARTS ── */
 function renderCharts() {
   const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
   const bookingsByMonth = new Array(12).fill(0);
@@ -553,10 +574,11 @@ function renderCharts() {
     revenueByMonth[d.getMonth()] += b.total || 0;
   });
   const isDark = document.body.classList.contains("dark");
-  const gridColor = isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.06)";
+  const gridColor  = isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.06)";
   const labelColor = isDark ? "#8a9bbf" : "#5a6a8a";
   const cfg = (label, data, color) => ({
-    type: "bar", data: { labels: months, datasets: [{ label, data, backgroundColor: color + "88", borderColor: color, borderWidth: 2, borderRadius: 6 }] },
+    type: "bar",
+    data: { labels: months, datasets: [{ label, data, backgroundColor: color + "88", borderColor: color, borderWidth: 2, borderRadius: 6 }] },
     options: { responsive: true, plugins: { legend: { display: false } }, scales: { x: { grid: { color: gridColor }, ticks: { color: labelColor, font: { size: 10 } } }, y: { grid: { color: gridColor }, ticks: { color: labelColor, font: { size: 10 } } } } }
   });
   const ctx1 = document.getElementById("bookingsChart");
@@ -564,12 +586,12 @@ function renderCharts() {
   if (bookingsChart) bookingsChart.destroy();
   if (revenueChart)  revenueChart.destroy();
   bookingsChart = new Chart(ctx1, cfg("Bookings", bookingsByMonth, "#0057ff"));
-  revenueChart  = new Chart(ctx2, cfg("Revenue", revenueByMonth,  "#00c96e"));
+  revenueChart  = new Chart(ctx2, cfg("Revenue",  revenueByMonth,  "#00c96e"));
 }
 
-/* OVERVIEW TABLE */
+/* ── OVERVIEW TABLE ── */
 function renderOverview() {
-  const tbody = document.getElementById("overviewTable");
+  const tbody  = document.getElementById("overviewTable");
   const recent = allBookings.slice(0, 8);
   if (!recent.length) { tbody.innerHTML = '<tr class="empty-row"><td colspan="6">No bookings yet</td></tr>'; return; }
   tbody.innerHTML = recent.map(b => `
@@ -583,7 +605,7 @@ function renderOverview() {
     </tr>`).join("");
 }
 
-/* BOOKINGS TABLE */
+/* ── BOOKINGS TABLE ── */
 function renderBookingsTable(list) {
   const tbody = document.getElementById("bookingsTable");
   if (!list.length) { tbody.innerHTML = '<tr class="empty-row"><td colspan="9">No bookings found</td></tr>'; return; }
@@ -597,7 +619,7 @@ function renderBookingsTable(list) {
       <td>${b.phone||"—"}</td>
       <td style="max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${(b.pickup||"").split(",")[0]} → ${(b.drop||"").split(",")[0]}</td>
       <td>${b.date||"—"}</td>
-      <td>₹${(b.total||0).toLocaleString()} <small style="color:var(--text-muted)">${b.paymentType==="pay_later"?"(Pay Later)":b.source==="whatsapp"?"(WA)":b.paid?"(₹"+b.paid+" paid)":""}</small></td>
+      <td>₹${(b.total||0).toLocaleString("en-IN")} <small style="color:var(--text-muted)">${b.paymentType==="pay_later"?"(Pay Later)":b.source==="whatsapp"?"(WA)":b.paid?"(₹"+b.paid+" paid)":""}</small></td>
       <td>
         <select class="status-sel" onchange="updateStatus('${b.id}',this.value)">
           ${["pending","confirmed","assigned","packing","transit","delivered"].map(s=>`<option value="${s}"${b.status===s?" selected":""}>${cap(s)}</option>`).join("")}
@@ -625,7 +647,7 @@ function updateStatus(id, status) {
   });
 }
 
-/* EXPORT CSV */
+/* ── EXPORT CSV ── */
 function exportCSV() {
   const headers = ["ID","Customer","Phone","Pickup","Drop","Date","Total","Status","Driver"];
   const rows = allBookings.map(b => [
@@ -641,25 +663,36 @@ function exportCSV() {
   toast("📁 CSV downloaded!");
 }
 
-/* DRIVERS */
+/* ── DRIVERS LIST ── */
 function renderDrivers() {
   const el = document.getElementById("driversList");
-  if (!allDrivers.length) { el.innerHTML = '<div style="text-align:center;color:var(--text-muted);padding:40px;">No drivers found. Run setup-accounts.js to create driver accounts.</div>'; return; }
+  if (!allDrivers.length) {
+    el.innerHTML = '<div style="text-align:center;color:var(--text-muted);padding:40px;">No drivers yet. Create one using the form above.</div>';
+    return;
+  }
   el.innerHTML = allDrivers.map(d => `
     <div class="driver-card">
       <div class="driver-info">
         <div class="driver-avatar">${(d.name||"D").charAt(0)}</div>
         <div>
           <div class="driver-name">${d.name||"Driver"}</div>
-          <div class="driver-meta"><span class="online-dot ${d.isOnline?"on":"off"}"></span>${d.isOnline?"Online":"Offline"} &nbsp;·&nbsp; ${d.email}</div>
-          <div class="driver-meta" style="margin-top:3px">📞 ${d.phone||"—"} &nbsp;·&nbsp; Active job: <strong>${d.currentBooking?"#"+d.currentBooking.slice(-6).toUpperCase():"None"}</strong></div>
+          <div class="driver-meta">
+            <span class="online-dot ${d.isOnline?"on":"off"}"></span>${d.isOnline?"Online":"Offline"}
+            &nbsp;·&nbsp; ${d.email}
+            ${d.vehicle ? `&nbsp;·&nbsp; ${d.vehicle}` : ""}
+          </div>
+          <div class="driver-meta" style="margin-top:3px">
+            📞 ${d.phone||"—"}
+            &nbsp;·&nbsp; Active job: <strong>${d.currentBooking?"#"+d.currentBooking.slice(-6).toUpperCase():"None"}</strong>
+            ${d.rating ? `&nbsp;·&nbsp; ⭐ ${d.rating}` : ""}
+          </div>
         </div>
       </div>
       <span class="badge ${d.isOnline?"badge-delivered":"badge-pending"}">${d.isOnline?"🟢 Active":"⚫ Offline"}</span>
     </div>`).join("");
 }
 
-/* CUSTOMERS */
+/* ── CUSTOMERS ── */
 function renderCustomers() {
   const tbody = document.getElementById("customersTable");
   if (!allCustomers.length) { tbody.innerHTML = '<tr class="empty-row"><td colspan="6">No customers yet</td></tr>'; return; }
@@ -674,7 +707,7 @@ function renderCustomers() {
     </tr>`).join("");
 }
 
-/* REVIEWS */
+/* ── REVIEWS ── */
 function renderReviews() {
   const tbody = document.getElementById("reviewsTable");
   if (!allReviews.length) { tbody.innerHTML = '<tr class="empty-row"><td colspan="6">No reviews yet</td></tr>'; return; }
@@ -707,7 +740,7 @@ function deleteReview(id) {
   });
 }
 
-/* PROMOS */
+/* ── PROMOS ── */
 function createPromo() {
   requireAdmin(() => {
     const code  = document.getElementById("promoCode").value.trim().toUpperCase();
@@ -715,15 +748,21 @@ function createPromo() {
     const value = Number(document.getElementById("promoValue").value);
     const max   = Number(document.getElementById("promoMax").value) || 999;
     if (!code || !value) { toast("⚠️ Fill in code & value"); return; }
-    window._firebase.db.collection("promos").doc(code).set({ code, type, value, max, used: 0, active: true, createdAt: firebase.firestore.FieldValue.serverTimestamp() })
-      .then(() => { toast("✅ Promo created: " + code); document.getElementById("promoCode").value = ""; document.getElementById("promoValue").value = ""; })
-      .catch(e => toast("❌ " + e.message));
+    window._firebase.db.collection("promos").doc(code).set({
+      code, type, value, max, used: 0, active: true,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    }).then(() => {
+      toast("✅ Promo created: " + code);
+      document.getElementById("promoCode").value = "";
+      document.getElementById("promoValue").value = "";
+    }).catch(e => toast("❌ " + e.message));
   });
 }
 
 function togglePromo(id, active) {
   requireAdmin(() => {
-    window._firebase.db.collection("promos").doc(id).update({ active }).then(() => toast(active?"✅ Promo activated":"⏸ Promo paused"));
+    window._firebase.db.collection("promos").doc(id).update({ active })
+      .then(() => toast(active?"✅ Promo activated":"⏸ Promo paused"));
   });
 }
 function deletePromo(id) {
@@ -750,22 +789,21 @@ function renderPromos() {
     </tr>`).join("");
 }
 
-/* BROADCAST */
+/* ── BROADCAST ── */
 async function sendBroadcast() {
   requireAdmin(async () => {
-    const msg   = document.getElementById("broadcastMsg").value.trim();
-    const viaWA = document.getElementById("sendWA").checked;
+    const msg      = document.getElementById("broadcastMsg").value.trim();
+    const viaWA    = document.getElementById("sendWA").checked;
     const viaEmail = document.getElementById("sendEmail").checked;
     if (!msg) { toast("⚠️ Type a message first"); return; }
     const result = document.getElementById("broadcastResult");
     result.textContent = "⏳ Sending...";
-    if (viaWA) {
-      const encoded = encodeURIComponent(msg);
-      window.open(`https://wa.me/?text=${encoded}`, "_blank");
-    }
+    if (viaWA) { window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, "_blank"); }
     await window._firebase.db.collection("broadcasts").add({
-      message: msg, via: [viaWA?"WhatsApp":"", viaEmail?"Email":""].filter(Boolean).join(", "),
-      recipients: allCustomers.length, createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      message: msg,
+      via: [viaWA?"WhatsApp":"", viaEmail?"Email":""].filter(Boolean).join(", "),
+      recipients: allCustomers.length,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
     });
     result.textContent = `✅ Broadcast sent to ${allCustomers.length} customers!`;
     document.getElementById("broadcastMsg").value = "";
@@ -773,18 +811,23 @@ async function sendBroadcast() {
   });
 }
 
-/* ASSIGN MODAL */
+/* ── ASSIGN MODAL ── */
 function openAssignModal(id) {
   assigningId = id;
   const b = allBookings.find(x => x.id === id);
   if (!b) return;
-  document.getElementById("assignInfo").innerHTML = `<strong>Booking:</strong> #${id.slice(-6).toUpperCase()}<br><strong>Customer:</strong> ${b.customerName||"—"}<br><strong>Route:</strong> ${(b.pickup||"").split(",")[0]} → ${(b.drop||"").split(",")[0]}<br><strong>Date:</strong> ${b.date||"—"}`;
+  document.getElementById("assignInfo").innerHTML =
+    `<strong>Booking:</strong> #${id.slice(-6).toUpperCase()}<br>` +
+    `<strong>Customer:</strong> ${b.customerName||"—"}<br>` +
+    `<strong>Route:</strong> ${(b.pickup||"").split(",")[0]} → ${(b.drop||"").split(",")[0]}<br>` +
+    `<strong>Date:</strong> ${b.date||"—"}`;
   document.getElementById("assignModal").style.display = "flex";
 }
 function closeAssignModal() { document.getElementById("assignModal").style.display = "none"; assigningId = null; }
 function populateAssignSelect() {
   const sel = document.getElementById("assignSelect");
-  sel.innerHTML = '<option value="">-- Select a driver --</option>' + allDrivers.map(d => `<option value="${d.id}">${d.name||d.email}</option>`).join("");
+  sel.innerHTML = '<option value="">-- Select a driver --</option>' +
+    allDrivers.map(d => `<option value="${d.id}">${d.name||d.email}</option>`).join("");
 }
 function confirmAssign() {
   requireAdmin(() => {
@@ -792,26 +835,34 @@ function confirmAssign() {
     if (!driverUid) { toast("⚠️ Select a driver"); return; }
     const driver = allDrivers.find(d => d.id === driverUid);
     const db = window._firebase.db;
-    db.collection("bookings").doc(assigningId).update({ driverUid, driverName: driver?.name||"Driver", driverPhone: driver?.phone||"", status: "assigned" })
-      .then(() => db.collection("users").doc(driverUid).update({ currentBooking: assigningId }))
-      .then(() => { toast("✅ Driver assigned!"); closeAssignModal(); })
-      .catch(e => toast("❌ " + e.message));
+    db.collection("bookings").doc(assigningId).update({
+      driverUid, driverName: driver?.name||"Driver",
+      driverPhone: driver?.phone||"", status: "assigned"
+    })
+    .then(() => db.collection("users").doc(driverUid).update({ currentBooking: assigningId }))
+    .then(() => { toast("✅ Driver assigned!"); closeAssignModal(); })
+    .catch(e => toast("❌ " + e.message));
   });
 }
 
-/* NAV */
+/* ── NAV ── */
 function showSection(name, el) {
   document.querySelectorAll(".section").forEach(s => s.classList.remove("active"));
   document.querySelectorAll(".nav-item").forEach(n => n.classList.remove("active"));
   document.getElementById("section" + cap(name)).classList.add("active");
   if (el) el.classList.add("active");
-  const titles = { overview:"Overview", bookings:"Bookings", drivers:"Drivers", customers:"Customers", reviews:"Reviews", cancels:"Cancellations", claims:"Damage Claims", promos:"Promo Codes", broadcast:"Broadcast" };
+  const titles = {
+    overview:"Overview", bookings:"Bookings", drivers:"Drivers",
+    customers:"Customers", reviews:"Reviews", cancels:"Cancellations",
+    claims:"Damage Claims", promos:"Promo Codes", broadcast:"Broadcast"
+  };
   document.getElementById("sectionTitle").textContent = titles[name] || cap(name);
   if (name === "overview") renderCharts();
   if (name === "cancels")  loadCancelRequests();
   if (name === "claims")   loadDamageClaims();
 }
 
+/* ── DAMAGE CLAIMS ── */
 let currentClaimDocId = "";
 
 async function loadDamageClaims() {
@@ -825,14 +876,14 @@ async function loadDamageClaims() {
     const statusColor = { pending:"#d97706", investigating:"#2563eb", approved:"#16a34a", rejected:"#dc2626" };
     tbody.innerHTML = snap.docs.map(d => {
       const c = d.data();
-      const date = c.createdAt?.toDate?.().toLocaleDateString("en-IN") || "—";
+      const date   = c.createdAt?.toDate?.().toLocaleDateString("en-IN") || "—";
       const photos = c.photos?.length ? `<span style="color:#2563eb;cursor:pointer;font-weight:600" onclick="viewClaimPhotos('${d.id}')">${c.photos.length} photo(s)</span>` : "None";
       const col = statusColor[c.status] || "#64748b";
       return `<tr>
         <td style="font-family:monospace;font-size:.75rem">${d.id.slice(0,8).toUpperCase()}</td>
-        <td>${c.bookingDocId?.slice(0,8) || "—"}</td>
-        <td>${c.damageType || "—"}</td>
-        <td style="max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${c.description || "—"}</td>
+        <td>${c.bookingDocId?.slice(0,8)||"—"}</td>
+        <td>${c.damageType||"—"}</td>
+        <td style="max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${c.description||"—"}</td>
         <td>${photos}</td>
         <td>${date}</td>
         <td><span style="color:${col};font-weight:700;font-size:.78rem">${(c.status||"pending").toUpperCase()}</span></td>
@@ -847,12 +898,11 @@ async function openClaimDetail(docId) {
   const doc = await window._firebase.db.collection("damageClaims").doc(docId).get();
   if (!doc.exists) return;
   const c = doc.data();
-  const panel = document.getElementById("claimDetailPanel");
+  const panel   = document.getElementById("claimDetailPanel");
   const content = document.getElementById("claimDetailContent");
   const photoHtml = c.photos?.length
-    ? c.photos.map(p => `<img src="${p}" style="width:80px;height:80px;object-fit:cover;border-radius:8px;border:2px solid var(--border-light)">`).join("")
+    ? c.photos.map(p => `<img src="${p}" style="width:80px;height:80px;object-fit:cover;border-radius:8px;border:2px solid var(--border)">`).join("")
     : "<span style='color:var(--text-muted);font-size:.82rem'>No photos attached</span>";
-
   content.innerHTML = `
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem 1.2rem;margin-bottom:1rem;font-size:.85rem">
       <div><span style="color:var(--text-muted)">Claim ID:</span> <strong>${docId.slice(0,8).toUpperCase()}</strong></div>
@@ -860,10 +910,9 @@ async function openClaimDetail(docId) {
       <div><span style="color:var(--text-muted)">Type:</span> <strong>${c.damageType||"—"}</strong></div>
       <div><span style="color:var(--text-muted)">Status:</span> <strong style="color:#7c3aed">${(c.status||"pending").toUpperCase()}</strong></div>
     </div>
-    <div style="font-size:.85rem;color:var(--text-secondary);margin-bottom:.9rem;background:var(--bg-secondary);padding:.7rem;border-radius:10px"><strong>Description:</strong><br>${c.description||"—"}</div>
+    <div style="font-size:.85rem;color:var(--text-muted);margin-bottom:.9rem;background:var(--surface2);padding:.7rem;border-radius:10px"><strong>Description:</strong><br>${c.description||"—"}</div>
     ${c.adminResponse ? `<div style="font-size:.82rem;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:.6rem;margin-bottom:.8rem;color:#166534"><strong>Previous response:</strong> ${c.adminResponse}</div>` : ""}
-    <div style="display:flex;gap:6px;flex-wrap:wrap">${photoHtml}</div>
-  `;
+    <div style="display:flex;gap:6px;flex-wrap:wrap">${photoHtml}</div>`;
   panel.style.display = "block";
   panel.scrollIntoView({ behavior:"smooth", block:"start" });
 }
@@ -874,8 +923,7 @@ async function resolveDamageClaim(newStatus) {
   if (!response) { alert("Please enter an admin response before resolving."); return; }
   try {
     await window._firebase.db.collection("damageClaims").doc(currentClaimDocId).update({
-      status: newStatus,
-      adminResponse: response,
+      status: newStatus, adminResponse: response,
       resolvedAt: firebase.firestore.FieldValue.serverTimestamp(),
       resolvedBy: firebase.auth().currentUser?.uid || "admin"
     });
@@ -884,6 +932,8 @@ async function resolveDamageClaim(newStatus) {
     loadDamageClaims();
   } catch(e) { alert("Error: " + e.message); }
 }
+
+/* ── CANCELLATIONS ── */
 async function loadCancelRequests() {
   const tbody = document.getElementById("cancelsTable");
   if (!tbody || !window._firebase) return;
@@ -910,10 +960,95 @@ async function loadCancelRequests() {
 async function resolveCancelRequest(docId) {
   if (!window._firebase) return;
   await window._firebase.db.collection("cancelRequests").doc(docId).update({ resolved: true });
+  toast("✅ Marked as resolved");
   loadCancelRequests();
 }
 
+/* ── UTILS ── */
 function cap(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : ""; }
+
+/* ================================================================
+   ✅ FIX: adminCreateDriver()
+   Creates a driver account using a secondary Firebase app instance
+   so the admin session is NOT disturbed.
+   ================================================================ */
+async function adminCreateDriver() {
+  const name     = (document.getElementById("newDriverName")     || {}).value || "";
+  const email    = (document.getElementById("newDriverEmail")    || {}).value || "";
+  const phone    = (document.getElementById("newDriverPhone")    || {}).value || "";
+  const vehicle  = (document.getElementById("newDriverVehicle")  || {}).value || "";
+  const password = (document.getElementById("newDriverPassword") || {}).value || "";
+  const msgEl    = document.getElementById("adminDriverMsg");
+
+  const setMsg = (text, ok) => {
+    if (!msgEl) return;
+    msgEl.textContent = text;
+    msgEl.style.color = ok ? "#16a34a" : "#e53e3e";
+  };
+
+  if (!name.trim())
+    return setMsg("⚠️ Please enter the driver's full name.", false);
+  if (!email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim()))
+    return setMsg("⚠️ Please enter a valid email address.", false);
+  if (phone.trim() && phone.trim().length !== 10)
+    return setMsg("⚠️ Phone must be 10 digits (or leave it blank).", false);
+  if (password.length < 6)
+    return setMsg("⚠️ Password must be at least 6 characters.", false);
+
+  setMsg("⏳ Creating driver account...", true);
+
+  // Disable button during creation
+  const btn = document.querySelector('[onclick="adminCreateDriver()"]');
+  if (btn) { btn.disabled = true; btn.textContent = "Creating..."; }
+
+  try {
+    const { db } = window._firebase;
+
+    // ── Use a secondary Firebase app so admin stays logged in ──
+    const secondaryApp  = firebase.initializeApp(firebase.app().options, "adminDriver_" + Date.now());
+    const secondaryAuth = secondaryApp.auth();
+
+    const cred      = await secondaryAuth.createUserWithEmailAndPassword(email.trim(), password);
+    const driverUid = cred.user.uid;
+
+    await secondaryAuth.signOut();
+    await secondaryApp.delete();
+
+    // Save driver profile to Firestore
+    await db.collection("users").doc(driverUid).set({
+      name:       name.trim(),
+      email:      email.trim(),
+      phone:      phone.trim() ? "+91" + phone.trim() : "",
+      vehicle:    vehicle || "",
+      role:       "driver",
+      isOnline:   false,
+      rating:     0,
+      totalMoves: 0,
+      createdBy:  adminUser ? adminUser.uid : "admin",
+      createdAt:  firebase.firestore.FieldValue.serverTimestamp()
+    });
+
+    setMsg('✅ Driver "' + name.trim() + '" created! They can now log in at driver.html', true);
+    toast("✅ Driver account created for " + name.trim());
+
+    // Clear form fields
+    ["newDriverName","newDriverEmail","newDriverPhone","newDriverVehicle","newDriverPassword"]
+      .forEach(id => { const el = document.getElementById(id); if (el) el.value = ""; });
+
+    // Refresh the drivers list
+    loadDrivers();
+
+  } catch (err) {
+    console.error("Driver creation error:", err);
+    if      (err.code === "auth/email-already-in-use") setMsg("⚠️ A driver with this email already exists.", false);
+    else if (err.code === "auth/invalid-email")        setMsg("⚠️ Invalid email address format.", false);
+    else if (err.code === "auth/weak-password")        setMsg("⚠️ Password is too weak. Use at least 6 characters.", false);
+    else setMsg("⚠️ " + (err.message || "Failed to create driver."), false);
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = "✅ Create Driver Account"; }
+  }
+}
+
 </script>
 </body>
 </html>
