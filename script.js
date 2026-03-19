@@ -471,7 +471,6 @@ let resetConfirmation = null;
 let resetNewPassword = null;
 
 async function sendResetOTP() {
-
   const phone = document.getElementById("resetPhone").value.trim();
   const password = document.getElementById("resetNewPassword").value;
 
@@ -479,7 +478,6 @@ async function sendResetOTP() {
     alert("Enter valid phone number");
     return;
   }
-
   if (password.length < 6) {
     alert("Password must be at least 6 characters");
     return;
@@ -487,30 +485,37 @@ async function sendResetOTP() {
 
   const fullPhone = "+91" + phone;
 
-  const recaptcha = new firebase.auth.RecaptchaVerifier(
-    'recaptcha-reset',
-    { size: 'invisible' }
-  );
+  // ✅ FIX: Clear old verifier properly without touching innerHTML
+  if (window.resetRecaptchaVerifier) {
+    try { window.resetRecaptchaVerifier.clear(); } catch(e) {}
+    window.resetRecaptchaVerifier = null;
+  }
 
   try {
+    // ✅ Use auth modal container instead of a div inside the panel
+    window.resetRecaptchaVerifier = new firebase.auth.RecaptchaVerifier(
+      "authModal",   // ← render on the modal overlay div, not a small inner div
+      { size: "invisible", callback: () => {} }
+    );
+
+    await window.resetRecaptchaVerifier.render();
 
     resetConfirmation = await firebase.auth().signInWithPhoneNumber(
       fullPhone,
-      recaptcha
+      window.resetRecaptchaVerifier
     );
 
     resetNewPassword = password;
-
     switchPanel("panelResetOTP");
 
   } catch (err) {
-
+    if (window.resetRecaptchaVerifier) {
+      try { window.resetRecaptchaVerifier.clear(); } catch(e) {}
+      window.resetRecaptchaVerifier = null;
+    }
     alert("OTP failed: " + err.message);
-
   }
-
 }
-
 async function verifyResetOTP() {
 
   const otp = document.getElementById("resetOTP").value;
