@@ -210,13 +210,13 @@ body.dark-mode .navbar { background: #06101f; }
   position: relative; min-height: 100vh;
   display: flex; align-items: center;
   padding: 90px 2.5rem 5rem;
-  overflow: hidden; color: #0f172a;
+  overflow: hidden; color: white;
   background: url('https://raw.githubusercontent.com/azharahmedm786-sketch/moving-quote/main/images/hero-bg.jpg') center/cover no-repeat;
 }
 .hero::before {
   content: '';
   position: absolute; inset: 0;
-  background: linear-gradient(150deg, rgba(255,255,255,0.92) 0%, rgba(240,245,255,0.88) 50%, rgba(255,255,255,0.92) 100%);
+  background: linear-gradient(150deg, rgba(6,14,36,0.40) 0%, rgba(12,27,58,0.30) 50%, rgba(15,37,84,0.40) 100%);
   z-index: 0;
 }
 /* Diagonal white slice at bottom */
@@ -243,8 +243,8 @@ body.dark-mode .navbar { background: #06101f; }
 
 .hero-badge {
   display: inline-flex; align-items: center; gap: 0.5rem;
-  background: rgba(26,86,219,0.10); border: 1px solid rgba(26,86,219,0.30);
-  color: #1e40af; padding: 0.5rem 1.2rem;
+  background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.40);
+  color: white; padding: 0.5rem 1.2rem;
   border-radius: var(--radius-pill); font-size: 0.78rem; font-weight: 700;
   margin-bottom: 1.5rem; letter-spacing: 0.5px; backdrop-filter: blur(8px);
   text-transform: uppercase;
@@ -254,15 +254,15 @@ body.dark-mode .navbar { background: #06101f; }
   font-family: 'Syne', sans-serif;
   font-size: clamp(2.4rem, 6vw, 4.2rem);
   font-weight: 800; line-height: 1.05;
-  margin-bottom: 1.25rem; letter-spacing: -0.03em; color: #0f172a;
+  margin-bottom: 1.25rem; letter-spacing: -0.03em; color: white;
 }
 .hero-accent {
-  background: linear-gradient(120deg, #1e40af 0%, #2563eb 50%, #ea580c 100%);
+  background: linear-gradient(120deg, #fed7aa 0%, #fb923c 45%, #ea580c 100%);
   -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
 }
 .hero-sub {
   font-size: clamp(0.95rem, 2vw, 1.1rem);
-  color: #334155; margin-bottom: 2rem;
+  color: rgba(255,255,255,0.90); margin-bottom: 2rem;
   line-height: 1.7; max-width: 520px;
 }
 
@@ -282,20 +282,20 @@ body.dark-mode .navbar { background: #06101f; }
 }
 .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 16px 40px rgba(234,88,12,0.50); }
 .btn-ghost {
-  border: 2px solid #1e40af; color: #1e40af;
+  border: 2px solid rgba(255,255,255,0.7); color: white;
   padding: 0.9rem 1.75rem; border-radius: var(--radius-pill);
   text-decoration: none; font-weight: 600; font-size: 0.95rem;
-  transition: all 0.3s; background: rgba(30,64,175,0.06);
+  transition: all 0.3s; background: rgba(255,255,255,0.10);
   backdrop-filter: blur(8px); white-space: nowrap;
   display: inline-flex; align-items: center; justify-content: center;
   width: auto; flex: 0 0 auto; line-height: 1.4;
 }
-.btn-ghost:hover { background: #1e40af; color: white; border-color: #1e40af; }
+.btn-ghost:hover { background: rgba(255,255,255,0.25); color: white; border-color: white; }
 
 .hero-trust { display: flex; gap: 1.75rem; flex-wrap: wrap; }
 .hero-trust span {
   display: flex; align-items: center; gap: 0.35rem;
-  font-size: 0.82rem; color: #475569; font-weight: 600;
+  font-size: 0.82rem; color: rgba(255,255,255,0.85); font-weight: 600;
 }
 
 /* Float Cards */
