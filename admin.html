@@ -679,7 +679,10 @@ function renderBookingsTable(list) {
         </select>
       </td>
       <td>${b.driverName||'<span style="color:var(--text-muted);font-size:.78rem">Unassigned</span>'}</td>
-      <td><button class="btn-sm btn-assign" onclick="openAssignModal('${b.id}')">🚚 Assign</button></td>
+      <td style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
+        <button class="btn-sm btn-assign" onclick="openAssignModal('${b.id}')">🚚 Assign</button>
+        <button class="btn-sm" style="background:rgba(220,38,38,.1);color:#dc2626;" onclick="deleteBooking('${b.id}','${b.bookingRef||b.id.slice(-6).toUpperCase()}')">🗑 Delete</button>
+      </td>
     </tr>`).join("");
 }
 
@@ -696,6 +699,16 @@ function updateStatus(id, status) {
   requireAdmin(() => {
     window._firebase.db.collection("bookings").doc(id).update({ status })
       .then(() => toast("✅ Status → " + cap(status)))
+      .catch(e => toast("❌ " + e.message));
+  });
+}
+
+/* ── DELETE BOOKING ── */
+function deleteBooking(id, ref) {
+  requireAdmin(() => {
+    if (!confirm(`⚠️ Permanently delete booking #${ref}?\n\nThis cannot be undone.`)) return;
+    window._firebase.db.collection("bookings").doc(id).delete()
+      .then(() => toast("🗑️ Booking #" + ref + " deleted"))
       .catch(e => toast("❌ " + e.message));
   });
 }
