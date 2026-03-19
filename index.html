@@ -929,107 +929,122 @@ alt="PackZen Packers and Movers Bangalore">
 <!-- ======================== MODALS ======================== -->
 
 <!-- AUTH MODAL -->
-<div id="authModal" class="modal-overlay" role="dialog" aria-modal="true" aria-label="Login or Sign up" style="display:none;">
+<!-- AUTH MODAL -->
+<div id="authModal" class="modal-overlay" role="dialog" aria-modal="true" style="display:none;">
   <div class="modal-box auth-modal-box">
+
+    <!-- LOGIN PANEL -->
     <div class="auth-panel" id="panelLogin">
+
       <button class="modal-x" onclick="closeAuthModal()">✕</button>
+
       <div class="auth-logo">📦 PackZen</div>
       <h2 class="auth-title">Welcome Back</h2>
-      <p class="auth-sub">Login to view your bookings &amp; quotes</p>
-      <label class="field-label">Email Address</label>
+      <p class="auth-sub">Login to view your bookings & track moves</p>
+
+      <label>Email Address</label>
       <input id="loginEmail" type="email" placeholder="your@email.com" class="field-input">
-      <label class="field-label">Password</label>
+
+      <label>Password</label>
       <input id="loginPassword" type="password" placeholder="Enter password" class="field-input">
+
       <div id="loginError" class="auth-error"></div>
-      <button class="btn-auth" onclick="loginUser()">Login →</button>
+
+      <button class="btn-auth" onclick="loginUser()">Login</button>
+
       <div class="auth-divider"><span>or</span></div>
-      <button class="btn-auth-outline" onclick="switchPanel('panelSignup')">Create New Account</button>
-      <p class="auth-link" onclick="switchPanel('panelRecover')">Forgot password? Recover Account</p>
-      <div class="auth-panel" id="panelRecover" style="display:none;">
 
-<h2 class="auth-title">Reset Password</h2>
+      <button class="btn-auth-outline" onclick="switchPanel('panelSignup')">
+        Create New Account
+      </button>
 
-<label>Phone Number</label>
-<div class="phone-row">
-<span class="phone-prefix">+91</span>
-<input id="resetPhone" type="tel" placeholder="10 digit mobile" maxlength="10">
-</div>
+      <p class="auth-link" onclick="switchPanel('panelRecover')">
+        Forgot password? Recover Account
+      </p>
 
-<label>New Password</label>
-<input id="resetNewPassword" type="password" placeholder="New password">
-
-<button class="btn-auth" onclick="sendResetOTP()">Send OTP</button>
-
-<div id="recaptcha-reset"></div>
-
-      </div>
-        <div class="auth-panel" id="panelResetOTP" style="display:none;">
-      
-<h2 class="auth-title">Verify OTP</h2>
-
-<input id="resetOTP" type="text" placeholder="Enter 6 digit OTP" class="field-input">
-
-<button class="btn-auth" onclick="verifyResetOTP()">Verify OTP & Reset Password</button>
-
-</div>
-        
-
-</div>
     </div>
-    <div class="auth-panel" id="panelSignup" style="display:none;">
+
+
+    <!-- PASSWORD RESET PANEL -->
+    <div class="auth-panel" id="panelRecover" style="display:none;">
+
       <button class="modal-x" onclick="closeAuthModal()">✕</button>
-      <div class="auth-logo">📦 PackZen</div>
-      <h2 class="auth-title">Create Account</h2>
-      <p class="auth-sub">Sign up to save quotes &amp; track bookings</p>
-      <label class="field-label">Full Name</label>
-      <input id="signupName" type="text" placeholder="Your full name" class="field-input">
-      <label class="field-label">Email Address</label>
-      <input id="signupEmail" type="email" placeholder="your@email.com" class="field-input">
-      <label class="field-label">Phone Number</label>
+
+      <h2 class="auth-title">Reset Password</h2>
+
+      <label>Phone Number</label>
       <div class="phone-row">
         <span class="phone-prefix">+91</span>
-        <input id="signupPhone" type="tel" placeholder="10-digit mobile" class="field-input phone-input" maxlength="10">
+        <input id="resetPhone" type="tel" placeholder="10 digit mobile" maxlength="10">
       </div>
-      <label class="field-label">Password</label>
+
+      <label>New Password</label>
+      <input id="resetNewPassword" type="password" placeholder="New password">
+
+      <button class="btn-auth" onclick="sendResetOTP()">Send OTP</button>
+
+      <div id="recaptcha-reset"></div>
+
+      <p class="auth-link" onclick="switchPanel('panelLogin')">
+        Back to login
+      </p>
+
+    </div>
+
+
+    <!-- OTP VERIFY PANEL -->
+    <div class="auth-panel" id="panelResetOTP" style="display:none;">
+
+      <button class="modal-x" onclick="closeAuthModal()">✕</button>
+
+      <h2 class="auth-title">Verify OTP</h2>
+
+      <input id="resetOTP" type="text" placeholder="Enter 6 digit OTP" class="field-input">
+
+      <button class="btn-auth" onclick="verifyResetOTP()">
+        Verify OTP & Reset Password
+      </button>
+
+    </div>
+
+
+    <!-- SIGNUP PANEL -->
+    <div class="auth-panel" id="panelSignup" style="display:none;">
+
+      <button class="modal-x" onclick="closeAuthModal()">✕</button>
+
+      <div class="auth-logo">📦 PackZen</div>
+      <h2 class="auth-title">Create Account</h2>
+
+      <label>Full Name</label>
+      <input id="signupName" type="text" placeholder="Your full name" class="field-input">
+
+      <label>Email</label>
+      <input id="signupEmail" type="email" placeholder="your@email.com" class="field-input">
+
+      <label>Phone Number</label>
+      <div class="phone-row">
+        <span class="phone-prefix">+91</span>
+        <input id="signupPhone" type="tel" placeholder="10 digit mobile" maxlength="10">
+      </div>
+
+      <label>Password</label>
       <input id="signupPassword" type="password" placeholder="Min 6 characters" class="field-input">
-      <label class="field-label">Referral Code (optional)</label>
-      <input id="signupReferral" type="text" placeholder="Friend's referral code" class="field-input" style="text-transform:uppercase">
-    <div id="panelSignup">
-   ...
-   <div id="recaptcha-container"></div>
-</div>
+
+      <div id="recaptcha-container"></div>
+
       <div id="signupError" class="auth-error"></div>
-      <button class="btn-auth" onclick="signupUser()">Send OTP &amp; Register →</button>
-      <p class="auth-link" onclick="switchPanel('panelLogin')">Already have an account? Login</p>
+
+      <button class="btn-auth" onclick="signupUser()">
+        Send OTP & Register
+      </button>
+
+      <p class="auth-link" onclick="switchPanel('panelLogin')">
+        Already have an account? Login
+      </p>
+
     </div>
-    <div class="auth-panel" id="panelOTP" style="display:none;">
-      <button class="modal-x" onclick="closeAuthModal()">✕</button>
-      <div class="auth-logo">📱</div>
-      <h2 class="auth-title">Verify Your Phone</h2>
-      <p class="auth-sub" id="otpSubText">Enter the 6-digit OTP sent to your number</p>
-      <div class="otp-boxes">
-        <input class="otp-box" type="tel" maxlength="1" oninput="otpInput(this,0)">
-        <input class="otp-box" type="tel" maxlength="1" oninput="otpInput(this,1)">
-        <input class="otp-box" type="tel" maxlength="1" oninput="otpInput(this,2)">
-        <input class="otp-box" type="tel" maxlength="1" oninput="otpInput(this,3)">
-        <input class="otp-box" type="tel" maxlength="1" oninput="otpInput(this,4)">
-        <input class="otp-box" type="tel" maxlength="1" oninput="otpInput(this,5)">
-      </div>
-      <div id="otpError" class="auth-error"></div>
-      <button class="btn-auth" onclick="verifyOTP()">Verify OTP →</button>
-      <p class="auth-link" onclick="resendOTP()">Resend OTP</p>
-    </div>
-    <div class="auth-panel" id="panelRecover" style="display:none;">
-      <button class="modal-x" onclick="closeAuthModal()">✕</button>
-      <div class="auth-logo">🔑</div>
-      <h2 class="auth-title">Recover Account</h2>
-      <p class="auth-sub">Enter your registered email. We'll send a password reset link.</p>
-      <label class="field-label">Email Address</label>
-      <input id="recoverEmail" type="email" placeholder="your@email.com" class="field-input">
-      <div id="recoverMsg" class="auth-error"></div>
-      <button class="btn-auth" onclick="recoverAccount()">Send Reset Link →</button>
-      <p class="auth-link" onclick="switchPanel('panelLogin')">← Back to Login</p>
-    </div>
+
   </div>
 </div>
 
