@@ -287,7 +287,7 @@ function openAuthModal(panel = "login") {
 }
 function closeAuthModal() { document.getElementById("authModal").style.display = "none"; clearAuthErrors(); }
 function switchPanel(id) {
-  ["panelLogin","panelSignup","panelOTP","panelRecover"].forEach(p => {
+["panelLogin","panelSignup","panelOTP","panelRecover","panelResetOTP"].forEach(p => {
     const el = document.getElementById(p);
     if (el) el.style.display = p === id ? "block" : "none";
   });
