@@ -1,5 +1,5 @@
 /* ============================================
-   PACKZEN — BOLD PROFESSIONAL REDESIGN v5.0 
+   PACKZEN — BOLD PROFESSIONAL REDESIGN v5.0
    Deep Navy Command + Electric Orange Fire
    Premium Logistics Brand Identity
    ============================================ */
@@ -210,28 +210,29 @@ body.dark-mode .navbar { background: #06101f; }
   position: relative; min-height: 100vh;
   display: flex; align-items: center;
   padding: 90px 2.5rem 5rem;
-  overflow: hidden; color: white;
+  overflow: hidden; color: #0f172a;
   background: url('https://raw.githubusercontent.com/azharahmedm786-sketch/moving-quote/main/images/hero-bg.jpg') center/cover no-repeat;
 }
 .hero::before {
   content: '';
   position: absolute; inset: 0;
-  background: linear-gradient(150deg, rgba(4,10,26,0.92) 0%, rgba(8,20,48,0.88) 50%, rgba(10,28,64,0.92) 100%);
+  background: linear-gradient(150deg, rgba(255,255,255,0.92) 0%, rgba(240,245,255,0.88) 50%, rgba(255,255,255,0.92) 100%);
   z-index: 0;
 }
-/* Diagonal orange slice at bottom */
+/* Diagonal white slice at bottom */
 .hero::after {
   content: '';
   position: absolute; bottom: -2px; left: 0; right: 0; height: 80px;
   background: white;
   clip-path: polygon(0 100%, 100% 0, 100% 100%);
+  -webkit-clip-path: polygon(0 100%, 100% 0, 100% 100%);
   z-index: 2;
 }
 
 .blob { position: absolute; border-radius: 50%; filter: blur(100px); z-index: 1; will-change: transform; pointer-events: none; }
-.blob-1 { width: 700px; height: 700px; background: rgba(26,86,219,0.18); top: -250px; right: -200px; animation: blobFloat 14s ease-in-out infinite; }
-.blob-2 { width: 450px; height: 450px; background: rgba(234,88,12,0.10); bottom: -80px; right: 10%; animation: blobFloat 11s ease-in-out infinite reverse; }
-.blob-3 { width: 320px; height: 320px; background: rgba(12,27,58,0.35); top: 25%; left: -80px; animation: blobFloat 17s ease-in-out infinite 4s; }
+.blob-1 { width: 700px; height: 700px; background: rgba(26,86,219,0.06); top: -250px; right: -200px; animation: blobFloat 14s ease-in-out infinite; }
+.blob-2 { width: 450px; height: 450px; background: rgba(234,88,12,0.04); bottom: -80px; right: 10%; animation: blobFloat 11s ease-in-out infinite reverse; }
+.blob-3 { width: 320px; height: 320px; background: rgba(12,27,58,0.04); top: 25%; left: -80px; animation: blobFloat 17s ease-in-out infinite 4s; }
 @keyframes blobFloat {
   0%,100% { transform: translate(0,0) scale(1); }
   33%      { transform: translate(30px,-22px) scale(1.05); }
@@ -242,8 +243,8 @@ body.dark-mode .navbar { background: #06101f; }
 
 .hero-badge {
   display: inline-flex; align-items: center; gap: 0.5rem;
-  background: rgba(249,115,22,0.15); border: 1px solid rgba(249,115,22,0.45);
-  color: #fed7aa; padding: 0.5rem 1.2rem;
+  background: rgba(26,86,219,0.10); border: 1px solid rgba(26,86,219,0.30);
+  color: #1e40af; padding: 0.5rem 1.2rem;
   border-radius: var(--radius-pill); font-size: 0.78rem; font-weight: 700;
   margin-bottom: 1.5rem; letter-spacing: 0.5px; backdrop-filter: blur(8px);
   text-transform: uppercase;
@@ -253,15 +254,15 @@ body.dark-mode .navbar { background: #06101f; }
   font-family: 'Syne', sans-serif;
   font-size: clamp(2.4rem, 6vw, 4.2rem);
   font-weight: 800; line-height: 1.05;
-  margin-bottom: 1.25rem; letter-spacing: -0.03em; color: white;
+  margin-bottom: 1.25rem; letter-spacing: -0.03em; color: #0f172a;
 }
 .hero-accent {
-  background: linear-gradient(120deg, #fed7aa 0%, #fb923c 45%, #ea580c 100%);
+  background: linear-gradient(120deg, #1e40af 0%, #2563eb 50%, #ea580c 100%);
   -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
 }
 .hero-sub {
   font-size: clamp(0.95rem, 2vw, 1.1rem);
-  color: rgba(255,255,255,0.72); margin-bottom: 2rem;
+  color: #334155; margin-bottom: 2rem;
   line-height: 1.7; max-width: 520px;
 }
 
@@ -281,20 +282,20 @@ body.dark-mode .navbar { background: #06101f; }
 }
 .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 16px 40px rgba(234,88,12,0.50); }
 .btn-ghost {
-  border: 2px solid rgba(255,255,255,0.32); color: white;
+  border: 2px solid #1e40af; color: #1e40af;
   padding: 0.9rem 1.75rem; border-radius: var(--radius-pill);
   text-decoration: none; font-weight: 600; font-size: 0.95rem;
-  transition: all 0.3s; background: rgba(255,255,255,0.06);
+  transition: all 0.3s; background: rgba(30,64,175,0.06);
   backdrop-filter: blur(8px); white-space: nowrap;
   display: inline-flex; align-items: center; justify-content: center;
   width: auto; flex: 0 0 auto; line-height: 1.4;
 }
-.btn-ghost:hover { background: rgba(255,255,255,0.14); border-color: rgba(255,255,255,0.55); }
+.btn-ghost:hover { background: #1e40af; color: white; border-color: #1e40af; }
 
 .hero-trust { display: flex; gap: 1.75rem; flex-wrap: wrap; }
 .hero-trust span {
   display: flex; align-items: center; gap: 0.35rem;
-  font-size: 0.82rem; color: rgba(255,255,255,0.70); font-weight: 500;
+  font-size: 0.82rem; color: #475569; font-weight: 600;
 }
 
 /* Float Cards */
@@ -424,28 +425,11 @@ body.dark-mode .stats-bar { background: var(--bg-secondary); }
 }
 .service-card {
   background: white; border-radius: var(--radius-xl);
-  padding: 0; box-shadow: var(--shadow-md);
+  padding: 2.25rem 1.75rem; box-shadow: var(--shadow-md);
   transition: all 0.35s cubic-bezier(0.34,1.2,0.64,1);
   border: 1px solid var(--border-light); position: relative; overflow: hidden;
   border-top: 3px solid transparent;
-  display: flex; flex-direction: column;
 }
-.service-card img {
-  width: 100%;
-  height: 200px;
-  object-fit: cover;
-  display: block;
-  border-radius: 0;
-  flex-shrink: 0;
-}
-.service-card .sc-icon,
-.service-card h3,
-.service-card p,
-.service-card .sc-badge {
-  padding-left: 1.75rem;
-  padding-right: 1.75rem;
-}
-.service-card .sc-icon { padding-top: 1.25rem; }
 body.dark-mode .service-card { background: var(--bg-secondary); }
 .service-card::before {
   content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
@@ -465,12 +449,12 @@ body.dark-mode .service-card { background: var(--bg-secondary); }
 .service-card:hover::after { bottom: -20px; right: -20px; }
 .sc-icon { font-size: 2.8rem; margin-bottom: 1.1rem; display: block; }
 .service-card h3 { font-size: 1.15rem; margin-bottom: 0.65rem; color: var(--text-primary); }
-.service-card p { color: var(--text-muted); font-size: 0.88rem; line-height: 1.65; padding-bottom: 1.5rem; }
+.service-card p { color: var(--text-muted); font-size: 0.88rem; line-height: 1.65; }
 .sc-badge {
   display: inline-block; background: var(--gold-gradient);
   color: white; padding: 0.25rem 0.9rem;
   border-radius: var(--radius-pill); font-size: 0.65rem; font-weight: 800;
-  margin-top: 1rem; margin-bottom: 1.5rem; text-transform: uppercase; letter-spacing: 0.7px;
+  margin-top: 1rem; text-transform: uppercase; letter-spacing: 0.7px;
   box-shadow: 0 4px 12px rgba(234,88,12,0.30);
 }
 
@@ -593,7 +577,7 @@ body.dark-mode .why-section { background: var(--bg-primary); }
 
 /* Process section */
 .process-section { padding: var(--space-3xl) var(--space-lg); background: var(--primary-gradient); position: relative; overflow: hidden; }
-.process-section::before { content: ''; position: absolute; inset: 0; background: url('https://raw.githubusercontent.com/azharahmedm786-sketch/moving-quote/main/images/services-bg.jpg') center/cover no-repeat; opacity: 0.25; }
+.process-section::before { content: ''; position: absolute; inset: 0; background: url('https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=1400&q=60&auto=format&fit=crop') center/cover no-repeat; opacity: 0.04; }
 .process-section .section-header h2 { color: white; }
 .process-section .section-header p  { color: rgba(255,255,255,0.7); }
 .process-steps { display: grid; grid-template-columns: repeat(4,1fr); gap: 1.5rem; max-width: 1100px; margin: 0 auto; position: relative; z-index: 1; }
@@ -1312,20 +1296,6 @@ body.dark-mode .why-section { background: var(--bg-primary); }
 .reveal-stagger.visible .service-card:nth-child(2), .reveal-stagger.visible .review-card:nth-child(2), .reveal-stagger.visible .why-card:nth-child(2) { opacity: 1; transform: none; transition-delay: 0.15s; }
 .reveal-stagger.visible .service-card:nth-child(3), .reveal-stagger.visible .review-card:nth-child(3), .reveal-stagger.visible .why-card:nth-child(3) { opacity: 1; transform: none; transition-delay: 0.25s; }
 .reveal-stagger.visible .service-card:nth-child(4), .reveal-stagger.visible .review-card:nth-child(4), .reveal-stagger.visible .why-card:nth-child(4) { opacity: 1; transform: none; transition-delay: 0.35s; }
-
-/* ✅ FALLBACK — always show cards even if JS scroll observer doesn't fire */
-@media (max-width: 9999px) {
-  .reveal-stagger .service-card,
-  .reveal-stagger .review-card,
-  .reveal-stagger .why-card {
-    opacity: 1 !important;
-    transform: none !important;
-  }
-  .reveal {
-    opacity: 1 !important;
-    transform: none !important;
-  }
-}
 
 /* ============================================
    RESPONSIVE
