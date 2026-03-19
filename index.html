@@ -103,12 +103,12 @@
   <!-- New sections styles -->
   <style>
     /* HERO UPDATES */
-    .hero-desc { font-size:.9rem; color:#475569; line-height:1.7; margin:10px 0 14px; max-width:480px; }
+    .hero-desc { font-size:.9rem; color:rgba(255,255,255,0.90); line-height:1.7; margin:10px 0 14px; max-width:480px; }
     .hero-checklist { display:flex; flex-direction:column; gap:6px; margin-bottom:16px; }
-    .hero-checklist span { font-size:.85rem; color:#475569; }
-    .hero-cta-text { font-size:.88rem; color:#475569; margin-bottom:16px; }
-    .btn-wa-hero { background:rgba(37,211,102,0.12) !important; border-color:rgba(37,211,102,0.4) !important; color:#16a34a !important; }
-    .btn-wa-hero:hover { background:rgba(37,211,102,0.22) !important; }
+    .hero-checklist span { font-size:.85rem; color:rgba(255,255,255,0.85); }
+    .hero-cta-text { font-size:.88rem; color:rgba(255,255,255,0.80); margin-bottom:16px; }
+    .btn-wa-hero { background:rgba(37,211,102,0.15) !important; border-color:rgba(37,211,102,0.4) !important; color:#25d366 !important; }
+    .btn-wa-hero:hover { background:rgba(37,211,102,0.25) !important; }
 
     /* TRUST SIGNALS BAR */
     .trust-signals-section { padding: 24px 20px; background: rgba(59,130,246,0.06); border-top: 1px solid rgba(59,130,246,0.15); border-bottom: 1px solid rgba(59,130,246,0.15); }
@@ -1336,12 +1336,22 @@ alt="PackZen Packers and Movers Bangalore">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
 <script src="script.js"></script>
 <script>
+  // ✅ Fix NaN in stats — override animateCounter before script.js runs it
+  // Stats are hardcoded so we just make sure they stay correct
+  document.addEventListener('DOMContentLoaded', function() {
+    var statValues = ['100', '2026', '100', '0'];
+    var statNumbers = document.querySelectorAll('.stat-number');
+    statNumbers.forEach(function(el, i) {
+      el.removeAttribute('data-target');
+      el.removeAttribute('data-animated');
+      if (statValues[i] !== undefined) el.textContent = statValues[i];
+    });
+  });
+
+  // ✅ Google Maps loader
   function loadGoogleMaps() {
-    if (!window.ENV || !window.ENV.GOOGLE_MAPS_KEY) {
-      console.error('Google Maps key not configured.');
-      return;
-    }
-    const s = document.createElement('script');
+    if (!window.ENV || !window.ENV.GOOGLE_MAPS_KEY) return;
+    var s = document.createElement('script');
     s.src = 'https://maps.googleapis.com/maps/api/js?key=' + window.ENV.GOOGLE_MAPS_KEY + '&libraries=places&callback=initAutocomplete';
     s.async = true; s.defer = true;
     document.head.appendChild(s);
