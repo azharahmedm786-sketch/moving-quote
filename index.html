@@ -9,7 +9,7 @@
   <title>Affordable Packers &amp; Movers Bangalore | Zero Damage | Live Tracking | PackZen</title>
   <meta name="description" content="PackZen Packers &amp; Movers Bangalore — affordable house shifting, office relocation, live tracking &amp; insured transport. Get instant quote now.">
 
-  <!-- Google Analytics — Replace G-XXXXXXXXXX with your Measurement ID from analytics.google.com -->
+  <!-- ⚠️ TODO: Replace G-XXXXXXXXXX with your real Google Analytics Measurement ID -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
@@ -22,7 +22,6 @@
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://packzenblr.in/">
 
-  <!-- Open Graph -->
   <meta property="og:type"         content="website">
   <meta property="og:site_name"    content="PackZen Packers &amp; Movers">
   <meta property="og:title"        content="PackZen Packers &amp; Movers Bangalore">
@@ -33,13 +32,11 @@
   <meta property="og:image:height" content="630">
   <meta property="og:locale"       content="en_IN">
 
-  <!-- Twitter Card -->
   <meta name="twitter:card"        content="summary_large_image">
   <meta name="twitter:title"       content="PackZen Packers &amp; Movers Bangalore">
   <meta name="twitter:description" content="Reliable, insured &amp; affordable packing and moving services in Bangalore.">
   <meta name="twitter:image"       content="https://packzenblr.in/assets/logo/packzen-og.png">
 
-  <!-- PWA + Mobile -->
   <meta name="theme-color"                           content="#2563eb">
   <meta name="mobile-web-app-capable"                content="yes">
   <meta name="apple-mobile-web-app-capable"          content="yes">
@@ -49,12 +46,10 @@
   <link rel="apple-touch-icon" href="assets/logo/packzen-logo.png">
   <link rel="icon" type="image/png" href="assets/logo/packzen-logo.png">
 
-  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet"  href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Syne:wght@700;800&display=swap">
 
-  <!-- Schema.org JSON-LD -->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -63,9 +58,10 @@
     "url": "https://packzenblr.in/",
     "logo": "https://packzenblr.in/assets/logo/packzen-logo.png",
     "image": "https://packzenblr.in/assets/logo/packzen-logo.png",
-    "description": "Bangalore's newest packers and movers offering safe and affordable relocation services with live tracking and transparent pricing.","foundingDate": "2026",
+    "description": "Bangalore's newest packers and movers offering safe and affordable relocation services with live tracking and transparent pricing.",
+    "foundingDate": "2026",
     "telephone": "+919945095453",
-"email": "support@packzenblr.in",
+    "email": "support@packzenblr.in",
     "address": {
       "@type": "PostalAddress",
       "streetAddress": "HSR Layout ITI layout park",
@@ -86,21 +82,14 @@
       "closes": "21:00"
     },
     "priceRange": "₹₹",
-    "areaServed": {
-      "@type": "City",
-      "name": "Bangalore"
-    },
+    "areaServed": { "@type": "City", "name": "Bangalore" },
     "sameAs": ["https://wa.me/919945095453"]
   }
   </script>
 
-  <!-- Stylesheet -->
   <link rel="preload" href="style.css" as="style">
   <link rel="stylesheet" href="style.css">
 
-  <!-- jsPDF moved to bottom of body — was blocking render in <head> -->
-
-  <!-- New sections styles -->
   <style>
     /* HERO UPDATES */
     .hero-desc { font-size:.9rem; color:rgba(255,255,255,0.90); line-height:1.7; margin:10px 0 14px; max-width:480px; }
@@ -178,6 +167,24 @@
     .fcta-call { background:linear-gradient(135deg,#2563eb,#3b82f6); color:#fff; }
     .fcta-wa { background:linear-gradient(135deg,#16a34a,#22c55e); color:#fff; }
     .fcta-quote { background:rgba(255,255,255,0.1); color:var(--text,#fff); border:1px solid rgba(255,255,255,0.2); }
+
+    /* QUOTE SECTION directly after hero */
+    .quote-section {
+      padding: var(--space-3xl) var(--space-lg);
+      background: linear-gradient(160deg, #dce8f8 0%, #c8daf5 40%, #e4edf8 100%);
+      overflow: hidden; position: relative;
+    }
+    .quote-section::before {
+      content: ''; position: absolute; top: -100px; right: -100px;
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, rgba(249,115,22,0.08) 0%, transparent 70%);
+      border-radius: 50%; pointer-events: none;
+    }
+    .quote-wrapper {
+      display: grid; grid-template-columns: 1fr 1.5fr;
+      gap: 3.5rem; max-width: 1200px; margin: 0 auto; align-items: start;
+    }
+    @media (max-width: 1024px) { .quote-wrapper { grid-template-columns: 1fr; gap: 2rem; } }
   </style>
 
 </head>
@@ -190,10 +197,7 @@
 <nav class="navbar" role="navigation" aria-label="Main navigation">
   <div class="nav-inner">
     <a href="index.html" class="logo-wrap">
-   <img src="assets/logo/packzen-logo.png"
-class="logo-img"
-loading="lazy"
-alt="PackZen Packers and Movers Bangalore">
+      <img src="assets/logo/packzen-logo.png" class="logo-img" loading="lazy" alt="PackZen Packers and Movers Bangalore">
     </a>
     <div class="nav-links">
       <a href="#services">Services</a>
@@ -229,7 +233,7 @@ alt="PackZen Packers and Movers Bangalore">
     <div class="hero-badge">🚀 Bangalore's Newest &amp; Most Transparent Movers</div>
     <h1 class="hero-title">Reliable Packers &amp; Movers<br><span class="hero-accent">in Bangalore 🚛</span></h1>
     <p class="hero-sub">Safe, Affordable &amp; Hassle-Free House Shifting</p>
-    <p class="hero-desc">Moving homes shouldn't be stressful. <strong>PackZen Packers &amp; Movers</strong> was founded in 2026 with a single mission — make every move in Bangalore safe, affordable, and stress-free. Professional packing, careful handling, and real-time tracking, all at transparent prices.</p>
+    <p class="hero-desc">Moving homes shouldn't be stressful. <strong>PackZen Packers &amp; Movers</strong> was founded in 2026 with a single mission — make every move in Bangalore safe, affordable, and stress-free.</p>
     <div class="hero-checklist">
       <span>✔ Experienced moving team</span>
       <span>✔ Premium packing materials</span>
@@ -240,7 +244,7 @@ alt="PackZen Packers and Movers Bangalore">
     <div class="hero-actions">
       <a href="#quote" class="btn-primary" aria-label="Get instant moving quote">📦 Get Instant Quote →</a>
       <a href="tel:9945095453" class="btn-ghost">📞 Call Now</a>
-      <a href="https://wa.me/919945095453?text=Hello%20PackZen%2C%20I%20need%20a%20moving%20quote" class="btn-ghost btn-wa-hero" target="_blank">💬 WhatsApp Us</a>
+      <a href="https://wa.me/919945095453?text=Hello%20PackZen%2C%20I%20need%20a%20moving%20quote" class="btn-ghost btn-wa-hero" target="_blank" rel="noopener noreferrer">💬 WhatsApp Us</a>
     </div>
     <div class="hero-trust">
       <span>✔ Licensed &amp; Insured</span>
@@ -265,245 +269,7 @@ alt="PackZen Packers and Movers Bangalore">
   </div>
 </header>
 
-<!-- STATS BAR -->
-<section class="stats-bar" id="statsStrip">
-  <div class="stat-item">
-    <div class="stat-top"><span class="stat-number" data-animated="1">100</span><span class="stat-suffix">+</span></div>
-    <span class="stat-label">Moves Completed</span>
-  </div>
-  <div class="stat-divider"></div>
-  <div class="stat-item">
-    <div class="stat-top"><span class="stat-number" data-animated="1">2026</span><span class="stat-suffix"></span></div>
-    <span class="stat-label">Founded</span>
-  </div>
-  <div class="stat-divider"></div>
-  <div class="stat-item">
-    <div class="stat-top"><span class="stat-number" data-animated="1">100</span><span class="stat-suffix">%</span></div>
-    <span class="stat-label">On-Time Delivery</span>
-  </div>
-  <div class="stat-divider"></div>
-  <div class="stat-item">
-    <div class="stat-top"><span class="stat-number" data-animated="1">0</span><span class="stat-suffix"> Damage</span></div>
-    <span class="stat-label">Zero Damage Record</span>
-  </div>
-</section>
-
-<!-- MARQUEE -->
-<div class="marquee-wrap">
-  <div class="marquee-track">
-    <span>✔ Licensed &amp; Insured</span><span class="dot">◆</span>
-    <span>✔ Experienced Team</span><span class="dot">◆</span>
-    <span>✔ Safe Packing</span><span class="dot">◆</span>
-    <span>✔ On-Time Delivery</span><span class="dot">◆</span>
-    <span>✔ GPS Tracked Vehicles</span><span class="dot">◆</span>
-    <span>✔ Zero Damage Guarantee</span><span class="dot">◆</span>
-    <span>✔ Licensed &amp; Insured</span><span class="dot">◆</span>
-    <span>✔ Experienced Team</span><span class="dot">◆</span>
-    <span>✔ Safe Packing</span><span class="dot">◆</span>
-    <span>✔ On-Time Delivery</span><span class="dot">◆</span>
-    <span>✔ GPS Tracked Vehicles</span><span class="dot">◆</span>
-    <span>✔ Zero Damage Guarantee</span><span class="dot">◆</span>
-  </div>
-</div>
-
-<!-- SERVICES -->
-<section class="services-section" id="services">
-  <div class="section-header reveal">
-    <div class="section-tag">What We Offer</div>
-    <h2>Our Moving Services</h2>
-    <p>Purpose-built services for Bangalore's homes and offices — handled with care from day one.</p>
-  </div>
-  <div class="services-grid reveal-stagger">
-    <div class="service-card">
-      <img src="https://raw.githubusercontent.com/azharahmedm786-sketch/moving-quote/main/images/service-home.jpg" alt="Home Relocation Bangalore" width="400" height="200" loading="lazy">
-      <div class="sc-icon">🏠</div>
-      <h3>Home Relocation</h3>
-      <p>Safe &amp; secure home shifting with full packing, loading and unpacking at destination.</p>
-      <div class="sc-badge">Most Popular</div>
-    </div>
-    <div class="service-card">
-      <img src="https://raw.githubusercontent.com/azharahmedm786-sketch/moving-quote/main/images/service-office.jpg" alt="Office Shifting Bangalore" width="400" height="200" loading="lazy">
-      <div class="sc-icon">🏢</div>
-      <h3>Office Shifting</h3>
-      <p>Minimal downtime office relocation with IT equipment handling and furniture setup.</p>
-    </div>
-    <div class="service-card">
-      <img src="https://raw.githubusercontent.com/azharahmedm786-sketch/moving-quote/main/images/service-truck.jpg" alt="Local Shifting Bangalore" width="400" height="200" loading="lazy">
-      <div class="sc-icon">📍</div>
-      <h3>Local Shifting</h3>
-      <p>Fast &amp; affordable within-Bangalore shifting. Same day delivery available.</p>
-    </div>
-    <div class="service-card">
-      <img src="https://raw.githubusercontent.com/azharahmedm786-sketch/moving-quote/main/images/service-loading.jpg" alt="Loading and Unloading Service" width="400" height="200" loading="lazy">
-      <div class="sc-icon">💪</div>
-      <h3>Loading &amp; Unloading</h3>
-      <p>Trained manpower for heavy furniture and appliance handling with care.</p>
-    </div>
-  </div>
-</section>
-
-<!-- TRUST SIGNALS -->
-<section class="trust-signals-section reveal">
-  <div class="ts-inner">
-    <div class="ts-badge">
-      <div class="ts-icon">🚀</div>
-      <div><div class="ts-val">Est. 2026</div><div class="ts-lbl">Fresh Start, Zero Shortcuts</div></div>
-    </div>
-    <div class="ts-divider"></div>
-    <div class="ts-badge">
-      <div class="ts-icon">🛡️</div>
-      <div><div class="ts-val">100% Insured</div><div class="ts-lbl">All moves covered</div></div>
-    </div>
-    <div class="ts-divider"></div>
-    <div class="ts-badge">
-      <div class="ts-icon">📍</div>
-      <div><div class="ts-val">Live GPS Tracking</div><div class="ts-lbl">Real-time on every move</div></div>
-    </div>
-    <div class="ts-divider"></div>
-    <div class="ts-badge">
-      <div class="ts-icon">💰</div>
-      <div><div class="ts-val">Transparent Pricing</div><div class="ts-lbl">No hidden charges, ever</div></div>
-    </div>
-  </div>
-</section>
-
-<!-- PRICING TABLE -->
-<section class="pricing-section reveal" id="pricing">
-  <div class="section-header">
-    <div class="section-tag">Transparent Pricing</div>
-    <h2>Estimated Moving Charges 💰</h2>
-    <p>We built PackZen on <strong>honest, transparent pricing</strong>. No surprise bills. No hidden charges. Ever.</p>
-  </div>
-  <div class="pricing-table-wrap reveal">
-    <table class="pricing-table">
-      <thead>
-        <tr><th>Move Type</th><th>Estimated Price</th></tr>
-      </thead>
-      <tbody>
-        <tr><td>1 BHK Local Move</td><td>₹2,500 – ₹5,000</td></tr>
-        <tr><td>2 BHK Local Move</td><td>₹4,500 – ₹8,000</td></tr>
-        <tr><td>3 BHK Local Move</td><td>₹7,000 – ₹12,000</td></tr>
-        <tr><td>Office Relocation</td><td>Custom Quote</td></tr>
-        <tr><td>Intercity Moves</td><td>Based on distance</td></tr>
-      </tbody>
-    </table>
-    <p class="pricing-note">💡 Final price depends on distance, inventory size, floor access and packing requirements.</p>
-    <div style="text-align:center;margin-top:24px;">
-      <a href="#quote" class="btn-primary">Get Your Exact Quote →</a>
-    </div>
-  </div>
-</section>
-
-<!-- HOW IT WORKS -->
-<section class="hiw-section reveal" id="how-it-works">
-  <div class="section-header">
-    <div class="section-tag">Simple Process</div>
-    <h2>How Your Move Works 📦</h2>
-    <p>We've designed our process to be completely transparent and stress-free — from first quote to final delivery.</p>
-  </div>
-  <div class="hiw-steps reveal-stagger">
-    <div class="hiw-step">
-      <div class="hiw-num">1</div>
-      <div class="hiw-icon">📋</div>
-      <h3>Get an Instant Quote</h3>
-      <p>Enter your pickup and drop details to receive a quick, accurate estimate instantly.</p>
-    </div>
-    <div class="hiw-connector">→</div>
-    <div class="hiw-step">
-      <div class="hiw-num">2</div>
-      <div class="hiw-icon">📅</div>
-      <h3>Confirm Your Booking</h3>
-      <p>Choose your moving date and secure your slot. Our team will confirm within 30 minutes.</p>
-    </div>
-    <div class="hiw-connector">→</div>
-    <div class="hiw-step">
-      <div class="hiw-num">3</div>
-      <div class="hiw-icon">📦</div>
-      <h3>Professional Packing &amp; Loading</h3>
-      <p>Our trained team carefully packs and loads your belongings with premium materials.</p>
-    </div>
-    <div class="hiw-connector">→</div>
-    <div class="hiw-step">
-      <div class="hiw-num">4</div>
-      <div class="hiw-icon">🎉</div>
-      <h3>Safe Transport &amp; Delivery</h3>
-      <p>Your items are transported safely with live tracking and delivered on time, every time.</p>
-    </div>
-  </div>
-</section>
-
-<!-- WHY CHOOSE US -->
-<section class="why-section reveal" id="why">
-  <div class="section-header">
-    <div class="section-tag">Why PackZen</div>
-    <h2>Built Different From Day One</h2>
-    <p>We started PackZen because we believe moving deserves better — more honesty, more care, and real technology.</p>
-  </div>
-  <div class="why-grid reveal-stagger">
-    <div class="why-card">
-      <div class="why-icon">🛡️</div>
-      <h3>Damage Protection</h3>
-      <p>Every move is fully insured. We cover the cost of any damage — no questions asked.</p>
-    </div>
-    <div class="why-card">
-      <div class="why-icon">👷</div>
-      <h3>Trained &amp; Verified Staff</h3>
-      <p>Our packers are background-checked, trained professionals — not random daily labour.</p>
-    </div>
-    <div class="why-card">
-      <div class="why-icon">💰</div>
-      <h3>Transparent Billing</h3>
-      <p>Price you see is price you pay. No surprise charges at delivery. Invoice provided always.</p>
-    </div>
-    <div class="why-card">
-      <div class="why-icon">⏰</div>
-      <h3>On-Time, Every Time</h3>
-      <p>We confirm your slot, send a reminder, and call 30 min before arrival. Punctuality is our promise — not a bonus.</p>
-    </div>
-    <div class="why-card">
-      <div class="why-icon">📍</div>
-      <h3>Live GPS Tracking</h3>
-      <p>Track your driver and goods in real-time from packing to delivery on your phone.</p>
-    </div>
-    <div class="why-card">
-      <div class="why-icon">💬</div>
-      <h3>Always Reachable</h3>
-      <p>WhatsApp, call, or email us at <a href="/cdn-cgi/l/email-protection#9cefe9ececf3eee8dcecfdfff7e6f9f2fef0eeb2f5f2" style="color:#3b82f6"><span class="__cf_email__" data-cfemail="bdcec8cdcdd2cfc9fdcddcded6c7d8d3dfd1cf93d4d3">[email&#160;protected]</span></a>. Your dedicated move coordinator is always available.</p>
-    </div>
-  </div>
-</section>
-
-<!-- TRACK ORDER BANNER -->
-<div id="trackOrderBanner" style="display:none;">
-  <div class="tob-inner">
-    <div class="tob-top">
-      <div class="tob-pulse"></div>
-      <div class="tob-text">
-        <div class="tob-title">📦 Active Booking</div>
-        <div class="tob-id">ID: <strong id="tobBookingId">—</strong> · <span id="tobStatusLabel" class="tob-status-label">Confirmed</span></div>
-      </div>
-      <div class="tob-top-actions">
-        <button class="tob-btn-track" onclick="openTrackingOrLogin()">Track →</button>
-        <button class="tob-dismiss" onclick="dismissTrackBanner()">✕</button>
-      </div>
-    </div>
-    <div class="tob-progress-bar"><div class="tob-progress-fill" id="tobProgressFill"></div></div>
-    <div class="tob-steps">
-      <div class="tob-step active" id="tobs0"><div class="tob-step-dot"><span>✓</span></div><div class="tob-step-line"></div><div class="tob-step-label">Booked</div></div>
-      <div class="tob-step" id="tobs1"><div class="tob-step-dot"><span>🚛</span></div><div class="tob-step-line"></div><div class="tob-step-label">Assigned</div></div>
-      <div class="tob-step" id="tobs2"><div class="tob-step-dot"><span>📦</span></div><div class="tob-step-line"></div><div class="tob-step-label">Packing</div></div>
-      <div class="tob-step" id="tobs3"><div class="tob-step-dot"><span>🚚</span></div><div class="tob-step-line"></div><div class="tob-step-label">Transit</div></div>
-      <div class="tob-step" id="tobs4"><div class="tob-step-dot"><span>🎉</span></div><div class="tob-step-label">Delivered</div></div>
-    </div>
-    <div class="tob-driver" id="tobDriverRow" style="display:none;">
-      <span class="tob-driver-icon">🚚</span>
-      <span id="tobDriverName">Driver assigned</span>
-      <a id="tobDriverPhone" href="#" class="tob-driver-call">Call Driver</a>
-    </div>
-  </div>
-</div>
-
-<!-- QUOTE SECTION -->
+<!-- ✅ BOOKING FORM — Moved directly after hero -->
 <main>
 <section class="quote-section" id="quote">
   <div class="quote-wrapper">
@@ -731,31 +497,28 @@ alt="PackZen Packers and Movers Bangalore">
             </div>
             <div class="field-group">
               <label class="field-label"><span class="field-icon">💳</span> Choose Payment</label>
+            </div>
+            <div class="payment-opts">
+              <div class="payment-opt" id="optAdvance" onclick="selectPayment('advance')">
+                <div class="po-icon">💰</div><div class="po-label">Advance</div>
+                <div class="po-amount" id="optAdvanceAmt">₹0</div><div class="po-note">10% now · rest on day</div>
               </div>
-              <div class="payment-opts">
-                <div class="payment-opt" id="optAdvance" onclick="selectPayment('advance')">
-                  <div class="po-icon">💰</div><div class="po-label">Advance</div>
-                  <div class="po-amount" id="optAdvanceAmt">₹0</div><div class="po-note">10% now · rest on day</div>
-                </div>
-               <div class="payment-opt" id="optFull" onclick="selectPayment('full')">
-                  <div class="po-icon">✅</div><div class="po-label">Pay Full</div>
-                  <div class="po-amount" id="optFullAmt">₹0</div><div class="po-note">7% discount</div>
-                </div>
-                <div class="payment-opt selected" id="optAtDrop" onclick="selectPayment('at_drop')">
-                  <div class="po-badge" style="background:#16a34a">✓ Active</div><div class="po-icon">🚚</div><div class="po-label">Pay Later</div>
-                  <div class="po-amount" id="optAtDropAmt">₹0</div><div class="po-note">Cash on delivery</div>
-                </div>
+              <div class="payment-opt" id="optFull" onclick="selectPayment('full')">
+                <div class="po-icon">✅</div><div class="po-label">Pay Full</div>
+                <div class="po-amount" id="optFullAmt">₹0</div><div class="po-note">7% discount</div>
+              </div>
+              <div class="payment-opt selected" id="optAtDrop" onclick="selectPayment('at_drop')">
+                <div class="po-badge" style="background:#16a34a">✓ Active</div><div class="po-icon">🚚</div><div class="po-label">Pay Later</div>
+                <div class="po-amount" id="optAtDropAmt">₹0</div><div class="po-note">Cash on delivery</div>
               </div>
             </div>
             <label class="tnc-row">
               <input type="checkbox" id="tncAccepted">
-              <span>I agree to the <a href="legal.html" target="_blank">Terms &amp; Conditions</a> and <a href="legal.html" target="_blank">Privacy Policy</a></span>
+              <span>I agree to the <a href="legal.html" target="_blank" rel="noopener noreferrer">Terms &amp; Conditions</a> and <a href="legal.html" target="_blank" rel="noopener noreferrer">Privacy Policy</a></span>
             </label>
             <div class="book-actions">
               <button onclick="bookWithoutPayment()" class="btn-pay">📋 Confirm Booking · Pay on Delivery</button>
-              <button id="btnPayOnline" onclick="startRazorpayPayment()" class="btn-pay">
-                💳 Pay Online
-              </button>
+              <button id="btnPayOnline" onclick="startRazorpayPayment()" class="btn-pay">💳 Pay Online</button>
               <button onclick="bookOnWhatsApp()" class="btn-whatsapp-alt">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
                 Book &amp; Send Confirmation via WhatsApp
@@ -786,6 +549,186 @@ alt="PackZen Packers and Movers Bangalore">
 </section>
 </main>
 
+<!-- STATS BAR -->
+<section class="stats-bar" id="statsStrip">
+  <div class="stat-item">
+    <div class="stat-top"><span class="stat-number" data-animated="1">100</span><span class="stat-suffix">+</span></div>
+    <span class="stat-label">Moves Completed</span>
+  </div>
+  <div class="stat-divider"></div>
+  <div class="stat-item">
+    <div class="stat-top"><span class="stat-number" data-animated="1">2026</span><span class="stat-suffix"></span></div>
+    <span class="stat-label">Founded</span>
+  </div>
+  <div class="stat-divider"></div>
+  <div class="stat-item">
+    <div class="stat-top"><span class="stat-number" data-animated="1">100</span><span class="stat-suffix">%</span></div>
+    <span class="stat-label">On-Time Delivery</span>
+  </div>
+  <div class="stat-divider"></div>
+  <div class="stat-item">
+    <div class="stat-top"><span class="stat-number" data-animated="1">0</span><span class="stat-suffix"> Damage</span></div>
+    <span class="stat-label">Zero Damage Record</span>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee-wrap">
+  <div class="marquee-track">
+    <span>✔ Licensed &amp; Insured</span><span class="dot">◆</span>
+    <span>✔ Experienced Team</span><span class="dot">◆</span>
+    <span>✔ Safe Packing</span><span class="dot">◆</span>
+    <span>✔ On-Time Delivery</span><span class="dot">◆</span>
+    <span>✔ GPS Tracked Vehicles</span><span class="dot">◆</span>
+    <span>✔ Zero Damage Guarantee</span><span class="dot">◆</span>
+    <span>✔ Licensed &amp; Insured</span><span class="dot">◆</span>
+    <span>✔ Experienced Team</span><span class="dot">◆</span>
+    <span>✔ Safe Packing</span><span class="dot">◆</span>
+    <span>✔ On-Time Delivery</span><span class="dot">◆</span>
+    <span>✔ GPS Tracked Vehicles</span><span class="dot">◆</span>
+    <span>✔ Zero Damage Guarantee</span><span class="dot">◆</span>
+  </div>
+</div>
+
+<!-- TRACK ORDER BANNER -->
+<div id="trackOrderBanner" style="display:none;">
+  <div class="tob-inner">
+    <div class="tob-top">
+      <div class="tob-pulse"></div>
+      <div class="tob-text">
+        <div class="tob-title">📦 Active Booking</div>
+        <div class="tob-id">ID: <strong id="tobBookingId">—</strong> · <span id="tobStatusLabel" class="tob-status-label">Confirmed</span></div>
+      </div>
+      <div class="tob-top-actions">
+        <button class="tob-btn-track" onclick="openTrackingOrLogin()">Track →</button>
+        <button class="tob-dismiss" onclick="dismissTrackBanner()">✕</button>
+      </div>
+    </div>
+    <div class="tob-progress-bar"><div class="tob-progress-fill" id="tobProgressFill"></div></div>
+    <div class="tob-steps">
+      <div class="tob-step active" id="tobs0"><div class="tob-step-dot"><span>✓</span></div><div class="tob-step-line"></div><div class="tob-step-label">Booked</div></div>
+      <div class="tob-step" id="tobs1"><div class="tob-step-dot"><span>🚛</span></div><div class="tob-step-line"></div><div class="tob-step-label">Assigned</div></div>
+      <div class="tob-step" id="tobs2"><div class="tob-step-dot"><span>📦</span></div><div class="tob-step-line"></div><div class="tob-step-label">Packing</div></div>
+      <div class="tob-step" id="tobs3"><div class="tob-step-dot"><span>🚚</span></div><div class="tob-step-line"></div><div class="tob-step-label">Transit</div></div>
+      <div class="tob-step" id="tobs4"><div class="tob-step-dot"><span>🎉</span></div><div class="tob-step-label">Delivered</div></div>
+    </div>
+    <div class="tob-driver" id="tobDriverRow" style="display:none;">
+      <span class="tob-driver-icon">🚚</span>
+      <span id="tobDriverName">Driver assigned</span>
+      <a id="tobDriverPhone" href="#" class="tob-driver-call">Call Driver</a>
+    </div>
+  </div>
+</div>
+
+<!-- SERVICES -->
+<section class="services-section" id="services">
+  <div class="section-header reveal">
+    <div class="section-tag">What We Offer</div>
+    <h2>Our Moving Services</h2>
+    <p>Purpose-built services for Bangalore's homes and offices — handled with care from day one.</p>
+  </div>
+  <div class="services-grid reveal-stagger">
+    <div class="service-card">
+      <img src="https://raw.githubusercontent.com/azharahmedm786-sketch/moving-quote/main/images/service-home.jpg" alt="Home Relocation Bangalore" width="400" height="200" loading="lazy">
+      <div class="sc-icon">🏠</div>
+      <h3>Home Relocation</h3>
+      <p>Safe &amp; secure home shifting with full packing, loading and unpacking at destination.</p>
+      <div class="sc-badge">Most Popular</div>
+    </div>
+    <div class="service-card">
+      <img src="https://raw.githubusercontent.com/azharahmedm786-sketch/moving-quote/main/images/service-office.jpg" alt="Office Shifting Bangalore" width="400" height="200" loading="lazy">
+      <div class="sc-icon">🏢</div>
+      <h3>Office Shifting</h3>
+      <p>Minimal downtime office relocation with IT equipment handling and furniture setup.</p>
+    </div>
+    <div class="service-card">
+      <img src="https://raw.githubusercontent.com/azharahmedm786-sketch/moving-quote/main/images/service-truck.jpg" alt="Local Shifting Bangalore" width="400" height="200" loading="lazy">
+      <div class="sc-icon">📍</div>
+      <h3>Local Shifting</h3>
+      <p>Fast &amp; affordable within-Bangalore shifting. Same day delivery available.</p>
+    </div>
+    <div class="service-card">
+      <img src="https://raw.githubusercontent.com/azharahmedm786-sketch/moving-quote/main/images/service-loading.jpg" alt="Loading and Unloading Service" width="400" height="200" loading="lazy">
+      <div class="sc-icon">💪</div>
+      <h3>Loading &amp; Unloading</h3>
+      <p>Trained manpower for heavy furniture and appliance handling with care.</p>
+    </div>
+  </div>
+</section>
+
+<!-- TRUST SIGNALS -->
+<section class="trust-signals-section reveal">
+  <div class="ts-inner">
+    <div class="ts-badge"><div class="ts-icon">🚀</div><div><div class="ts-val">Est. 2026</div><div class="ts-lbl">Fresh Start, Zero Shortcuts</div></div></div>
+    <div class="ts-divider"></div>
+    <div class="ts-badge"><div class="ts-icon">🛡️</div><div><div class="ts-val">100% Insured</div><div class="ts-lbl">All moves covered</div></div></div>
+    <div class="ts-divider"></div>
+    <div class="ts-badge"><div class="ts-icon">📍</div><div><div class="ts-val">Live GPS Tracking</div><div class="ts-lbl">Real-time on every move</div></div></div>
+    <div class="ts-divider"></div>
+    <div class="ts-badge"><div class="ts-icon">💰</div><div><div class="ts-val">Transparent Pricing</div><div class="ts-lbl">No hidden charges, ever</div></div></div>
+  </div>
+</section>
+
+<!-- PRICING TABLE -->
+<section class="pricing-section reveal" id="pricing">
+  <div class="section-header">
+    <div class="section-tag">Transparent Pricing</div>
+    <h2>Estimated Moving Charges 💰</h2>
+    <p>We built PackZen on <strong>honest, transparent pricing</strong>. No surprise bills. No hidden charges. Ever.</p>
+  </div>
+  <div class="pricing-table-wrap reveal">
+    <table class="pricing-table">
+      <thead><tr><th>Move Type</th><th>Estimated Price</th></tr></thead>
+      <tbody>
+        <tr><td>1 BHK Local Move</td><td>₹2,500 – ₹5,000</td></tr>
+        <tr><td>2 BHK Local Move</td><td>₹4,500 – ₹8,000</td></tr>
+        <tr><td>3 BHK Local Move</td><td>₹7,000 – ₹12,000</td></tr>
+        <tr><td>Office Relocation</td><td>Custom Quote</td></tr>
+        <tr><td>Intercity Moves</td><td>Based on distance</td></tr>
+      </tbody>
+    </table>
+    <p class="pricing-note">💡 Final price depends on distance, inventory size, floor access and packing requirements.</p>
+    <div style="text-align:center;margin-top:24px;">
+      <a href="#quote" class="btn-primary">Get Your Exact Quote →</a>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="hiw-section reveal" id="how-it-works">
+  <div class="section-header">
+    <div class="section-tag">Simple Process</div>
+    <h2>How Your Move Works 📦</h2>
+    <p>We've designed our process to be completely transparent and stress-free.</p>
+  </div>
+  <div class="hiw-steps reveal-stagger">
+    <div class="hiw-step"><div class="hiw-num">1</div><div class="hiw-icon">📋</div><h3>Get an Instant Quote</h3><p>Enter your pickup and drop details to receive a quick, accurate estimate instantly.</p></div>
+    <div class="hiw-connector">→</div>
+    <div class="hiw-step"><div class="hiw-num">2</div><div class="hiw-icon">📅</div><h3>Confirm Your Booking</h3><p>Choose your moving date and secure your slot. Our team will confirm within 30 minutes.</p></div>
+    <div class="hiw-connector">→</div>
+    <div class="hiw-step"><div class="hiw-num">3</div><div class="hiw-icon">📦</div><h3>Professional Packing &amp; Loading</h3><p>Our trained team carefully packs and loads your belongings with premium materials.</p></div>
+    <div class="hiw-connector">→</div>
+    <div class="hiw-step"><div class="hiw-num">4</div><div class="hiw-icon">🎉</div><h3>Safe Transport &amp; Delivery</h3><p>Your items are transported safely with live tracking and delivered on time, every time.</p></div>
+  </div>
+</section>
+
+<!-- WHY CHOOSE US -->
+<section class="why-section reveal" id="why">
+  <div class="section-header">
+    <div class="section-tag">Why PackZen</div>
+    <h2>Built Different From Day One</h2>
+    <p>We started PackZen because we believe moving deserves better — more honesty, more care, and real technology.</p>
+  </div>
+  <div class="why-grid reveal-stagger">
+    <div class="why-card"><div class="why-icon">🛡️</div><h3>Damage Protection</h3><p>Every move is fully insured. We cover the cost of any damage — no questions asked.</p></div>
+    <div class="why-card"><div class="why-icon">👷</div><h3>Trained &amp; Verified Staff</h3><p>Our packers are background-checked, trained professionals — not random daily labour.</p></div>
+    <div class="why-card"><div class="why-icon">💰</div><h3>Transparent Billing</h3><p>Price you see is price you pay. No surprise charges at delivery. Invoice provided always.</p></div>
+    <div class="why-card"><div class="why-icon">⏰</div><h3>On-Time, Every Time</h3><p>We confirm your slot, send a reminder, and call 30 min before arrival. Punctuality is our promise.</p></div>
+    <div class="why-card"><div class="why-icon">📍</div><h3>Live GPS Tracking</h3><p>Track your driver and goods in real-time from packing to delivery on your phone.</p></div>
+    <div class="why-card"><div class="why-icon">💬</div><h3>Always Reachable</h3><p>WhatsApp, call, or email us at <a href="/cdn-cgi/l/email-protection#34474144445b4640744455575f4e515a5658461a5d5a" style="color:#3b82f6"><span class="__cf_email__" data-cfemail="11626461617e6365516170727a6b747f737d633f787f">[email&#160;protected]</span></a>. Your dedicated move coordinator is always available.</p></div>
+  </div>
+</section>
+
 <!-- REVIEWS -->
 <section class="reviews-section" id="reviews">
   <div class="section-header reveal">
@@ -801,7 +744,6 @@ alt="PackZen Packers and Movers Bangalore">
     </div>
   </div>
   <div class="reviews-grid reveal-stagger" id="reviewsGrid">
-    <!-- Dynamic reviews from Firebase will appear here -->
     <div class="review-card" style="grid-column:1/-1; text-align:center; padding:40px 24px;">
       <div style="font-size:3rem; margin-bottom:16px;">⭐</div>
       <div style="font-size:1.1rem; font-weight:700; color:var(--text,#fff); margin-bottom:10px;">No reviews yet — be the first!</div>
@@ -809,12 +751,10 @@ alt="PackZen Packers and Movers Bangalore">
       <button class="btn-primary leave-review-btn" onclick="openReviewModal()" style="margin:0 auto;">⭐ Leave a Review</button>
     </div>
   </div>
-  <div style="text-align:center; margin-top:28px;" id="leaveReviewBtnWrap">
-    <!-- button hidden when no reviews yet since it's shown inline above -->
-  </div>
+  <div style="text-align:center; margin-top:28px;" id="leaveReviewBtnWrap"></div>
 </section>
 
-<!-- FAQ SECTION -->
+<!-- FAQ -->
 <section class="faq-section reveal" id="faq">
   <div class="section-header">
     <div class="section-tag">Got Questions?</div>
@@ -823,39 +763,24 @@ alt="PackZen Packers and Movers Bangalore">
   </div>
   <div class="faq-list reveal">
     <div class="faq-item">
-      <button class="faq-q" onclick="toggleFaq(this)">
-        How early should I book my move?
-        <span class="faq-arrow">▾</span>
-      </button>
-      <div class="faq-a">We recommend booking at least 1–3 days in advance to secure your preferred moving date. Being a new startup, we give each move our full attention — book early to get your preferred slot.</div>
+      <button class="faq-q" onclick="toggleFaq(this)">How early should I book my move?<span class="faq-arrow">▾</span></button>
+      <div class="faq-a">We recommend booking at least 1–3 days in advance to secure your preferred moving date.</div>
     </div>
     <div class="faq-item">
-      <button class="faq-q" onclick="toggleFaq(this)">
-        Do you provide packing materials?
-        <span class="faq-arrow">▾</span>
-      </button>
-      <div class="faq-a">Yes. Our team brings high-quality packing materials including bubble wrap, carton boxes, and protective sheets for safe transportation of all your items.</div>
+      <button class="faq-q" onclick="toggleFaq(this)">Do you provide packing materials?<span class="faq-arrow">▾</span></button>
+      <div class="faq-a">Yes. Our team brings high-quality packing materials including bubble wrap, carton boxes, and protective sheets.</div>
     </div>
     <div class="faq-item">
-      <button class="faq-q" onclick="toggleFaq(this)">
-        Are my belongings insured during the move?
-        <span class="faq-arrow">▾</span>
-      </button>
-      <div class="faq-a">Yes. All moves are fully insured. Insurance options are available for additional protection during transit. In the rare event of damage, we cover the cost — no questions asked.</div>
+      <button class="faq-q" onclick="toggleFaq(this)">Are my belongings insured during the move?<span class="faq-arrow">▾</span></button>
+      <div class="faq-a">Yes. All moves are fully insured. In the rare event of damage, we cover the cost — no questions asked.</div>
     </div>
     <div class="faq-item">
-      <button class="faq-q" onclick="toggleFaq(this)">
-        Do you move fragile items like TVs and glass?
-        <span class="faq-arrow">▾</span>
-      </button>
-      <div class="faq-a">Absolutely. Fragile items like TVs, mirrors, and glassware are packed using special protective materials and handled with extra care by our trained team.</div>
+      <button class="faq-q" onclick="toggleFaq(this)">Do you move fragile items like TVs and glass?<span class="faq-arrow">▾</span></button>
+      <div class="faq-a">Absolutely. Fragile items like TVs, mirrors, and glassware are packed using special protective materials.</div>
     </div>
     <div class="faq-item">
-      <button class="faq-q" onclick="toggleFaq(this)">
-        Can I reschedule my booking?
-        <span class="faq-arrow">▾</span>
-      </button>
-      <div class="faq-a">Yes, rescheduling is possible depending on availability. You can reschedule directly from your dashboard or call us and we'll confirm the new slot within 2 hours.</div>
+      <button class="faq-q" onclick="toggleFaq(this)">Can I reschedule my booking?<span class="faq-arrow">▾</span></button>
+      <div class="faq-a">Yes, rescheduling is possible depending on availability. You can reschedule directly from your dashboard.</div>
     </div>
   </div>
 </section>
@@ -869,13 +794,13 @@ alt="PackZen Packers and Movers Bangalore">
     <p class="fcta-sub">Get your <strong>free instant estimate today</strong> — no commitment, no hidden charges.</p>
     <div class="fcta-actions">
       <a href="tel:9945095453" class="fcta-btn fcta-call">📞 Call Now</a>
-      <a href="https://wa.me/919945095453?text=Hello%20PackZen%2C%20I%20need%20a%20moving%20quote" class="fcta-btn fcta-wa" target="_blank">💬 WhatsApp Us</a>
+      <a href="https://wa.me/919945095453?text=Hello%20PackZen%2C%20I%20need%20a%20moving%20quote" class="fcta-btn fcta-wa" target="_blank" rel="noopener noreferrer">💬 WhatsApp Us</a>
       <a href="#quote" class="fcta-btn fcta-quote">📦 Get Instant Quote</a>
     </div>
   </div>
 </section>
 
-<!-- ✅ FIX: local-seo section placed correctly AFTER reviews, BEFORE footer -->
+<!-- LOCAL SEO -->
 <section class="local-seo">
   <h2>Packers and Movers in Bangalore</h2>
   <p>PackZen Packers &amp; Movers is a new-age relocation startup based in Bangalore, founded in 2026. We provide professional house shifting and relocation services with live GPS tracking, transparent pricing, and zero-damage commitment.</p>
@@ -897,7 +822,6 @@ alt="PackZen Packers and Movers Bangalore">
   </ul>
 </section>
 
-<!-- ✅ FIX: Single footer — removed duplicate/orphan opening tag -->
 <footer class="footer">
   <div class="footer-inner">
     <div class="footer-brand">
@@ -907,114 +831,154 @@ alt="PackZen Packers and Movers Bangalore">
     <div class="footer-info">
       <div class="footer-detail">📍 HSR Layout, Bangalore</div>
       <div class="footer-detail">📞 <a href="tel:9945095453">9945095453</a></div>
-      <div class="footer-detail">✉️ <a href="/cdn-cgi/l/email-protection#afdcdadfdfc0dddbefdfceccc4d5cac1cdc3dd81c6c1"><span class="__cf_email__" data-cfemail="21525451514e5355615140424a5b444f434d530f484f">[email&#160;protected]</span></a></div>
+      <div class="footer-detail">✉️ <a href="/cdn-cgi/l/email-protection#b6c5c3c6c6d9c4c2f6c6d7d5ddccd3d8d4dac498dfd8"><span class="__cf_email__" data-cfemail="6f1c1a1f1f001d1b2f1f0e0c04150a010d031d410601">[email&#160;protected]</span></a></div>
       <div class="footer-detail">💬 <a href="https://wa.me/919945095453?text=Hello%20PackZen%20I%20need%20moving%20service">WhatsApp Us</a></div>
     </div>
   </div>
-  <!-- ✅ FIX: merged two footer-bottom divs into one -->
   <div class="footer-bottom" style="display:flex; flex-direction:column; gap:8px; align-items:center;">
     <div>
       <a href="legal.html" style="color:rgba(255,255,255,.5); text-decoration:none; font-size:.8rem; margin:0 12px;">Privacy Policy</a>
       <a href="legal.html" style="color:rgba(255,255,255,.5); text-decoration:none; font-size:.8rem; margin:0 12px;">Terms of Service</a>
       <a href="legal.html" style="color:rgba(255,255,255,.5); text-decoration:none; font-size:.8rem; margin:0 12px;">Refund Policy</a>
     </div>
-    <div>© 2026 PackZen Packers &amp; Movers. All rights reserved. | <a href="/cdn-cgi/l/email-protection#c9babcb9b9a6bbbd89b9a8aaa2b3aca7aba5bbe7a0a7" style="color:rgba(255,255,255,.5);text-decoration:none;"><span class="__cf_email__" data-cfemail="d2a1a7a2a2bda0a692a2b3b1b9a8b7bcb0bea0fcbbbc">[email&#160;protected]</span></a></div>
+    <div>© 2026 PackZen Packers &amp; Movers. All rights reserved. | <a href="/cdn-cgi/l/email-protection#7d0e080d0d120f093d0d1c1e160718131f110f531413" style="color:rgba(255,255,255,.5);text-decoration:none;"><span class="__cf_email__" data-cfemail="cbb8bebbbba4b9bf8bbbaaa8a0b1aea5a9a7b9e5a2a5">[email&#160;protected]</span></a></div>
   </div>
 </footer>
 
-<!-- FLOATING BUTTONS — outside footer, inside body -->
+<!-- FLOATING BUTTONS -->
 <a href="tel:9945095453" class="float-call">📞 Call</a>
-<a href="https://wa.me/919945095453" class="float-wa" target="_blank">💬 WhatsApp</a>
+<a href="https://wa.me/919945095453" class="float-wa" target="_blank" rel="noopener noreferrer">💬 WhatsApp</a>
+
+<!-- DEDICATED RECAPTCHA CONTAINER for password reset (hidden) -->
+<div id="recaptcha-reset-container" style="position:absolute;width:0;height:0;overflow:hidden;opacity:0;pointer-events:none;"></div>
 
 <!-- ======================== MODALS ======================== -->
 
-<!-- AUTH MODAL -->
 <!-- AUTH MODAL -->
 <div id="authModal" class="modal-overlay" role="dialog" aria-modal="true" style="display:none;">
   <div class="modal-box auth-modal-box">
 
     <!-- LOGIN PANEL -->
     <div class="auth-panel" id="panelLogin">
-
       <button class="modal-x" onclick="closeAuthModal()">✕</button>
-
       <div class="auth-logo">📦 PackZen</div>
       <h2 class="auth-title">Welcome Back</h2>
-      <p class="auth-sub">Login to view your bookings & track moves</p>
+      <p class="auth-sub">Login to view your bookings &amp; track moves</p>
 
-   <label>Phone Number</label>
-<div class="phone-row">
-  <span class="phone-prefix">+91</span>
-  <input id="loginPhone" type="tel" placeholder="10 digit mobile number" maxlength="10" class="field-input" style="flex:1;">
-</div>
+      <label>Phone Number</label>
+      <div class="phone-row">
+        <span class="phone-prefix">+91</span>
+        <input id="loginPhone" type="tel" placeholder="10-digit mobile number" maxlength="10" class="field-input" style="flex:1;">
+      </div>
+
       <label>Password</label>
       <input id="loginPassword" type="password" placeholder="Enter password" class="field-input">
 
       <div id="loginError" class="auth-error"></div>
 
-      <button class="btn-auth" onclick="loginUser()">Login</button>
+      <button class="btn-auth" onclick="loginUser()">Login →</button>
 
       <div class="auth-divider"><span>or</span></div>
 
-      <button class="btn-auth-outline" onclick="switchPanel('panelSignup')">
-        Create New Account
-      </button>
+      <button class="btn-auth-outline" onclick="switchPanel('panelSignup')">Create New Account</button>
 
-      <p class="auth-link" onclick="switchPanel('panelRecover')">
-        Forgot password? Recover Account
-      </p>
-
+      <p class="auth-link" onclick="switchPanel('panelRecover')">Forgot password? Recover Account</p>
     </div>
 
-
-    <!-- PASSWORD RESET PANEL -->
+    <!-- PASSWORD RESET PANEL — Advanced Design -->
     <div class="auth-panel" id="panelRecover" style="display:none;">
-
       <button class="modal-x" onclick="closeAuthModal()">✕</button>
 
-      <h2 class="auth-title">Reset Password</h2>
+      <!-- Advanced header block -->
+      <div class="reset-header">
+        <div class="reset-header-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f97316" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="11" width="18" height="11" rx="2"/>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+          </svg>
+        </div>
+        <h2>Set a new password</h2>
+        <p>Enter your phone &amp; new password, then verify with OTP</p>
+      </div>
 
       <label>Phone Number</label>
       <div class="phone-row">
         <span class="phone-prefix">+91</span>
-        <input id="resetPhone" type="tel" placeholder="10 digit mobile" maxlength="10">
+        <input id="resetPhone" type="tel" placeholder="10-digit mobile" maxlength="10">
       </div>
 
-      <label>New Password</label>
-      <input id="resetNewPassword" type="password" placeholder="New password">
+      <label style="margin-top:12px;display:block;">New Password</label>
+      <div class="pass-input-wrap">
+        <input id="resetNewPassword" type="password" placeholder="Min. 6 characters" class="field-input"
+          oninput="updatePasswordStrength(this.value)">
+        <button class="pass-toggle-btn" type="button" onclick="toggleResetPass()" aria-label="Show/hide password">
+          <svg id="resetEyeIcon" width="16" height="16" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+            <circle cx="12" cy="12" r="3"/>
+          </svg>
+        </button>
+      </div>
 
-      <button class="btn-auth" onclick="sendResetOTP()">Send OTP</button>
+      <!-- Password strength bars -->
+      <div class="strength-bars">
+        <div class="strength-bar" id="sb1"></div>
+        <div class="strength-bar" id="sb2"></div>
+        <div class="strength-bar" id="sb3"></div>
+        <div class="strength-bar" id="sb4"></div>
+      </div>
+      <p class="strength-label" id="strengthLabel"></p>
 
-      <div id="recaptcha-reset"></div>
-
-      <p class="auth-link" onclick="switchPanel('panelLogin')">
-        Back to login
-      </p>
-
-    </div>
-
-
-    <!-- OTP VERIFY PANEL -->
-    <div class="auth-panel" id="panelResetOTP" style="display:none;">
-
-      <button class="modal-x" onclick="closeAuthModal()">✕</button>
-
-      <h2 class="auth-title">Verify OTP</h2>
-
-      <input id="resetOTP" type="text" placeholder="Enter 6 digit OTP" class="field-input">
-
-      <button class="btn-auth" onclick="verifyResetOTP()">
-        Verify OTP & Reset Password
+      <!-- Advanced Send OTP button -->
+      <button class="btn-send-otp" id="sendOtpBtn" onclick="sendResetOTP()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white"
+          stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.65 3.35a2 2 0 0 1 2-2.18h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+        </svg>
+        Send OTP
       </button>
 
+      <!-- Divider -->
+      <div class="reset-divider"><span>secure verification</span></div>
+
+      <!-- Trust badges -->
+      <div class="reset-trust-row">
+        <div class="reset-trust-item">OTP via SMS</div>
+        <div class="reset-trust-item">256-bit encrypted</div>
+        <div class="reset-trust-item">Instant reset</div>
+      </div>
+
+      <p class="auth-link" onclick="switchPanel('panelLogin')">Remember it? Back to login</p>
     </div>
 
+    <!-- OTP VERIFY PANEL (for Reset) -->
+    <div class="auth-panel" id="panelResetOTP" style="display:none;">
+      <button class="modal-x" onclick="closeAuthModal()">✕</button>
+
+      <div style="text-align:center; margin-bottom:8px;">
+        <div style="width:56px;height:56px;background:linear-gradient(135deg,#c2410c,#f97316);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07"/><path d="M14.05 2a9 9 0 0 1 8 7.94"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+        </div>
+      </div>
+
+      <h2 class="auth-title" style="text-align:center;">Verify OTP</h2>
+      <span class="auth-sub-otp">Enter the 6-digit OTP sent to your phone</span>
+
+      <input id="resetOTP" type="text" inputmode="numeric" maxlength="6"
+        placeholder="• • • • • •"
+        class="field-input"
+        style="text-align:center;font-size:1.5rem;font-weight:800;letter-spacing:6px;font-family:'Syne',sans-serif;color:var(--navy-deep);">
+
+      <button class="btn-auth" onclick="verifyResetOTP()">
+        Verify OTP &amp; Reset Password
+      </button>
+
+      <p class="auth-link" onclick="switchPanel('panelRecover')">← Go back &amp; resend OTP</p>
+    </div>
 
     <!-- SIGNUP PANEL -->
     <div class="auth-panel" id="panelSignup" style="display:none;">
-
       <button class="modal-x" onclick="closeAuthModal()">✕</button>
-
       <div class="auth-logo">📦 PackZen</div>
       <h2 class="auth-title">Create Account</h2>
 
@@ -1034,24 +998,36 @@ alt="PackZen Packers and Movers Bangalore">
       <input id="signupPassword" type="password" placeholder="Min 6 characters" class="field-input">
 
       <div id="recaptcha-container"></div>
-
       <div id="signupError" class="auth-error"></div>
 
-      <button class="btn-auth" onclick="signupUser()">
-        Send OTP & Register
-      </button>
+      <button class="btn-auth" onclick="signupUser()">Send OTP &amp; Register</button>
 
-      <p class="auth-link" onclick="switchPanel('panelLogin')">
-        Already have an account? Login
-      </p>
+      <p class="auth-link" onclick="switchPanel('panelLogin')">Already have an account? Login</p>
+    </div>
 
+    <!-- OTP PANEL (for Signup) -->
+    <div class="auth-panel" id="panelOTP" style="display:none;">
+      <button class="modal-x" onclick="closeAuthModal()">✕</button>
+      <h2 class="auth-title">Verify Your Number</h2>
+      <p id="otpSubText" class="auth-sub">Enter the OTP sent to your mobile</p>
+      <div class="otp-boxes">
+        <input class="otp-box" type="text" maxlength="1" inputmode="numeric" oninput="otpInput(this,0)">
+        <input class="otp-box" type="text" maxlength="1" inputmode="numeric" oninput="otpInput(this,1)">
+        <input class="otp-box" type="text" maxlength="1" inputmode="numeric" oninput="otpInput(this,2)">
+        <input class="otp-box" type="text" maxlength="1" inputmode="numeric" oninput="otpInput(this,3)">
+        <input class="otp-box" type="text" maxlength="1" inputmode="numeric" oninput="otpInput(this,4)">
+        <input class="otp-box" type="text" maxlength="1" inputmode="numeric" oninput="otpInput(this,5)">
+      </div>
+      <div id="otpError" class="auth-error"></div>
+      <button class="btn-auth" onclick="verifyOTP()">Verify OTP →</button>
+      <p class="auth-link" onclick="resendOTP()">Didn't receive? Resend OTP</p>
     </div>
 
   </div>
 </div>
 
 <!-- DASHBOARD MODAL -->
-<div id="dashboardModal" class="modal-overlay" role="dialog" aria-modal="true" aria-label="My account dashboard" style="display:none;">
+<div id="dashboardModal" class="modal-overlay" role="dialog" aria-modal="true" style="display:none;">
   <div class="modal-box dashboard-box">
     <button class="modal-x" onclick="closeDashboard()">✕</button>
     <div class="dashboard-header">
@@ -1148,11 +1124,11 @@ alt="PackZen Packers and Movers Bangalore">
         <div class="field-group"><label class="field-label">New Date <span style="color:#dc2626">*</span></label><input type="date" id="rescheduleDate" class="field-input"></div>
         <div class="field-group"><label class="field-label">Preferred Time</label><input type="time" id="rescheduleTime" class="field-input"></div>
       </div>
-      <p class="am-note">Note: Rescheduling is subject to driver availability. We'll confirm within 2 hours.</p>
+      <p style="font-size:.82rem;color:var(--text-muted);">Note: Rescheduling is subject to driver availability. We'll confirm within 2 hours.</p>
     </div>
     <div class="am-footer">
       <button class="am-btn-secondary" onclick="closeRescheduleModal()">Cancel</button>
-      <button class="am-btn-primary" id="btnConfirmReschedule" onclick="confirmReschedule()">Confirm Reschedule</button>
+      <button class="am-btn-primary am-btn-confirm" id="btnConfirmReschedule" onclick="confirmReschedule()">Confirm Reschedule</button>
     </div>
   </div>
 </div>
@@ -1160,13 +1136,13 @@ alt="PackZen Packers and Movers Bangalore">
 <!-- RATE DRIVER MODAL -->
 <div id="rateDriverModal" class="modal-overlay" style="display:none;">
   <div class="modal-box action-modal">
-    <div class="am-header rate-header">
-      <div class="am-icon">⭐</div>
+    <div class="am-header rate-header" style="background:linear-gradient(135deg,var(--gold-tint),#fff8f0);">
+      <div class="am-icon" style="background:var(--gold-tint);color:var(--gold);">⭐</div>
       <div><div class="am-title">Rate Your Driver</div><div class="am-ref" id="rateBookingRef"></div></div>
       <button class="modal-close" onclick="closeRateDriverModal()">✕</button>
     </div>
     <div class="am-body">
-      <p class="am-driver-name">How was <strong id="rateDriverName">your driver</strong>?</p>
+      <p style="text-align:center;margin-bottom:1rem;font-size:.9rem;">How was <strong id="rateDriverName">your driver</strong>?</p>
       <div class="star-row">
         <span class="rate-star" onclick="selectDriverRating(1)">★</span>
         <span class="rate-star" onclick="selectDriverRating(2)">★</span>
@@ -1174,14 +1150,13 @@ alt="PackZen Packers and Movers Bangalore">
         <span class="rate-star" onclick="selectDriverRating(4)">★</span>
         <span class="rate-star" onclick="selectDriverRating(5)">★</span>
       </div>
-      <div class="star-labels"><span>Poor</span><span>Excellent</span></div>
       <label class="field-label" style="margin-top:.8rem">Comments (optional)</label>
       <textarea id="ratingFeedback" class="field-input" rows="3" placeholder="What did you like or dislike?"></textarea>
       <div id="ratingMsg" style="font-size:.8rem;margin-top:.4rem;color:#16a34a"></div>
     </div>
     <div class="am-footer">
       <button class="am-btn-secondary" onclick="closeRateDriverModal()">Skip</button>
-      <button class="am-btn-primary" id="btnSubmitRating" onclick="submitDriverRating()">Submit Rating</button>
+      <button class="am-btn-confirm" id="btnSubmitRating" onclick="submitDriverRating()">Submit Rating</button>
     </div>
   </div>
 </div>
@@ -1190,12 +1165,12 @@ alt="PackZen Packers and Movers Bangalore">
 <div id="damageModal" class="modal-overlay" style="display:none;">
   <div class="modal-box action-modal">
     <div class="am-header" style="background:linear-gradient(135deg,#7c3aed,#6d28d9)">
-      <div class="am-icon">🔧</div>
-      <div><div class="am-title">Report Damage / Claim</div><div class="am-ref" id="damageBookingRef"></div></div>
-      <button class="modal-close" onclick="closeDamageModal()">✕</button>
+      <div class="am-icon" style="background:rgba(255,255,255,0.2);color:white;">🔧</div>
+      <div><div class="am-title" style="color:white;">Report Damage / Claim</div><div class="am-ref" id="damageBookingRef" style="color:rgba(255,255,255,0.7);"></div></div>
+      <button class="modal-close" onclick="closeDamageModal()" style="background:rgba(255,255,255,0.2);color:white;">✕</button>
     </div>
     <div class="am-body">
-      <div class="warn-box">⚠️ Claims must be reported within <strong>24 hours</strong> of delivery. Please attach clear photos of the damaged item(s).</div>
+      <div class="am-warning">⚠️ Claims must be reported within <strong>24 hours</strong> of delivery. Please attach clear photos of the damaged item(s).</div>
       <label class="field-label" style="margin-top:.5rem">Type of Damage <span style="color:#dc2626">*</span></label>
       <select id="damageType" class="field-input" style="margin-bottom:.9rem">
         <option value="">Select damage type</option>
@@ -1207,10 +1182,11 @@ alt="PackZen Packers and Movers Bangalore">
         <option value="Other">Other</option>
       </select>
       <label class="field-label">Describe what happened <span style="color:#dc2626">*</span></label>
-      <textarea id="damageDesc" class="field-input" rows="3" placeholder="Which item was damaged? How did it happen? What is the approximate value?" style="margin-bottom:.9rem"></textarea>
+      <textarea id="damageDesc" class="field-input" rows="3" placeholder="Which item was damaged? How did it happen?" style="margin-bottom:.9rem"></textarea>
       <label class="field-label">Upload Photos (max 5)</label>
       <div class="damage-upload-area" onclick="document.getElementById('damagePhotosInput').click()">
-        <div class="dua-icon">📸</div><div class="dua-text">Tap to upload damage photos</div><div class="dua-sub">Clear photos help resolve claims faster</div>
+        <div style="font-size:1.5rem;margin-bottom:4px;">📸</div>
+        <div style="font-size:.82rem;color:var(--text-muted);">Tap to upload damage photos</div>
       </div>
       <input type="file" id="damagePhotosInput" multiple accept="image/*" style="display:none" onchange="previewDamagePhotos(this)">
       <div id="damagePhotoPreview" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:.6rem"></div>
@@ -1218,13 +1194,13 @@ alt="PackZen Packers and Movers Bangalore">
     </div>
     <div class="am-footer">
       <button class="am-btn-secondary" onclick="closeDamageModal()">Cancel</button>
-      <button class="am-btn-primary" id="btnSubmitDamage" onclick="submitDamageClaim()" style="background:linear-gradient(135deg,#7c3aed,#6d28d9)">Submit Claim</button>
+      <button class="am-btn-confirm" id="btnSubmitDamage" onclick="submitDamageClaim()" style="background:linear-gradient(135deg,#7c3aed,#6d28d9)">Submit Claim</button>
     </div>
   </div>
 </div>
 
 <!-- TRACKING MODAL -->
-<div id="trackingModal" class="modal-overlay" role="dialog" aria-modal="true" aria-label="Track my booking" style="display:none;">
+<div id="trackingModal" class="modal-overlay" role="dialog" aria-modal="true" style="display:none;">
   <div class="modal-box tracking-box">
     <button class="modal-x" onclick="closeTrackingModal()">✕</button>
     <div class="tracking-header">
@@ -1307,9 +1283,8 @@ alt="PackZen Packers and Movers Bangalore">
 </div>
 
 <!-- PAYMENT CONFIRMATION MODAL -->
-<div id="paymentModal" class="modal-overlay" role="dialog" aria-modal="true" aria-label="Booking confirmation" style="display:none;">
+<div id="paymentModal" class="modal-overlay" role="dialog" aria-modal="true" style="display:none;">
   <div class="confirm-card">
-    <!-- ✅ FIX: confirm-logo-wrap correctly placed inside modal, inside confirm-card -->
     <div class="confirm-logo-wrap">
       <img src="assets/logo/packzen-logo.png" class="confirm-logo" alt="PackZen Packers and Movers" width="80" height="40" loading="lazy">
     </div>
@@ -1379,15 +1354,13 @@ alt="PackZen Packers and Movers Bangalore">
   </div>
 </div>
 
-<!-- ✅ SCRIPTS — at bottom of body -->
-<script src="env-config.js"></script>
+<!-- SCRIPTS -->
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="env-config.js"></script>
 <script src="firebase-config.js"></script>
 <script src="https://checkout.razorpay.com/v1/checkout.js" defer></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
 <script src="script.js"></script>
 <script>
-  // ✅ Fix NaN in stats — override animateCounter before script.js runs it
-  // Stats are hardcoded so we just make sure they stay correct
   document.addEventListener('DOMContentLoaded', function() {
     var statValues = ['100', '2026', '100', '0'];
     var statNumbers = document.querySelectorAll('.stat-number');
@@ -1398,7 +1371,6 @@ alt="PackZen Packers and Movers Bangalore">
     });
   });
 
-  // ✅ Google Maps loader
   function loadGoogleMaps() {
     if (!window.ENV || !window.ENV.GOOGLE_MAPS_KEY) return;
     var s = document.createElement('script');
