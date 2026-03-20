@@ -1062,30 +1062,57 @@
     </div>
 
     <!-- OTP VERIFY PANEL (for Reset) -->
+   <!-- 
+  INSTRUCTIONS: In your index.html, find the block:
+    <div class="auth-panel" id="panelResetOTP" style="display:none;">
+  and replace the ENTIRE block (up to the closing </div> before the next panel)
+  with the code below.
+-->
+
+    <!-- OTP VERIFY PANEL (for Reset Password) — FIXED -->
     <div class="auth-panel" id="panelResetOTP" style="display:none;">
       <button class="modal-x" onclick="closeAuthModal()">✕</button>
 
       <div style="text-align:center; margin-bottom:8px;">
         <div style="width:56px;height:56px;background:linear-gradient(135deg,#c2410c,#f97316);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07"/><path d="M14.05 2a9 9 0 0 1 8 7.94"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07"/>
+            <path d="M14.05 2a9 9 0 0 1 8 7.94"/>
+            <line x1="1" y1="1" x2="23" y2="23"/>
+          </svg>
         </div>
       </div>
 
-      <h2 class="auth-title" style="text-align:center;">Verify OTP</h2>
-      <span class="auth-sub-otp">Enter the 6-digit OTP sent to your phone</span>
+      <h2 class="auth-title" style="text-align:center;">Enter OTP</h2>
+      <p style="text-align:center;color:var(--text-muted);font-size:.85rem;margin-bottom:4px;">
+        We sent a 6-digit code to
+      </p>
+      <p style="text-align:center;font-weight:700;color:var(--navy-deep);font-size:.95rem;margin-bottom:1.25rem;" id="resetOtpPhoneDisplay">
+        your phone
+      </p>
 
       <input id="resetOTP" type="text" inputmode="numeric" maxlength="6"
         placeholder="• • • • • •"
         class="field-input"
         style="text-align:center;font-size:1.5rem;font-weight:800;letter-spacing:6px;font-family:'Syne',sans-serif;color:var(--navy-deep);">
 
-      <button class="btn-auth" onclick="verifyResetOTP()">
-        Verify OTP &amp; Reset Password
+      <button class="btn-auth" onclick="verifyResetOTP()" style="margin-top:1rem;">
+        Verify OTP &amp; Send Reset Link
       </button>
 
-      <p class="auth-link" onclick="switchPanel('panelRecover')">← Go back &amp; resend OTP</p>
-    </div>
+      <!-- 60-second resend timer -->
+      <div style="text-align:center;margin-top:.75rem;display:flex;align-items:center;justify-content:center;gap:.5rem;flex-wrap:wrap;">
+        <span style="font-size:.82rem;color:var(--text-muted);" id="otpTimerText"></span>
+        <button id="resetOtpResendBtn"
+          onclick="resendResetOTP()"
+          disabled
+          style="background:none;border:none;color:var(--gold);font-size:.85rem;font-weight:600;cursor:pointer;padding:0;font-family:'DM Sans',sans-serif;">
+          Resend OTP
+        </button>
+      </div>
 
+      <p class="auth-link" style="margin-top:.75rem;" onclick="switchPanel('panelRecover')">← Change phone number</p>
+    </div>
     <!-- SIGNUP PANEL -->
     <div class="auth-panel" id="panelSignup" style="display:none;">
       <button class="modal-x" onclick="closeAuthModal()">✕</button>
