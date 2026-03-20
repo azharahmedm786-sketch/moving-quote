@@ -524,21 +524,57 @@ body.dark-mode .service-card { background: var(--bg-secondary); }
    ============================================ */
 .trust-signals-section {
   padding: 36px 20px !important;
-  background: var(--navy-deep) !important;
-  border-top: none; border-bottom: none;
+  background: #0b1a2f !important; /* solid visible navy */
+  border-top: none;
+  border-bottom: none;
 }
-.ts-inner {
-  max-width: 900px; margin: 0 auto;
-  display: flex; align-items: center; justify-content: center;
-  flex-wrap: wrap; gap: 0;
-}
-.ts-badge { display: flex; align-items: center; gap: 12px; padding: 0 28px; }
-.ts-icon { font-size: 1.7rem; }
-.ts-val { font-weight: 800; font-size: 1rem !important; color: white; }
-.ts-lbl { font-size: 0.72rem; color: rgba(255,255,255,0.55); }
-.ts-divider { width: 1px; height: 40px; background: rgba(255,255,255,0.12); }
-@media(max-width:600px){ .ts-divider{display:none;} .ts-badge{padding:10px 16px;} }
 
+.ts-inner {
+  max-width: 900px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.ts-badge {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 28px;
+}
+
+.ts-icon {
+  font-size: 1.7rem;
+  color: #00e0ff; /* bright accent so icons pop */
+}
+
+.ts-val {
+  font-weight: 800;
+  font-size: 1rem !important;
+  color: #ffffff; /* force visible */
+}
+
+.ts-lbl {
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.75); /* increased visibility */
+}
+
+.ts-divider {
+  width: 1px;
+  height: 40px;
+  background: rgba(255,255,255,0.2); /* more visible divider */
+}
+
+/* MOBILE FIX */
+@media(max-width:600px){
+  .ts-divider { display:none; }
+  .ts-badge {
+    padding:10px 16px;
+    justify-content:center;
+  }
+}
 /* ============================================
    PRICING TABLE
    ============================================ */
