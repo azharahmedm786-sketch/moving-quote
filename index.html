@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en-IN">
 <head>
@@ -268,7 +269,7 @@
   </div>
 </header>
 
-<!-- ✅ BOOKING FORM — Moved directly after hero -->
+<!-- BOOKING FORM -->
 <main>
 <section class="quote-section" id="quote">
   <div class="quote-wrapper">
@@ -363,7 +364,6 @@
         <!-- STEP 2: DETAILS -->
         <div class="form-step">
           <div class="step-body">
-            <!-- ADVANCED DATE PICKER -->
             <div class="field-group">
               <label class="field-label"><span class="field-icon">📅</span> Moving Date <span style="color:#dc2626">*</span></label>
               <div class="date-strip" id="dateStrip"></div>
@@ -375,30 +375,20 @@
                 style="position:absolute;opacity:0;pointer-events:none;width:0;height:0;"
                 onchange="onCustomDatePicked(this.value)">
             </div>
-
-            <!-- ADVANCED TIME SLOT PICKER -->
             <div class="field-group">
               <label class="field-label"><span class="field-icon">🕐</span> Preferred Time Slot <span style="color:#dc2626">*</span></label>
               <div class="time-slots-grid">
                 <button type="button" class="time-slot-btn" onclick="selectTimeSlot(this,'06:00','🌅 Early Morning','6:00 AM – 8:00 AM')">
-                  <span class="ts-emoji">🌅</span>
-                  <span class="ts-label">Early Morning</span>
-                  <span class="ts-time">6 AM – 8 AM</span>
+                  <span class="ts-emoji">🌅</span><span class="ts-label">Early Morning</span><span class="ts-time">6 AM – 8 AM</span>
                 </button>
                 <button type="button" class="time-slot-btn" onclick="selectTimeSlot(this,'08:00','🌤️ Morning','8:00 AM – 12:00 PM')">
-                  <span class="ts-emoji">🌤️</span>
-                  <span class="ts-label">Morning</span>
-                  <span class="ts-time">8 AM – 12 PM</span>
+                  <span class="ts-emoji">🌤️</span><span class="ts-label">Morning</span><span class="ts-time">8 AM – 12 PM</span>
                 </button>
                 <button type="button" class="time-slot-btn" onclick="selectTimeSlot(this,'12:00','☀️ Afternoon','12:00 PM – 4:00 PM')">
-                  <span class="ts-emoji">☀️</span>
-                  <span class="ts-label">Afternoon</span>
-                  <span class="ts-time">12 PM – 4 PM</span>
+                  <span class="ts-emoji">☀️</span><span class="ts-label">Afternoon</span><span class="ts-time">12 PM – 4 PM</span>
                 </button>
                 <button type="button" class="time-slot-btn" onclick="selectTimeSlot(this,'16:00','🌇 Evening','4:00 PM – 7:00 PM')">
-                  <span class="ts-emoji">🌇</span>
-                  <span class="ts-label">Evening</span>
-                  <span class="ts-time">4 PM – 7 PM</span>
+                  <span class="ts-emoji">🌇</span><span class="ts-label">Evening</span><span class="ts-time">4 PM – 7 PM</span>
                 </button>
               </div>
               <input type="hidden" id="shiftTime" value="">
@@ -582,22 +572,22 @@
 <!-- STATS BAR -->
 <section class="stats-bar" id="statsStrip">
   <div class="stat-item">
-    <div class="stat-top"><span class="stat-number" data-animated="1">100</span><span class="stat-suffix">+</span></div>
+    <div class="stat-top"><span class="stat-number">100</span><span class="stat-suffix">+</span></div>
     <span class="stat-label">Moves Completed</span>
   </div>
   <div class="stat-divider"></div>
   <div class="stat-item">
-    <div class="stat-top"><span class="stat-number" data-animated="1">2026</span><span class="stat-suffix"></span></div>
+    <div class="stat-top"><span class="stat-number">2026</span><span class="stat-suffix"></span></div>
     <span class="stat-label">Founded</span>
   </div>
   <div class="stat-divider"></div>
   <div class="stat-item">
-    <div class="stat-top"><span class="stat-number" data-animated="1">100</span><span class="stat-suffix">%</span></div>
+    <div class="stat-top"><span class="stat-number">100</span><span class="stat-suffix">%</span></div>
     <span class="stat-label">On-Time Delivery</span>
   </div>
   <div class="stat-divider"></div>
   <div class="stat-item">
-    <div class="stat-top"><span class="stat-number" data-animated="1">0</span><span class="stat-suffix"> Damage</span></div>
+    <div class="stat-top"><span class="stat-number">0</span><span class="stat-suffix"> Damage</span></div>
     <span class="stat-label">Zero Damage Record</span>
   </div>
 </section>
@@ -659,26 +649,26 @@
   </div>
   <div class="services-grid reveal-stagger">
     <div class="service-card">
-     <img src="assets/images/service-home.webp"alt="Home Relocation Bangalore" width="400" height="200" loading="lazy">
+      <img src="assets/images/service-home.jpg" alt="Home Relocation Bangalore" width="400" height="200" loading="lazy">
       <div class="sc-icon">🏠</div>
       <h3>Home Relocation</h3>
       <p>Safe &amp; secure home shifting with full packing, loading and unpacking at destination.</p>
       <div class="sc-badge">Most Popular</div>
     </div>
     <div class="service-card">
-      <img src="assets/images/service-office.webp" alt="Office Shifting Bangalore" width="400" height="200" loading="lazy">
+      <img src="assets/images/service-office.jpg" alt="Office Shifting Bangalore" width="400" height="200" loading="lazy">
       <div class="sc-icon">🏢</div>
       <h3>Office Shifting</h3>
       <p>Minimal downtime office relocation with IT equipment handling and furniture setup.</p>
     </div>
     <div class="service-card">
-      <img src="assets/images/service-truck.webp" alt="Local Shifting Bangalore" width="400" height="200" loading="lazy">
+      <img src="assets/images/service-truck.jpg" alt="Local Shifting Bangalore" width="400" height="200" loading="lazy">
       <div class="sc-icon">📍</div>
       <h3>Local Shifting</h3>
       <p>Fast &amp; affordable within-Bangalore shifting. Same day delivery available.</p>
     </div>
     <div class="service-card">
-    <img src="assets/images/service-loading.webp" alt="Loading and Unloading Service" width="400" height="200" loading="lazy">
+      <img src="assets/images/service-loading.jpg" alt="Loading and Unloading Service" width="400" height="200" loading="lazy">
       <div class="sc-icon">💪</div>
       <h3>Loading &amp; Unloading</h3>
       <p>Trained manpower for heavy furniture and appliance handling with care.</p>
@@ -755,7 +745,7 @@
     <div class="why-card"><div class="why-icon">💰</div><h3>Transparent Billing</h3><p>Price you see is price you pay. No surprise charges at delivery. Invoice provided always.</p></div>
     <div class="why-card"><div class="why-icon">⏰</div><h3>On-Time, Every Time</h3><p>We confirm your slot, send a reminder, and call 30 min before arrival. Punctuality is our promise.</p></div>
     <div class="why-card"><div class="why-icon">📍</div><h3>Live GPS Tracking</h3><p>Track your driver and goods in real-time from packing to delivery on your phone.</p></div>
-    <div class="why-card"><div class="why-icon">💬</div><h3>Always Reachable</h3><p>WhatsApp, call, or email us at <a href="/cdn-cgi/l/email-protection#34474144445b4640744455575f4e515a5658461a5d5a" style="color:#3b82f6"><span class="__cf_email__" data-cfemail="11626461617e6365516170727a6b747f737d633f787f">[email&#160;protected]</span></a>. Your dedicated move coordinator is always available.</p></div>
+    <div class="why-card"><div class="why-icon">💬</div><h3>Always Reachable</h3><p>WhatsApp, call, or email us at <a href="mailto:support@packzenblr.in" style="color:#3b82f6">support@packzenblr.in</a>. Your dedicated move coordinator is always available.</p></div>
   </div>
 </section>
 
@@ -766,7 +756,6 @@
     <h2>Real Reviews From Real Customers</h2>
     <p>Trusted by families and offices across Bangalore — here's what they say.</p>
   </div>
-
   <div class="overall-rating">
     <div class="or-score">5.0</div>
     <div>
@@ -774,89 +763,56 @@
       <div class="or-label" id="reviewCountLabel">Based on 6 verified reviews</div>
     </div>
   </div>
-
   <div class="reviews-grid reveal-stagger" id="reviewsGrid">
-
-    <!-- Review 1 -->
     <div class="review-card">
       <div class="review-stars">★★★★★</div>
       <p class="review-text">"Honestly the best moving experience I've had in Bangalore. The team arrived 10 minutes early, packed everything neatly, and not a single item was damaged. The live tracking was a great touch — I could see exactly where my stuff was the whole time."</p>
       <div class="review-author">
         <div class="review-avatar">AS</div>
-        <div>
-          <div class="review-name">Ahmed Shariff</div>
-          <div class="review-meta">2 BHK · HSR Layout to Whitefield · March 2026</div>
-        </div>
+        <div><div class="review-name">Ahmed Shariff</div><div class="review-meta">2 BHK · HSR Layout to Whitefield · March 2026</div></div>
       </div>
     </div>
-
-    <!-- Review 2 -->
     <div class="review-card">
       <div class="review-stars">★★★★★</div>
       <p class="review-text">"PackZen shifted our entire office in just one day with zero downtime. They handled all the IT equipment and furniture with so much care. The pricing was transparent — what they quoted is exactly what we paid. Will definitely use them again."</p>
       <div class="review-author">
         <div class="review-avatar">SP</div>
-        <div>
-          <div class="review-name">Sneha Patel</div>
-          <div class="review-meta">Office Relocation · Indiranagar to Marathahalli · March 2026</div>
-        </div>
+        <div><div class="review-name">Sneha Patel</div><div class="review-meta">Office Relocation · Indiranagar to Marathahalli · March 2026</div></div>
       </div>
     </div>
-
-    <!-- Review 3 -->
     <div class="review-card">
       <div class="review-stars">★★★★★</div>
       <p class="review-text">"Booked PackZen for my 3 BHK shift on short notice and they delivered perfectly. The guys were professional, fast, and very careful with my TV and washing machine. Got WhatsApp confirmation instantly. Highly recommend to anyone moving in Bangalore!"</p>
       <div class="review-author">
         <div class="review-avatar">AM</div>
-        <div>
-          <div class="review-name">Amit Sharma</div>
-          <div class="review-meta">3 BHK · Electronic City to Sarjapur · February 2026</div>
-        </div>
+        <div><div class="review-name">Amit Sharma</div><div class="review-meta">3 BHK · Electronic City to Sarjapur · February 2026</div></div>
       </div>
     </div>
-
-    <!-- Review 4 -->
     <div class="review-card">
       <div class="review-stars">★★★★★</div>
       <p class="review-text">"I was really nervous about shifting my 1 BHK alone but PackZen made it so smooth. They wrapped every single item carefully, even my small photo frames. Finished the whole move in under 4 hours. Very happy with the service and the price was exactly what they quoted!"</p>
       <div class="review-author">
         <div class="review-avatar">RV</div>
-        <div>
-          <div class="review-name">Ravi Verma</div>
-          <div class="review-meta">1 BHK · Koramangala to BTM Layout · March 2026</div>
-        </div>
+        <div><div class="review-name">Ravi Verma</div><div class="review-meta">1 BHK · Koramangala to BTM Layout · March 2026</div></div>
       </div>
     </div>
-
-    <!-- Review 5 -->
     <div class="review-card">
       <div class="review-stars">★★★★★</div>
       <p class="review-text">"Used PackZen for shifting my parents' house — a full 3 BHK with lots of old furniture and fragile items. The team was incredibly patient and careful. They even helped reassemble the beds at the new place. 100% trustworthy service. Will refer to all my friends."</p>
       <div class="review-author">
         <div class="review-avatar">JD</div>
-        <div>
-          <div class="review-name">Joseph D'Souza</div>
-          <div class="review-meta">3 BHK · Jayanagar to JP Nagar · March 2026</div>
-        </div>
+        <div><div class="review-name">Joseph D'Souza</div><div class="review-meta">3 BHK · Jayanagar to JP Nagar · March 2026</div></div>
       </div>
     </div>
-
-    <!-- Review 6 -->
     <div class="review-card">
       <div class="review-stars">★★★★★</div>
       <p class="review-text">"Superb experience from start to finish! Booked online in 5 minutes, got a WhatsApp confirmation immediately, and the movers showed up exactly on time. They handled my fridge and washing machine with extra care. Zero damage, zero stress. PackZen is the real deal!"</p>
       <div class="review-author">
         <div class="review-avatar">FK</div>
-        <div>
-          <div class="review-name">Faisal Khan</div>
-          <div class="review-meta">2 BHK · Hebbal to Yelahanka · February 2026</div>
-        </div>
+        <div><div class="review-name">Faisal Khan</div><div class="review-meta">2 BHK · Hebbal to Yelahanka · February 2026</div></div>
       </div>
     </div>
-
   </div>
-
   <div style="text-align:center; margin-top:2rem;">
     <button class="btn-primary leave-review-btn" onclick="openReviewModal()" style="margin:0 auto;">⭐ Leave a Review</button>
   </div>
@@ -940,7 +896,7 @@
     <div class="footer-info">
       <div class="footer-detail">📍 HSR Layout, Bangalore</div>
       <div class="footer-detail">📞 <a href="tel:9945095453">9945095453</a></div>
-      <div class="footer-detail">✉️ <a href="/cdn-cgi/l/email-protection#b6c5c3c6c6d9c4c2f6c6d7d5ddccd3d8d4dac498dfd8"><span class="__cf_email__" data-cfemail="6f1c1a1f1f001d1b2f1f0e0c04150a010d031d410601">[email&#160;protected]</span></a></div>
+      <div class="footer-detail">✉️ <a href="mailto:support@packzenblr.in">support@packzenblr.in</a></div>
       <div class="footer-detail">💬 <a href="https://wa.me/919945095453?text=Hello%20PackZen%20I%20need%20moving%20service">WhatsApp Us</a></div>
     </div>
   </div>
@@ -950,7 +906,7 @@
       <a href="legal.html" style="color:rgba(255,255,255,.5); text-decoration:none; font-size:.8rem; margin:0 12px;">Terms of Service</a>
       <a href="legal.html" style="color:rgba(255,255,255,.5); text-decoration:none; font-size:.8rem; margin:0 12px;">Refund Policy</a>
     </div>
-    <div>© 2026 PackZen Packers &amp; Movers. All rights reserved. | <a href="/cdn-cgi/l/email-protection#7d0e080d0d120f093d0d1c1e160718131f110f531413" style="color:rgba(255,255,255,.5);text-decoration:none;"><span class="__cf_email__" data-cfemail="cbb8bebbbba4b9bf8bbbaaa8a0b1aea5a9a7b9e5a2a5">[email&#160;protected]</span></a></div>
+    <div>© 2026 PackZen Packers &amp; Movers. All rights reserved. | <a href="mailto:support@packzenblr.in" style="color:rgba(255,255,255,.5);text-decoration:none;">support@packzenblr.in</a></div>
   </div>
 </footer>
 
@@ -958,7 +914,7 @@
 <a href="tel:9945095453" class="float-call">📞 Call</a>
 <a href="https://wa.me/919945095453" class="float-wa" target="_blank" rel="noopener noreferrer">💬 WhatsApp</a>
 
-<!-- DEDICATED RECAPTCHA CONTAINER for password reset (hidden) -->
+<!-- RECAPTCHA CONTAINER -->
 <div id="recaptcha-reset-container" style="position:absolute;width:0;height:0;overflow:hidden;opacity:0;pointer-events:none;"></div>
 
 <!-- ======================== MODALS ======================== -->
@@ -966,70 +922,49 @@
 <!-- AUTH MODAL -->
 <div id="authModal" class="modal-overlay" role="dialog" aria-modal="true" style="display:none;">
   <div class="modal-box auth-modal-box">
-
-    <!-- LOGIN PANEL -->
     <div class="auth-panel" id="panelLogin">
       <button class="modal-x" onclick="closeAuthModal()">✕</button>
       <div class="auth-logo">📦 PackZen</div>
       <h2 class="auth-title">Welcome Back</h2>
       <p class="auth-sub">Login to view your bookings &amp; track moves</p>
-
       <label>Phone Number</label>
       <div class="phone-row">
         <span class="phone-prefix">+91</span>
         <input id="loginPhone" type="tel" placeholder="10-digit mobile number" maxlength="10" class="field-input" style="flex:1;">
       </div>
-
       <label>Password</label>
       <input id="loginPassword" type="password" placeholder="Enter password" class="field-input">
-
       <div id="loginError" class="auth-error"></div>
-
       <button class="btn-auth" onclick="loginUser()">Login →</button>
-
       <div class="auth-divider"><span>or</span></div>
-
       <button class="btn-auth-outline" onclick="switchPanel('panelSignup')">Create New Account</button>
-
       <p class="auth-link" onclick="switchPanel('panelRecover')">Forgot password? Recover Account</p>
     </div>
-
-    <!-- PASSWORD RESET PANEL — Advanced Design -->
     <div class="auth-panel" id="panelRecover" style="display:none;">
       <button class="modal-x" onclick="closeAuthModal()">✕</button>
-
-      <!-- Advanced header block -->
       <div class="reset-header">
         <div class="reset-header-icon">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f97316" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="3" y="11" width="18" height="11" rx="2"/>
-            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+            <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
           </svg>
         </div>
         <h2>Set a new password</h2>
         <p>Enter your phone &amp; new password, then verify with OTP</p>
       </div>
-
       <label>Phone Number</label>
       <div class="phone-row">
         <span class="phone-prefix">+91</span>
         <input id="resetPhone" type="tel" placeholder="10-digit mobile" maxlength="10">
       </div>
-
       <label style="margin-top:12px;display:block;">New Password</label>
       <div class="pass-input-wrap">
-        <input id="resetNewPassword" type="password" placeholder="Min. 6 characters" class="field-input"
-          oninput="updatePasswordStrength(this.value)">
+        <input id="resetNewPassword" type="password" placeholder="Min. 6 characters" class="field-input" oninput="updatePasswordStrength(this.value)">
         <button class="pass-toggle-btn" type="button" onclick="toggleResetPass()" aria-label="Show/hide password">
-          <svg id="resetEyeIcon" width="16" height="16" viewBox="0 0 24 24" fill="none"
-            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-            <circle cx="12" cy="12" r="3"/>
+          <svg id="resetEyeIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
           </svg>
         </button>
       </div>
-
-      <!-- Password strength bars -->
       <div class="strength-bars">
         <div class="strength-bar" id="sb1"></div>
         <div class="strength-bar" id="sb2"></div>
@@ -1037,111 +972,61 @@
         <div class="strength-bar" id="sb4"></div>
       </div>
       <p class="strength-label" id="strengthLabel"></p>
-
-      <!-- Advanced Send OTP button -->
       <button class="btn-send-otp" id="sendOtpBtn" onclick="sendResetOTP()">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white"
-          stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.65 3.35a2 2 0 0 1 2-2.18h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
         </svg>
         Send OTP
       </button>
-
-      <!-- Divider -->
       <div class="reset-divider"><span>secure verification</span></div>
-
-      <!-- Trust badges -->
       <div class="reset-trust-row">
         <div class="reset-trust-item">OTP via SMS</div>
         <div class="reset-trust-item">256-bit encrypted</div>
         <div class="reset-trust-item">Instant reset</div>
       </div>
-
       <p class="auth-link" onclick="switchPanel('panelLogin')">Remember it? Back to login</p>
     </div>
-
-    <!-- OTP VERIFY PANEL (for Reset) -->
-   <!-- 
-  INSTRUCTIONS: In your index.html, find the block:
-    <div class="auth-panel" id="panelResetOTP" style="display:none;">
-  and replace the ENTIRE block (up to the closing </div> before the next panel)
-  with the code below.
--->
-
-    <!-- OTP VERIFY PANEL (for Reset Password) — FIXED -->
     <div class="auth-panel" id="panelResetOTP" style="display:none;">
       <button class="modal-x" onclick="closeAuthModal()">✕</button>
-
       <div style="text-align:center; margin-bottom:8px;">
         <div style="width:56px;height:56px;background:linear-gradient(135deg,#c2410c,#f97316);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07"/>
-            <path d="M14.05 2a9 9 0 0 1 8 7.94"/>
-            <line x1="1" y1="1" x2="23" y2="23"/>
+            <path d="M14.05 2a9 9 0 0 1 8 7.94"/><line x1="1" y1="1" x2="23" y2="23"/>
           </svg>
         </div>
       </div>
-
       <h2 class="auth-title" style="text-align:center;">Enter OTP</h2>
-      <p style="text-align:center;color:var(--text-muted);font-size:.85rem;margin-bottom:4px;">
-        We sent a 6-digit code to
-      </p>
-      <p style="text-align:center;font-weight:700;color:var(--navy-deep);font-size:.95rem;margin-bottom:1.25rem;" id="resetOtpPhoneDisplay">
-        your phone
-      </p>
-
-      <input id="resetOTP" type="text" inputmode="numeric" maxlength="6"
-        placeholder="• • • • • •"
-        class="field-input"
-        style="text-align:center;font-size:1.5rem;font-weight:800;letter-spacing:6px;font-family:'Syne',sans-serif;color:var(--navy-deep);">
-
-      <button class="btn-auth" onclick="verifyResetOTP()" style="margin-top:1rem;">
-        Verify OTP &amp; Send Reset Link
-      </button>
-
-      <!-- 60-second resend timer -->
+      <p style="text-align:center;color:var(--text-muted);font-size:.85rem;margin-bottom:4px;">We sent a 6-digit code to</p>
+      <p style="text-align:center;font-weight:700;color:var(--navy-deep);font-size:.95rem;margin-bottom:1.25rem;" id="resetOtpPhoneDisplay">your phone</p>
+      <input id="resetOTP" type="text" inputmode="numeric" maxlength="6" placeholder="• • • • • •" class="field-input" style="text-align:center;font-size:1.5rem;font-weight:800;letter-spacing:6px;font-family:'Syne',sans-serif;color:var(--navy-deep);">
+      <button class="btn-auth" onclick="verifyResetOTP()" style="margin-top:1rem;">Verify OTP &amp; Reset Password</button>
       <div style="text-align:center;margin-top:.75rem;display:flex;align-items:center;justify-content:center;gap:.5rem;flex-wrap:wrap;">
         <span style="font-size:.82rem;color:var(--text-muted);" id="otpTimerText"></span>
-        <button id="resetOtpResendBtn"
-          onclick="resendResetOTP()"
-          disabled
-          style="background:none;border:none;color:var(--gold);font-size:.85rem;font-weight:600;cursor:pointer;padding:0;font-family:'DM Sans',sans-serif;">
-          Resend OTP
-        </button>
+        <button id="resetOtpResendBtn" onclick="resendResetOTP()" disabled style="background:none;border:none;color:var(--gold);font-size:.85rem;font-weight:600;cursor:pointer;padding:0;font-family:'DM Sans',sans-serif;">Resend OTP</button>
       </div>
-
       <p class="auth-link" style="margin-top:.75rem;" onclick="switchPanel('panelRecover')">← Change phone number</p>
     </div>
-    <!-- SIGNUP PANEL -->
     <div class="auth-panel" id="panelSignup" style="display:none;">
       <button class="modal-x" onclick="closeAuthModal()">✕</button>
       <div class="auth-logo">📦 PackZen</div>
       <h2 class="auth-title">Create Account</h2>
-
       <label>Full Name</label>
       <input id="signupName" type="text" placeholder="Your full name" class="field-input">
-
       <label>Email</label>
       <input id="signupEmail" type="email" placeholder="your@email.com" class="field-input">
-
       <label>Phone Number</label>
       <div class="phone-row">
         <span class="phone-prefix">+91</span>
         <input id="signupPhone" type="tel" placeholder="10 digit mobile" maxlength="10">
       </div>
-
       <label>Password</label>
       <input id="signupPassword" type="password" placeholder="Min 6 characters" class="field-input">
-
       <div id="recaptcha-container"></div>
       <div id="signupError" class="auth-error"></div>
-
       <button class="btn-auth" onclick="signupUser()">Send OTP &amp; Register</button>
-
       <p class="auth-link" onclick="switchPanel('panelLogin')">Already have an account? Login</p>
     </div>
-
-    <!-- OTP PANEL (for Signup) -->
     <div class="auth-panel" id="panelOTP" style="display:none;">
       <button class="modal-x" onclick="closeAuthModal()">✕</button>
       <h2 class="auth-title">Verify Your Number</h2>
@@ -1158,7 +1043,6 @@
       <button class="btn-auth" onclick="verifyOTP()">Verify OTP →</button>
       <p class="auth-link" onclick="resendOTP()">Didn't receive? Resend OTP</p>
     </div>
-
   </div>
 </div>
 
@@ -1491,8 +1375,7 @@
 </div>
 
 <!-- SCRIPTS -->
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="https://packzen-config.azharahmedm786.workers.dev"></script>
-
+<script src="https://packzen-config.azharahmedm786.workers.dev"></script>
 <script src="firebase-config.js"></script>
 <script src="https://checkout.razorpay.com/v1/checkout.js" defer></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
@@ -1502,8 +1385,6 @@
     var statValues = ['100', '2026', '100', '0'];
     var statNumbers = document.querySelectorAll('.stat-number');
     statNumbers.forEach(function(el, i) {
-      el.removeAttribute('data-target');
-      el.removeAttribute('data-animated');
       if (statValues[i] !== undefined) el.textContent = statValues[i];
     });
   });
