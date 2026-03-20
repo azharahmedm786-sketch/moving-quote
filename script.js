@@ -27,6 +27,43 @@ let uploadedPhotos      = [];
 let pendingWhatsAppMsg  = null;
 let pendingAdminMsg     = null;
 
+/* ============================================
+   OWNER NOTIFICATION — Auto WhatsApp on booking
+   ============================================ */
+const OWNER_WHATSAPP = "919945095453"; // Your WhatsApp number
+
+function notifyOwner(bookingRef, name, phone, pickup, drop, date, total, payType, source) {
+  const emoji  = source === "online" ? "💳" : source === "whatsapp" ? "📲" : "📋";
+  const payLbl = source === "online"
+    ? "Paid Online ✅"
+    : source === "whatsapp"
+    ? "WhatsApp booking"
+    : "Pay on delivery";
+
+  const msg =
+    `${emoji} *New Booking Alert — PackZen* 🚚\n` +
+    `━━━━━━━━━━━━━━━━━━━━\n` +
+    `📌 *ID:* ${bookingRef}\n` +
+    `👤 *Customer:* ${name}\n` +
+    `📞 *Phone:* +91 ${phone}\n` +
+    `📍 *Pickup:* ${pickup}\n` +
+    `🏁 *Drop:* ${drop}\n` +
+    `📅 *Date:* ${date || "To be confirmed"}\n` +
+    `💰 *Amount:* ₹${Number(total).toLocaleString("en-IN")}\n` +
+    `💳 *Payment:* ${payLbl}\n` +
+    `━━━━━━━━━━━━━━━━━━━━\n` +
+    `Reply CONFIRM or call customer now.`;
+
+  // Open WhatsApp to your number with the booking details
+  setTimeout(() => {
+    window.open(
+      `https://wa.me/${OWNER_WHATSAPP}?text=${encodeURIComponent(msg)}`,
+      "_blank",
+      "noopener,noreferrer"
+    );
+  }, 1500); // slight delay so the confirmation card appears first
+}
+
 const MIN_BASE_PRICE = 1999;
 const FRIDGE_PRICE   = 150;
 const RAZORPAY_KEY   = (window.ENV && window.ENV.RAZORPAY_KEY) || "";
@@ -231,7 +268,7 @@ function initPaymentOptions() {
    ============================================ */
 function waitForFirebase(cb, tries = 0) {
   if (window._firebase) { cb(); return; }
-  if (tries > 30) { console.warn("Firebase not loaded"); return; }
+  if (tries > 30) { return; // firebase timeout }
   setTimeout(() => waitForFirebase(cb, tries + 1), 200);
 }
 
@@ -260,7 +297,7 @@ function updateNavForUser(user) {
           if (adminLink) adminLink.style.display = "block";
         }
       })
-      .catch(err => console.error("Nav admin check error:", err));
+      .catch(() => {}); // silent
   } else {
     loginBtn.style.display = "inline-block";
     navUser.style.display  = "none";
@@ -385,14 +422,14 @@ function signupUser() {
           if (btn) { btn.disabled = false; btn.textContent = "Send OTP & Register →"; }
         })
         .catch(err => {
-          console.error("OTP send error:", err);
+          
           try { window.recaptchaVerifier.clear(); } catch(e) {}
           window.recaptchaVerifier = null;
           showError("signupError", getAuthErrorMessage(err.code));
           if (btn) { btn.disabled = false; btn.textContent = "Send OTP & Register →"; }
         });
     }).catch(err => {
-      console.error("Recaptcha render error:", err);
+      
       showError("signupError", "reCAPTCHA error. Please refresh and try again.");
       if (btn) { btn.disabled = false; btn.textContent = "Send OTP & Register →"; }
     });
@@ -461,7 +498,7 @@ async function processReferral(refCode, newUserUid) {
       });
       await db.collection("users").doc(newUserUid).update({ referralDiscount: 500, referredBy: refCode });
     }
-  } catch (e) { console.error("Referral error:", e); }
+  } catch (e) {  }
 }
 
 function resendOTP() {
@@ -484,11 +521,11 @@ async function sendResetOTP() {
   const password = document.getElementById("resetNewPassword").value;
 
   if (phone.length !== 10) {
-    alert("Enter a valid 10-digit phone number");
+    showToast("⚠️ Enter a valid 10-digit phone number");
     return;
   }
   if (password.length < 6) {
-    alert("Password must be at least 6 characters");
+    showToast("⚠️ Password must be at least 6 characters");
     return;
   }
 
@@ -531,7 +568,7 @@ async function sendResetOTP() {
     if (btn) { btn.disabled = false; btn.textContent = "Send OTP"; }
 
   } catch (err) {
-    console.error("Reset OTP error:", err);
+    
 
     // ✅ Step 7: Clean up on failure so retry works
     if (window.resetRecaptchaVerifier) {
@@ -542,7 +579,7 @@ async function sendResetOTP() {
 
     if (btn) { btn.disabled = false; btn.textContent = "Send OTP"; }
 
-    alert("Failed to send OTP: " + err.message);
+    showToast("❌ Failed to send OTP: " + err.message);
   }
 }
 
@@ -550,12 +587,12 @@ async function verifyResetOTP() {
   const otp = document.getElementById("resetOTP").value.trim();
 
   if (!otp || otp.length !== 6) {
-    alert("Please enter the 6-digit OTP");
+    showToast("⚠️ Please enter the 6-digit OTP");
     return;
   }
 
   if (!resetConfirmation) {
-    alert("OTP session expired. Please go back and try again.");
+    showToast("⚠️ OTP session expired. Please go back and try again.");
     switchPanel("panelRecover");
     return;
   }
@@ -571,21 +608,56 @@ async function verifyResetOTP() {
 
     if (btn) { btn.disabled = false; btn.textContent = "Verify OTP & Reset Password"; }
 
-    alert("✅ Password reset successful! Please login with your new password.");
+    showToast("✅ Password reset successful! Please login with your new password.", 5000); switchPanel("panelLogin");
     switchPanel("panelLogin");
 
   } catch (err) {
-    console.error("Reset OTP verify error:", err);
+    
     if (btn) { btn.disabled = false; btn.textContent = "Verify OTP & Reset Password"; }
 
     if (err.code === "auth/invalid-verification-code") {
-      alert("Invalid OTP. Please check and try again.");
+      showToast("❌ Invalid OTP. Please check and try again.");
     } else if (err.code === "auth/session-expired") {
-      alert("OTP expired. Please go back and request a new one.");
+      showToast("⚠️ OTP expired. Please request a new one."); switchPanel("panelRecover");
       switchPanel("panelRecover");
     } else {
-      alert("Error: " + err.message);
+      showToast("❌ Error: " + err.message);
     }
+  }
+}
+
+/* ============================================
+   RESET PANEL — Eye toggle & strength meter
+   ============================================ */
+function toggleResetPass() {
+  const input = document.getElementById("resetNewPassword");
+  const icon  = document.getElementById("resetEyeIcon");
+  if (!input || !icon) return;
+  if (input.type === "password") {
+    input.type = "text";
+    icon.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>';
+  } else {
+    input.type = "password";
+    icon.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
+  }
+}
+
+function updatePasswordStrength(val) {
+  let score = 0;
+  if (val.length >= 6)  score++;
+  if (val.length >= 10) score++;
+  if (/[A-Z]/.test(val) && /[0-9]/.test(val)) score++;
+  if (/[^A-Za-z0-9]/.test(val)) score++;
+  const colors = ["#ef4444","#f97316","#eab308","#16a34a"];
+  const labels = ["Weak","Fair","Good","Strong"];
+  [1,2,3,4].forEach(i => {
+    const bar = document.getElementById("sb" + i);
+    if (bar) bar.style.background = i <= score ? colors[score-1] : "var(--border-light)";
+  });
+  const label = document.getElementById("strengthLabel");
+  if (label) {
+    label.textContent = val.length === 0 ? "" : (labels[score-1] || "Weak");
+    label.style.color = val.length === 0 ? "" : (colors[score-1] || "#ef4444");
   }
 }
 
@@ -919,7 +991,7 @@ async function saveQuoteToFirestore(total) {
       total, date: new Date().toLocaleDateString("en-IN"),
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
     });
-  } catch (e) { console.error("Quote save error:", e); }
+  } catch (e) {  }
 }
 
 /* ============================================
@@ -937,7 +1009,7 @@ function initAutocomplete() {
   if (toggle) {
     toggle.addEventListener("change", () => {
       if (!toggle.checked) return;
-      if (!navigator.geolocation) { alert("Location not supported."); toggle.checked = false; return; }
+      if (!navigator.geolocation) { showToast("⚠️ Location not supported by this browser."); toggle.checked = false; return; }
       pickupInput.value = "📍 Getting your location...";
       navigator.geolocation.getCurrentPosition(
         pos => {
@@ -947,10 +1019,10 @@ function initAutocomplete() {
               pickupInput.value = res[0].formatted_address;
               pickupPlace = { geometry: { location: latLng } };
               showLocation("pickup"); calculateQuote(true);
-            } else { pickupInput.value = ""; toggle.checked = false; alert("Could not get address. Type manually."); }
+            } else { pickupInput.value = ""; toggle.checked = false; showToast("⚠️ Could not get address. Please type it manually."); }
           });
         },
-        err => { pickupInput.value = ""; toggle.checked = false; alert("Location error: " + err.message); },
+        err => { pickupInput.value = ""; toggle.checked = false; showToast("❌ Location error: " + err.message); },
         { enableHighAccuracy: true, timeout: 10000 }
       );
     });
@@ -1024,10 +1096,10 @@ function calculateQuote(auto = false) {
   const house   = document.getElementById("house");
   const vehicle = document.getElementById("vehicle");
   const result  = document.getElementById("result");
-  if (!pickup?.value || !drop?.value)        { if (!auto) alert("Enter pickup & drop");    return; }
+  if (!pickup?.value || !drop?.value)        { if (!auto) showToast("📍 Please enter pickup & drop locations."); return; }
   const houseBase   = Number(house?.value   || 0);
   const vehicleRate = Number(vehicle?.value || 0);
-  if (!houseBase || (!isIntercityMove && !vehicleRate)) { if (!auto) alert("Select house & vehicle"); return; }
+  if (!houseBase || (!isIntercityMove && !vehicleRate)) { if (!auto) showToast("🏠 Please select house type and vehicle."); return; }
 
   const chargedItems = ["sofaCheck","tvCheck","tvUnitCheck","coffeeCheck","acCheck","bedCheck","wardrobeCheck","dressingCheck","sideTableCheck"];
   let itemCount = 0;
@@ -1124,9 +1196,9 @@ async function bookOnWhatsApp() {
   if (!currentUser) { showToast("👋 Please login or create an account to book."); openAuthModal("login"); return; }
   const name  = document.getElementById("custName")?.value?.trim();
   const phone = document.getElementById("custPhone")?.value?.trim();
-  if (!name)                       return alert("Please enter your name.");
-  if (!phone || phone.length < 10) return alert("Please enter a valid phone number.");
-  if (lastCalculatedTotal === 0)   return alert("Price not calculated yet.");
+  if (!name)                       return showToast("⚠️ Please enter your name.");
+  if (!phone || phone.length < 10) return showToast("⚠️ Please enter a valid phone number.");
+  if (lastCalculatedTotal === 0)   return showToast("⚠️ Price not calculated yet. Please enter pickup & drop locations.");
 
   saveLead();
   const pickup      = document.getElementById("pickup")?.value  || "";
@@ -1158,6 +1230,7 @@ async function bookOnWhatsApp() {
       currentBookingId = docRef.id;
       localStorage.setItem("packzen_active_booking", docRef.id);
       queueSMS(phone, "booking_confirmed", { name, bookingRef, date, pickup, total: discountedTotal });
+      notifyOwner(bookingRef, name, phone, pickup, drop, date, discountedTotal, "pay_later", "whatsapp");
 
       showConfirmationCard({
         bookingRef, name, phone, pickup, drop, date,
@@ -1174,8 +1247,8 @@ async function bookOnWhatsApp() {
         `🏠 *House:* ${houseText||"—"}\n🚚 *Vehicle:* ${vehicleText||"—"}\n` +
         `💰 *Estimate:* ₹${discountedTotal.toLocaleString("en-IN")}\n━━━━━━━━━━━━━━━━━━━━\nPayment: Cash on moving day`;
       pendingAdminMsg = pendingWhatsAppMsg;
-    } catch(e) { console.error("WA booking save:", e); alert("Booking save failed: " + e.message); }
-  } else { alert("Service not ready. Please refresh and try again."); }
+    } catch(e) { // showToast("❌ Booking save failed: " + e.message); }
+  } else { showToast("⚠️ Service not ready. Please refresh and try again."); }
 }
 
 /* ============================================
@@ -1186,10 +1259,10 @@ function startPayment() {
   if (!document.getElementById("tncAccepted")?.checked) { showToast("⚠️ Please accept the Terms & Conditions."); return; }
   const name  = document.getElementById("custName")?.value?.trim();
   const phone = document.getElementById("custPhone")?.value?.trim();
-  if (!name)  return alert("Please enter your name.");
-  if (!phone || phone.length < 10) return alert("Please enter a valid phone number.");
-  if (lastCalculatedTotal === 0)   return alert("Price not calculated yet.");
-  if (!RAZORPAY_KEY) { alert("⚠️ Razorpay key not found. Check env-config.js."); return; }
+  if (!name)  return showToast("⚠️ Please enter your name.");
+  if (!phone || phone.length < 10) return showToast("⚠️ Please enter a valid phone number.");
+  if (lastCalculatedTotal === 0)   return showToast("⚠️ Price not calculated yet. Please enter pickup & drop locations.");
+  if (!RAZORPAY_KEY) { showToast("⚠️ Payment not configured. Please contact support."); return; }
 
   const discounted = Math.max(lastCalculatedTotal - promoDiscount, 0);
   if (selectedPayment === "at_drop") { bookWithoutPayment(); return; }
@@ -1210,7 +1283,7 @@ function startPayment() {
     modal: { ondismiss: () => {} }
   });
   rzp.open();
-  rzp.on("payment.failed", r => alert("Payment failed: " + r.error.description));
+  rzp.on("payment.failed", r => showToast("❌ Payment failed: " + r.error.description));
 }
 
 function onPaymentSuccess(response, name, phone, paid, total) {
@@ -1259,7 +1332,8 @@ function onPaymentSuccess(response, name, phone, paid, total) {
         name, bookingRef, date: shiftDate?.value || "TBD",
         pickup: pickup?.value || "", total
       });
-    }).catch(e => console.error("Booking save:", e));
+      notifyOwner(bookingRef, name, phone, pickup?.value || "—", drop?.value || "—", shiftDate?.value || "TBD", total, selectedPayment, "online");
+    }).catch(() => {}); // silent
   }
 }
 
@@ -1292,7 +1366,8 @@ function downloadInvoice() {
   doc.setTextColor(0,0,0); doc.setFontSize(11);
   doc.text("Invoice No: " + bookingId, 14, 42);
   doc.text("Date: " + now.toLocaleDateString("en-IN"), 14, 50);
-  doc.text("GSTIN: 29XXXXX1234Z1 (Add yours)", 14, 58);
+  const gstin = (window.ENV && window.ENV.GSTIN) ? window.ENV.GSTIN : "";
+  if (gstin) doc.text("GSTIN: " + gstin, 14, 58);
 
   doc.setFillColor(240, 247, 255); doc.rect(14, 65, 182, 8, "F");
   doc.setFont("helvetica","bold"); doc.text("Booking Details", 16, 71);
@@ -1544,7 +1619,7 @@ async function checkAndShowActiveBooking(uid) {
     if (tobId) tobId.textContent = b.bookingRef || doc.id.slice(0,8).toUpperCase();
     document.getElementById("trackOrderBanner").style.display = "block";
     updateTrackBanner(b); startBannerTracking();
-  } catch(e) { console.warn("Active booking check:", e.message); }
+  } catch(e) {  }
 }
 
 function dismissTrackBanner() {
@@ -2223,7 +2298,7 @@ async function createDriver() {
     showToast(`✅ Driver account created for ${name}`);
 
   } catch (error) {
-    console.error("Driver creation error:", error);
+    
     if (error.code === "auth/email-already-in-use") {
       setMsg("⚠️ A driver with this email already exists.", false);
     } else {
@@ -2291,6 +2366,7 @@ function bookWithoutPayment() {
     if (btn) { btn.disabled = false; btn.textContent = "📋 Confirm Booking · Pay on Delivery"; }
 
     queueSMS(phone, "booking_confirmed", { name, bookingRef, date, pickup, total: discountedTotal });
+    notifyOwner(bookingRef, name, phone, pickup, drop, date, discountedTotal, "pay_later", "direct");
 
     const houseEl   = document.getElementById("house");
     const vehicleEl = document.getElementById("vehicle");
@@ -2371,7 +2447,7 @@ function loadUserQuotes() {
           <div class="qi-date">${q.date||""}</div>
         </div>`;
       }).join("");
-    }).catch(e => console.error("Quotes load:", e));
+    }).catch(() => {}); // silent
 }
 
 function loadUserBookings() {
@@ -2419,7 +2495,7 @@ function loadUserBookings() {
           </div>` : ""}
         </div>`;
       }).join("");
-    }).catch(e => console.error("Bookings load:", e));
+    }).catch(() => {}); // silent
 }
 
 function loadProfileData() {
@@ -2437,7 +2513,7 @@ function loadProfileData() {
     if (phoneEl)     phoneEl.value = d.phone || "";
     if (prefEmailEl) prefEmailEl.checked = d.prefEmail !== false;
     if (prefSMSEl)   prefSMSEl.checked   = d.prefSMS   !== false;
-  }).catch(e => console.error("Profile load:", e));
+  }).catch(() => {}); // silent
 }
 
 function saveProfile() {
@@ -2458,7 +2534,7 @@ function savePreferences() {
   if (!currentUser || !window._firebase) return;
   const prefEmail = document.getElementById("prefEmail")?.checked;
   const prefSMS   = document.getElementById("prefSMS")?.checked;
-  window._firebase.db.collection("users").doc(currentUser.uid).update({ prefEmail, prefSMS }).catch(e => console.error("Prefs save:", e));
+  window._firebase.db.collection("users").doc(currentUser.uid).update({ prefEmail, prefSMS }).catch(() => {}); // silent
 }
 
 function openProfile() {
@@ -2696,7 +2772,7 @@ async function requestPushPermission() {
         fcmToken: token, fcmUpdatedAt: firebase.firestore.FieldValue.serverTimestamp()
       });
     }
-  } catch(e) { console.warn("FCM token error:", e); }
+  } catch(e) {  }
 }
 
 function subscribeToBookingNotifications(bookingDocId) {
@@ -2753,7 +2829,7 @@ async function queueSMS(phone, templateKey, data) {
       mobile, message, template: templateKey,
       status: "pending", createdAt: firebase.firestore.FieldValue.serverTimestamp(), retries: 0
     });
-  } catch(e) { console.error("SMS queue error:", e); }
+  } catch(e) {  }
 }
 
 function setupStatusSMS(bookingDocId, customerPhone, customerName, bookingRef) {
@@ -2865,4 +2941,43 @@ function toggleFaq(btn) {
   const isOpen = item.classList.contains("open");
   document.querySelectorAll(".faq-item.open").forEach(i => i.classList.remove("open"));
   if (!isOpen) item.classList.add("open");
+}
+
+/* ============================================
+   RESET PASSWORD — Advanced UI helpers
+   ============================================ */
+
+function toggleResetPass() {
+  const input = document.getElementById("resetNewPassword");
+  const icon  = document.getElementById("resetEyeIcon");
+  if (!input || !icon) return;
+  if (input.type === "password") {
+    input.type = "text";
+    icon.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>';
+  } else {
+    input.type = "password";
+    icon.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
+  }
+}
+
+function updatePasswordStrength(val) {
+  let score = 0;
+  if (val.length >= 6)                                   score++;
+  if (val.length >= 10)                                  score++;
+  if (/[A-Z]/.test(val) && /[0-9]/.test(val))           score++;
+  if (/[^A-Za-z0-9]/.test(val))                         score++;
+
+  const colors = ["#ef4444","#f97316","#eab308","#16a34a"];
+  const labels = ["Weak","Fair","Good","Strong"];
+
+  [1,2,3,4].forEach(i => {
+    const bar = document.getElementById("sb" + i);
+    if (bar) bar.style.background = i <= score ? colors[score-1] : "var(--border-light)";
+  });
+
+  const label = document.getElementById("strengthLabel");
+  if (label) {
+    label.textContent  = val.length === 0 ? "" : (labels[score-1] || "Weak");
+    label.style.color  = val.length === 0 ? "" : (colors[score-1] || "#ef4444");
+  }
 }
