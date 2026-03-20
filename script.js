@@ -77,6 +77,318 @@ function debounce(fn, ms) {
 }
 
 /* ============================================
+   BOTTOM SHEET SYSTEM
+   ============================================ */
+
+let _activeBs = null;
+
+function openBottomSheet(id) {
+  closeAllBottomSheets();
+  const sheet = document.getElementById(id);
+  const overlay = document.getElementById("bsOverlay");
+  if (!sheet || !overlay) return;
+
+  // Build dynamic content before opening
+  if (id === "bsDate")        buildBsDateStrip();
+  if (id === "bsHouse")       buildBsHouseOptions();
+
+  overlay.classList.add("open");
+  sheet.classList.add("open");
+  _activeBs = id;
+  document.body.style.overflow = "hidden";
+}
+
+function closeAllBottomSheets() {
+  document.querySelectorAll(".bottom-sheet.open").forEach(s => s.classList.remove("open"));
+  const overlay = document.getElementById("bsOverlay");
+  if (overlay) overlay.classList.remove("open");
+  _activeBs = null;
+  document.body.style.overflow = "";
+}
+
+/* ---------- DATE SHEET ---------- */
+function buildBsDateStrip() {
+  const strip = document.getElementById("bsDateStrip");
+  if (!strip) return;
+  strip.innerHTML = "";
+
+  const today = new Date(); today.setHours(0,0,0,0);
+  const DAYS   = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+  const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  const selected = document.getElementById("shiftDate")?.value;
+
+  // Also set min on date input
+  const di = document.getElementById("bsDateInput");
+  if (di) di.min = today.toISOString().split("T")[0];
+
+  for (let i = 0; i < 14; i++) {
+    const d = new Date(today);
+    d.setDate(today.getDate() + i);
+    const ds = d.toISOString().split("T")[0];
+
+    const card = document.createElement("div");
+    card.className = "bs-date-card" +
+      (i === 0 ? " today-card" : "") +
+      (ds === selected ? " selected" : "");
+    card.dataset.date = ds;
+    card.innerHTML = `
+      <div class="bs-dc-day">${DAYS[d.getDay()]}</div>
+      <div class="bs-dc-num">${d.getDate()}</div>
+      <div class="bs-dc-month">${MONTHS[d.getMonth()]}</div>
+      ${i === 0 ? '<div class="bs-dc-tag">Today</div>' : i === 1 ? '<div class="bs-dc-tag">Tomorrow</div>' : ''}
+    `;
+    card.addEventListener("click", () => {
+      strip.querySelectorAll(".bs-date-card").forEach(c => c.classList.remove("selected"));
+      card.classList.add("selected");
+      applyDate(ds, d);
+    });
+    strip.appendChild(card);
+  }
+}
+
+function onBsDatePicked(val) {
+  if (!val) return;
+  const today = new Date(); today.setHours(0,0,0,0);
+  const d = new Date(val + "T00:00:00");
+  if (d < today) { showToast("⚠️ Please select today or a future date."); return; }
+  // Deselect strip cards
+  document.querySelectorAll(".bs-date-card").forEach(c => c.classList.remove("selected"));
+  applyDate(val, d);
+}
+
+function applyDate(ds, d) {
+  const DAYS   = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+  const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  document.getElementById("shiftDate").value = ds;
+
+  const trigger = document.getElementById("dateTrigger");
+  const text    = document.getElementById("dateTriggerText");
+  if (trigger) trigger.classList.add("filled");
+  if (text)    text.textContent = DAYS[d.getDay()] + ", " + d.getDate() + " " + MONTHS[d.getMonth()] + " " + d.getFullYear();
+
+  closeAllBottomSheets();
+  calculateQuote(true);
+}
+
+/* ---------- TIME SHEET ---------- */
+function pickTimeSlot(value, label) {
+  document.getElementById("shiftTime").value = value;
+  document.getElementById("shiftTimeLabel").value = label;
+
+  document.querySelectorAll("#bsTime .bs-option").forEach(b => b.classList.remove("selected"));
+  event.currentTarget.classList.add("selected");
+
+  const trigger = document.getElementById("timeTrigger");
+  const text    = document.getElementById("timeTriggerText");
+  if (trigger) trigger.classList.add("filled");
+  if (text)    text.textContent = label;
+
+  setTimeout(closeAllBottomSheets, 250);
+}
+
+/* ---------- HOUSE TYPE SHEET ---------- */
+function buildBsHouseOptions() {
+  const body = document.getElementById("bsHouseBody");
+  if (!body) return;
+
+  const config = window.MOVE_TYPE_CONFIG?.[selectedMoveType || "home"] || window.MOVE_TYPE_CONFIG?.home;
+  if (!config) return;
+
+  const title = document.querySelector("#bsHouse .bs-title");
+  if (title) title.textContent = "🏠 " + config.sizeLabel;
+
+  const selected = document.getElementById("house")?.value;
+  body.innerHTML = '<div class="bs-house-grid">' +
+    config.sizes.map(s => `
+      <div class="bs-house-card ${s.value === selected ? 'selected' : ''}"
+           onclick="pickHouseType('${s.value}','${s.icon} ${s.label}','${s.label}')">
+        <div class="bs-house-icon">${s.icon}</div>
+        <div class="bs-house-label">${s.label}</div>
+        <div class="bs-house-sub">${s.sub || ''}</div>
+      </div>`).join("") + '</div>';
+}
+
+function pickHouseType(value, label, shortLabel) {
+  const sel = document.getElementById("house");
+  if (sel) sel.value = value;
+
+  document.querySelectorAll(".bs-house-card").forEach(c => c.classList.remove("selected"));
+  event.currentTarget.classList.add("selected");
+
+  const trigger = document.getElementById("houseTrigger");
+  const text    = document.getElementById("houseTriggerText");
+  const icon    = document.getElementById("houseTrigger")?.querySelector(".bs-trigger-icon");
+  if (trigger) trigger.classList.add("filled");
+  if (text) text.textContent = label;
+
+  setTimeout(() => { closeAllBottomSheets(); calculateQuote(true); }, 250);
+}
+
+/* ---------- VEHICLE SHEET ---------- */
+function pickVehicle(value, label, sub, price) {
+  const sel = document.getElementById("vehicle");
+  if (sel) sel.value = value;
+
+  document.querySelectorAll(".bs-vehicle-opt").forEach(b => b.classList.remove("selected"));
+  event.currentTarget.classList.add("selected");
+
+  const trigger = document.getElementById("vehicleTrigger");
+  const text    = document.getElementById("vehicleTriggerText");
+  if (trigger) trigger.classList.add("filled");
+  if (text) text.textContent = label + "  ·  " + price;
+
+  setTimeout(() => { closeAllBottomSheets(); calculateQuote(true); }, 250);
+}
+
+/* ---------- FLOOR SHEETS ---------- */
+function pickFloor(type, value, label, price) {
+  const sel = document.getElementById(type === "pickup" ? "pickupFloor" : "dropFloor");
+  if (sel) sel.value = value;
+
+  const sheetId = type === "pickup" ? "bsPickupFloor" : "bsDropFloor";
+  document.querySelectorAll("#" + sheetId + " .bs-option").forEach(b => b.classList.remove("selected"));
+  event.currentTarget.classList.add("selected");
+
+  const triggerId = type === "pickup" ? "pickupFloorTrigger" : "dropFloorTrigger";
+  const textId    = type === "pickup" ? "pickupFloorText" : "dropFloorText";
+  const trigger   = document.getElementById(triggerId);
+  const text      = document.getElementById(textId);
+  if (trigger) trigger.classList.add("filled");
+  if (text) text.textContent = label + "  " + price;
+
+  setTimeout(() => { closeAllBottomSheets(); calculateQuote(true); }, 250);
+}
+
+/* ---------- SWIPE TO CLOSE ---------- */
+(function() {
+  let startY = 0;
+  document.addEventListener("touchstart", e => {
+    if (e.target.closest(".bottom-sheet")) startY = e.touches[0].clientY;
+  }, { passive: true });
+  document.addEventListener("touchend", e => {
+    if (!_activeBs) return;
+    const endY = e.changedTouches[0].clientY;
+    if (endY - startY > 80) closeAllBottomSheets(); // swipe down 80px to close
+  }, { passive: true });
+})();
+
+/* ============================================
+   ADVANCED DATE PICKER
+   ============================================ */
+function buildDateStrip() {
+  const strip = document.getElementById("dateStrip");
+  if (!strip) return;
+
+  strip.innerHTML = "";
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const days  = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+  const months= ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+
+  // Show next 10 days starting from today
+  for (let i = 0; i < 10; i++) {
+    const d = new Date(today);
+    d.setDate(today.getDate() + i);
+
+    const card = document.createElement("div");
+    card.className = "date-card" + (i === 0 ? " today-card" : "");
+    card.dataset.date = d.toISOString().split("T")[0];
+
+    card.innerHTML = `
+      <div class="dc-day">${days[d.getDay()]}</div>
+      <div class="dc-num">${d.getDate()}</div>
+      <div class="dc-month">${months[d.getMonth()]}</div>
+      ${i === 0 ? '<div class="dc-tag">Today</div>' : i === 1 ? '<div class="dc-tag">Tomorrow</div>' : ''}
+    `;
+
+    card.addEventListener("click", () => selectDateCard(card, d));
+    strip.appendChild(card);
+  }
+}
+
+function selectDateCard(card, dateObj) {
+  // Deselect all
+  document.querySelectorAll(".date-card").forEach(c => c.classList.remove("selected"));
+  card.classList.add("selected");
+
+  // Set hidden input value
+  const dateStr = dateObj.toISOString().split("T")[0];
+  const shiftDate = document.getElementById("shiftDate");
+  if (shiftDate) shiftDate.value = dateStr;
+
+  // Update label
+  const label = document.getElementById("dateSelectedLabel");
+  const days   = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+  const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  if (label) {
+    label.textContent = `✅ ${days[dateObj.getDay()]}, ${dateObj.getDate()} ${months[dateObj.getMonth()]}`;
+    label.className = "date-selected-label has-date";
+  }
+  calculateQuote(true);
+}
+
+function openCustomDate() {
+  const input = document.getElementById("shiftDate");
+  if (!input) return;
+
+  // Set min date to today
+  const today = new Date().toISOString().split("T")[0];
+  input.min = today;
+  input.style.position = "fixed";
+  input.style.opacity  = "0";
+  input.style.top      = "50%";
+  input.style.left     = "50%";
+  input.style.width    = "1px";
+  input.style.height   = "1px";
+  input.click();
+  setTimeout(() => {
+    input.style.position = "absolute";
+    input.style.width    = "0";
+    input.style.height   = "0";
+  }, 500);
+}
+
+function onCustomDatePicked(val) {
+  if (!val) return;
+  const d = new Date(val + "T00:00:00");
+  const today = new Date(); today.setHours(0,0,0,0);
+
+  if (d < today) {
+    showToast("⚠️ Please select today or a future date.");
+    return;
+  }
+
+  // Deselect strip cards (custom date may not be in strip)
+  document.querySelectorAll(".date-card").forEach(c => c.classList.remove("selected"));
+
+  // Check if date is in strip — select it if so
+  const dateStr = val;
+  const match = document.querySelector(`.date-card[data-date="${dateStr}"]`);
+  if (match) match.classList.add("selected");
+
+  // Update label
+  const label = document.getElementById("dateSelectedLabel");
+  const days   = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+  const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  if (label) {
+    label.textContent = `✅ ${days[d.getDay()]}, ${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
+    label.className = "date-selected-label has-date";
+  }
+  calculateQuote(true);
+}
+
+function selectTimeSlot(btn, value, label, range) {
+  // Deselect all time slots
+  document.querySelectorAll(".time-slot-btn").forEach(b => b.classList.remove("selected"));
+  btn.classList.add("selected");
+
+  const timeInput  = document.getElementById("shiftTime");
+  const labelInput = document.getElementById("shiftTimeLabel");
+  if (timeInput)  timeInput.value  = value;
+  if (labelInput) labelInput.value = range;
+}
+
+/* ============================================
    PAGE LOAD
    ============================================ */
 document.addEventListener("DOMContentLoaded", () => {
@@ -215,6 +527,7 @@ document.addEventListener("DOMContentLoaded", () => {
   buildChecklist();
   setTimeout(() => renderSizeCards("home"), 100);
   initPaymentOptions();
+  buildDateStrip(); // Build advanced date picker
 
   // Inject furniture category styles
   if (!document.getElementById('pz-fc-styles')) {
@@ -2049,7 +2362,11 @@ function nextStep() {
   }
   if (currentStep === 2) {
     let ok = true;
-    if (!house?.value) { showToast("🏠 Please select your " + (selectedMoveType === "office" ? "office size" : "house type")); ok = false; }
+    const dateVal = document.getElementById("shiftDate")?.value;
+    const timeVal = document.getElementById("shiftTime")?.value;
+    if (!dateVal) { showToast("📅 Please select a moving date"); ok = false; }
+    else if (!timeVal) { showToast("🕐 Please select a time slot"); ok = false; }
+    else if (!house?.value) { showToast("🏠 Please select your " + (selectedMoveType === "office" ? "office size" : "house type")); ok = false; }
     else if (!isIntercityMove && !vehicle?.value) { showToast("🚚 Please select a vehicle type"); ok = false; }
     if (!ok) return;
   }
@@ -2069,9 +2386,17 @@ function shakeField(el) {
 function selectMoveType(el, type) {
   selectedMoveType = type;
   document.getElementById("moveType").value = type;
-  document.querySelectorAll(".move-type-card").forEach(c => c.classList.remove("selected"));
+  // Support both old move-type-card and new bs-move-card
+  document.querySelectorAll(".move-type-card, .bs-move-card").forEach(c => c.classList.remove("selected"));
   el.classList.add("selected");
   renderSizeCards(type);
+  // Reset house trigger text when move type changes
+  const houseTrigger = document.getElementById("houseTrigger");
+  const houseTriggerText = document.getElementById("houseTriggerText");
+  if (houseTrigger) houseTrigger.classList.remove("filled");
+  if (houseTriggerText) houseTriggerText.textContent = "Tap to select house type";
+  const houseEl = document.getElementById("house");
+  if (houseEl) houseEl.value = "";
 }
 
 function renderSizeCards(type) {
