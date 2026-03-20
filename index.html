@@ -364,15 +364,46 @@
         <!-- STEP 2: DETAILS -->
         <div class="form-step">
           <div class="step-body">
-            <div class="field-row-2">
-              <div class="field-group">
-                <label class="field-label"><span class="field-icon">📅</span> Moving Date</label>
-                <input type="date" id="shiftDate" aria-label="Moving date" aria-required="true" class="field-input">
+            <!-- ADVANCED DATE PICKER -->
+            <div class="field-group">
+              <label class="field-label"><span class="field-icon">📅</span> Moving Date <span style="color:#dc2626">*</span></label>
+              <div class="date-strip" id="dateStrip"></div>
+              <div class="date-more-row">
+                <button type="button" class="date-more-btn" onclick="openCustomDate()">📆 Pick another date</button>
+                <span class="date-selected-label" id="dateSelectedLabel"></span>
               </div>
-              <div class="field-group">
-                <label class="field-label"><span class="field-icon">🕐</span> Preferred Time</label>
-                <input type="time" id="shiftTime" class="field-input">
+              <input type="date" id="shiftDate" aria-label="Moving date" aria-required="true"
+                style="position:absolute;opacity:0;pointer-events:none;width:0;height:0;"
+                onchange="onCustomDatePicked(this.value)">
+            </div>
+
+            <!-- ADVANCED TIME SLOT PICKER -->
+            <div class="field-group">
+              <label class="field-label"><span class="field-icon">🕐</span> Preferred Time Slot <span style="color:#dc2626">*</span></label>
+              <div class="time-slots-grid">
+                <button type="button" class="time-slot-btn" onclick="selectTimeSlot(this,'06:00','🌅 Early Morning','6:00 AM – 8:00 AM')">
+                  <span class="ts-emoji">🌅</span>
+                  <span class="ts-label">Early Morning</span>
+                  <span class="ts-time">6 AM – 8 AM</span>
+                </button>
+                <button type="button" class="time-slot-btn" onclick="selectTimeSlot(this,'08:00','🌤️ Morning','8:00 AM – 12:00 PM')">
+                  <span class="ts-emoji">🌤️</span>
+                  <span class="ts-label">Morning</span>
+                  <span class="ts-time">8 AM – 12 PM</span>
+                </button>
+                <button type="button" class="time-slot-btn" onclick="selectTimeSlot(this,'12:00','☀️ Afternoon','12:00 PM – 4:00 PM')">
+                  <span class="ts-emoji">☀️</span>
+                  <span class="ts-label">Afternoon</span>
+                  <span class="ts-time">12 PM – 4 PM</span>
+                </button>
+                <button type="button" class="time-slot-btn" onclick="selectTimeSlot(this,'16:00','🌇 Evening','4:00 PM – 7:00 PM')">
+                  <span class="ts-emoji">🌇</span>
+                  <span class="ts-label">Evening</span>
+                  <span class="ts-time">4 PM – 7 PM</span>
+                </button>
               </div>
+              <input type="hidden" id="shiftTime" value="">
+              <input type="hidden" id="shiftTimeLabel" value="">
             </div>
             <div class="field-group" id="sizeFieldGroup">
               <label class="field-label" id="sizeSelectorLabel"><span class="field-icon">🏠</span> <span id="sizeLabelText">House Type</span></label>
