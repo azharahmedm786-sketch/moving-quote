@@ -95,11 +95,24 @@ document.addEventListener("DOMContentLoaded", () => {
     setTimeout(() => { el.scrollIntoView({ behavior: "smooth", block: "center" }); }, 320);
   });
 
-  // Scroll Reveal
+  // Scroll Reveal — add js-reveal to body so CSS knows JS is active
+  document.body.classList.add("js-reveal");
+
   const revealObs = new IntersectionObserver((entries) => {
-    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add("visible"); revealObs.unobserve(e.target); } });
-  }, { threshold: 0.12 });
-  document.querySelectorAll(".reveal, .reveal-stagger").forEach(el => revealObs.observe(el));
+    entries.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add("visible"); revealObs.unobserve(e.target); }
+    });
+  }, { threshold: 0, rootMargin: "0px 0px -40px 0px" });
+
+  // Immediately mark elements already in viewport as visible
+  document.querySelectorAll(".reveal, .reveal-stagger").forEach(el => {
+    const rect = el.getBoundingClientRect();
+    if (rect.top < window.innerHeight) {
+      el.classList.add("visible");
+    } else {
+      revealObs.observe(el);
+    }
+  });
 
   // Stats counter
   const STAT_VALUES = [100, 2026, 100, 0];
