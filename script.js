@@ -95,24 +95,16 @@ document.addEventListener("DOMContentLoaded", () => {
     setTimeout(() => { el.scrollIntoView({ behavior: "smooth", block: "center" }); }, 320);
   });
 
-  // Scroll Reveal — add js-reveal to body so CSS knows JS is active
-  document.body.classList.add("js-reveal");
-
-  const revealObs = new IntersectionObserver((entries) => {
-    entries.forEach(e => {
-      if (e.isIntersecting) { e.target.classList.add("visible"); revealObs.unobserve(e.target); }
-    });
-  }, { threshold: 0, rootMargin: "0px 0px -40px 0px" });
-
-  // Immediately mark elements already in viewport as visible
-  document.querySelectorAll(".reveal, .reveal-stagger").forEach(el => {
-    const rect = el.getBoundingClientRect();
-    if (rect.top < window.innerHeight) {
+  // Reveal — mark everything visible immediately, no animation dependency
+  const makeVisible = () => {
+    document.querySelectorAll(".reveal, .reveal-stagger").forEach(el => {
       el.classList.add("visible");
-    } else {
-      revealObs.observe(el);
-    }
-  });
+    });
+  };
+  makeVisible();
+  // Also run after a short delay in case DOM isn't fully painted
+  setTimeout(makeVisible, 100);
+  setTimeout(makeVisible, 500);
 
   // Stats counter
   const STAT_VALUES = [100, 2026, 100, 0];
@@ -196,9 +188,15 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!e.target.closest(".nav-user")) document.getElementById("userDropdown")?.classList.remove("open");
   });
 
-  // Auth state
+  // Auth state — set LOCAL persistence so login survives page refresh
   waitForFirebase(() => {
-    window._firebase.auth.onAuthStateChanged(user => {
+    const auth = window._firebase.auth;
+
+    // Keep user logged in across refreshes (localStorage)
+    auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+      .catch(() => {}); // silent fallback if already set
+
+    auth.onAuthStateChanged(user => {
       currentUser = user;
       updateNavForUser(user);
       if (user) {
@@ -211,7 +209,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (banner) banner.style.display = "none";
       }
     });
-  });
+  }); // end waitForFirebase
 
   loadReviewsPublic();
   buildChecklist();
@@ -726,8 +724,9 @@ async function loginUser() {
         return showError("loginError", "⚠️ Account setup incomplete. Please contact support.");
       }
 
-      // Step 2: Sign in with the linked email + entered password
+      // Step 2: Sign in with persistence set to LOCAL (survives refresh)
       showError("loginError", "⏳ Signing you in...", "info");
+      await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(() => {});
       const cred = await auth.signInWithEmailAndPassword(userEmail, pass);
 
       if (btn) { btn.disabled = false; btn.textContent = "Login →"; }
