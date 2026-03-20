@@ -590,32 +590,55 @@ async function verifyResetOTP() {
 }
 
 /* ============================================
-   LOGIN
+   LOGIN — Phone Number + Password
    ============================================ */
-function loginUser() {
-  const email = document.getElementById("loginEmail").value.trim();
+async function loginUser() {
+  const phone = document.getElementById("loginPhone").value.trim();
   const pass  = document.getElementById("loginPassword").value;
 
-  if (!email)                            return showError("loginError", "⚠️ Please enter your email address.");
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return showError("loginError", "⚠️ Please enter a valid email address.");
-  if (!pass)                             return showError("loginError", "⚠️ Please enter your password.");
+  if (!phone || phone.length !== 10 || !/^\d{10}$/.test(phone))
+    return showError("loginError", "⚠️ Please enter a valid 10-digit mobile number.");
+  if (!pass)
+    return showError("loginError", "⚠️ Please enter your password.");
 
   const btn = document.querySelector("#panelLogin .btn-auth");
   if (btn) { btn.disabled = true; btn.textContent = "Signing in..."; }
-  showError("loginError", "⏳ Signing you in...", "info");
+  showError("loginError", "⏳ Looking up your account...", "info");
 
-  waitForFirebase(() => {
-    window._firebase.auth.signInWithEmailAndPassword(email, pass)
-      .then(cred => {
+  waitForFirebase(async () => {
+    const { auth, db } = window._firebase;
+    try {
+      // Step 1: Look up the email linked to this phone number in Firestore
+      const snap = await db.collection("users")
+        .where("phone", "==", phone)
+        .limit(1).get();
+
+      if (snap.empty) {
         if (btn) { btn.disabled = false; btn.textContent = "Login →"; }
-        closeAuthModal();
-        const name = (cred.user.displayName || "").split(" ")[0] || "there";
-        showToast(`👋 Welcome back, ${name}!`);
-      })
-      .catch(err => {
+        return showError("loginError", "⚠️ No account found with this phone number.");
+      }
+
+      const userData  = snap.docs[0].data();
+      const userEmail = userData.email;
+
+      if (!userEmail) {
         if (btn) { btn.disabled = false; btn.textContent = "Login →"; }
-        showError("loginError", getAuthErrorMessage(err.code));
-      });
+        return showError("loginError", "⚠️ Account issue. Please contact support.");
+      }
+
+      // Step 2: Sign in with the found email + entered password
+      showError("loginError", "⏳ Signing you in...", "info");
+      const cred = await auth.signInWithEmailAndPassword(userEmail, pass);
+
+      if (btn) { btn.disabled = false; btn.textContent = "Login →"; }
+      closeAuthModal();
+      const name = (cred.user.displayName || userData.name || "").split(" ")[0] || "there";
+      showToast(`👋 Welcome back, ${name}!`);
+
+    } catch (err) {
+      if (btn) { btn.disabled = false; btn.textContent = "Login →"; }
+      showError("loginError", getAuthErrorMessage(err.code));
+    }
   });
 }
 
