@@ -1398,16 +1398,15 @@ body.dark-mode .stats-bar { background: var(--bg-secondary); }
 /* ============================================
    REVEAL ANIMATIONS
    ============================================ */
-/* REVEAL ANIMATIONS — safe: content visible by default, animates when JS loads */
-.reveal { opacity: 1; transform: none; transition: opacity 0.65s ease, transform 0.65s ease; }
-.js-reveal .reveal { opacity: 0; transform: translateY(24px); }
-.js-reveal .reveal.visible { opacity: 1; transform: translateY(0); }
-.reveal-stagger .service-card, .reveal-stagger .review-card, .reveal-stagger .why-card { opacity: 1; transform: none; transition: opacity 0.5s ease, transform 0.5s ease; }
-.js-reveal .reveal-stagger .service-card, .js-reveal .reveal-stagger .review-card, .js-reveal .reveal-stagger .why-card { opacity: 0; transform: translateY(20px); }
-.js-reveal .reveal-stagger.visible .service-card:nth-child(1), .js-reveal .reveal-stagger.visible .review-card:nth-child(1), .js-reveal .reveal-stagger.visible .why-card:nth-child(1) { opacity: 1; transform: none; transition-delay: 0.05s; }
-.js-reveal .reveal-stagger.visible .service-card:nth-child(2), .js-reveal .reveal-stagger.visible .review-card:nth-child(2), .js-reveal .reveal-stagger.visible .why-card:nth-child(2) { opacity: 1; transform: none; transition-delay: 0.15s; }
-.js-reveal .reveal-stagger.visible .service-card:nth-child(3), .js-reveal .reveal-stagger.visible .review-card:nth-child(3), .js-reveal .reveal-stagger.visible .why-card:nth-child(3) { opacity: 1; transform: none; transition-delay: 0.25s; }
-.js-reveal .reveal-stagger.visible .service-card:nth-child(4), .js-reveal .reveal-stagger.visible .review-card:nth-child(4), .js-reveal .reveal-stagger.visible .why-card:nth-child(4) { opacity: 1; transform: none; transition-delay: 0.35s; }
+/* REVEAL ANIMATIONS — always visible, no JS dependency */
+.reveal { opacity: 1 !important; transform: none !important; }
+.reveal.visible { opacity: 1 !important; transform: none !important; }
+.reveal-stagger .service-card,
+.reveal-stagger .review-card,
+.reveal-stagger .why-card { opacity: 1 !important; transform: none !important; }
+.reveal-stagger.visible .service-card,
+.reveal-stagger.visible .review-card,
+.reveal-stagger.visible .why-card { opacity: 1 !important; transform: none !important; }
 
 /* ============================================
    RESPONSIVE
