@@ -1,8 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/><title>PackZen Admin Dashboard</title>
+  <meta charset="UTF-8"/>
+  <title>PackZen Admin</title>
   <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+
+  <!-- ✅ FIX 1: Block Google from indexing the admin page -->
+  <meta name="robots" content="noindex, nofollow, noarchive"/>
+
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
@@ -20,7 +25,11 @@
     .field-input:focus{border-color:var(--primary)}
     .btn-auth{width:100%;padding:14px;background:var(--primary);color:#fff;border:none;border-radius:50px;font-family:'DM Sans',sans-serif;font-size:1rem;font-weight:700;cursor:pointer;margin-top:20px;box-shadow:0 6px 20px rgba(0,87,255,.3);transition:transform .2s}
     .btn-auth:hover{transform:translateY(-2px)}
+    .btn-auth:disabled{opacity:.6;cursor:not-allowed;transform:none}
     .auth-err{font-size:.85rem;color:#e53e3e;margin-top:10px;min-height:18px}
+    .lockout-banner{background:rgba(220,38,38,.1);border:1px solid rgba(220,38,38,.3);border-radius:10px;padding:10px 14px;font-size:.84rem;color:#dc2626;margin-top:12px;display:none}
+
+    /* ✅ FIX 2: Shell is NOT in the DOM at load — injected only after auth passes */
     .admin-shell{display:none}
     .admin-shell.active{display:flex;min-height:100vh}
     .sidebar{width:240px;background:var(--dark);display:flex;flex-direction:column;padding:24px 0;flex-shrink:0;position:fixed;top:0;left:0;bottom:0;z-index:100;overflow-y:auto}
@@ -42,6 +51,9 @@
     .theme-btn{background:var(--surface);border:1.5px solid var(--border);color:var(--text);width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;transition:transform .3s}
     .theme-btn:hover{transform:rotate(20deg)}
     .admin-badge{background:rgba(0,87,255,.1);color:var(--primary);font-size:.75rem;font-weight:700;padding:4px 12px;border-radius:20px;border:1px solid rgba(0,87,255,.2)}
+    /* ✅ FIX 3: Session timer display */
+    .session-timer{font-size:.75rem;color:var(--text-muted);padding:4px 10px;border:1px solid var(--border);border-radius:20px;}
+    .session-timer.warn{color:#d97706;border-color:#d97706}
     .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-bottom:22px}
     .stat-card{background:var(--surface);border-radius:16px;padding:18px 20px;border:1px solid var(--border);box-shadow:var(--shadow-sm)}
     .sc-lbl{font-size:.78rem;color:var(--text-muted);font-weight:600;margin-bottom:5px}
@@ -100,14 +112,11 @@
     .bulk-textarea:focus{border-color:var(--primary)}
     .toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--dark);color:#fff;padding:12px 24px;border-radius:50px;font-size:.9rem;font-weight:600;z-index:99999;opacity:0;transition:opacity .3s,transform .3s;pointer-events:none;white-space:nowrap}
     .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-
-    /* ── Driver form inputs inside table-card ── */
     .driver-form-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:14px}
     .driver-form-grid input,.driver-form-grid select{padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:.88rem;background:var(--surface2);color:var(--text);outline:none;width:100%}
     .driver-form-grid input:focus,.driver-form-grid select:focus{border-color:var(--primary)}
     .driver-form-actions{display:flex;align-items:flex-end}
     #adminDriverMsg{min-height:18px;font-size:.83rem;margin-top:6px;font-weight:600}
-
     @media(max-width:768px){
       .admin-shell.active{flex-direction:column}
       .sidebar{position:static;width:100%;flex-direction:row;padding:10px;height:auto;flex-wrap:nowrap;overflow-x:auto}
@@ -122,20 +131,274 @@
 </head>
 <body>
 
+<!-- LOGIN SCREEN -->
 <div class="admin-login" id="adminLogin">
   <div class="login-card">
     <div class="login-logo">📦 PackZen <span style="color:var(--text-muted);font-size:.9rem;font-weight:500;">Admin</span></div>
     <p class="login-sub">Restricted — admin access only</p>
+
+    <!-- ✅ FIX: autocomplete off prevents browser from suggesting admin credentials to non-admins -->
     <label class="field-label">Email</label>
-    <input id="adminEmail" type="email" class="field-input" placeholder="admin@packzen.com">
+    <input id="adminEmail" type="email" class="field-input" placeholder="admin@packzen.com" autocomplete="off">
     <label class="field-label">Password</label>
-    <input id="adminPass" type="password" class="field-input" placeholder="Password">
+    <input id="adminPass" type="password" class="field-input" placeholder="Password" autocomplete="off">
+
     <div id="adminErr" class="auth-err"></div>
-    <button class="btn-auth" onclick="adminLogin()">Login to Dashboard →</button>
+    <div class="lockout-banner" id="lockoutBanner">🔒 Too many failed attempts. Please wait <span id="lockoutTimer">30</span>s before trying again.</div>
+
+    <button class="btn-auth" id="loginBtn" onclick="adminLogin()">Login to Dashboard →</button>
   </div>
 </div>
 
-<div class="admin-shell" id="adminShell">
+<!-- ✅ FIX 2: Admin shell is EMPTY until auth passes — injected by buildShell() -->
+<div class="admin-shell" id="adminShell"></div>
+
+<div class="toast" id="adminToast"></div>
+
+<script src="env-config.js"></script>
+<script src="firebase-config.js"></script>
+
+<script>
+/* ================================================================
+   ✅ SECURITY CONSTANTS
+   ================================================================ */
+const ADMIN_EMAILS = [
+  "admin@packzen.com",
+  "support@packzenblr.in",
+  "azharahmedm786@gmail.com",
+  "moveeasyblr@gmail.com"
+];
+
+/* ✅ FIX 3: Brute-force rate limiter
+   Max 3 failed attempts → 30s lockout, stored in sessionStorage
+   so it resets on tab close but persists within the session. */
+const RATE_KEY   = "pz_admin_attempts";
+const LOCK_KEY   = "pz_admin_lockout";
+const MAX_TRIES  = 3;
+const LOCKOUT_MS = 30 * 1000; // 30 seconds
+
+function getRateData() {
+  try { return JSON.parse(sessionStorage.getItem(RATE_KEY)) || { count: 0 }; } catch(e) { return { count: 0 }; }
+}
+function setRateData(d) { try { sessionStorage.setItem(RATE_KEY, JSON.stringify(d)); } catch(e) {} }
+function getLockout()   { try { return parseInt(sessionStorage.getItem(LOCK_KEY) || "0"); } catch(e) { return 0; } }
+function setLockout(ts) { try { sessionStorage.setItem(LOCK_KEY, String(ts)); } catch(e) {} }
+
+function isLockedOut() {
+  const until = getLockout();
+  return until > Date.now();
+}
+
+function recordFailedAttempt() {
+  const d = getRateData();
+  d.count = (d.count || 0) + 1;
+  setRateData(d);
+  if (d.count >= MAX_TRIES) {
+    setLockout(Date.now() + LOCKOUT_MS);
+    setRateData({ count: 0 });
+    startLockoutTimer();
+  }
+}
+
+function clearAttempts() {
+  try { sessionStorage.removeItem(RATE_KEY); sessionStorage.removeItem(LOCK_KEY); } catch(e) {}
+}
+
+let lockoutInterval = null;
+function startLockoutTimer() {
+  const banner = document.getElementById("lockoutBanner");
+  const span   = document.getElementById("lockoutTimer");
+  const btn    = document.getElementById("loginBtn");
+  if (banner) banner.style.display = "block";
+  if (btn) btn.disabled = true;
+  if (lockoutInterval) clearInterval(lockoutInterval);
+  lockoutInterval = setInterval(() => {
+    const remaining = Math.ceil((getLockout() - Date.now()) / 1000);
+    if (remaining <= 0) {
+      clearInterval(lockoutInterval);
+      if (banner) banner.style.display = "none";
+      if (btn) btn.disabled = false;
+      return;
+    }
+    if (span) span.textContent = remaining;
+  }, 500);
+}
+
+// Resume lockout if page was refreshed during lockout window
+if (isLockedOut()) startLockoutTimer();
+
+/* ✅ FIX 4: Session timeout — 2 hours
+   Stored in sessionStorage so it resets on tab close. */
+const SESSION_KEY      = "pz_admin_session_start";
+const SESSION_LIMIT_MS = 2 * 60 * 60 * 1000; // 2 hours
+const WARN_BEFORE_MS   = 10 * 60 * 1000;      // warn 10 min before
+
+let sessionInterval = null;
+
+function startSessionTimer() {
+  try { sessionStorage.setItem(SESSION_KEY, String(Date.now())); } catch(e) {}
+  sessionInterval = setInterval(() => {
+    const start = parseInt(sessionStorage.getItem(SESSION_KEY) || "0");
+    if (!start) return;
+    const elapsed   = Date.now() - start;
+    const remaining = SESSION_LIMIT_MS - elapsed;
+    const timerEl   = document.getElementById("sessionTimerDisplay");
+    if (!timerEl) return;
+    if (remaining <= 0) {
+      clearInterval(sessionInterval);
+      toast("⏱️ Session expired. Signing out for security.");
+      setTimeout(() => adminSignOut(), 1500);
+      return;
+    }
+    const mins = Math.floor(remaining / 60000);
+    timerEl.textContent = "Session: " + mins + "m";
+    timerEl.className   = "session-timer" + (remaining < WARN_BEFORE_MS ? " warn" : "");
+  }, 30000);
+}
+
+/* ================================================================
+   FIREBASE HELPER
+   ================================================================ */
+function waitFB(cb, n=0) {
+  if (window._firebase) { cb(); return; }
+  if (n > 30) {
+    const err = document.getElementById("adminErr");
+    if (err) err.textContent = "Firebase failed to load. Check your connection and refresh.";
+    const btn = document.getElementById("loginBtn");
+    if (btn) { btn.disabled = false; btn.textContent = "Login to Dashboard →"; }
+    return;
+  }
+  setTimeout(() => waitFB(cb, n+1), 200);
+}
+
+/* ================================================================
+   AUTO-LOGIN GUARD (checks if already signed in as admin on load)
+   ================================================================ */
+document.addEventListener("DOMContentLoaded", () => {
+  waitFB(() => {
+    const { auth, db } = window._firebase;
+    auth.onAuthStateChanged(async (user) => {
+      if (!user) return; // Not logged in — show login form, nothing else
+      const userEmail = (user.email || "").toLowerCase();
+      try {
+        const snap = await db.collection("users").doc(user.uid).get();
+        const data = snap.data() || {};
+        if (data.role === "admin" || ADMIN_EMAILS.includes(userEmail)) {
+          adminUser = user;
+          showShell(data.name || user.displayName || "Admin");
+        }
+        // If not admin role — do nothing (don't redirect, just show login)
+      } catch(e) {
+        if (ADMIN_EMAILS.includes(userEmail)) {
+          adminUser = user;
+          showShell(user.displayName || "Admin");
+        }
+      }
+    });
+  });
+});
+
+/* ================================================================
+   LOGIN — WITH RATE LIMITING
+   ================================================================ */
+function adminLogin() {
+  // ✅ Block if locked out
+  if (isLockedOut()) { startLockoutTimer(); return; }
+
+  const email = document.getElementById("adminEmail").value.trim().toLowerCase();
+  const pass  = document.getElementById("adminPass").value;
+  const err   = document.getElementById("adminErr");
+  const btn   = document.getElementById("loginBtn");
+  err.textContent = ""; err.style.color = "#ef4444";
+
+  if (!email || !pass) { err.textContent = "Please enter email and password."; return; }
+
+  btn.disabled = true; btn.textContent = "Signing in...";
+
+  waitFB(() => {
+    const { auth, db } = window._firebase;
+    auth.signInWithEmailAndPassword(email, pass)
+      .then(cred => {
+        adminUser = cred.user;
+        const userEmail = cred.user.email?.toLowerCase() || "";
+        db.collection("users").doc(cred.user.uid).get()
+          .then(async doc => {
+            const role = doc.exists ? doc.data()?.role : null;
+            const name = doc.exists ? (doc.data()?.name || "Admin") : "Admin";
+            if (role === "admin" || ADMIN_EMAILS.includes(userEmail)) {
+              // Auto-fix missing role in Firestore
+              if (ADMIN_EMAILS.includes(userEmail) && role !== "admin") {
+                try {
+                  if (doc.exists) {
+                    await db.collection("users").doc(cred.user.uid).update({ role: "admin" });
+                  } else {
+                    await db.collection("users").doc(cred.user.uid).set({
+                      name: cred.user.displayName || "Admin", email: userEmail,
+                      role: "admin", createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                  }
+                } catch(e) { console.warn("Could not set admin role:", e.message); }
+              }
+              clearAttempts(); // ✅ Reset attempts on successful login
+              showShell(name);
+            } else {
+              auth.signOut(); adminUser = null;
+              recordFailedAttempt(); // ✅ Count as failed — wrong role
+              err.textContent = "Access denied. Your account does not have admin permissions.";
+            }
+          })
+          .catch(() => {
+            if (ADMIN_EMAILS.includes(userEmail)) {
+              clearAttempts();
+              showShell(cred.user.displayName || "Admin");
+            } else {
+              auth.signOut(); adminUser = null;
+              recordFailedAttempt();
+              err.textContent = "Could not verify admin role. Please contact support.";
+            }
+          });
+      })
+      .catch(e => {
+        recordFailedAttempt(); // ✅ Count failed attempt
+        const d = getRateData();
+        const remaining = MAX_TRIES - d.count;
+        if      (e.code === "auth/wrong-password" || e.code === "auth/invalid-credential")
+          err.textContent = `Wrong password. ${remaining > 0 ? remaining + " attempt(s) remaining." : ""}`;
+        else if (e.code === "auth/user-not-found")
+          err.textContent = "No account found with this email.";
+        else if (e.code === "auth/invalid-email")
+          err.textContent = "Invalid email address.";
+        else if (e.code === "auth/too-many-requests")
+          err.textContent = "Too many attempts. Please wait a few minutes.";
+        else
+          err.textContent = e.message;
+      })
+      .finally(() => { btn.disabled = false; btn.textContent = "Login to Dashboard →"; });
+  });
+}
+
+/* ================================================================
+   SIGN OUT
+   ================================================================ */
+function adminSignOut() {
+  if (sessionInterval) clearInterval(sessionInterval);
+  try { sessionStorage.removeItem(SESSION_KEY); } catch(e) {}
+  waitFB(() => window._firebase.auth.signOut().then(() => {
+    // ✅ FIX: Clear the shell HTML on sign out — no admin UI left in DOM
+    const shell = document.getElementById("adminShell");
+    if (shell) { shell.classList.remove("active"); shell.innerHTML = ""; }
+    document.getElementById("adminLogin").style.display = "flex";
+    adminUser = null; allBookings=[]; allDrivers=[]; allCustomers=[]; allReviews=[]; allPromos=[];
+  }));
+}
+
+/* ================================================================
+   ✅ FIX 2 — BUILD SHELL: Admin HTML injected ONLY after auth passes
+   The browser never receives admin UI HTML for unauthenticated visits.
+   ================================================================ */
+function buildShell(adminName) {
+  const shell = document.getElementById("adminShell");
+  shell.innerHTML = `
   <aside class="sidebar">
     <div class="sidebar-logo"><span>📦 Pack<b>Zen</b></span><br><small style="color:rgba(255,255,255,.35);font-size:.72rem;">Admin Panel</small></div>
     <div class="sb-role">Main</div>
@@ -153,17 +416,16 @@
       <button class="btn-signout" onclick="adminSignOut()">🚪 Sign Out</button>
     </div>
   </aside>
-
   <main class="admin-main">
     <div class="topbar">
       <h1 id="sectionTitle">Overview</h1>
       <div class="topbar-right">
+        <span class="session-timer" id="sessionTimerDisplay">Session: 120m</span>
         <button class="theme-btn" onclick="toggleAdminTheme()">🌙</button>
         <div class="admin-badge">🔐 Admin</div>
-        <span style="font-size:.83rem;color:var(--text-muted);font-weight:500;" id="adminNameDisplay">admin</span>
+        <span style="font-size:.83rem;color:var(--text-muted);font-weight:500;" id="adminNameDisplay">${adminName}</span>
       </div>
     </div>
-
     <!-- OVERVIEW -->
     <div class="section active" id="sectionOverview">
       <div class="stats-grid">
@@ -184,7 +446,6 @@
         <tbody id="overviewTable"><tr class="empty-row"><td colspan="6">Loading...</td></tr></tbody></table>
       </div>
     </div>
-
     <!-- BOOKINGS -->
     <div class="section" id="sectionBookings">
       <div class="table-card">
@@ -199,15 +460,10 @@
         <tbody id="bookingsTable"><tr class="empty-row"><td colspan="9">Loading...</td></tr></tbody></table>
       </div>
     </div>
-
-    <!-- DRIVERS — includes Create Driver form -->
+    <!-- DRIVERS -->
     <div class="section" id="sectionDrivers">
-
-      <!-- ✅ CREATE DRIVER FORM -->
       <div class="table-card" style="margin-bottom:20px;">
-        <div class="table-hdr">
-          <div class="table-title">🚚 Create New Driver Account</div>
-        </div>
+        <div class="table-hdr"><div class="table-title">🚚 Create New Driver Account</div></div>
         <div style="padding:20px;">
           <div class="driver-form-grid">
             <div>
@@ -237,21 +493,14 @@
               <input id="newDriverPassword" type="password" placeholder="Min 6 characters" autocomplete="new-password">
             </div>
             <div class="driver-form-actions">
-              <button class="btn-primary-sm" onclick="adminCreateDriver()" style="width:100%;padding:12px;font-size:.9rem;">
-                ✅ Create Driver Account
-              </button>
+              <button class="btn-primary-sm" onclick="adminCreateDriver()" style="width:100%;padding:12px;font-size:.9rem;">✅ Create Driver Account</button>
             </div>
           </div>
           <div id="adminDriverMsg"></div>
         </div>
       </div>
-
-      <!-- DRIVERS LIST -->
-      <div id="driversList">
-        <div style="text-align:center;color:var(--text-muted);padding:40px;">Loading drivers...</div>
-      </div>
+      <div id="driversList"><div style="text-align:center;color:var(--text-muted);padding:40px;">Loading drivers...</div></div>
     </div>
-
     <!-- CUSTOMERS -->
     <div class="section" id="sectionCustomers">
       <div class="table-card">
@@ -260,7 +509,6 @@
         <tbody id="customersTable"><tr class="empty-row"><td colspan="6">Loading...</td></tr></tbody></table>
       </div>
     </div>
-
     <!-- REVIEWS -->
     <div class="section" id="sectionReviews">
       <div class="table-card">
@@ -269,7 +517,6 @@
         <tbody id="reviewsTable"><tr class="empty-row"><td colspan="6">Loading...</td></tr></tbody></table>
       </div>
     </div>
-
     <!-- PROMOS -->
     <div class="section" id="sectionPromos">
       <div class="table-card" style="margin-bottom:20px;">
@@ -290,7 +537,6 @@
         <tbody id="promosTable"><tr class="empty-row"><td colspan="7">No promos yet.</td></tr></tbody></table>
       </div>
     </div>
-
     <!-- CANCELLATIONS -->
     <div class="section" id="sectionCancels">
       <div class="table-card">
@@ -302,7 +548,6 @@
         <tbody id="cancelsTable"><tr class="empty-row"><td colspan="6">Loading...</td></tr></tbody></table>
       </div>
     </div>
-
     <!-- DAMAGE CLAIMS -->
     <div class="section" id="sectionClaims">
       <div class="table-card">
@@ -325,7 +570,7 @@
             <div id="claimDetailContent"></div>
             <div style="margin-top:1rem">
               <label style="font-size:.82rem;font-weight:600;color:var(--text-muted);display:block;margin-bottom:.4rem">Admin Response</label>
-              <textarea id="claimResponseText" rows="3" style="width:100%;padding:.6rem;border:1.5px solid var(--border);border-radius:10px;background:var(--surface2);color:var(--text);font-size:.85rem;box-sizing:border-box" placeholder="Describe your resolution (e.g. Approved ₹2,000 compensation / Rejected — insufficient evidence)"></textarea>
+              <textarea id="claimResponseText" rows="3" style="width:100%;padding:.6rem;border:1.5px solid var(--border);border-radius:10px;background:var(--surface2);color:var(--text);font-size:.85rem;box-sizing:border-box" placeholder="Describe your resolution..."></textarea>
             </div>
             <div style="display:flex;gap:.7rem;margin-top:.8rem;flex-wrap:wrap">
               <button onclick="resolveDamageClaim('approved')" style="padding:.55rem 1.1rem;background:#16a34a;color:white;border:none;border-radius:10px;cursor:pointer;font-weight:700;font-size:.82rem">✅ Approve Claim</button>
@@ -336,7 +581,6 @@
         </div>
       </div>
     </div>
-
     <!-- BROADCAST -->
     <div class="section" id="sectionBroadcast">
       <div class="table-card">
@@ -360,64 +604,40 @@
       </div>
     </div>
   </main>
-</div>
-
-<!-- ASSIGN MODAL -->
-<div class="assign-overlay" id="assignModal" style="display:none;">
-  <div class="assign-box">
-    <div class="assign-title">🚚 Assign Driver to Booking</div>
-    <div class="assign-info" id="assignInfo">Loading...</div>
-    <label class="field-label">Select Driver</label>
-    <select class="field-input" id="assignSelect"><option value="">-- Select a driver --</option></select>
-    <div class="btn-row">
-      <button class="btn-cancel" onclick="closeAssignModal()">Cancel</button>
-      <button class="btn-confirm" onclick="confirmAssign()">Assign ✓</button>
+  <!-- ASSIGN MODAL -->
+  <div class="assign-overlay" id="assignModal" style="display:none;">
+    <div class="assign-box">
+      <div class="assign-title">🚚 Assign Driver to Booking</div>
+      <div class="assign-info" id="assignInfo">Loading...</div>
+      <label class="field-label">Select Driver</label>
+      <select class="field-input" id="assignSelect"><option value="">-- Select a driver --</option></select>
+      <div class="btn-row">
+        <button class="btn-cancel" onclick="closeAssignModal()">Cancel</button>
+        <button class="btn-confirm" onclick="confirmAssign()">Assign ✓</button>
+      </div>
     </div>
-  </div>
-</div>
+  </div>`;
+}
 
-<div class="toast" id="adminToast"></div>
-
-<script src="env-config.js"></script>
-<script src="firebase-config.js"></script>
-
-<!-- Auto-login guard: shows shell if already logged in as admin -->
-<script>
-const _ADMIN_EMAILS_GUARD = ["admin@packzen.com","support@packzenblr.in","azharahmedm786@gmail.com","moveeasyblr@gmail.com"];
-document.addEventListener("DOMContentLoaded", () => {
-  function waitForFirebase(cb, tries = 0) {
-    if (window._firebase) { cb(); return; }
-    if (tries > 30) { console.warn("Firebase not loaded"); return; }
-    setTimeout(() => waitForFirebase(cb, tries + 1), 200);
-  }
-  waitForFirebase(() => {
-    const { auth, db } = window._firebase;
-    auth.onAuthStateChanged(async (user) => {
-      if (!user) return;
-      const userEmail = (user.email || "").toLowerCase();
-      try {
-        const snap = await db.collection("users").doc(user.uid).get();
-        const data = snap.data() || {};
-        if (data.role === "admin" || _ADMIN_EMAILS_GUARD.includes(userEmail)) {
-          if (typeof adminUser !== "undefined") adminUser = user;
-          setTimeout(() => { if (typeof showShell === "function") showShell(data.name || user.displayName || "Admin"); }, 150);
-        }
-      } catch (error) {
-        // Firestore rules may block read — fall back to email check
-        if (_ADMIN_EMAILS_GUARD.includes(userEmail)) {
-          if (typeof adminUser !== "undefined") adminUser = user;
-          setTimeout(() => { if (typeof showShell === "function") showShell(user.displayName || "Admin"); }, 150);
-        }
-      }
-    });
-  });
-});
-</script>
-
-<script>
+/* ================================================================
+   SHOW SHELL — only called after successful admin auth
+   ================================================================ */
 let adminUser = null, allBookings = [], allDrivers = [], allCustomers = [], allReviews = [], allPromos = [];
-let assigningId = null;
-let bookingsChart = null, revenueChart = null;
+let assigningId = null, bookingsChart = null, revenueChart = null;
+
+function showShell(name) {
+  document.getElementById("adminLogin").style.display = "none";
+  buildShell(name); // ✅ Inject admin HTML now — not before
+  const shell = document.getElementById("adminShell");
+  shell.classList.add("active");
+  // Apply saved theme
+  if (localStorage.getItem("packzen-theme") === "dark") {
+    document.body.classList.add("dark");
+    setTimeout(() => { const b = document.querySelector(".theme-btn"); if(b) b.textContent="☀️"; }, 100);
+  }
+  startSessionTimer(); // ✅ Start 2-hour session countdown
+  loadAll();
+}
 
 function requireAdmin(cb) {
   if (!adminUser) { toast("⚠️ Not logged in as admin."); return; }
@@ -430,129 +650,12 @@ function toggleAdminTheme() {
   document.querySelector(".theme-btn").textContent = document.body.classList.contains("dark") ? "☀️" : "🌙";
   localStorage.setItem("packzen-theme", document.body.classList.contains("dark") ? "dark" : "light");
 }
-if (localStorage.getItem("packzen-theme") === "dark") {
-  document.body.classList.add("dark");
-  setTimeout(() => { const b = document.querySelector(".theme-btn"); if(b) b.textContent = "☀️"; }, 100);
-}
 
 /* ── TOAST ── */
 function toast(msg, dur=3000) {
   const t = document.getElementById("adminToast");
   t.textContent = msg; t.classList.add("show");
   setTimeout(() => t.classList.remove("show"), dur);
-}
-
-/* ── FIREBASE HELPER ── */
-function waitFB(cb, n=0) {
-  if (window._firebase) { cb(); return; }
-  if (n > 30) {
-    const err = document.getElementById("adminErr");
-    if (err) err.textContent = "Firebase failed to load. Check your internet connection and refresh.";
-    const btn = document.querySelector("#adminLogin .btn-auth");
-    if (btn) { btn.disabled = false; btn.textContent = "Login to Dashboard →"; }
-    return;
-  }
-  setTimeout(() => waitFB(cb, n+1), 200);
-}
-
-/* ── ADMIN EMAILS — add your admin email(s) here ── */
-const ADMIN_EMAILS = [
-  "admin@packzen.com",
-  "support@packzenblr.in",
-  "azharahmedm786@gmail.com",
-  "moveeasyblr@gmail.com"
-];
-
-/* ── LOGIN ── */
-function adminLogin() {
-  const email = document.getElementById("adminEmail").value.trim().toLowerCase();
-  const pass  = document.getElementById("adminPass").value;
-  const err   = document.getElementById("adminErr");
-  const btn   = document.querySelector("#adminLogin .btn-auth");
-  err.textContent = ""; err.style.color = "#ef4444";
-
-  if (!email || !pass) { err.textContent = "Please enter email and password."; return; }
-  if (btn) { btn.disabled = true; btn.textContent = "Signing in..."; }
-
-  waitFB(() => {
-    const { auth, db } = window._firebase;
-    auth.signInWithEmailAndPassword(email, pass)
-      .then(cred => {
-        adminUser = cred.user;
-        const userEmail = cred.user.email?.toLowerCase() || "";
-
-        db.collection("users").doc(cred.user.uid).get()
-          .then(async doc => {
-            const role = doc.exists ? doc.data()?.role : null;
-            const name = doc.exists ? (doc.data()?.name || "Admin") : "Admin";
-
-            // ✅ Allow login if: role === "admin" OR email is in ADMIN_EMAILS list
-            if (role === "admin" || ADMIN_EMAILS.includes(userEmail)) {
-
-              // Auto-fix: if email is in ADMIN_EMAILS but role isn't set yet, set it now
-              if (ADMIN_EMAILS.includes(userEmail) && role !== "admin") {
-                try {
-                  if (doc.exists) {
-                    await db.collection("users").doc(cred.user.uid).update({ role: "admin" });
-                  } else {
-                    await db.collection("users").doc(cred.user.uid).set({
-                      name: cred.user.displayName || "Admin",
-                      email: userEmail,
-                      role: "admin",
-                      createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                    });
-                  }
-                  console.log("Admin role set in Firestore ✅");
-                } catch(e) {
-                  console.warn("Could not set admin role:", e.message);
-                }
-              }
-
-              showShell(name);
-            } else {
-              auth.signOut(); adminUser = null;
-              err.textContent = "Access denied. Your account does not have admin permissions.";
-            }
-          })
-          .catch(() => {
-            // Firestore read failed (security rules) — fall back to email check only
-            if (ADMIN_EMAILS.includes(userEmail)) {
-              showShell(cred.user.displayName || "Admin");
-            } else {
-              auth.signOut(); adminUser = null;
-              err.textContent = "Could not verify admin role. Please contact support.";
-            }
-          });
-      })
-      .catch(e => {
-        if (e.code === "auth/wrong-password" || e.code === "auth/invalid-credential")
-          err.textContent = "Wrong password. Please try again.";
-        else if (e.code === "auth/user-not-found")
-          err.textContent = "No account found with this email.";
-        else if (e.code === "auth/invalid-email")
-          err.textContent = "Invalid email address.";
-        else if (e.code === "auth/too-many-requests")
-          err.textContent = "Too many attempts. Please wait a few minutes.";
-        else
-          err.textContent = e.message;
-      })
-      .finally(() => { if (btn) { btn.disabled = false; btn.textContent = "Login to Dashboard →"; } });
-  });
-}
-
-function adminSignOut() {
-  waitFB(() => window._firebase.auth.signOut().then(() => {
-    document.getElementById("adminShell").classList.remove("active");
-    document.getElementById("adminLogin").style.display = "flex";
-    adminUser = null;
-  }));
-}
-
-function showShell(name) {
-  document.getElementById("adminLogin").style.display = "none";
-  document.getElementById("adminShell").classList.add("active");
-  document.getElementById("adminNameDisplay").textContent = name;
-  loadAll();
 }
 
 /* ── LOAD ALL ── */
@@ -593,6 +696,7 @@ function loadPromos() {
 function loadBroadcastHistory() {
   window._firebase.db.collection("broadcasts").orderBy("createdAt","desc").limit(10).onSnapshot(snap => {
     const tbody = document.getElementById("broadcastTable");
+    if (!tbody) return;
     if (snap.empty) { tbody.innerHTML = '<tr class="empty-row"><td colspan="4">No broadcasts yet.</td></tr>'; return; }
     tbody.innerHTML = snap.docs.map(d => {
       const b = d.data();
@@ -605,21 +709,22 @@ function loadBroadcastHistory() {
 
 /* ── STATS ── */
 function updateStats() {
-  document.getElementById("statTotal").textContent     = allBookings.length;
-  document.getElementById("statPending").textContent   = allBookings.filter(b => !b.driverUid && b.status !== "delivered").length;
-  document.getElementById("statProgress").textContent  = allBookings.filter(b => ["assigned","packing","transit"].includes(b.status)).length;
-  document.getElementById("statDelivered").textContent = allBookings.filter(b => b.status === "delivered").length;
+  const el = id => document.getElementById(id);
+  if (!el("statTotal")) return;
+  el("statTotal").textContent     = allBookings.length;
+  el("statPending").textContent   = allBookings.filter(b => !b.driverUid && b.status !== "delivered").length;
+  el("statProgress").textContent  = allBookings.filter(b => ["assigned","packing","transit"].includes(b.status)).length;
+  el("statDelivered").textContent = allBookings.filter(b => b.status === "delivered").length;
   const rev = allBookings.reduce((s, b) => s + (b.total || 0), 0);
-  document.getElementById("statRevenue").textContent = "₹" + (rev >= 100000 ? (rev/100000).toFixed(1)+"L" : rev.toLocaleString("en-IN"));
+  el("statRevenue").textContent = "₹" + (rev >= 100000 ? (rev/100000).toFixed(1)+"L" : rev.toLocaleString("en-IN"));
   const ratings = allReviews.filter(r => r.rating).map(r => r.rating);
-  document.getElementById("statRating").textContent = ratings.length ? (ratings.reduce((a,b)=>a+b,0)/ratings.length).toFixed(1)+"★" : "—";
+  el("statRating").textContent = ratings.length ? (ratings.reduce((a,b)=>a+b,0)/ratings.length).toFixed(1)+"★" : "—";
 }
 
 /* ── CHARTS ── */
 function renderCharts() {
   const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-  const bookingsByMonth = new Array(12).fill(0);
-  const revenueByMonth  = new Array(12).fill(0);
+  const bookingsByMonth = new Array(12).fill(0), revenueByMonth = new Array(12).fill(0);
   allBookings.forEach(b => {
     const d = b.createdAt?.toDate ? b.createdAt.toDate() : null;
     if (!d) return;
@@ -630,12 +735,12 @@ function renderCharts() {
   const gridColor  = isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.06)";
   const labelColor = isDark ? "#8a9bbf" : "#5a6a8a";
   const cfg = (label, data, color) => ({
-    type: "bar",
-    data: { labels: months, datasets: [{ label, data, backgroundColor: color + "88", borderColor: color, borderWidth: 2, borderRadius: 6 }] },
-    options: { responsive: true, plugins: { legend: { display: false } }, scales: { x: { grid: { color: gridColor }, ticks: { color: labelColor, font: { size: 10 } } }, y: { grid: { color: gridColor }, ticks: { color: labelColor, font: { size: 10 } } } } }
+    type:"bar", data:{ labels:months, datasets:[{ label, data, backgroundColor:color+"88", borderColor:color, borderWidth:2, borderRadius:6 }] },
+    options:{ responsive:true, plugins:{ legend:{ display:false } }, scales:{ x:{ grid:{ color:gridColor }, ticks:{ color:labelColor, font:{ size:10 } } }, y:{ grid:{ color:gridColor }, ticks:{ color:labelColor, font:{ size:10 } } } } }
   });
   const ctx1 = document.getElementById("bookingsChart");
   const ctx2 = document.getElementById("revenueChart");
+  if (!ctx1 || !ctx2) return;
   if (bookingsChart) bookingsChart.destroy();
   if (revenueChart)  revenueChart.destroy();
   bookingsChart = new Chart(ctx1, cfg("Bookings", bookingsByMonth, "#0057ff"));
@@ -644,7 +749,8 @@ function renderCharts() {
 
 /* ── OVERVIEW TABLE ── */
 function renderOverview() {
-  const tbody  = document.getElementById("overviewTable");
+  const tbody = document.getElementById("overviewTable");
+  if (!tbody) return;
   const recent = allBookings.slice(0, 8);
   if (!recent.length) { tbody.innerHTML = '<tr class="empty-row"><td colspan="6">No bookings yet</td></tr>'; return; }
   tbody.innerHTML = recent.map(b => `
@@ -661,6 +767,7 @@ function renderOverview() {
 /* ── BOOKINGS TABLE ── */
 function renderBookingsTable(list) {
   const tbody = document.getElementById("bookingsTable");
+  if (!tbody) return;
   if (!list.length) { tbody.innerHTML = '<tr class="empty-row"><td colspan="9">No bookings found</td></tr>'; return; }
   tbody.innerHTML = list.map(b => `
     <tr>
@@ -694,7 +801,6 @@ function filterBookings(q) {
   );
   renderBookingsTable(f);
 }
-
 function updateStatus(id, status) {
   requireAdmin(() => {
     window._firebase.db.collection("bookings").doc(id).update({ status })
@@ -702,8 +808,6 @@ function updateStatus(id, status) {
       .catch(e => toast("❌ " + e.message));
   });
 }
-
-/* ── DELETE BOOKING ── */
 function deleteBooking(id, ref) {
   requireAdmin(() => {
     if (!confirm(`⚠️ Permanently delete booking #${ref}?\n\nThis cannot be undone.`)) return;
@@ -712,8 +816,6 @@ function deleteBooking(id, ref) {
       .catch(e => toast("❌ " + e.message));
   });
 }
-
-/* ── EXPORT CSV ── */
 function exportCSV() {
   const headers = ["ID","Customer","Phone","Pickup","Drop","Date","Total","Status","Driver"];
   const rows = allBookings.map(b => [
@@ -729,29 +831,19 @@ function exportCSV() {
   toast("📁 CSV downloaded!");
 }
 
-/* ── DRIVERS LIST ── */
+/* ── DRIVERS ── */
 function renderDrivers() {
   const el = document.getElementById("driversList");
-  if (!allDrivers.length) {
-    el.innerHTML = '<div style="text-align:center;color:var(--text-muted);padding:40px;">No drivers yet. Create one using the form above.</div>';
-    return;
-  }
+  if (!el) return;
+  if (!allDrivers.length) { el.innerHTML = '<div style="text-align:center;color:var(--text-muted);padding:40px;">No drivers yet. Create one using the form above.</div>'; return; }
   el.innerHTML = allDrivers.map(d => `
     <div class="driver-card">
       <div class="driver-info">
         <div class="driver-avatar">${(d.name||"D").charAt(0)}</div>
         <div>
           <div class="driver-name">${d.name||"Driver"}</div>
-          <div class="driver-meta">
-            <span class="online-dot ${d.isOnline?"on":"off"}"></span>${d.isOnline?"Online":"Offline"}
-            &nbsp;·&nbsp; ${d.email}
-            ${d.vehicle ? `&nbsp;·&nbsp; ${d.vehicle}` : ""}
-          </div>
-          <div class="driver-meta" style="margin-top:3px">
-            📞 ${d.phone||"—"}
-            &nbsp;·&nbsp; Active job: <strong>${d.currentBooking?"#"+d.currentBooking.slice(-6).toUpperCase():"None"}</strong>
-            ${d.rating ? `&nbsp;·&nbsp; ⭐ ${d.rating}` : ""}
-          </div>
+          <div class="driver-meta"><span class="online-dot ${d.isOnline?"on":"off"}"></span>${d.isOnline?"Online":"Offline"} &nbsp;·&nbsp; ${d.email}${d.vehicle?` &nbsp;·&nbsp; ${d.vehicle}`:""}</div>
+          <div class="driver-meta" style="margin-top:3px">📞 ${d.phone||"—"} &nbsp;·&nbsp; Active job: <strong>${d.currentBooking?"#"+d.currentBooking.slice(-6).toUpperCase():"None"}</strong>${d.rating?` &nbsp;·&nbsp; ⭐ ${d.rating}`:""}</div>
         </div>
       </div>
       <span class="badge ${d.isOnline?"badge-delivered":"badge-pending"}">${d.isOnline?"🟢 Active":"⚫ Offline"}</span>
@@ -761,12 +853,11 @@ function renderDrivers() {
 /* ── CUSTOMERS ── */
 function renderCustomers() {
   const tbody = document.getElementById("customersTable");
+  if (!tbody) return;
   if (!allCustomers.length) { tbody.innerHTML = '<tr class="empty-row"><td colspan="6">No customers yet</td></tr>'; return; }
   tbody.innerHTML = allCustomers.map(c => `
     <tr>
-      <td>${c.name||"—"}</td>
-      <td>${c.email||"—"}</td>
-      <td>${c.phone||"—"}</td>
+      <td>${c.name||"—"}</td><td>${c.email||"—"}</td><td>${c.phone||"—"}</td>
       <td>${allBookings.filter(b=>b.customerUid===c.id).length}</td>
       <td>${c.referralCount||0} (₹${c.referralCredits||0})</td>
       <td>${c.createdAt?.toDate?c.createdAt.toDate().toLocaleDateString("en-IN"):"—"}</td>
@@ -776,6 +867,7 @@ function renderCustomers() {
 /* ── REVIEWS ── */
 function renderReviews() {
   const tbody = document.getElementById("reviewsTable");
+  if (!tbody) return;
   if (!allReviews.length) { tbody.innerHTML = '<tr class="empty-row"><td colspan="6">No reviews yet</td></tr>'; return; }
   tbody.innerHTML = allReviews.map(r => `
     <tr>
@@ -791,62 +883,33 @@ function renderReviews() {
     </tr>`).join("");
   updateStats();
 }
-
-function approveReview(id) {
-  requireAdmin(() => {
-    window._firebase.db.collection("reviews").doc(id).update({ status: "approved" })
-      .then(() => toast("✅ Review approved!")).catch(e => toast("❌ " + e.message));
-  });
-}
-function deleteReview(id) {
-  requireAdmin(() => {
-    if (!confirm("Delete this review?")) return;
-    window._firebase.db.collection("reviews").doc(id).delete()
-      .then(() => toast("🗑️ Review deleted")).catch(e => toast("❌ " + e.message));
-  });
-}
+function approveReview(id) { requireAdmin(() => window._firebase.db.collection("reviews").doc(id).update({ status:"approved" }).then(()=>toast("✅ Review approved!")).catch(e=>toast("❌ "+e.message))); }
+function deleteReview(id) { requireAdmin(() => { if(!confirm("Delete this review?")) return; window._firebase.db.collection("reviews").doc(id).delete().then(()=>toast("🗑️ Review deleted")).catch(e=>toast("❌ "+e.message)); }); }
 
 /* ── PROMOS ── */
 function createPromo() {
   requireAdmin(() => {
-    const code  = document.getElementById("promoCode").value.trim().toUpperCase();
-    const type  = document.getElementById("promoType").value;
-    const value = Number(document.getElementById("promoValue").value);
-    const max   = Number(document.getElementById("promoMax").value) || 999;
-    if (!code || !value) { toast("⚠️ Fill in code & value"); return; }
-    window._firebase.db.collection("promos").doc(code).set({
-      code, type, value, max, used: 0, active: true,
-      createdAt: firebase.firestore.FieldValue.serverTimestamp()
-    }).then(() => {
-      toast("✅ Promo created: " + code);
-      document.getElementById("promoCode").value = "";
-      document.getElementById("promoValue").value = "";
-    }).catch(e => toast("❌ " + e.message));
+    const code=document.getElementById("promoCode").value.trim().toUpperCase();
+    const type=document.getElementById("promoType").value;
+    const value=Number(document.getElementById("promoValue").value);
+    const max=Number(document.getElementById("promoMax").value)||999;
+    if (!code||!value) { toast("⚠️ Fill in code & value"); return; }
+    window._firebase.db.collection("promos").doc(code).set({ code, type, value, max, used:0, active:true, createdAt:firebase.firestore.FieldValue.serverTimestamp() })
+      .then(()=>{ toast("✅ Promo created: "+code); document.getElementById("promoCode").value=""; document.getElementById("promoValue").value=""; })
+      .catch(e=>toast("❌ "+e.message));
   });
 }
-
-function togglePromo(id, active) {
-  requireAdmin(() => {
-    window._firebase.db.collection("promos").doc(id).update({ active })
-      .then(() => toast(active?"✅ Promo activated":"⏸ Promo paused"));
-  });
-}
-function deletePromo(id) {
-  requireAdmin(() => {
-    if (!confirm("Delete promo?")) return;
-    window._firebase.db.collection("promos").doc(id).delete().then(() => toast("🗑️ Promo deleted"));
-  });
-}
+function togglePromo(id, active) { requireAdmin(()=>window._firebase.db.collection("promos").doc(id).update({active}).then(()=>toast(active?"✅ Promo activated":"⏸ Promo paused"))); }
+function deletePromo(id) { requireAdmin(()=>{ if(!confirm("Delete promo?"))return; window._firebase.db.collection("promos").doc(id).delete().then(()=>toast("🗑️ Promo deleted")); }); }
 function renderPromos() {
   const tbody = document.getElementById("promosTable");
+  if (!tbody) return;
   if (!allPromos.length) { tbody.innerHTML = '<tr class="empty-row"><td colspan="7">No promo codes yet</td></tr>'; return; }
   tbody.innerHTML = allPromos.map(p => `
     <tr>
       <td><strong style="font-family:'Syne',sans-serif;color:var(--primary)">${p.code}</strong></td>
-      <td>${cap(p.type)}</td>
-      <td>${p.type==="percent"?p.value+"%":"₹"+p.value}</td>
-      <td>${p.used||0}</td>
-      <td>${p.max||"∞"}</td>
+      <td>${cap(p.type)}</td><td>${p.type==="percent"?p.value+"%":"₹"+p.value}</td>
+      <td>${p.used||0}</td><td>${p.max||"∞"}</td>
       <td><span class="badge ${p.active?"badge-delivered":"badge-pending"}">${p.active?"Active":"Inactive"}</span></td>
       <td>
         <button class="btn-sm btn-assign" onclick="togglePromo('${p.id}',${!p.active})">${p.active?"Pause":"Activate"}</button>
@@ -858,21 +921,16 @@ function renderPromos() {
 /* ── BROADCAST ── */
 async function sendBroadcast() {
   requireAdmin(async () => {
-    const msg      = document.getElementById("broadcastMsg").value.trim();
-    const viaWA    = document.getElementById("sendWA").checked;
-    const viaEmail = document.getElementById("sendEmail").checked;
+    const msg=document.getElementById("broadcastMsg").value.trim();
+    const viaWA=document.getElementById("sendWA").checked;
+    const viaEmail=document.getElementById("sendEmail").checked;
     if (!msg) { toast("⚠️ Type a message first"); return; }
-    const result = document.getElementById("broadcastResult");
-    result.textContent = "⏳ Sending...";
-    if (viaWA) { window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, "_blank"); }
-    await window._firebase.db.collection("broadcasts").add({
-      message: msg,
-      via: [viaWA?"WhatsApp":"", viaEmail?"Email":""].filter(Boolean).join(", "),
-      recipients: allCustomers.length,
-      createdAt: firebase.firestore.FieldValue.serverTimestamp()
-    });
-    result.textContent = `✅ Broadcast sent to ${allCustomers.length} customers!`;
-    document.getElementById("broadcastMsg").value = "";
+    const result=document.getElementById("broadcastResult");
+    result.textContent="⏳ Sending...";
+    if (viaWA) window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`,"_blank");
+    await window._firebase.db.collection("broadcasts").add({ message:msg, via:[viaWA?"WhatsApp":"",viaEmail?"Email":""].filter(Boolean).join(", "), recipients:allCustomers.length, createdAt:firebase.firestore.FieldValue.serverTimestamp() });
+    result.textContent=`✅ Broadcast sent to ${allCustomers.length} customers!`;
+    document.getElementById("broadcastMsg").value="";
     toast("📢 Broadcast sent!");
   });
 }
@@ -892,8 +950,8 @@ function openAssignModal(id) {
 function closeAssignModal() { document.getElementById("assignModal").style.display = "none"; assigningId = null; }
 function populateAssignSelect() {
   const sel = document.getElementById("assignSelect");
-  sel.innerHTML = '<option value="">-- Select a driver --</option>' +
-    allDrivers.map(d => `<option value="${d.id}">${d.name||d.email}</option>`).join("");
+  if (!sel) return;
+  sel.innerHTML = '<option value="">-- Select a driver --</option>' + allDrivers.map(d=>`<option value="${d.id}">${d.name||d.email}</option>`).join("");
 }
 function confirmAssign() {
   requireAdmin(() => {
@@ -901,74 +959,63 @@ function confirmAssign() {
     if (!driverUid) { toast("⚠️ Select a driver"); return; }
     const driver = allDrivers.find(d => d.id === driverUid);
     const db = window._firebase.db;
-    db.collection("bookings").doc(assigningId).update({
-      driverUid, driverName: driver?.name||"Driver",
-      driverPhone: driver?.phone||"", status: "assigned"
-    })
-    .then(() => db.collection("users").doc(driverUid).update({ currentBooking: assigningId }))
-    .then(() => { toast("✅ Driver assigned!"); closeAssignModal(); })
-    .catch(e => toast("❌ " + e.message));
+    db.collection("bookings").doc(assigningId).update({ driverUid, driverName:driver?.name||"Driver", driverPhone:driver?.phone||"", status:"assigned" })
+      .then(()=>db.collection("users").doc(driverUid).update({ currentBooking:assigningId }))
+      .then(()=>{ toast("✅ Driver assigned!"); closeAssignModal(); })
+      .catch(e=>toast("❌ "+e.message));
   });
 }
 
 /* ── NAV ── */
 function showSection(name, el) {
-  document.querySelectorAll(".section").forEach(s => s.classList.remove("active"));
-  document.querySelectorAll(".nav-item").forEach(n => n.classList.remove("active"));
-  document.getElementById("section" + cap(name)).classList.add("active");
+  document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
+  document.querySelectorAll(".nav-item").forEach(n=>n.classList.remove("active"));
+  const sec = document.getElementById("section"+cap(name));
+  if (sec) sec.classList.add("active");
   if (el) el.classList.add("active");
-  const titles = {
-    overview:"Overview", bookings:"Bookings", drivers:"Drivers",
-    customers:"Customers", reviews:"Reviews", cancels:"Cancellations",
-    claims:"Damage Claims", promos:"Promo Codes", broadcast:"Broadcast"
-  };
-  document.getElementById("sectionTitle").textContent = titles[name] || cap(name);
-  if (name === "overview") renderCharts();
-  if (name === "cancels")  loadCancelRequests();
-  if (name === "claims")   loadDamageClaims();
+  const titles = { overview:"Overview", bookings:"Bookings", drivers:"Drivers", customers:"Customers", reviews:"Reviews", cancels:"Cancellations", claims:"Damage Claims", promos:"Promo Codes", broadcast:"Broadcast" };
+  const titleEl = document.getElementById("sectionTitle");
+  if (titleEl) titleEl.textContent = titles[name] || cap(name);
+  if (name==="overview") renderCharts();
+  if (name==="cancels")  loadCancelRequests();
+  if (name==="claims")   loadDamageClaims();
 }
 
 /* ── DAMAGE CLAIMS ── */
 let currentClaimDocId = "";
-
 async function loadDamageClaims() {
   const tbody = document.getElementById("claimsTable");
   if (!tbody || !window._firebase) return;
   tbody.innerHTML = "<tr><td colspan='8' style='text-align:center;padding:1rem'>Loading...</td></tr>";
   try {
-    const snap = await window._firebase.db.collection("damageClaims")
-      .orderBy("createdAt","desc").limit(60).get();
+    const snap = await window._firebase.db.collection("damageClaims").orderBy("createdAt","desc").limit(60).get();
     if (snap.empty) { tbody.innerHTML = "<tr class='empty-row'><td colspan='8'>No damage claims yet.</td></tr>"; return; }
     const statusColor = { pending:"#d97706", investigating:"#2563eb", approved:"#16a34a", rejected:"#dc2626" };
     tbody.innerHTML = snap.docs.map(d => {
       const c = d.data();
       const date   = c.createdAt?.toDate?.().toLocaleDateString("en-IN") || "—";
-      const photos = c.photos?.length ? `<span style="color:#2563eb;cursor:pointer;font-weight:600" onclick="viewClaimPhotos('${d.id}')">${c.photos.length} photo(s)</span>` : "None";
+      const photos = c.photos?.length ? `<span style="color:#2563eb;cursor:pointer;font-weight:600" onclick="openClaimDetail('${d.id}')">${c.photos.length} photo(s)</span>` : "None";
       const col = statusColor[c.status] || "#64748b";
       return `<tr>
         <td style="font-family:monospace;font-size:.75rem">${d.id.slice(0,8).toUpperCase()}</td>
         <td>${c.bookingDocId?.slice(0,8)||"—"}</td>
         <td>${c.damageType||"—"}</td>
         <td style="max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${c.description||"—"}</td>
-        <td>${photos}</td>
-        <td>${date}</td>
+        <td>${photos}</td><td>${date}</td>
         <td><span style="color:${col};font-weight:700;font-size:.78rem">${(c.status||"pending").toUpperCase()}</span></td>
         <td><button onclick="openClaimDetail('${d.id}')" style="padding:.3rem .7rem;background:#7c3aed;color:white;border:none;border-radius:8px;cursor:pointer;font-size:.75rem">Review</button></td>
       </tr>`;
     }).join("");
   } catch(e) { tbody.innerHTML = `<tr><td colspan='8' style='color:red'>Error: ${e.message}</td></tr>`; }
 }
-
 async function openClaimDetail(docId) {
   currentClaimDocId = docId;
   const doc = await window._firebase.db.collection("damageClaims").doc(docId).get();
   if (!doc.exists) return;
   const c = doc.data();
-  const panel   = document.getElementById("claimDetailPanel");
+  const panel = document.getElementById("claimDetailPanel");
   const content = document.getElementById("claimDetailContent");
-  const photoHtml = c.photos?.length
-    ? c.photos.map(p => `<img src="${p}" style="width:80px;height:80px;object-fit:cover;border-radius:8px;border:2px solid var(--border)">`).join("")
-    : "<span style='color:var(--text-muted);font-size:.82rem'>No photos attached</span>";
+  const photoHtml = c.photos?.length ? c.photos.map(p=>`<img src="${p}" style="width:80px;height:80px;object-fit:cover;border-radius:8px;border:2px solid var(--border)">`).join("") : "<span style='color:var(--text-muted);font-size:.82rem'>No photos attached</span>";
   content.innerHTML = `
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem 1.2rem;margin-bottom:1rem;font-size:.85rem">
       <div><span style="color:var(--text-muted)">Claim ID:</span> <strong>${docId.slice(0,8).toUpperCase()}</strong></div>
@@ -977,23 +1024,18 @@ async function openClaimDetail(docId) {
       <div><span style="color:var(--text-muted)">Status:</span> <strong style="color:#7c3aed">${(c.status||"pending").toUpperCase()}</strong></div>
     </div>
     <div style="font-size:.85rem;color:var(--text-muted);margin-bottom:.9rem;background:var(--surface2);padding:.7rem;border-radius:10px"><strong>Description:</strong><br>${c.description||"—"}</div>
-    ${c.adminResponse ? `<div style="font-size:.82rem;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:.6rem;margin-bottom:.8rem;color:#166534"><strong>Previous response:</strong> ${c.adminResponse}</div>` : ""}
+    ${c.adminResponse?`<div style="font-size:.82rem;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:.6rem;margin-bottom:.8rem;color:#166534"><strong>Previous response:</strong> ${c.adminResponse}</div>`:""}
     <div style="display:flex;gap:6px;flex-wrap:wrap">${photoHtml}</div>`;
   panel.style.display = "block";
   panel.scrollIntoView({ behavior:"smooth", block:"start" });
 }
-
 async function resolveDamageClaim(newStatus) {
   if (!currentClaimDocId || !window._firebase) return;
   const response = document.getElementById("claimResponseText").value.trim();
   if (!response) { alert("Please enter an admin response before resolving."); return; }
   try {
-    await window._firebase.db.collection("damageClaims").doc(currentClaimDocId).update({
-      status: newStatus, adminResponse: response,
-      resolvedAt: firebase.firestore.FieldValue.serverTimestamp(),
-      resolvedBy: firebase.auth().currentUser?.uid || "admin"
-    });
-    toast(`✅ Claim marked as ${newStatus}`);
+    await window._firebase.db.collection("damageClaims").doc(currentClaimDocId).update({ status:newStatus, adminResponse:response, resolvedAt:firebase.firestore.FieldValue.serverTimestamp(), resolvedBy:firebase.auth().currentUser?.uid||"admin" });
+    toast("✅ Claim marked as " + newStatus);
     document.getElementById("claimDetailPanel").style.display = "none";
     loadDamageClaims();
   } catch(e) { alert("Error: " + e.message); }
@@ -1005,116 +1047,68 @@ async function loadCancelRequests() {
   if (!tbody || !window._firebase) return;
   tbody.innerHTML = "<tr><td colspan='6' style='text-align:center;padding:1rem'>Loading...</td></tr>";
   try {
-    const snap = await window._firebase.db.collection("cancelRequests")
-      .orderBy("createdAt","desc").limit(50).get();
+    const snap = await window._firebase.db.collection("cancelRequests").orderBy("createdAt","desc").limit(50).get();
     if (snap.empty) { tbody.innerHTML = "<tr class='empty-row'><td colspan='6'>No cancellation requests yet.</td></tr>"; return; }
     tbody.innerHTML = snap.docs.map(d => {
       const c = d.data();
       const date = c.createdAt?.toDate?.().toLocaleDateString("en-IN") || "—";
       return `<tr>
-        <td>${c.bookingDocId||"—"}</td>
-        <td>${c.customerUid?.slice(0,8)||"—"}</td>
-        <td>${c.reason||"—"}</td>
-        <td>${date}</td>
+        <td>${c.bookingDocId||"—"}</td><td>${c.customerUid?.slice(0,8)||"—"}</td>
+        <td>${c.reason||"—"}</td><td>${date}</td>
         <td><span style="color:${c.resolved?'#16a34a':'#dc2626'}">${c.resolved?"✅ Resolved":"⏳ Pending"}</span></td>
         <td><button onclick="resolveCancelRequest('${d.id}')" style="padding:.3rem .7rem;background:#2563eb;color:white;border:none;border-radius:8px;cursor:pointer;font-size:.75rem">Mark Resolved</button></td>
       </tr>`;
     }).join("");
   } catch(e) { tbody.innerHTML = `<tr><td colspan='6' style='color:red'>Error: ${e.message}</td></tr>`; }
 }
-
 async function resolveCancelRequest(docId) {
   if (!window._firebase) return;
-  await window._firebase.db.collection("cancelRequests").doc(docId).update({ resolved: true });
+  await window._firebase.db.collection("cancelRequests").doc(docId).update({ resolved:true });
   toast("✅ Marked as resolved");
   loadCancelRequests();
 }
 
-/* ── UTILS ── */
-function cap(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : ""; }
-
-/* ================================================================
-   ✅ FIX: adminCreateDriver()
-   Creates a driver account using a secondary Firebase app instance
-   so the admin session is NOT disturbed.
-   ================================================================ */
+/* ── CREATE DRIVER ── */
 async function adminCreateDriver() {
-  const name     = (document.getElementById("newDriverName")     || {}).value || "";
-  const email    = (document.getElementById("newDriverEmail")    || {}).value || "";
-  const phone    = (document.getElementById("newDriverPhone")    || {}).value || "";
-  const vehicle  = (document.getElementById("newDriverVehicle")  || {}).value || "";
-  const password = (document.getElementById("newDriverPassword") || {}).value || "";
+  const name     = (document.getElementById("newDriverName")||{}).value||"";
+  const email    = (document.getElementById("newDriverEmail")||{}).value||"";
+  const phone    = (document.getElementById("newDriverPhone")||{}).value||"";
+  const vehicle  = (document.getElementById("newDriverVehicle")||{}).value||"";
+  const password = (document.getElementById("newDriverPassword")||{}).value||"";
   const msgEl    = document.getElementById("adminDriverMsg");
-
-  const setMsg = (text, ok) => {
-    if (!msgEl) return;
-    msgEl.textContent = text;
-    msgEl.style.color = ok ? "#16a34a" : "#e53e3e";
-  };
-
-  if (!name.trim())
-    return setMsg("⚠️ Please enter the driver's full name.", false);
-  if (!email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim()))
-    return setMsg("⚠️ Please enter a valid email address.", false);
-  if (phone.trim() && phone.trim().length !== 10)
-    return setMsg("⚠️ Phone must be 10 digits (or leave it blank).", false);
-  if (password.length < 6)
-    return setMsg("⚠️ Password must be at least 6 characters.", false);
-
+  const setMsg   = (text, ok) => { if(msgEl){ msgEl.textContent=text; msgEl.style.color=ok?"#16a34a":"#e53e3e"; } };
+  if (!name.trim()) return setMsg("⚠️ Please enter the driver's full name.", false);
+  if (!email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) return setMsg("⚠️ Please enter a valid email address.", false);
+  if (phone.trim() && phone.trim().length!==10) return setMsg("⚠️ Phone must be 10 digits (or leave it blank).", false);
+  if (password.length < 6) return setMsg("⚠️ Password must be at least 6 characters.", false);
   setMsg("⏳ Creating driver account...", true);
-
-  // Disable button during creation
   const btn = document.querySelector('[onclick="adminCreateDriver()"]');
-  if (btn) { btn.disabled = true; btn.textContent = "Creating..."; }
-
+  if (btn) { btn.disabled=true; btn.textContent="Creating..."; }
   try {
     const { db } = window._firebase;
-
-    // ── Use a secondary Firebase app so admin stays logged in ──
-    const secondaryApp  = firebase.initializeApp(firebase.app().options, "adminDriver_" + Date.now());
+    const secondaryApp  = firebase.initializeApp(firebase.app().options, "adminDriver_"+Date.now());
     const secondaryAuth = secondaryApp.auth();
-
     const cred      = await secondaryAuth.createUserWithEmailAndPassword(email.trim(), password);
     const driverUid = cred.user.uid;
-
     await secondaryAuth.signOut();
     await secondaryApp.delete();
-
-    // Save driver profile to Firestore
-    await db.collection("users").doc(driverUid).set({
-      name:       name.trim(),
-      email:      email.trim(),
-      phone:      phone.trim() ? "+91" + phone.trim() : "",
-      vehicle:    vehicle || "",
-      role:       "driver",
-      isOnline:   false,
-      rating:     0,
-      totalMoves: 0,
-      createdBy:  adminUser ? adminUser.uid : "admin",
-      createdAt:  firebase.firestore.FieldValue.serverTimestamp()
-    });
-
-    setMsg('✅ Driver "' + name.trim() + '" created! They can now log in at driver.html', true);
-    toast("✅ Driver account created for " + name.trim());
-
-    // Clear form fields
-    ["newDriverName","newDriverEmail","newDriverPhone","newDriverVehicle","newDriverPassword"]
-      .forEach(id => { const el = document.getElementById(id); if (el) el.value = ""; });
-
-    // Refresh the drivers list
+    await db.collection("users").doc(driverUid).set({ name:name.trim(), email:email.trim(), phone:phone.trim()?"+91"+phone.trim():"", vehicle:vehicle||"", role:"driver", isOnline:false, rating:0, totalMoves:0, createdBy:adminUser?adminUser.uid:"admin", createdAt:firebase.firestore.FieldValue.serverTimestamp() });
+    setMsg('✅ Driver "'+name.trim()+'" created! They can now log in at driver.html', true);
+    toast("✅ Driver account created for "+name.trim());
+    ["newDriverName","newDriverEmail","newDriverPhone","newDriverVehicle","newDriverPassword"].forEach(id=>{const el=document.getElementById(id);if(el)el.value="";});
     loadDrivers();
-
-  } catch (err) {
-    console.error("Driver creation error:", err);
-    if      (err.code === "auth/email-already-in-use") setMsg("⚠️ A driver with this email already exists.", false);
-    else if (err.code === "auth/invalid-email")        setMsg("⚠️ Invalid email address format.", false);
-    else if (err.code === "auth/weak-password")        setMsg("⚠️ Password is too weak. Use at least 6 characters.", false);
-    else setMsg("⚠️ " + (err.message || "Failed to create driver."), false);
+  } catch(err) {
+    if      (err.code==="auth/email-already-in-use") setMsg("⚠️ A driver with this email already exists.", false);
+    else if (err.code==="auth/invalid-email")        setMsg("⚠️ Invalid email address format.", false);
+    else if (err.code==="auth/weak-password")        setMsg("⚠️ Password is too weak. Use at least 6 characters.", false);
+    else setMsg("⚠️ "+(err.message||"Failed to create driver."), false);
   } finally {
-    if (btn) { btn.disabled = false; btn.textContent = "✅ Create Driver Account"; }
+    if (btn) { btn.disabled=false; btn.textContent="✅ Create Driver Account"; }
   }
 }
 
+/* ── UTILS ── */
+function cap(s) { return s ? s.charAt(0).toUpperCase()+s.slice(1) : ""; }
 </script>
 </body>
 </html>
