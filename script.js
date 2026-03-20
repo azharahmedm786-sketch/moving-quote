@@ -370,21 +370,26 @@ function showError(id, msg, isSuccess = false) {
 
 function getAuthErrorMessage(code) {
   const messages = {
-    "auth/user-not-found":            "No account found with this email. Please sign up.",
-    "auth/wrong-password":            "Incorrect password. Please try again.",
-    "auth/invalid-credential":        "Incorrect email or password. Please try again.",
-    "auth/invalid-email":             "Please enter a valid email address.",
-    "auth/email-already-in-use":      "This email is already registered. Please login.",
-    "auth/weak-password":             "Password is too weak. Use at least 6 characters.",
-    "auth/network-request-failed":    "Network error. Please check your connection.",
-    "auth/too-many-requests":         "Too many attempts. Please wait a few minutes.",
-    "auth/invalid-phone-number":      "Invalid phone number. Enter a valid 10-digit number.",
-    "auth/operation-not-allowed":     "This sign-in method is not enabled. Contact support.",
-    "auth/session-expired":           "OTP expired. Please request a new one.",
-    "auth/invalid-verification-code": "Invalid OTP. Please check and try again.",
-    "auth/quota-exceeded":            "SMS quota exceeded. Please try again later.",
+    "auth/user-not-found":               "⚠️ No account found. Please sign up first.",
+    "auth/wrong-password":               "⚠️ Incorrect password. Please try again.",
+    "auth/invalid-credential":           "⚠️ Incorrect phone or password. Please try again.",
+    "auth/invalid-login-credentials":    "⚠️ Incorrect phone or password. Please try again.",
+    "auth/invalid-email":                "⚠️ Please enter a valid email address.",
+    "auth/email-already-in-use":         "⚠️ This email is already registered. Please login.",
+    "auth/weak-password":                "⚠️ Password too weak. Use at least 6 characters.",
+    "auth/network-request-failed":       "⚠️ Network error. Please check your connection.",
+    "auth/too-many-requests":            "⚠️ Too many attempts. Please wait a few minutes and try again.",
+    "auth/invalid-phone-number":         "⚠️ Invalid phone number. Enter a valid 10-digit number.",
+    "auth/operation-not-allowed":        "⚠️ Sign-in method not enabled. Contact support.",
+    "auth/session-expired":              "⚠️ OTP expired. Please request a new one.",
+    "auth/invalid-verification-code":    "⚠️ Invalid OTP. Please check and try again.",
+    "auth/quota-exceeded":               "⚠️ SMS quota exceeded. Please try again later.",
+    "auth/user-disabled":                "⚠️ This account has been disabled. Contact support.",
+    "auth/requires-recent-login":        "⚠️ Please log out and log in again to continue.",
+    "auth/account-exists-with-different-credential": "⚠️ Account exists with different login method.",
+    "permission-denied":                 "⚠️ Access denied. Please log out and log in again.",
   };
-  return messages[code] || "Something went wrong. Please try again.";
+  return messages[code] || ("⚠️ Error: " + (code || "unknown") + ". Please try again.");
 }
 
 /* ============================================
@@ -711,40 +716,55 @@ async function loginUser() {
         if (!snap2.empty) userDoc = snap2.docs[0];
       }
 
-      if (!userDoc) {
-        if (btn) { btn.disabled = false; btn.textContent = "Login →"; }
-        return showError("loginError", "⚠️ No account found with this phone number. Please sign up first.");
-      }
-
-      const userData  = userDoc.data();
-      const userEmail = userData.email;
-
-      if (!userEmail) {
-        if (btn) { btn.disabled = false; btn.textContent = "Login →"; }
-        return showError("loginError", "⚠️ Account setup incomplete. Please contact support.");
-      }
-
-      // Step 2: Sign in with persistence set to LOCAL (survives refresh)
+      // Step 2: Sign in
       showError("loginError", "⏳ Signing you in...", "info");
       await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(() => {});
-      const cred = await auth.signInWithEmailAndPassword(userEmail, pass);
+
+      let cred = null;
+
+      if (userDoc) {
+        // Found in Firestore — use linked email
+        const userData2 = userDoc.data();
+        const linkedEmail = userData2.email;
+        if (linkedEmail) {
+          cred = await auth.signInWithEmailAndPassword(linkedEmail, pass);
+        }
+      }
+
+      if (!cred) {
+        // Fallback: try phone as email format (some signups use phone@packzen.in)
+        const fallbackEmail = phone + "@packzen.in";
+        try {
+          cred = await auth.signInWithEmailAndPassword(fallbackEmail, pass);
+        } catch(e2) {
+          // Fallback failed - show helpful message
+          if (btn) { btn.disabled = false; btn.textContent = "Login →"; }
+          return showError("loginError", "⚠️ Account not found. Please sign up or check your phone number.");
+        }
+      }
 
       if (btn) { btn.disabled = false; btn.textContent = "Login →"; }
       closeAuthModal();
+      const userData = userDoc ? userDoc.data() : {};
       const name = (cred.user.displayName || userData.name || "").split(" ")[0] || "there";
       showToast(`👋 Welcome back, ${name}!`);
 
     } catch (err) {
       if (btn) { btn.disabled = false; btn.textContent = "Login →"; }
-      // ✅ FIX: Better error messages for wrong password vs other errors
-      if (err.code === "auth/wrong-password" || err.code === "auth/invalid-credential") {
-        showError("loginError", "⚠️ Incorrect password. Please try again.");
-      } else if (err.code === "auth/too-many-requests") {
+      // Show specific error based on Firebase error code
+      const code = err.code || "";
+      if (code === "auth/wrong-password" || code === "auth/invalid-credential" || code === "auth/invalid-login-credentials") {
+        showError("loginError", "⚠️ Incorrect password. Please try again or reset your password.");
+      } else if (code === "auth/too-many-requests") {
         showError("loginError", "⚠️ Too many failed attempts. Please wait a few minutes.");
-      } else if (err.code === "auth/network-request-failed") {
+      } else if (code === "auth/network-request-failed") {
         showError("loginError", "⚠️ Network error. Please check your connection.");
+      } else if (code === "auth/user-not-found") {
+        showError("loginError", "⚠️ No account found with this phone number.");
+      } else if (code === "permission-denied") {
+        showError("loginError", "⚠️ Database access denied. Please contact support.");
       } else {
-        showError("loginError", getAuthErrorMessage(err.code));
+        showError("loginError", getAuthErrorMessage(code));
       }
     }
   });
