@@ -54,14 +54,13 @@ function notifyOwner(bookingRef, name, phone, pickup, drop, date, total, payType
     `━━━━━━━━━━━━━━━━━━━━\n` +
     `Reply CONFIRM or call customer now.`;
 
-  // Open WhatsApp to your number with the booking details
   setTimeout(() => {
     window.open(
       `https://wa.me/${OWNER_WHATSAPP}?text=${encodeURIComponent(msg)}`,
       "_blank",
       "noopener,noreferrer"
     );
-  }, 1500); // slight delay so the confirmation card appears first
+  }, 1500);
 }
 
 const MIN_BASE_PRICE = 1999;
@@ -88,7 +87,6 @@ function openBottomSheet(id) {
   const overlay = document.getElementById("bsOverlay");
   if (!sheet || !overlay) return;
 
-  // Build dynamic content before opening
   if (id === "bsDate")        buildBsDateStrip();
   if (id === "bsHouse")       buildBsHouseOptions();
 
@@ -106,7 +104,6 @@ function closeAllBottomSheets() {
   document.body.style.overflow = "";
 }
 
-/* ---------- DATE SHEET ---------- */
 function buildBsDateStrip() {
   const strip = document.getElementById("bsDateStrip");
   if (!strip) return;
@@ -117,7 +114,6 @@ function buildBsDateStrip() {
   const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
   const selected = document.getElementById("shiftDate")?.value;
 
-  // Also set min on date input
   const di = document.getElementById("bsDateInput");
   if (di) di.min = today.toISOString().split("T")[0];
 
@@ -151,7 +147,6 @@ function onBsDatePicked(val) {
   const today = new Date(); today.setHours(0,0,0,0);
   const d = new Date(val + "T00:00:00");
   if (d < today) { showToast("⚠️ Please select today or a future date."); return; }
-  // Deselect strip cards
   document.querySelectorAll(".bs-date-card").forEach(c => c.classList.remove("selected"));
   applyDate(val, d);
 }
@@ -170,7 +165,6 @@ function applyDate(ds, d) {
   calculateQuote(true);
 }
 
-/* ---------- TIME SHEET ---------- */
 function pickTimeSlot(value, label) {
   document.getElementById("shiftTime").value = value;
   document.getElementById("shiftTimeLabel").value = label;
@@ -186,7 +180,6 @@ function pickTimeSlot(value, label) {
   setTimeout(closeAllBottomSheets, 250);
 }
 
-/* ---------- HOUSE TYPE SHEET ---------- */
 function buildBsHouseOptions() {
   const body = document.getElementById("bsHouseBody");
   if (!body) return;
@@ -217,14 +210,12 @@ function pickHouseType(value, label, shortLabel) {
 
   const trigger = document.getElementById("houseTrigger");
   const text    = document.getElementById("houseTriggerText");
-  const icon    = document.getElementById("houseTrigger")?.querySelector(".bs-trigger-icon");
   if (trigger) trigger.classList.add("filled");
   if (text) text.textContent = label;
 
   setTimeout(() => { closeAllBottomSheets(); calculateQuote(true); }, 250);
 }
 
-/* ---------- VEHICLE SHEET ---------- */
 function pickVehicle(value, label, sub, price) {
   const sel = document.getElementById("vehicle");
   if (sel) sel.value = value;
@@ -240,7 +231,6 @@ function pickVehicle(value, label, sub, price) {
   setTimeout(() => { closeAllBottomSheets(); calculateQuote(true); }, 250);
 }
 
-/* ---------- FLOOR SHEETS ---------- */
 function pickFloor(type, value, label, price) {
   const sel = document.getElementById(type === "pickup" ? "pickupFloor" : "dropFloor");
   if (sel) sel.value = value;
@@ -259,7 +249,6 @@ function pickFloor(type, value, label, price) {
   setTimeout(() => { closeAllBottomSheets(); calculateQuote(true); }, 250);
 }
 
-/* ---------- SWIPE TO CLOSE ---------- */
 (function() {
   let startY = 0;
   document.addEventListener("touchstart", e => {
@@ -268,7 +257,7 @@ function pickFloor(type, value, label, price) {
   document.addEventListener("touchend", e => {
     if (!_activeBs) return;
     const endY = e.changedTouches[0].clientY;
-    if (endY - startY > 80) closeAllBottomSheets(); // swipe down 80px to close
+    if (endY - startY > 80) closeAllBottomSheets();
   }, { passive: true });
 })();
 
@@ -285,7 +274,6 @@ function buildDateStrip() {
   const days  = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
   const months= ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 
-  // Show next 10 days starting from today
   for (let i = 0; i < 10; i++) {
     const d = new Date(today);
     d.setDate(today.getDate() + i);
@@ -307,16 +295,13 @@ function buildDateStrip() {
 }
 
 function selectDateCard(card, dateObj) {
-  // Deselect all
   document.querySelectorAll(".date-card").forEach(c => c.classList.remove("selected"));
   card.classList.add("selected");
 
-  // Set hidden input value
   const dateStr = dateObj.toISOString().split("T")[0];
   const shiftDate = document.getElementById("shiftDate");
   if (shiftDate) shiftDate.value = dateStr;
 
-  // Update label
   const label = document.getElementById("dateSelectedLabel");
   const days   = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
   const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
@@ -331,7 +316,6 @@ function openCustomDate() {
   const input = document.getElementById("shiftDate");
   if (!input) return;
 
-  // Set min date to today
   const today = new Date().toISOString().split("T")[0];
   input.min = today;
   input.style.position = "fixed";
@@ -358,15 +342,12 @@ function onCustomDatePicked(val) {
     return;
   }
 
-  // Deselect strip cards (custom date may not be in strip)
   document.querySelectorAll(".date-card").forEach(c => c.classList.remove("selected"));
 
-  // Check if date is in strip — select it if so
   const dateStr = val;
   const match = document.querySelector(`.date-card[data-date="${dateStr}"]`);
   if (match) match.classList.add("selected");
 
-  // Update label
   const label = document.getElementById("dateSelectedLabel");
   const days   = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
   const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
@@ -378,7 +359,6 @@ function onCustomDatePicked(val) {
 }
 
 function selectTimeSlot(btn, value, label, range) {
-  // Deselect all time slots
   document.querySelectorAll(".time-slot-btn").forEach(b => b.classList.remove("selected"));
   btn.classList.add("selected");
 
@@ -392,14 +372,12 @@ function selectTimeSlot(btn, value, label, range) {
    PAGE LOAD
    ============================================ */
 document.addEventListener("DOMContentLoaded", () => {
-  // Restore theme
   if (localStorage.getItem("packzen-theme") === "dark") {
     document.body.classList.add("dark-mode");
     const btn = document.getElementById("themeToggle");
     if (btn) btn.textContent = "☀️";
   }
 
-  // Auto-scroll focused input into view on mobile
   document.addEventListener("focusin", (e) => {
     const el = e.target;
     if (!["INPUT","TEXTAREA","SELECT"].includes(el.tagName)) return;
@@ -407,18 +385,15 @@ document.addEventListener("DOMContentLoaded", () => {
     setTimeout(() => { el.scrollIntoView({ behavior: "smooth", block: "center" }); }, 320);
   });
 
-  // Reveal — mark everything visible immediately, no animation dependency
   const makeVisible = () => {
     document.querySelectorAll(".reveal, .reveal-stagger").forEach(el => {
       el.classList.add("visible");
     });
   };
   makeVisible();
-  // Also run after a short delay in case DOM isn't fully painted
   setTimeout(makeVisible, 100);
   setTimeout(makeVisible, 500);
 
-  // Stats counter
   const STAT_VALUES = [100, 2026, 100, 0];
   const statNumbers = document.querySelectorAll(".stat-number");
   statNumbers.forEach((el, i) => {
@@ -465,7 +440,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }, 500);
   }
 
-  // Ripple
   document.querySelectorAll("button, .btn-primary, .btn-ghost").forEach(btn => {
     btn.addEventListener("click", function(e) {
       const r = document.createElement("span"); r.classList.add("ripple");
@@ -477,11 +451,9 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // Price pop animation
   const priceEl = document.getElementById("livePrice");
   if (priceEl) new MutationObserver(() => { priceEl.classList.remove("updated"); void priceEl.offsetWidth; priceEl.classList.add("updated"); }).observe(priceEl, { childList: true });
 
-  // Smooth scroll
   document.querySelectorAll('a[href^="#"]').forEach(a => {
     a.addEventListener("click", function(e) {
       const t = document.querySelector(this.getAttribute("href"));
@@ -489,24 +461,20 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // Navbar scroll
   const navbar = document.querySelector(".navbar");
   window.addEventListener("scroll", () => {
     navbar.style.background = window.scrollY > 50 ? "rgba(5,13,26,0.97)" : "rgba(5,13,26,0.85)";
   }, { passive: true });
 
-  // Close dropdown outside click
   document.addEventListener("click", (e) => {
     if (!e.target.closest(".nav-user")) document.getElementById("userDropdown")?.classList.remove("open");
   });
 
-  // Auth state — set LOCAL persistence so login survives page refresh
   waitForFirebase(() => {
     const auth = window._firebase.auth;
 
-    // Keep user logged in across refreshes (localStorage)
     auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
-      .catch(() => {}); // silent fallback if already set
+      .catch(() => {});
 
     auth.onAuthStateChanged(user => {
       currentUser = user;
@@ -521,15 +489,14 @@ document.addEventListener("DOMContentLoaded", () => {
         if (banner) banner.style.display = "none";
       }
     });
-  }); // end waitForFirebase
+  });
 
   loadReviewsPublic();
   buildChecklist();
   setTimeout(() => renderSizeCards("home"), 100);
   initPaymentOptions();
-  buildDateStrip(); // Build advanced date picker
+  buildDateStrip();
 
-  // Inject furniture category styles
   if (!document.getElementById('pz-fc-styles')) {
     const s = document.createElement('style');
     s.id = 'pz-fc-styles';
@@ -559,7 +526,6 @@ document.addEventListener("DOMContentLoaded", () => {
     document.head.appendChild(s);
   }
 
-  // :has() fallback for older browsers
   document.addEventListener("change", (e) => {
     if (e.target.type === "checkbox" && e.target.closest(".furniture-card")) {
       const card = e.target.closest(".furniture-card");
@@ -567,7 +533,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // ✅ FIX: Create dedicated hidden reCAPTCHA container for password reset
   if (!document.getElementById("recaptcha-reset-container")) {
     const div = document.createElement("div");
     div.id = "recaptcha-reset-container";
@@ -592,7 +557,7 @@ function initPaymentOptions() {
    ============================================ */
 function waitForFirebase(cb, tries = 0) {
   if (window._firebase) { cb(); return; }
-  if (tries > 30) { return; } // firebase timeout
+  if (tries > 30) { return; }
   setTimeout(() => waitForFirebase(cb, tries + 1), 200);
 }
 
@@ -621,7 +586,7 @@ function updateNavForUser(user) {
           if (adminLink) adminLink.style.display = "block";
         }
       })
-      .catch(() => {}); // silent
+      .catch(() => {});
   } else {
     loginBtn.style.display = "inline-block";
     navUser.style.display  = "none";
@@ -655,11 +620,12 @@ function openAuthModal(panel = "login") {
 function closeAuthModal() {
   document.getElementById("authModal").style.display = "none";
   clearAuthErrors();
+  // Reset the reset flow state when modal closes
+  resetPasswordResetFlow();
 }
 
-// ✅ FIX: panelResetOTP included in the list
 function switchPanel(id) {
-  ["panelLogin","panelSignup","panelOTP","panelRecover","panelResetOTP"].forEach(p => {
+  ["panelLogin","panelSignup","panelOTP","panelRecover","panelResetOTP","panelResetSuccess"].forEach(p => {
     const el = document.getElementById(p);
     if (el) el.style.display = p === id ? "block" : "none";
   });
@@ -751,14 +717,12 @@ function signupUser() {
           if (btn) { btn.disabled = false; btn.textContent = "Send OTP & Register →"; }
         })
         .catch(err => {
-          
           try { window.recaptchaVerifier.clear(); } catch(e) {}
           window.recaptchaVerifier = null;
           showError("signupError", getAuthErrorMessage(err.code));
           if (btn) { btn.disabled = false; btn.textContent = "Send OTP & Register →"; }
         });
     }).catch(err => {
-      
       showError("signupError", "reCAPTCHA error. Please refresh and try again.");
       if (btn) { btn.disabled = false; btn.textContent = "Send OTP & Register →"; }
     });
@@ -827,7 +791,7 @@ async function processReferral(refCode, newUserUid) {
       });
       await db.collection("users").doc(newUserUid).update({ referralDiscount: 500, referredBy: refCode });
     }
-  } catch (e) {  }
+  } catch (e) { }
 }
 
 function resendOTP() {
@@ -837,45 +801,67 @@ function resendOTP() {
 }
 
 /* ============================================
-   RESET PASSWORD OTP SYSTEM
-   ✅ FULLY FIXED — Uses dedicated hidden div,
-   clears old verifier safely, no modal collapse
+   ✅ FIXED PASSWORD RESET FLOW
+   
+   ROOT CAUSE OF OLD BUGS:
+   - Firebase has two separate auth systems: Phone Auth and Email/Password Auth
+   - The old code called updatePassword() on a PHONE AUTH user
+   - But login uses EMAIL/PASSWORD — a completely separate Firebase account
+   - So the email account's password was NEVER updated → old password kept working
+   
+   THE FIX:
+   Step 1: User enters phone number → we verify they own it via OTP
+   Step 2: After OTP verified, look up their EMAIL in Firestore by phone number
+   Step 3: Call sendPasswordResetEmail(email) → Firebase sends a secure reset link
+   Step 4: User clicks the email link → sets new password on the CORRECT account
+   Step 5: User can now login with their new password ✅
+   
+   This is the ONLY correct client-side-only solution for email/password accounts.
    ============================================ */
 
-let resetConfirmation = null;
-let resetNewPassword  = null;
+// State for the reset flow
+let resetFlowPhone        = "";    // The phone number entered by user
+let resetFlowConfirmation = null;  // Firebase OTP confirmation result
+let resetFlowOtpVerified  = false; // Whether OTP was successfully verified
 
-async function sendResetOTP() {
-  const phone    = document.getElementById("resetPhone").value.trim();
-  const password = document.getElementById("resetNewPassword").value;
+function resetPasswordResetFlow() {
+  resetFlowPhone        = "";
+  resetFlowConfirmation = null;
+  resetFlowOtpVerified  = false;
 
-  if (phone.length !== 10) {
-    showToast("⚠️ Enter a valid 10-digit phone number");
-    return;
-  }
-  if (password.length < 6) {
-    showToast("⚠️ Password must be at least 6 characters");
-    return;
-  }
-
-  const fullPhone = "+91" + phone;
-
-  // ✅ Step 1: Clear any existing reset reCAPTCHA verifier safely
+  // Clear the reCAPTCHA verifier so it can be recreated fresh
   if (window.resetRecaptchaVerifier) {
     try { window.resetRecaptchaVerifier.clear(); } catch(e) {}
     window.resetRecaptchaVerifier = null;
   }
+  const container = document.getElementById("recaptcha-reset-container");
+  if (container) container.innerHTML = "";
+}
 
-  // ✅ Step 2: Reset the dedicated hidden container (safe — not part of modal)
+/* STEP 4: Send OTP to verify phone ownership */
+async function sendResetOTP() {
+  const phone = document.getElementById("resetPhone").value.trim();
+
+  if (phone.length !== 10 || !/^\d{10}$/.test(phone)) {
+    showToast("⚠️ Please enter a valid 10-digit phone number.");
+    return;
+  }
+
+  resetFlowPhone = phone;
+
+  // Show the loading state on the button
+  const btn = document.getElementById("sendOtpBtn");
+  if (btn) { btn.disabled = true; btn.textContent = "Sending OTP..."; }
+
+  // Clear any previous reCAPTCHA verifier
+  if (window.resetRecaptchaVerifier) {
+    try { window.resetRecaptchaVerifier.clear(); } catch(e) {}
+    window.resetRecaptchaVerifier = null;
+  }
   const container = document.getElementById("recaptcha-reset-container");
   if (container) container.innerHTML = "";
 
-  // ✅ Step 3: Disable button to prevent double-clicks
-  const btn = document.querySelector("#panelRecover .btn-auth");
-  if (btn) { btn.disabled = true; btn.textContent = "Sending OTP..."; }
-
   try {
-    // ✅ Step 4: Create new verifier on the dedicated hidden container
     window.resetRecaptchaVerifier = new firebase.auth.RecaptchaVerifier(
       "recaptcha-reset-container",
       { size: "invisible", callback: () => {} }
@@ -883,23 +869,24 @@ async function sendResetOTP() {
 
     await window.resetRecaptchaVerifier.render();
 
-    // ✅ Step 5: Send OTP
-    resetConfirmation = await firebase.auth().signInWithPhoneNumber(
-      fullPhone,
+    resetFlowConfirmation = await firebase.auth().signInWithPhoneNumber(
+      "+91" + phone,
       window.resetRecaptchaVerifier
     );
 
-    resetNewPassword = password;
+    // Move to OTP entry panel (Step 6 in the flow)
+    // Pre-fill the phone display
+    const dispEl = document.getElementById("resetOtpPhoneDisplay");
+    if (dispEl) dispEl.textContent = "+91 " + phone;
 
-    // ✅ Step 6: Switch to OTP entry panel
     switchPanel("panelResetOTP");
 
     if (btn) { btn.disabled = false; btn.textContent = "Send OTP"; }
 
-  } catch (err) {
-    
+    // Start the 60-second resend timer
+    startOtpResendTimer();
 
-    // ✅ Step 7: Clean up on failure so retry works
+  } catch (err) {
     if (window.resetRecaptchaVerifier) {
       try { window.resetRecaptchaVerifier.clear(); } catch(e) {}
       window.resetRecaptchaVerifier = null;
@@ -908,51 +895,221 @@ async function sendResetOTP() {
 
     if (btn) { btn.disabled = false; btn.textContent = "Send OTP"; }
 
-    showToast("❌ Failed to send OTP: " + err.message);
+    const msg = err.code === "auth/invalid-phone-number"
+      ? "⚠️ Invalid phone number format."
+      : err.code === "auth/too-many-requests"
+      ? "⚠️ Too many OTP requests. Please wait a few minutes."
+      : "⚠️ Failed to send OTP. Please try again.";
+    showToast(msg);
   }
 }
 
+/* 60-second resend timer */
+let otpTimerInterval = null;
+
+function startOtpResendTimer() {
+  let seconds = 60;
+  const timerEl   = document.getElementById("otpTimerText");
+  const resendBtn = document.getElementById("resetOtpResendBtn");
+
+  if (resendBtn) resendBtn.disabled = true;
+  if (timerEl)   timerEl.textContent = "Resend in 60s";
+
+  clearInterval(otpTimerInterval);
+  otpTimerInterval = setInterval(() => {
+    seconds--;
+    if (timerEl) timerEl.textContent = seconds > 0 ? `Resend in ${seconds}s` : "";
+    if (seconds <= 0) {
+      clearInterval(otpTimerInterval);
+      if (resendBtn) resendBtn.disabled = false;
+      if (timerEl)   timerEl.textContent = "";
+    }
+  }, 1000);
+}
+
+/* Resend OTP — goes back to phone entry panel */
+function resendResetOTP() {
+  clearInterval(otpTimerInterval);
+  const otpInput = document.getElementById("resetOTP");
+  if (otpInput) otpInput.value = "";
+  switchPanel("panelRecover");
+  showToast("📱 Re-enter your phone number to resend OTP.");
+}
+
+/* STEP 7: Verify OTP → then look up email and send reset link */
 async function verifyResetOTP() {
   const otp = document.getElementById("resetOTP").value.trim();
 
-  if (!otp || otp.length !== 6) {
-    showToast("⚠️ Please enter the 6-digit OTP");
+  if (!otp || otp.length !== 6 || !/^\d{6}$/.test(otp)) {
+    showToast("⚠️ Please enter the 6-digit OTP.");
     return;
   }
 
-  if (!resetConfirmation) {
+  if (!resetFlowConfirmation) {
     showToast("⚠️ OTP session expired. Please go back and try again.");
     switchPanel("panelRecover");
     return;
   }
 
   const btn = document.querySelector("#panelResetOTP .btn-auth");
-  if (btn) { btn.disabled = true; btn.textContent = "Verifying..."; }
+  if (btn) { btn.disabled = true; btn.textContent = "Verifying OTP..."; }
 
   try {
-    const result = await resetConfirmation.confirm(otp);
-    const user   = result.user;
+    // ✅ STEP 1: Verify the OTP — this confirms the user owns the phone number
+    const result = await resetFlowConfirmation.confirm(otp);
+    resetFlowOtpVerified = true;
 
-    await user.updatePassword(resetNewPassword);
+    // Sign out the phone-auth session immediately (we don't want to stay logged in as phone user)
+    await firebase.auth().signOut().catch(() => {});
 
     if (btn) { btn.disabled = false; btn.textContent = "Verify OTP & Reset Password"; }
 
-    showToast("✅ Password reset successful! Please login with your new password.", 5000); switchPanel("panelLogin");
-    switchPanel("panelLogin");
+    // ✅ STEP 2: Look up the user's email in Firestore by their phone number
+    // Phone may be stored with or without +91 prefix
+    await sendPasswordResetByPhone(resetFlowPhone);
 
   } catch (err) {
-    
     if (btn) { btn.disabled = false; btn.textContent = "Verify OTP & Reset Password"; }
 
     if (err.code === "auth/invalid-verification-code") {
-      showToast("❌ Invalid OTP. Please check and try again.");
+      showToast("❌ Incorrect OTP. Please check and try again.");
     } else if (err.code === "auth/session-expired") {
-      showToast("⚠️ OTP expired. Please request a new one."); switchPanel("panelRecover");
+      showToast("⚠️ OTP expired. Please go back and request a new one.");
+      switchPanel("panelRecover");
+    } else if (err.code === "auth/code-expired") {
+      showToast("⚠️ OTP has expired. Please request a new one.");
       switchPanel("panelRecover");
     } else {
-      showToast("❌ Error: " + err.message);
+      showToast("⚠️ Verification failed. Please try again.");
     }
   }
+}
+
+/* 
+  ✅ STEP 3: After OTP is verified, look up email and send Firebase's
+  official password reset email to the user's ACTUAL email account.
+  This correctly updates the email/password auth account.
+*/
+async function sendPasswordResetByPhone(phone) {
+  if (!window._firebase) {
+    showToast("⚠️ Service not ready. Please refresh and try again.");
+    return;
+  }
+
+  const { db, auth } = window._firebase;
+
+  // Show loading state
+  switchPanel("panelResetOTP");
+  const btn = document.querySelector("#panelResetOTP .btn-auth");
+  if (btn) { btn.disabled = true; btn.textContent = "Looking up your account..."; }
+
+  try {
+    // Try both phone formats stored in Firestore
+    let email = null;
+
+    // Format 1: "9742700167" (without prefix)
+    const snap1 = await db.collection("users")
+      .where("phone", "==", phone)
+      .limit(1).get();
+    if (!snap1.empty) email = snap1.docs[0].data().email;
+
+    // Format 2: "+919742700167" (with +91 prefix)
+    if (!email) {
+      const snap2 = await db.collection("users")
+        .where("phone", "==", "+91" + phone)
+        .limit(1).get();
+      if (!snap2.empty) email = snap2.docs[0].data().email;
+    }
+
+    if (!email) {
+      if (btn) { btn.disabled = false; btn.textContent = "Verify OTP & Reset Password"; }
+      showToast("⚠️ No account found for this phone number. Please sign up.");
+      switchPanel("panelLogin");
+      return;
+    }
+
+    // ✅ STEP 4: Send the password reset email to the user's ACTUAL email account
+    // This is the CORRECT way to reset an email/password Firebase account
+    await auth.sendPasswordResetEmail(email);
+
+    if (btn) { btn.disabled = false; btn.textContent = "Verify OTP & Reset Password"; }
+
+    // ✅ STEP 9: Show success screen
+    showResetSuccess(email);
+
+  } catch (err) {
+    if (btn) { btn.disabled = false; btn.textContent = "Verify OTP & Reset Password"; }
+
+    if (err.code === "auth/user-not-found") {
+      showToast("⚠️ No account found for this phone number.");
+      switchPanel("panelLogin");
+    } else if (err.code === "permission-denied") {
+      showToast("⚠️ Database error. Please contact support.");
+    } else {
+      showToast("⚠️ Something went wrong. Please try again.");
+    }
+  }
+}
+
+/* ✅ STEP 9: Show the "Password Reset Email Sent" success screen */
+function showResetSuccess(email) {
+  // Mask the email for display: e.g. "us***@gmail.com"
+  const masked = email.replace(/(.{2})(.*)(@.*)/, (_, a, b, c) => a + "*".repeat(Math.min(b.length, 5)) + c);
+
+  // Check if we have a success panel, otherwise show in the recover panel
+  const successPanel = document.getElementById("panelResetSuccess");
+
+  if (successPanel) {
+    // Use dedicated success panel if it exists in HTML
+    const emailDisplay = document.getElementById("resetSuccessEmail");
+    if (emailDisplay) emailDisplay.textContent = masked;
+    switchPanel("panelResetSuccess");
+  } else {
+    // Fallback: show success message inside the recover panel
+    switchPanel("panelRecover");
+    const msgEl = document.getElementById("recoverMsg");
+    if (msgEl) {
+      msgEl.innerHTML =
+        `<div style="text-align:center;padding:16px 0">
+          <div style="font-size:2.5rem;margin-bottom:8px">🎉</div>
+          <div style="font-size:1rem;font-weight:700;color:#16a34a;margin-bottom:8px">Password Reset Email Sent!</div>
+          <div style="font-size:.85rem;color:var(--text-muted,#666);margin-bottom:4px">
+            We sent a reset link to <strong>${masked}</strong>
+          </div>
+          <div style="font-size:.82rem;color:var(--text-muted,#888)">
+            Click the link in the email to set your new password.<br>
+            Check your spam folder if you don't see it.
+          </div>
+        </div>`;
+      msgEl.style.color = "#16a34a";
+    }
+    // Hide the form fields so only the success message shows
+    const fields = document.querySelectorAll("#panelRecover input, #panelRecover button:not(.modal-x), #panelRecover label, #panelRecover .reset-header, #panelRecover .strength-bars, #panelRecover .strength-label, #panelRecover .reset-divider, #panelRecover .reset-trust-row");
+    fields.forEach(el => el.style.display = "none");
+
+    // Show a "Back to Login" button
+    setTimeout(() => {
+      const backBtn = document.createElement("button");
+      backBtn.className = "btn-auth";
+      backBtn.style.marginTop = "12px";
+      backBtn.textContent = "← Back to Login";
+      backBtn.onclick = () => {
+        // Restore hidden fields for next time
+        fields.forEach(el => el.style.display = "");
+        if (msgEl) { msgEl.innerHTML = ""; msgEl.style.color = ""; }
+        switchPanel("panelLogin");
+        resetPasswordResetFlow();
+      };
+      const panel = document.getElementById("panelRecover");
+      if (panel) panel.appendChild(backBtn);
+    }, 100);
+  }
+
+  // Clean up the reset flow state
+  clearInterval(otpTimerInterval);
+  resetFlowOtpVerified = false;
+
+  showToast("✅ Check your email for the password reset link!", 5000);
 }
 
 /* ============================================
@@ -1009,19 +1166,16 @@ async function loginUser() {
   waitForFirebase(async () => {
     const { auth, db } = window._firebase;
     try {
-      // ✅ FIX: Search both phone formats — "9742700167" and "+919742700167"
       const phoneWithPrefix    = "+91" + phone;
       const phoneWithoutPrefix = phone;
 
       let userDoc = null;
 
-      // Try without prefix first
       const snap1 = await db.collection("users")
         .where("phone", "==", phoneWithoutPrefix)
         .limit(1).get();
       if (!snap1.empty) userDoc = snap1.docs[0];
 
-      // If not found, try with +91 prefix
       if (!userDoc) {
         const snap2 = await db.collection("users")
           .where("phone", "==", phoneWithPrefix)
@@ -1029,14 +1183,12 @@ async function loginUser() {
         if (!snap2.empty) userDoc = snap2.docs[0];
       }
 
-      // Step 2: Sign in
       showError("loginError", "⏳ Signing you in...", "info");
       await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(() => {});
 
       let cred = null;
 
       if (userDoc) {
-        // Found in Firestore — use linked email
         const userData2 = userDoc.data();
         const linkedEmail = userData2.email;
         if (linkedEmail) {
@@ -1045,12 +1197,10 @@ async function loginUser() {
       }
 
       if (!cred) {
-        // Fallback: try phone as email format (some signups use phone@packzen.in)
         const fallbackEmail = phone + "@packzen.in";
         try {
           cred = await auth.signInWithEmailAndPassword(fallbackEmail, pass);
         } catch(e2) {
-          // Fallback failed - show helpful message
           if (btn) { btn.disabled = false; btn.textContent = "Login →"; }
           return showError("loginError", "⚠️ Account not found. Please sign up or check your phone number.");
         }
@@ -1064,10 +1214,9 @@ async function loginUser() {
 
     } catch (err) {
       if (btn) { btn.disabled = false; btn.textContent = "Login →"; }
-      // Show specific error based on Firebase error code
       const code = err.code || "";
       if (code === "auth/wrong-password" || code === "auth/invalid-credential" || code === "auth/invalid-login-credentials") {
-        showError("loginError", "⚠️ Incorrect password. Please try again or reset your password.");
+        showError("loginError", "⚠️ Incorrect password. Please try again or use Forgot Password.");
       } else if (code === "auth/too-many-requests") {
         showError("loginError", "⚠️ Too many failed attempts. Please wait a few minutes.");
       } else if (code === "auth/network-request-failed") {
@@ -1084,27 +1233,25 @@ async function loginUser() {
 }
 
 /* ============================================
-   RECOVER / RESET PASSWORD (email method)
+   NOTE: recoverAccount() below is the OLD email-based
+   recovery. The new phone+OTP flow is above.
+   This is kept as a fallback in case the user wants
+   to recover via email directly.
    ============================================ */
 function recoverAccount() {
-  const email = document.getElementById("recoverEmail").value.trim();
-
-  if (!email)                            return showError("recoverMsg", "⚠️ Please enter your email address.");
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return showError("recoverMsg", "⚠️ Please enter a valid email address.");
-
-  const btn = document.querySelector("#panelRecover .btn-auth");
-  if (btn) { btn.disabled = true; btn.textContent = "Sending..."; }
-  showError("recoverMsg", "⏳ Sending reset link...", "info");
+  const email = document.getElementById("recoverEmail")?.value.trim();
+  if (!email) return;
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    showError("recoverMsg", "⚠️ Please enter a valid email address.");
+    return;
+  }
 
   waitForFirebase(() => {
     window._firebase.auth.sendPasswordResetEmail(email)
       .then(() => {
-        if (btn) { btn.disabled = false; btn.textContent = "Send Reset Link →"; }
-        showError("recoverMsg",
-          "✅ Password reset link sent! Check your inbox (and spam/junk folder).", true);
+        showError("recoverMsg", "✅ Password reset link sent! Check your inbox.", true);
       })
       .catch(err => {
-        if (btn) { btn.disabled = false; btn.textContent = "Send Reset Link →"; }
         if (err.code === "auth/user-not-found") {
           showError("recoverMsg", "⚠️ No account found with this email address.");
         } else {
@@ -1336,7 +1483,7 @@ async function saveQuoteToFirestore(total) {
       total, date: new Date().toLocaleDateString("en-IN"),
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
     });
-  } catch (e) {  }
+  } catch (e) { }
 }
 
 /* ============================================
@@ -1678,7 +1825,7 @@ function onPaymentSuccess(response, name, phone, paid, total) {
         pickup: pickup?.value || "", total
       });
       notifyOwner(bookingRef, name, phone, pickup?.value || "—", drop?.value || "—", shiftDate?.value || "TBD", total, selectedPayment, "online");
-    }).catch(() => {}); // silent
+    }).catch(() => {});
   }
 }
 
@@ -1964,7 +2111,7 @@ async function checkAndShowActiveBooking(uid) {
     if (tobId) tobId.textContent = b.bookingRef || doc.id.slice(0,8).toUpperCase();
     document.getElementById("trackOrderBanner").style.display = "block";
     updateTrackBanner(b); startBannerTracking();
-  } catch(e) {  }
+  } catch(e) { }
 }
 
 function dismissTrackBanner() {
@@ -2386,11 +2533,9 @@ function shakeField(el) {
 function selectMoveType(el, type) {
   selectedMoveType = type;
   document.getElementById("moveType").value = type;
-  // Support both old move-type-card and new bs-move-card
   document.querySelectorAll(".move-type-card, .bs-move-card").forEach(c => c.classList.remove("selected"));
   el.classList.add("selected");
   renderSizeCards(type);
-  // Reset house trigger text when move type changes
   const houseTrigger = document.getElementById("houseTrigger");
   const houseTriggerText = document.getElementById("houseTriggerText");
   if (houseTrigger) houseTrigger.classList.remove("filled");
@@ -2655,7 +2800,6 @@ async function createDriver() {
     showToast(`✅ Driver account created for ${name}`);
 
   } catch (error) {
-    
     if (error.code === "auth/email-already-in-use") {
       setMsg("⚠️ A driver with this email already exists.", false);
     } else {
@@ -2804,7 +2948,7 @@ function loadUserQuotes() {
           <div class="qi-date">${q.date||""}</div>
         </div>`;
       }).join("");
-    }).catch(() => {}); // silent
+    }).catch(() => {});
 }
 
 function loadUserBookings() {
@@ -2852,7 +2996,7 @@ function loadUserBookings() {
           </div>` : ""}
         </div>`;
       }).join("");
-    }).catch(() => {}); // silent
+    }).catch(() => {});
 }
 
 function loadProfileData() {
@@ -2870,7 +3014,7 @@ function loadProfileData() {
     if (phoneEl)     phoneEl.value = d.phone || "";
     if (prefEmailEl) prefEmailEl.checked = d.prefEmail !== false;
     if (prefSMSEl)   prefSMSEl.checked   = d.prefSMS   !== false;
-  }).catch(() => {}); // silent
+  }).catch(() => {});
 }
 
 function saveProfile() {
@@ -2891,7 +3035,7 @@ function savePreferences() {
   if (!currentUser || !window._firebase) return;
   const prefEmail = document.getElementById("prefEmail")?.checked;
   const prefSMS   = document.getElementById("prefSMS")?.checked;
-  window._firebase.db.collection("users").doc(currentUser.uid).update({ prefEmail, prefSMS }).catch(() => {}); // silent
+  window._firebase.db.collection("users").doc(currentUser.uid).update({ prefEmail, prefSMS }).catch(() => {});
 }
 
 function openProfile() {
@@ -3129,7 +3273,7 @@ async function requestPushPermission() {
         fcmToken: token, fcmUpdatedAt: firebase.firestore.FieldValue.serverTimestamp()
       });
     }
-  } catch(e) {  }
+  } catch(e) { }
 }
 
 function subscribeToBookingNotifications(bookingDocId) {
@@ -3186,7 +3330,7 @@ async function queueSMS(phone, templateKey, data) {
       mobile, message, template: templateKey,
       status: "pending", createdAt: firebase.firestore.FieldValue.serverTimestamp(), retries: 0
     });
-  } catch(e) {  }
+  } catch(e) { }
 }
 
 function setupStatusSMS(bookingDocId, customerPhone, customerName, bookingRef) {
@@ -3298,43 +3442,4 @@ function toggleFaq(btn) {
   const isOpen = item.classList.contains("open");
   document.querySelectorAll(".faq-item.open").forEach(i => i.classList.remove("open"));
   if (!isOpen) item.classList.add("open");
-}
-
-/* ============================================
-   RESET PASSWORD — Advanced UI helpers
-   ============================================ */
-
-function toggleResetPass() {
-  const input = document.getElementById("resetNewPassword");
-  const icon  = document.getElementById("resetEyeIcon");
-  if (!input || !icon) return;
-  if (input.type === "password") {
-    input.type = "text";
-    icon.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>';
-  } else {
-    input.type = "password";
-    icon.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
-  }
-}
-
-function updatePasswordStrength(val) {
-  let score = 0;
-  if (val.length >= 6)                                   score++;
-  if (val.length >= 10)                                  score++;
-  if (/[A-Z]/.test(val) && /[0-9]/.test(val))           score++;
-  if (/[^A-Za-z0-9]/.test(val))                         score++;
-
-  const colors = ["#ef4444","#f97316","#eab308","#16a34a"];
-  const labels = ["Weak","Fair","Good","Strong"];
-
-  [1,2,3,4].forEach(i => {
-    const bar = document.getElementById("sb" + i);
-    if (bar) bar.style.background = i <= score ? colors[score-1] : "var(--border-light)";
-  });
-
-  const label = document.getElementById("strengthLabel");
-  if (label) {
-    label.textContent  = val.length === 0 ? "" : (labels[score-1] || "Weak");
-    label.style.color  = val.length === 0 ? "" : (colors[score-1] || "#ef4444");
-  }
 }
