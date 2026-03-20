@@ -16,7 +16,7 @@ let pendingSignupData   = null;
 let currentUser         = null;
 let otpPurpose          = "signup";
 let promoDiscount       = 0;
-let selectedPayment     = "at_drop"; 
+let selectedPayment     = "at_drop";
 let currentRating       = 0;
 let trackingListener    = null;
 let chatListener        = null;
@@ -281,7 +281,7 @@ function initPaymentOptions() {
    ============================================ */
 function waitForFirebase(cb, tries = 0) {
   if (window._firebase) { cb(); return; }
-  if (tries > 30) { return; // firebase timeout }
+  if (tries > 30) { return; } // firebase timeout
   setTimeout(() => waitForFirebase(cb, tries + 1), 200);
 }
 
@@ -1260,7 +1260,7 @@ async function bookOnWhatsApp() {
         `🏠 *House:* ${houseText||"—"}\n🚚 *Vehicle:* ${vehicleText||"—"}\n` +
         `💰 *Estimate:* ₹${discountedTotal.toLocaleString("en-IN")}\n━━━━━━━━━━━━━━━━━━━━\nPayment: Cash on moving day`;
       pendingAdminMsg = pendingWhatsAppMsg;
-    } catch(e) { // showToast("❌ Booking save failed: " + e.message); }
+    } catch(e) { showToast("❌ Booking save failed: " + e.message); }
   } else { showToast("⚠️ Service not ready. Please refresh and try again."); }
 }
 
