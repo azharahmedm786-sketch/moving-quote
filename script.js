@@ -608,25 +608,40 @@ async function loginUser() {
   waitForFirebase(async () => {
     const { auth, db } = window._firebase;
     try {
-      // Step 1: Look up the email linked to this phone number in Firestore
-      const snap = await db.collection("users")
-        .where("phone", "==", phone)
-        .limit(1).get();
+      // ✅ FIX: Search both phone formats — "9742700167" and "+919742700167"
+      const phoneWithPrefix    = "+91" + phone;
+      const phoneWithoutPrefix = phone;
 
-      if (snap.empty) {
-        if (btn) { btn.disabled = false; btn.textContent = "Login →"; }
-        return showError("loginError", "⚠️ No account found with this phone number.");
+      let userDoc = null;
+
+      // Try without prefix first
+      const snap1 = await db.collection("users")
+        .where("phone", "==", phoneWithoutPrefix)
+        .limit(1).get();
+      if (!snap1.empty) userDoc = snap1.docs[0];
+
+      // If not found, try with +91 prefix
+      if (!userDoc) {
+        const snap2 = await db.collection("users")
+          .where("phone", "==", phoneWithPrefix)
+          .limit(1).get();
+        if (!snap2.empty) userDoc = snap2.docs[0];
       }
 
-      const userData  = snap.docs[0].data();
+      if (!userDoc) {
+        if (btn) { btn.disabled = false; btn.textContent = "Login →"; }
+        return showError("loginError", "⚠️ No account found with this phone number. Please sign up first.");
+      }
+
+      const userData  = userDoc.data();
       const userEmail = userData.email;
 
       if (!userEmail) {
         if (btn) { btn.disabled = false; btn.textContent = "Login →"; }
-        return showError("loginError", "⚠️ Account issue. Please contact support.");
+        return showError("loginError", "⚠️ Account setup incomplete. Please contact support.");
       }
 
-      // Step 2: Sign in with the found email + entered password
+      // Step 2: Sign in with the linked email + entered password
       showError("loginError", "⏳ Signing you in...", "info");
       const cred = await auth.signInWithEmailAndPassword(userEmail, pass);
 
@@ -637,7 +652,16 @@ async function loginUser() {
 
     } catch (err) {
       if (btn) { btn.disabled = false; btn.textContent = "Login →"; }
-      showError("loginError", getAuthErrorMessage(err.code));
+      // ✅ FIX: Better error messages for wrong password vs other errors
+      if (err.code === "auth/wrong-password" || err.code === "auth/invalid-credential") {
+        showError("loginError", "⚠️ Incorrect password. Please try again.");
+      } else if (err.code === "auth/too-many-requests") {
+        showError("loginError", "⚠️ Too many failed attempts. Please wait a few minutes.");
+      } else if (err.code === "auth/network-request-failed") {
+        showError("loginError", "⚠️ Network error. Please check your connection.");
+      } else {
+        showError("loginError", getAuthErrorMessage(err.code));
+      }
     }
   });
 }
