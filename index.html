@@ -1377,6 +1377,39 @@
 <!-- SCRIPTS -->
 <script src="https://packzen-config.azharahmedm786.workers.dev"></script>
 <script src="firebase-config.js"></script>
+  <script>
+(function() {
+  const ADMIN_EMAILS = [
+    "admin@packzen.com",
+    "support@packzenblr.in",
+    "azharahmedm786@gmail.com",
+    "moveeasyblr@gmail.com"
+  ];
+  function waitFB(cb, n) {
+    n = n || 0;
+    if (window._firebase) { cb(); return; }
+    if (n > 30) return;
+    setTimeout(function() { waitFB(cb, n + 1); }, 200);
+  }
+  function applyAdminLink(show) {
+    var link = document.getElementById("adminNavLink");
+    if (link) link.style.display = show ? "" : "none";
+  }
+  waitFB(function() {
+    window._firebase.auth.onAuthStateChanged(function(user) {
+      if (!user) { applyAdminLink(false); return; }
+      var userEmail = (user.email || "").toLowerCase();
+      if (ADMIN_EMAILS.includes(userEmail)) { applyAdminLink(true); return; }
+      window._firebase.db.collection("users").doc(user.uid).get()
+        .then(function(doc) {
+          var role = doc.exists ? (doc.data() || {}).role : null;
+          applyAdminLink(role === "admin");
+        })
+        .catch(function() { applyAdminLink(false); });
+    });
+  });
+})();
+</script>
 <script src="https://checkout.razorpay.com/v1/checkout.js" defer></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
 <script src="script.js"></script>
