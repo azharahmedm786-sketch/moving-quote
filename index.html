@@ -920,129 +920,236 @@
 <!-- ======================== MODALS ======================== -->
 
 <!-- AUTH MODAL -->
+<!-- ═══════════════════════════════════════════
+     AUTH MODAL — Replace the entire
+     <div id="authModal" ...> block in index.html
+     with this complete block
+═══════════════════════════════════════════ -->
+
 <div id="authModal" class="modal-overlay" role="dialog" aria-modal="true" style="display:none;">
   <div class="modal-box auth-modal-box">
+
+    <!-- ══════════════════════════════════
+         PANEL 1 — LOGIN
+         Phone + Password
+    ══════════════════════════════════ -->
     <div class="auth-panel" id="panelLogin">
       <button class="modal-x" onclick="closeAuthModal()">✕</button>
       <div class="auth-logo">📦 PackZen</div>
       <h2 class="auth-title">Welcome Back</h2>
-      <p class="auth-sub">Login to view your bookings &amp; track moves</p>
+      <p class="auth-sub">Login with your phone number and password</p>
+
       <label>Phone Number</label>
       <div class="phone-row">
         <span class="phone-prefix">+91</span>
-        <input id="loginPhone" type="tel" placeholder="10-digit mobile number" maxlength="10" class="field-input" style="flex:1;">
+        <input id="loginPhone" type="tel" placeholder="10-digit mobile number"
+          maxlength="10" class="field-input" style="flex:1;"
+          onkeydown="if(event.key==='Enter')document.getElementById('loginPassword').focus()">
       </div>
-      <label>Password</label>
-      <input id="loginPassword" type="password" placeholder="Enter password" class="field-input">
+
+      <label style="margin-top:12px;display:block;">Password</label>
+      <input id="loginPassword" type="password" placeholder="Enter your password"
+        class="field-input"
+        onkeydown="if(event.key==='Enter')loginUser()">
+
       <div id="loginError" class="auth-error"></div>
-      <button class="btn-auth" onclick="loginUser()">Login →</button>
+      <button class="btn-auth" id="btnLogin" onclick="loginUser()">Login →</button>
+
       <div class="auth-divider"><span>or</span></div>
       <button class="btn-auth-outline" onclick="switchPanel('panelSignup')">Create New Account</button>
-      <p class="auth-link" onclick="switchPanel('panelRecover')">Forgot password? Recover Account</p>
+      <p class="auth-link" onclick="switchPanel('panelRecover')">Forgot password?</p>
     </div>
-    <div class="auth-panel" id="panelRecover" style="display:none;">
-      <button class="modal-x" onclick="closeAuthModal()">✕</button>
-      <div class="reset-header">
-        <div class="reset-header-icon">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f97316" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-          </svg>
-        </div>
-        <h2>Set a new password</h2>
-        <p>Enter your phone &amp; new password, then verify with OTP</p>
-      </div>
-      <label>Phone Number</label>
-      <div class="phone-row">
-        <span class="phone-prefix">+91</span>
-        <input id="resetPhone" type="tel" placeholder="10-digit mobile" maxlength="10">
-      </div>
-      <label style="margin-top:12px;display:block;">New Password</label>
-      <div class="pass-input-wrap">
-        <input id="resetNewPassword" type="password" placeholder="Min. 6 characters" class="field-input" oninput="updatePasswordStrength(this.value)">
-        <button class="pass-toggle-btn" type="button" onclick="toggleResetPass()" aria-label="Show/hide password">
-          <svg id="resetEyeIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
-          </svg>
-        </button>
-      </div>
-      <div class="strength-bars">
-        <div class="strength-bar" id="sb1"></div>
-        <div class="strength-bar" id="sb2"></div>
-        <div class="strength-bar" id="sb3"></div>
-        <div class="strength-bar" id="sb4"></div>
-      </div>
-      <p class="strength-label" id="strengthLabel"></p>
-      <button class="btn-send-otp" id="sendOtpBtn" onclick="sendResetOTP()">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.65 3.35a2 2 0 0 1 2-2.18h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
-        </svg>
-        Send OTP
-      </button>
-      <div class="reset-divider"><span>secure verification</span></div>
-      <div class="reset-trust-row">
-        <div class="reset-trust-item">OTP via SMS</div>
-        <div class="reset-trust-item">256-bit encrypted</div>
-        <div class="reset-trust-item">Instant reset</div>
-      </div>
-      <p class="auth-link" onclick="switchPanel('panelLogin')">Remember it? Back to login</p>
-    </div>
-    <div class="auth-panel" id="panelResetOTP" style="display:none;">
-      <button class="modal-x" onclick="closeAuthModal()">✕</button>
-      <div style="text-align:center; margin-bottom:8px;">
-        <div style="width:56px;height:56px;background:linear-gradient(135deg,#c2410c,#f97316);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07"/>
-            <path d="M14.05 2a9 9 0 0 1 8 7.94"/><line x1="1" y1="1" x2="23" y2="23"/>
-          </svg>
-        </div>
-      </div>
-      <h2 class="auth-title" style="text-align:center;">Enter OTP</h2>
-      <p style="text-align:center;color:var(--text-muted);font-size:.85rem;margin-bottom:4px;">We sent a 6-digit code to</p>
-      <p style="text-align:center;font-weight:700;color:var(--navy-deep);font-size:.95rem;margin-bottom:1.25rem;" id="resetOtpPhoneDisplay">your phone</p>
-      <input id="resetOTP" type="text" inputmode="numeric" maxlength="6" placeholder="• • • • • •" class="field-input" style="text-align:center;font-size:1.5rem;font-weight:800;letter-spacing:6px;font-family:'Syne',sans-serif;color:var(--navy-deep);">
-      <button class="btn-auth" onclick="verifyResetOTP()" style="margin-top:1rem;">Verify OTP &amp; Reset Password</button>
-      <div style="text-align:center;margin-top:.75rem;display:flex;align-items:center;justify-content:center;gap:.5rem;flex-wrap:wrap;">
-        <span style="font-size:.82rem;color:var(--text-muted);" id="otpTimerText"></span>
-        <button id="resetOtpResendBtn" onclick="resendResetOTP()" disabled style="background:none;border:none;color:var(--gold);font-size:.85rem;font-weight:600;cursor:pointer;padding:0;font-family:'DM Sans',sans-serif;">Resend OTP</button>
-      </div>
-      <p class="auth-link" style="margin-top:.75rem;" onclick="switchPanel('panelRecover')">← Change phone number</p>
-    </div>
+
+    <!-- ══════════════════════════════════
+         PANEL 2 — SIGN UP (Step 1)
+         Collect details → Send OTP
+    ══════════════════════════════════ -->
     <div class="auth-panel" id="panelSignup" style="display:none;">
       <button class="modal-x" onclick="closeAuthModal()">✕</button>
       <div class="auth-logo">📦 PackZen</div>
       <h2 class="auth-title">Create Account</h2>
-      <label>Full Name</label>
-      <input id="signupName" type="text" placeholder="Your full name" class="field-input">
-      <label>Email</label>
-      <input id="signupEmail" type="email" placeholder="your@email.com" class="field-input">
+      <p class="auth-sub">Enter your details — we'll verify your phone number</p>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+        <div>
+          <label>First Name</label>
+          <input id="signupFirstName" type="text" placeholder="First name"
+            class="field-input"
+            onkeydown="if(event.key==='Enter')document.getElementById('signupLastName').focus()">
+        </div>
+        <div>
+          <label>Last Name</label>
+          <input id="signupLastName" type="text" placeholder="Last name"
+            class="field-input"
+            onkeydown="if(event.key==='Enter')document.getElementById('signupPhone').focus()">
+        </div>
+      </div>
+
+      <label style="margin-top:12px;display:block;">Phone Number</label>
+      <div class="phone-row">
+        <span class="phone-prefix">+91</span>
+        <input id="signupPhone" type="tel" placeholder="10-digit mobile number"
+          maxlength="10"
+          onkeydown="if(event.key==='Enter')document.getElementById('signupEmail').focus()">
+      </div>
+
+      <label style="margin-top:12px;display:block;">Email Address</label>
+      <input id="signupEmail" type="email" placeholder="your@email.com"
+        class="field-input"
+        onkeydown="if(event.key==='Enter')signupUser()">
+
+      <label style="margin-top:12px;display:block;">Referral Code <span style="font-weight:400;color:var(--text-muted,#888)">(optional)</span></label>
+      <input id="signupReferral" type="text" placeholder="Enter referral code"
+        class="field-input" style="text-transform:uppercase;">
+
+      <!-- Invisible reCAPTCHA anchor for signup -->
+      <div id="recaptcha-container-signup"></div>
+
+      <div id="signupError" class="auth-error"></div>
+      <button class="btn-auth" id="btnSignupSendOtp" onclick="signupUser()" style="margin-top:16px;">
+        Send OTP →
+      </button>
+      <p class="auth-link" onclick="switchPanel('panelLogin')">Already have an account? Login</p>
+    </div>
+
+    <!-- ══════════════════════════════════
+         PANEL 3 — SIGN UP OTP (Step 2)
+         Verify phone OTP
+    ══════════════════════════════════ -->
+    <div class="auth-panel" id="panelSignupOTP" style="display:none;">
+      <button class="modal-x" onclick="closeAuthModal()">✕</button>
+      <div class="auth-logo">📱</div>
+      <h2 class="auth-title">Verify Your Phone</h2>
+      <p class="auth-sub">We sent a 6-digit OTP to</p>
+      <p id="signupOtpPhone" style="text-align:center;font-weight:700;font-size:.95rem;margin-bottom:20px;color:var(--text,#1a2332);">your phone</p>
+
+      <label>Enter OTP</label>
+      <input id="signupOtpInput" type="text" inputmode="numeric" maxlength="6"
+        placeholder="• • • • • •" class="field-input"
+        style="text-align:center;font-size:1.6rem;font-weight:800;letter-spacing:8px;"
+        onkeydown="if(event.key==='Enter')verifySignupOTP()">
+
+      <div id="signupOtpError" class="auth-error"></div>
+      <button class="btn-auth" id="btnVerifySignupOtp" onclick="verifySignupOTP()" style="margin-top:16px;">
+        Verify OTP →
+      </button>
+      <p class="auth-link" onclick="resendSignupOTP()">Didn't receive? Go back & resend</p>
+    </div>
+
+    <!-- ══════════════════════════════════
+         PANEL 4 — SET PASSWORD (Step 3)
+         After OTP verified → set password
+         → account created
+    ══════════════════════════════════ -->
+    <div class="auth-panel" id="panelSetPassword" style="display:none;">
+      <button class="modal-x" onclick="closeAuthModal()">✕</button>
+      <div class="auth-logo">🔒</div>
+      <h2 class="auth-title">Set Your Password</h2>
+      <p class="auth-sub">Phone verified ✅ — Choose a strong password to complete signup</p>
+
+      <label>Password</label>
+      <input id="setPasswordInput" type="password" placeholder="Min. 6 characters"
+        class="field-input"
+        onkeydown="if(event.key==='Enter')document.getElementById('setPasswordConfirm').focus()">
+
+      <label style="margin-top:12px;display:block;">Confirm Password</label>
+      <input id="setPasswordConfirm" type="password" placeholder="Re-enter password"
+        class="field-input"
+        onkeydown="if(event.key==='Enter')completeSignup()">
+
+      <div id="setPasswordError" class="auth-error"></div>
+      <button class="btn-auth" id="btnCompleteSignup" onclick="completeSignup()" style="margin-top:16px;">
+        Create Account →
+      </button>
+    </div>
+
+    <!-- ══════════════════════════════════
+         PANEL 5 — FORGOT PASSWORD (Step 1)
+         Enter phone → send OTP
+    ══════════════════════════════════ -->
+    <div class="auth-panel" id="panelRecover" style="display:none;">
+      <button class="modal-x" onclick="closeAuthModal()">✕</button>
+      <div class="auth-logo">🔑</div>
+      <h2 class="auth-title">Reset Password</h2>
+      <p class="auth-sub">Enter your registered phone number. We'll send an OTP to verify it's you.</p>
+
       <label>Phone Number</label>
       <div class="phone-row">
         <span class="phone-prefix">+91</span>
-        <input id="signupPhone" type="tel" placeholder="10 digit mobile" maxlength="10">
+        <input id="resetPhone" type="tel" placeholder="10-digit mobile number"
+          maxlength="10" class="field-input" style="flex:1;"
+          onkeydown="if(event.key==='Enter')sendResetOTP()">
       </div>
-      <label>Password</label>
-      <input id="signupPassword" type="password" placeholder="Min 6 characters" class="field-input">
-      <div id="recaptcha-container"></div>
-      <div id="signupError" class="auth-error"></div>
-      <button class="btn-auth" onclick="signupUser()">Send OTP &amp; Register</button>
-      <p class="auth-link" onclick="switchPanel('panelLogin')">Already have an account? Login</p>
+
+      <!-- Invisible reCAPTCHA anchor for reset -->
+      <div id="recaptcha-container-reset"></div>
+
+      <div id="recoverError" class="auth-error"></div>
+      <button class="btn-auth" id="btnSendResetOtp" onclick="sendResetOTP()" style="margin-top:16px;">
+        Send OTP →
+      </button>
+      <p class="auth-link" onclick="switchPanel('panelLogin')">← Back to Login</p>
     </div>
-    <div class="auth-panel" id="panelOTP" style="display:none;">
+
+    <!-- ══════════════════════════════════
+         PANEL 6 — RESET OTP (Step 2)
+         Verify OTP → signs into real account
+    ══════════════════════════════════ -->
+    <div class="auth-panel" id="panelResetOTP" style="display:none;">
       <button class="modal-x" onclick="closeAuthModal()">✕</button>
-      <h2 class="auth-title">Verify Your Number</h2>
-      <p id="otpSubText" class="auth-sub">Enter the OTP sent to your mobile</p>
-      <div class="otp-boxes">
-        <input class="otp-box" type="text" maxlength="1" inputmode="numeric" oninput="otpInput(this,0)">
-        <input class="otp-box" type="text" maxlength="1" inputmode="numeric" oninput="otpInput(this,1)">
-        <input class="otp-box" type="text" maxlength="1" inputmode="numeric" oninput="otpInput(this,2)">
-        <input class="otp-box" type="text" maxlength="1" inputmode="numeric" oninput="otpInput(this,3)">
-        <input class="otp-box" type="text" maxlength="1" inputmode="numeric" oninput="otpInput(this,4)">
-        <input class="otp-box" type="text" maxlength="1" inputmode="numeric" oninput="otpInput(this,5)">
+      <div class="auth-logo">📱</div>
+      <h2 class="auth-title">Enter OTP</h2>
+      <p class="auth-sub">We sent a 6-digit code to</p>
+      <p id="resetOtpPhone" style="text-align:center;font-weight:700;font-size:.95rem;margin-bottom:20px;color:var(--text,#1a2332);">your phone</p>
+
+      <label>6-Digit OTP</label>
+      <input id="resetOtpInput" type="text" inputmode="numeric" maxlength="6"
+        placeholder="• • • • • •" class="field-input"
+        style="text-align:center;font-size:1.6rem;font-weight:800;letter-spacing:8px;"
+        onkeydown="if(event.key==='Enter')verifyResetOTP()">
+
+      <div id="resetOtpError" class="auth-error"></div>
+      <button class="btn-auth" id="btnVerifyResetOtp" onclick="verifyResetOTP()" style="margin-top:16px;">
+        Verify OTP →
+      </button>
+
+      <div style="text-align:center;margin-top:12px;display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;">
+        <span id="resetOtpTimer" style="font-size:.82rem;color:var(--text-muted,#888);"></span>
+        <button id="btnResendResetOtp" onclick="resendResetOTP()" disabled
+          style="background:none;border:none;color:#f97316;font-size:.85rem;font-weight:600;cursor:pointer;padding:0;">
+          Resend OTP
+        </button>
       </div>
-      <div id="otpError" class="auth-error"></div>
-      <button class="btn-auth" onclick="verifyOTP()">Verify OTP →</button>
-      <p class="auth-link" onclick="resendOTP()">Didn't receive? Resend OTP</p>
+      <p class="auth-link" onclick="switchPanel('panelRecover')">← Change phone number</p>
     </div>
+
+    <!-- ══════════════════════════════════
+         PANEL 7 — NEW PASSWORD (Step 3)
+         updatePassword() → old password
+         stops working IMMEDIATELY ✅
+    ══════════════════════════════════ -->
+    <div class="auth-panel" id="panelResetPassword" style="display:none;">
+      <button class="modal-x" onclick="closeAuthModal()">✕</button>
+      <div class="auth-logo">🔒</div>
+      <h2 class="auth-title">Set New Password</h2>
+      <p class="auth-sub">Phone verified ✅ — Your new password will take effect immediately</p>
+
+      <label>New Password</label>
+      <input id="newPasswordInput" type="password" placeholder="Min. 6 characters"
+        class="field-input"
+        onkeydown="if(event.key==='Enter')document.getElementById('confirmPasswordInput').focus()">
+
+      <label style="margin-top:12px;display:block;">Confirm New Password</label>
+      <input id="confirmPasswordInput" type="password" placeholder="Re-enter new password"
+        class="field-input"
+        onkeydown="if(event.key==='Enter')setNewPassword()">
+
+      <div id="resetPasswordError" class="auth-error"></div>
+      <button class="btn-auth" id="btnSetNewPassword" onclick="setNewPassword()" style="margin-top:16px;">
+        Set New Password →
+      </button>
+    </div>
+
   </div>
 </div>
 
