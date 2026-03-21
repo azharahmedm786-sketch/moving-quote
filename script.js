@@ -1,65 +1,50 @@
 /* ============================================
    PackZen — script.js  (Full Feature Set)
-   Dark Mode · Auth · Promo · Referral · Chat
-   Checklist · Reviews · Invoice · Tracking
-   Photo Upload · Payment Options
    ============================================ */
 
 // ─── State ───────────────────────────────────
 let pickupPlace, dropPlace;
-let map, directionsService, directionsRenderer; 
+let map, directionsService, directionsRenderer;
 let pickupMarker, dropMarker;
-let lastCalculatedTotal = 0;
-let paymentReceiptId    = "";
-let confirmationResult  = null;
-let pendingSignupData   = null;
-let currentUser         = null;
-let otpPurpose          = "signup";
-let promoDiscount       = 0;
-let selectedPayment     = "at_drop";
-let currentRating       = 0;
-let trackingListener    = null;
-let chatListener        = null;
-let trackingMap         = null;
+let lastCalculatedTotal  = 0;
+let paymentReceiptId     = "";
+let confirmationResult   = null;
+let pendingSignupData    = null;
+let currentUser          = null;
+let otpPurpose           = "signup"; // "signup" | "reset"
+let promoDiscount        = 0;
+let selectedPayment      = "at_drop";
+let currentRating        = 0;
+let trackingListener     = null;
+let chatListener         = null;
+let trackingMap          = null;
 let trackingDriverMarker = null;
-let currentBookingId    = null;
-let uploadedPhotos      = [];
-let pendingWhatsAppMsg  = null;
-let pendingAdminMsg     = null;
+let currentBookingId     = null;
+let uploadedPhotos       = [];
+let pendingWhatsAppMsg   = null;
+let pendingAdminMsg      = null;
+
+// ─── Reset flow state ────────────────────────
+let resetFlowPhone     = "";
+let otpTimerInterval   = null;
 
 /* ============================================
-   OWNER NOTIFICATION — Auto WhatsApp on booking
+   OWNER NOTIFICATION
    ============================================ */
-const OWNER_WHATSAPP = "919945095453"; // Your WhatsApp number
+const OWNER_WHATSAPP = "919945095453";
 
 function notifyOwner(bookingRef, name, phone, pickup, drop, date, total, payType, source) {
   const emoji  = source === "online" ? "💳" : source === "whatsapp" ? "📲" : "📋";
-  const payLbl = source === "online"
-    ? "Paid Online ✅"
-    : source === "whatsapp"
-    ? "WhatsApp booking"
-    : "Pay on delivery";
-
+  const payLbl = source === "online" ? "Paid Online ✅" : source === "whatsapp" ? "WhatsApp booking" : "Pay on delivery";
   const msg =
     `${emoji} *New Booking Alert — PackZen* 🚚\n` +
     `━━━━━━━━━━━━━━━━━━━━\n` +
-    `📌 *ID:* ${bookingRef}\n` +
-    `👤 *Customer:* ${name}\n` +
-    `📞 *Phone:* +91 ${phone}\n` +
-    `📍 *Pickup:* ${pickup}\n` +
-    `🏁 *Drop:* ${drop}\n` +
-    `📅 *Date:* ${date || "To be confirmed"}\n` +
-    `💰 *Amount:* ₹${Number(total).toLocaleString("en-IN")}\n` +
-    `💳 *Payment:* ${payLbl}\n` +
-    `━━━━━━━━━━━━━━━━━━━━\n` +
-    `Reply CONFIRM or call customer now.`;
-
+    `📌 *ID:* ${bookingRef}\n👤 *Customer:* ${name}\n📞 *Phone:* +91 ${phone}\n` +
+    `📍 *Pickup:* ${pickup}\n🏁 *Drop:* ${drop}\n📅 *Date:* ${date || "To be confirmed"}\n` +
+    `💰 *Amount:* ₹${Number(total).toLocaleString("en-IN")}\n💳 *Payment:* ${payLbl}\n` +
+    `━━━━━━━━━━━━━━━━━━━━\nReply CONFIRM or call customer now.`;
   setTimeout(() => {
-    window.open(
-      `https://wa.me/${OWNER_WHATSAPP}?text=${encodeURIComponent(msg)}`,
-      "_blank",
-      "noopener,noreferrer"
-    );
+    window.open(`https://wa.me/${OWNER_WHATSAPP}?text=${encodeURIComponent(msg)}`, "_blank", "noopener,noreferrer");
   }, 1500);
 }
 
@@ -68,7 +53,7 @@ const FRIDGE_PRICE   = 150;
 const RAZORPAY_KEY   = (window.ENV && window.ENV.RAZORPAY_KEY) || "";
 
 /* ============================================
-   UTILITY — debounce
+   UTILITY
    ============================================ */
 function debounce(fn, ms) {
   let timer;
@@ -78,7 +63,6 @@ function debounce(fn, ms) {
 /* ============================================
    BOTTOM SHEET SYSTEM
    ============================================ */
-
 let _activeBs = null;
 
 function openBottomSheet(id) {
@@ -86,10 +70,8 @@ function openBottomSheet(id) {
   const sheet = document.getElementById(id);
   const overlay = document.getElementById("bsOverlay");
   if (!sheet || !overlay) return;
-
-  if (id === "bsDate")        buildBsDateStrip();
-  if (id === "bsHouse")       buildBsHouseOptions();
-
+  if (id === "bsDate")  buildBsDateStrip();
+  if (id === "bsHouse") buildBsHouseOptions();
   overlay.classList.add("open");
   sheet.classList.add("open");
   _activeBs = id;
@@ -108,31 +90,24 @@ function buildBsDateStrip() {
   const strip = document.getElementById("bsDateStrip");
   if (!strip) return;
   strip.innerHTML = "";
-
-  const today = new Date(); today.setHours(0,0,0,0);
+  const today  = new Date(); today.setHours(0,0,0,0);
   const DAYS   = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
   const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
   const selected = document.getElementById("shiftDate")?.value;
-
   const di = document.getElementById("bsDateInput");
   if (di) di.min = today.toISOString().split("T")[0];
-
   for (let i = 0; i < 14; i++) {
     const d = new Date(today);
     d.setDate(today.getDate() + i);
     const ds = d.toISOString().split("T")[0];
-
     const card = document.createElement("div");
-    card.className = "bs-date-card" +
-      (i === 0 ? " today-card" : "") +
-      (ds === selected ? " selected" : "");
+    card.className = "bs-date-card" + (i === 0 ? " today-card" : "") + (ds === selected ? " selected" : "");
     card.dataset.date = ds;
     card.innerHTML = `
       <div class="bs-dc-day">${DAYS[d.getDay()]}</div>
       <div class="bs-dc-num">${d.getDate()}</div>
       <div class="bs-dc-month">${MONTHS[d.getMonth()]}</div>
-      ${i === 0 ? '<div class="bs-dc-tag">Today</div>' : i === 1 ? '<div class="bs-dc-tag">Tomorrow</div>' : ''}
-    `;
+      ${i === 0 ? '<div class="bs-dc-tag">Today</div>' : i === 1 ? '<div class="bs-dc-tag">Tomorrow</div>' : ''}`;
     card.addEventListener("click", () => {
       strip.querySelectorAll(".bs-date-card").forEach(c => c.classList.remove("selected"));
       card.classList.add("selected");
@@ -155,12 +130,10 @@ function applyDate(ds, d) {
   const DAYS   = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
   const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
   document.getElementById("shiftDate").value = ds;
-
   const trigger = document.getElementById("dateTrigger");
   const text    = document.getElementById("dateTriggerText");
   if (trigger) trigger.classList.add("filled");
   if (text)    text.textContent = DAYS[d.getDay()] + ", " + d.getDate() + " " + MONTHS[d.getMonth()] + " " + d.getFullYear();
-
   closeAllBottomSheets();
   calculateQuote(true);
 }
@@ -168,127 +141,104 @@ function applyDate(ds, d) {
 function pickTimeSlot(value, label) {
   document.getElementById("shiftTime").value = value;
   document.getElementById("shiftTimeLabel").value = label;
-
   document.querySelectorAll("#bsTime .bs-option").forEach(b => b.classList.remove("selected"));
   event.currentTarget.classList.add("selected");
-
   const trigger = document.getElementById("timeTrigger");
   const text    = document.getElementById("timeTriggerText");
   if (trigger) trigger.classList.add("filled");
   if (text)    text.textContent = label;
-
   setTimeout(closeAllBottomSheets, 250);
 }
 
 function buildBsHouseOptions() {
   const body = document.getElementById("bsHouseBody");
   if (!body) return;
-
   const config = window.MOVE_TYPE_CONFIG?.[selectedMoveType || "home"] || window.MOVE_TYPE_CONFIG?.home;
   if (!config) return;
-
   const title = document.querySelector("#bsHouse .bs-title");
   if (title) title.textContent = "🏠 " + config.sizeLabel;
-
   const selected = document.getElementById("house")?.value;
   body.innerHTML = '<div class="bs-house-grid">' +
     config.sizes.map(s => `
-      <div class="bs-house-card ${s.value === selected ? 'selected' : ''}"
+      <div class="bs-house-card ${s.value === selected ? "selected" : ""}"
            onclick="pickHouseType('${s.value}','${s.icon} ${s.label}','${s.label}')">
         <div class="bs-house-icon">${s.icon}</div>
         <div class="bs-house-label">${s.label}</div>
-        <div class="bs-house-sub">${s.sub || ''}</div>
-      </div>`).join("") + '</div>';
+        <div class="bs-house-sub">${s.sub || ""}</div>
+      </div>`).join("") + "</div>";
 }
 
 function pickHouseType(value, label, shortLabel) {
   const sel = document.getElementById("house");
   if (sel) sel.value = value;
-
   document.querySelectorAll(".bs-house-card").forEach(c => c.classList.remove("selected"));
   event.currentTarget.classList.add("selected");
-
   const trigger = document.getElementById("houseTrigger");
   const text    = document.getElementById("houseTriggerText");
   if (trigger) trigger.classList.add("filled");
   if (text) text.textContent = label;
-
   setTimeout(() => { closeAllBottomSheets(); calculateQuote(true); }, 250);
 }
 
 function pickVehicle(value, label, sub, price) {
   const sel = document.getElementById("vehicle");
   if (sel) sel.value = value;
-
   document.querySelectorAll(".bs-vehicle-opt").forEach(b => b.classList.remove("selected"));
   event.currentTarget.classList.add("selected");
-
   const trigger = document.getElementById("vehicleTrigger");
   const text    = document.getElementById("vehicleTriggerText");
   if (trigger) trigger.classList.add("filled");
   if (text) text.textContent = label + "  ·  " + price;
-
   setTimeout(() => { closeAllBottomSheets(); calculateQuote(true); }, 250);
 }
 
 function pickFloor(type, value, label, price) {
   const sel = document.getElementById(type === "pickup" ? "pickupFloor" : "dropFloor");
   if (sel) sel.value = value;
-
-  const sheetId = type === "pickup" ? "bsPickupFloor" : "bsDropFloor";
-  document.querySelectorAll("#" + sheetId + " .bs-option").forEach(b => b.classList.remove("selected"));
-  event.currentTarget.classList.add("selected");
-
+  const sheetId   = type === "pickup" ? "bsPickupFloor" : "bsDropFloor";
   const triggerId = type === "pickup" ? "pickupFloorTrigger" : "dropFloorTrigger";
   const textId    = type === "pickup" ? "pickupFloorText" : "dropFloorText";
-  const trigger   = document.getElementById(triggerId);
-  const text      = document.getElementById(textId);
+  document.querySelectorAll("#" + sheetId + " .bs-option").forEach(b => b.classList.remove("selected"));
+  event.currentTarget.classList.add("selected");
+  const trigger = document.getElementById(triggerId);
+  const text    = document.getElementById(textId);
   if (trigger) trigger.classList.add("filled");
   if (text) text.textContent = label + "  " + price;
-
   setTimeout(() => { closeAllBottomSheets(); calculateQuote(true); }, 250);
 }
 
-(function() {
+(function () {
   let startY = 0;
   document.addEventListener("touchstart", e => {
     if (e.target.closest(".bottom-sheet")) startY = e.touches[0].clientY;
   }, { passive: true });
   document.addEventListener("touchend", e => {
     if (!_activeBs) return;
-    const endY = e.changedTouches[0].clientY;
-    if (endY - startY > 80) closeAllBottomSheets();
+    if (e.changedTouches[0].clientY - startY > 80) closeAllBottomSheets();
   }, { passive: true });
 })();
 
 /* ============================================
-   ADVANCED DATE PICKER
+   DATE PICKER
    ============================================ */
 function buildDateStrip() {
   const strip = document.getElementById("dateStrip");
   if (!strip) return;
-
   strip.innerHTML = "";
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const days  = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
-  const months= ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-
+  const today  = new Date(); today.setHours(0, 0, 0, 0);
+  const days   = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+  const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
   for (let i = 0; i < 10; i++) {
     const d = new Date(today);
     d.setDate(today.getDate() + i);
-
     const card = document.createElement("div");
     card.className = "date-card" + (i === 0 ? " today-card" : "");
     card.dataset.date = d.toISOString().split("T")[0];
-
     card.innerHTML = `
       <div class="dc-day">${days[d.getDay()]}</div>
       <div class="dc-num">${d.getDate()}</div>
       <div class="dc-month">${months[d.getMonth()]}</div>
-      ${i === 0 ? '<div class="dc-tag">Today</div>' : i === 1 ? '<div class="dc-tag">Tomorrow</div>' : ''}
-    `;
-
+      ${i === 0 ? '<div class="dc-tag">Today</div>' : i === 1 ? '<div class="dc-tag">Tomorrow</div>' : ""}`;
     card.addEventListener("click", () => selectDateCard(card, d));
     strip.appendChild(card);
   }
@@ -297,12 +247,9 @@ function buildDateStrip() {
 function selectDateCard(card, dateObj) {
   document.querySelectorAll(".date-card").forEach(c => c.classList.remove("selected"));
   card.classList.add("selected");
-
-  const dateStr = dateObj.toISOString().split("T")[0];
   const shiftDate = document.getElementById("shiftDate");
-  if (shiftDate) shiftDate.value = dateStr;
-
-  const label = document.getElementById("dateSelectedLabel");
+  if (shiftDate) shiftDate.value = dateObj.toISOString().split("T")[0];
+  const label  = document.getElementById("dateSelectedLabel");
   const days   = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
   const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
   if (label) {
@@ -315,40 +262,21 @@ function selectDateCard(card, dateObj) {
 function openCustomDate() {
   const input = document.getElementById("shiftDate");
   if (!input) return;
-
-  const today = new Date().toISOString().split("T")[0];
-  input.min = today;
-  input.style.position = "fixed";
-  input.style.opacity  = "0";
-  input.style.top      = "50%";
-  input.style.left     = "50%";
-  input.style.width    = "1px";
-  input.style.height   = "1px";
+  input.min = new Date().toISOString().split("T")[0];
+  input.style.cssText = "position:fixed;opacity:0;top:50%;left:50%;width:1px;height:1px;";
   input.click();
-  setTimeout(() => {
-    input.style.position = "absolute";
-    input.style.width    = "0";
-    input.style.height   = "0";
-  }, 500);
+  setTimeout(() => { input.style.cssText = "position:absolute;width:0;height:0;"; }, 500);
 }
 
 function onCustomDatePicked(val) {
   if (!val) return;
   const d = new Date(val + "T00:00:00");
   const today = new Date(); today.setHours(0,0,0,0);
-
-  if (d < today) {
-    showToast("⚠️ Please select today or a future date.");
-    return;
-  }
-
+  if (d < today) { showToast("⚠️ Please select today or a future date."); return; }
   document.querySelectorAll(".date-card").forEach(c => c.classList.remove("selected"));
-
-  const dateStr = val;
-  const match = document.querySelector(`.date-card[data-date="${dateStr}"]`);
+  const match = document.querySelector(`.date-card[data-date="${val}"]`);
   if (match) match.classList.add("selected");
-
-  const label = document.getElementById("dateSelectedLabel");
+  const label  = document.getElementById("dateSelectedLabel");
   const days   = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
   const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
   if (label) {
@@ -361,7 +289,6 @@ function onCustomDatePicked(val) {
 function selectTimeSlot(btn, value, label, range) {
   document.querySelectorAll(".time-slot-btn").forEach(b => b.classList.remove("selected"));
   btn.classList.add("selected");
-
   const timeInput  = document.getElementById("shiftTime");
   const labelInput = document.getElementById("shiftTimeLabel");
   if (timeInput)  timeInput.value  = value;
@@ -385,18 +312,11 @@ document.addEventListener("DOMContentLoaded", () => {
     setTimeout(() => { el.scrollIntoView({ behavior: "smooth", block: "center" }); }, 320);
   });
 
-  const makeVisible = () => {
-    document.querySelectorAll(".reveal, .reveal-stagger").forEach(el => {
-      el.classList.add("visible");
-    });
-  };
-  makeVisible();
-  setTimeout(makeVisible, 100);
-  setTimeout(makeVisible, 500);
+  const makeVisible = () => document.querySelectorAll(".reveal, .reveal-stagger").forEach(el => el.classList.add("visible"));
+  makeVisible(); setTimeout(makeVisible, 100); setTimeout(makeVisible, 500);
 
   const STAT_VALUES = [100, 2026, 100, 0];
-  const statNumbers = document.querySelectorAll(".stat-number");
-  statNumbers.forEach((el, i) => {
+  document.querySelectorAll(".stat-number").forEach((el, i) => {
     if (STAT_VALUES[i] !== undefined) {
       el.setAttribute("data-target", STAT_VALUES[i]);
       el.removeAttribute("data-animated");
@@ -408,7 +328,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (el.dataset.animated) return;
     el.dataset.animated = "1";
     const target = parseInt(el.getAttribute("data-target"), 10);
-    if (isNaN(target)) { return; }
+    if (isNaN(target)) return;
     const dur = 2000, start = performance.now();
     function tick(now) {
       const p = Math.min((now - start) / dur, 1);
@@ -432,8 +352,7 @@ document.addEventListener("DOMContentLoaded", () => {
   if (strip) {
     statsObs.observe(strip);
     setTimeout(() => {
-      const rect = strip.getBoundingClientRect();
-      if (rect.top < window.innerHeight) {
+      if (strip.getBoundingClientRect().top < window.innerHeight) {
         strip.querySelectorAll(".stat-number").forEach(animateCounter);
         statsObs.unobserve(strip);
       }
@@ -441,21 +360,23 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   document.querySelectorAll("button, .btn-primary, .btn-ghost").forEach(btn => {
-    btn.addEventListener("click", function(e) {
+    btn.addEventListener("click", function (e) {
       const r = document.createElement("span"); r.classList.add("ripple");
       const rect = this.getBoundingClientRect(), size = Math.max(rect.width, rect.height);
       r.style.width = r.style.height = size + "px";
-      r.style.left = e.clientX - rect.left - size/2 + "px";
-      r.style.top  = e.clientY - rect.top  - size/2 + "px";
+      r.style.left = e.clientX - rect.left - size / 2 + "px";
+      r.style.top  = e.clientY - rect.top  - size / 2 + "px";
       this.appendChild(r); r.addEventListener("animationend", () => r.remove());
     });
   });
 
   const priceEl = document.getElementById("livePrice");
-  if (priceEl) new MutationObserver(() => { priceEl.classList.remove("updated"); void priceEl.offsetWidth; priceEl.classList.add("updated"); }).observe(priceEl, { childList: true });
+  if (priceEl) new MutationObserver(() => {
+    priceEl.classList.remove("updated"); void priceEl.offsetWidth; priceEl.classList.add("updated");
+  }).observe(priceEl, { childList: true });
 
   document.querySelectorAll('a[href^="#"]').forEach(a => {
-    a.addEventListener("click", function(e) {
+    a.addEventListener("click", function (e) {
       const t = document.querySelector(this.getAttribute("href"));
       if (t) { e.preventDefault(); t.scrollIntoView({ behavior: "smooth" }); }
     });
@@ -472,10 +393,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   waitForFirebase(() => {
     const auth = window._firebase.auth;
-
-    auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
-      .catch(() => {});
-
+    auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(() => {});
     auth.onAuthStateChanged(user => {
       currentUser = user;
       updateNavForUser(user);
@@ -497,56 +415,59 @@ document.addEventListener("DOMContentLoaded", () => {
   initPaymentOptions();
   buildDateStrip();
 
-  if (!document.getElementById('pz-fc-styles')) {
-    const s = document.createElement('style');
-    s.id = 'pz-fc-styles';
+  if (!document.getElementById("pz-fc-styles")) {
+    const s = document.createElement("style");
+    s.id = "pz-fc-styles";
     s.textContent = `
-      .furniture-grid { display:flex; flex-direction:column; gap:8px; }
-      .fc-category { border:1px solid rgba(255,255,255,0.08); border-radius:12px; overflow:hidden; }
-      .fc-category-header { display:flex; align-items:center; gap:10px; padding:12px 16px; background:rgba(255,255,255,0.04); cursor:pointer; transition:background .2s; user-select:none; }
-      .fc-category-header:hover { background:rgba(255,255,255,0.08); }
-      .fc-cat-icon { font-size:1.1rem; }
-      .fc-cat-label { flex:1; font-weight:600; font-size:.9rem; color:var(--text,#fff); }
-      .fc-cat-arrow { font-size:.8rem; color:var(--text-muted,#aaa); transition:transform .2s; }
-      .fc-category-items { display:none; flex-wrap:wrap; gap:8px; padding:12px; background:rgba(255,255,255,0.02); }
-      .furniture-card { display:flex; flex-direction:column; align-items:center; width:80px; cursor:pointer; position:relative; }
-      .furniture-card input[type=checkbox] { position:absolute; opacity:0; width:0; height:0; }
-      .fc-body { display:flex; flex-direction:column; align-items:center; gap:4px; padding:10px 6px; border-radius:10px; width:100%; text-align:center; border:2px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); transition:all .2s; position:relative; }
-      .furniture-card input:checked ~ .fc-body { border-color:#3b82f6; background:rgba(59,130,246,0.15); }
-      .fc-check { position:absolute; top:4px; right:4px; width:16px; height:16px; background:#3b82f6; border-radius:50%; font-size:9px; color:#fff; display:flex; align-items:center; justify-content:center; opacity:0; transform:scale(0); transition:all .15s; }
-      .furniture-card input:checked ~ .fc-body .fc-check { opacity:1; transform:scale(1); }
-      .fc-emoji { font-size:1.5rem; line-height:1; }
-      .fc-name { font-size:.72rem; font-weight:500; color:var(--text,#fff); line-height:1.2; }
-      .fc-price { font-size:.68rem; color:#22c55e; font-weight:600; display:none; }
-      .carton-box-row { display:flex; align-items:center; flex-wrap:wrap; gap:10px; padding:4px 0; width:100%; }
-      .carton-label { font-size:.85rem; color:var(--text,#fff); flex:1; min-width:160px; }
-      .carton-qty-wrap { display:flex; align-items:center; gap:6px; }
-      .carton-price-note { font-size:.8rem; color:#22c55e; font-weight:600; }
-    `;
+      .furniture-grid{display:flex;flex-direction:column;gap:8px;}
+      .fc-category{border:1px solid rgba(255,255,255,0.08);border-radius:12px;overflow:hidden;}
+      .fc-category-header{display:flex;align-items:center;gap:10px;padding:12px 16px;background:rgba(255,255,255,0.04);cursor:pointer;transition:background .2s;user-select:none;}
+      .fc-category-header:hover{background:rgba(255,255,255,0.08);}
+      .fc-cat-icon{font-size:1.1rem;}
+      .fc-cat-label{flex:1;font-weight:600;font-size:.9rem;color:var(--text,#fff);}
+      .fc-cat-arrow{font-size:.8rem;color:var(--text-muted,#aaa);transition:transform .2s;}
+      .fc-category-items{display:none;flex-wrap:wrap;gap:8px;padding:12px;background:rgba(255,255,255,0.02);}
+      .furniture-card{display:flex;flex-direction:column;align-items:center;width:80px;cursor:pointer;position:relative;}
+      .furniture-card input[type=checkbox]{position:absolute;opacity:0;width:0;height:0;}
+      .fc-body{display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 6px;border-radius:10px;width:100%;text-align:center;border:2px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.03);transition:all .2s;position:relative;}
+      .furniture-card input:checked~.fc-body{border-color:#3b82f6;background:rgba(59,130,246,0.15);}
+      .fc-check{position:absolute;top:4px;right:4px;width:16px;height:16px;background:#3b82f6;border-radius:50%;font-size:9px;color:#fff;display:flex;align-items:center;justify-content:center;opacity:0;transform:scale(0);transition:all .15s;}
+      .furniture-card input:checked~.fc-body .fc-check{opacity:1;transform:scale(1);}
+      .fc-emoji{font-size:1.5rem;line-height:1;}
+      .fc-name{font-size:.72rem;font-weight:500;color:var(--text,#fff);line-height:1.2;}
+      .fc-price{font-size:.68rem;color:#22c55e;font-weight:600;display:none;}
+      .carton-box-row{display:flex;align-items:center;flex-wrap:wrap;gap:10px;padding:4px 0;width:100%;}
+      .carton-label{font-size:.85rem;color:var(--text,#fff);flex:1;min-width:160px;}
+      .carton-qty-wrap{display:flex;align-items:center;gap:6px;}
+      .carton-price-note{font-size:.8rem;color:#22c55e;font-weight:600;}`;
     document.head.appendChild(s);
   }
 
   document.addEventListener("change", (e) => {
     if (e.target.type === "checkbox" && e.target.closest(".furniture-card")) {
-      const card = e.target.closest(".furniture-card");
-      card.classList.toggle("checked", e.target.checked);
+      e.target.closest(".furniture-card").classList.toggle("checked", e.target.checked);
     }
   });
 
-  if (!document.getElementById("recaptcha-reset-container")) {
-    const div = document.createElement("div");
-    div.id = "recaptcha-reset-container";
-    div.style.cssText = "position:absolute;width:0;height:0;overflow:hidden;opacity:0;pointer-events:none;";
-    document.body.appendChild(div);
+  if (!document.getElementById("recaptcha-container-signup")) {
+    const d = document.createElement("div");
+    d.id = "recaptcha-container-signup";
+    d.style.cssText = "position:absolute;width:0;height:0;overflow:hidden;opacity:0;pointer-events:none;";
+    document.body.appendChild(d);
+  }
+  if (!document.getElementById("recaptcha-container-reset")) {
+    const d = document.createElement("div");
+    d.id = "recaptcha-container-reset";
+    d.style.cssText = "position:absolute;width:0;height:0;overflow:hidden;opacity:0;pointer-events:none;";
+    document.body.appendChild(d);
   }
 });
 
 /* ============================================
-   Payment Options Initialisation
+   PAYMENT OPTIONS
    ============================================ */
 function initPaymentOptions() {
-  const atDrop = document.getElementById("optAtDrop");
-  if (atDrop) atDrop.classList.add("selected");
+  document.getElementById("optAtDrop")?.classList.add("selected");
   document.getElementById("optAdvance")?.classList.remove("selected");
   document.getElementById("optFull")?.classList.remove("selected");
   selectedPayment = "at_drop";
@@ -557,7 +478,7 @@ function initPaymentOptions() {
    ============================================ */
 function waitForFirebase(cb, tries = 0) {
   if (window._firebase) { cb(); return; }
-  if (tries > 30) { return; }
+  if (tries > 30) return;
   setTimeout(() => waitForFirebase(cb, tries + 1), 200);
 }
 
@@ -570,26 +491,19 @@ function updateNavForUser(user) {
   const navAvatar = document.getElementById("navAvatar");
   const navName   = document.getElementById("navUserName");
   const adminLink = document.getElementById("adminNavLink");
-
   if (adminLink) adminLink.style.display = "none";
-
   if (user) {
-    loginBtn.style.display = "none";
-    navUser.style.display  = "flex";
+    if (loginBtn) loginBtn.style.display = "none";
+    if (navUser)  navUser.style.display  = "flex";
     const name = user.displayName || user.email?.split("@")[0] || "User";
-    navName.textContent   = name.split(" ")[0];
-    navAvatar.textContent = name.charAt(0).toUpperCase();
-
+    if (navName)   navName.textContent   = name.split(" ")[0];
+    if (navAvatar) navAvatar.textContent = name.charAt(0).toUpperCase();
     window._firebase.db.collection("users").doc(user.uid).get()
-      .then(doc => {
-        if (doc.exists && doc.data().role === "admin") {
-          if (adminLink) adminLink.style.display = "block";
-        }
-      })
+      .then(doc => { if (doc.exists && doc.data().role === "admin" && adminLink) adminLink.style.display = "block"; })
       .catch(() => {});
   } else {
-    loginBtn.style.display = "inline-block";
-    navUser.style.display  = "none";
+    if (loginBtn) loginBtn.style.display = "inline-block";
+    if (navUser)  navUser.style.display  = "none";
   }
 }
 
@@ -597,17 +511,14 @@ function toggleUserMenu() {
   const dropdown = document.getElementById("userDropdown");
   const navUser  = document.getElementById("navUser");
   if (!dropdown || !navUser) return;
-  const isOpen = dropdown.classList.contains("open");
-  if (isOpen) { dropdown.classList.remove("open"); return; }
+  if (dropdown.classList.contains("open")) { dropdown.classList.remove("open"); return; }
   const rect = navUser.getBoundingClientRect();
   dropdown.style.top   = (rect.bottom + 6) + "px";
   dropdown.style.right = (window.innerWidth - rect.right) + "px";
   dropdown.classList.add("open");
 }
 
-function closeUserMenu() {
-  document.getElementById("userDropdown")?.classList.remove("open");
-}
+function closeUserMenu() { document.getElementById("userDropdown")?.classList.remove("open"); }
 
 /* ============================================
    AUTH MODAL
@@ -620,301 +531,474 @@ function openAuthModal(panel = "login") {
 function closeAuthModal() {
   document.getElementById("authModal").style.display = "none";
   clearAuthErrors();
-  // Reset the reset flow state when modal closes
-  resetPasswordResetFlow();
+  _clearSignupRecaptcha();
+  _clearResetRecaptcha();
+  resetFlowPhone   = "";
+  confirmationResult = null;
+  pendingSignupData  = null;
+  clearInterval(otpTimerInterval);
 }
 
 function switchPanel(id) {
-  ["panelLogin","panelSignup","panelOTP","panelRecover","panelResetOTP","panelResetSuccess"].forEach(p => {
+  [
+    "panelLogin", "panelSignup", "panelSignupOTP",
+    "panelSetPassword", "panelRecover", "panelResetOTP", "panelResetPassword"
+  ].forEach(p => {
     const el = document.getElementById(p);
     if (el) el.style.display = p === id ? "block" : "none";
   });
 }
 
 function clearAuthErrors() {
-  ["loginError","signupError","otpError","recoverMsg"].forEach(id => {
+  [
+    "loginError", "signupError", "signupOtpError",
+    "setPasswordError", "recoverError", "resetOtpError", "resetPasswordError"
+  ].forEach(id => {
     const el = document.getElementById(id);
-    if (el) { el.textContent = ""; el.style.color = "#e53e3e"; }
+    if (el) { el.textContent = ""; el.style.color = "#dc2626"; }
   });
 }
 
-function showError(id, msg, isSuccess = false) {
+function showError(id, msg, type = "error") {
   const el = document.getElementById(id);
   if (!el) return;
   el.textContent = msg;
-  if (isSuccess === true)        el.style.color = "#16a34a";
-  else if (isSuccess === "info") el.style.color = "#2563eb";
-  else                           el.style.color = "#dc2626";
+  el.style.color = type === "success" ? "#16a34a" : type === "info" ? "#2563eb" : "#dc2626";
 }
 
 function getAuthErrorMessage(code) {
-  const messages = {
+  const map = {
     "auth/user-not-found":               "⚠️ No account found. Please sign up first.",
     "auth/wrong-password":               "⚠️ Incorrect password. Please try again.",
-    "auth/invalid-credential":           "⚠️ Incorrect phone or password. Please try again.",
-    "auth/invalid-login-credentials":    "⚠️ Incorrect phone or password. Please try again.",
-    "auth/invalid-email":                "⚠️ Please enter a valid email address.",
-    "auth/email-already-in-use":         "⚠️ This email is already registered. Please login.",
+    "auth/invalid-credential":           "⚠️ Incorrect details. Please try again.",
+    "auth/invalid-login-credentials":    "⚠️ Incorrect details. Please try again.",
+    "auth/email-already-in-use":         "⚠️ This email is already registered.",
     "auth/weak-password":                "⚠️ Password too weak. Use at least 6 characters.",
-    "auth/network-request-failed":       "⚠️ Network error. Please check your connection.",
-    "auth/too-many-requests":            "⚠️ Too many attempts. Please wait a few minutes and try again.",
-    "auth/invalid-phone-number":         "⚠️ Invalid phone number. Enter a valid 10-digit number.",
-    "auth/operation-not-allowed":        "⚠️ Sign-in method not enabled. Contact support.",
+    "auth/network-request-failed":       "⚠️ Network error. Check your connection.",
+    "auth/too-many-requests":            "⚠️ Too many attempts. Please wait a few minutes.",
+    "auth/invalid-phone-number":         "⚠️ Invalid phone number.",
     "auth/session-expired":              "⚠️ OTP expired. Please request a new one.",
-    "auth/invalid-verification-code":    "⚠️ Invalid OTP. Please check and try again.",
-    "auth/quota-exceeded":               "⚠️ SMS quota exceeded. Please try again later.",
-    "auth/user-disabled":                "⚠️ This account has been disabled. Contact support.",
-    "auth/requires-recent-login":        "⚠️ Please log out and log in again to continue.",
-    "auth/account-exists-with-different-credential": "⚠️ Account exists with different login method.",
-    "permission-denied":                 "⚠️ Access denied. Please log out and log in again.",
+    "auth/invalid-verification-code":    "⚠️ Incorrect OTP. Please try again.",
+    "auth/quota-exceeded":               "⚠️ SMS quota exceeded. Try again later.",
+    "auth/credential-already-in-use":    "⚠️ This phone number is already linked to another account.",
   };
-  return messages[code] || ("⚠️ Error: " + (code || "unknown") + ". Please try again.");
+  return map[code] || ("⚠️ " + (code || "Something went wrong. Please try again."));
 }
 
-/* ============================================
-   SIGNUP
-   ============================================ */
+/* ─────────────────────────────────────────────
+   RECAPTCHA HELPERS
+───────────────────────────────────────────── */
+function _clearSignupRecaptcha() {
+  if (window._signupRecaptcha) {
+    try { window._signupRecaptcha.clear(); } catch (e) {}
+    window._signupRecaptcha = null;
+  }
+  const c = document.getElementById("recaptcha-container-signup");
+  if (c) c.innerHTML = "";
+}
+
+function _clearResetRecaptcha() {
+  if (window._resetRecaptcha) {
+    try { window._resetRecaptcha.clear(); } catch (e) {}
+    window._resetRecaptcha = null;
+  }
+  const c = document.getElementById("recaptcha-container-reset");
+  if (c) c.innerHTML = "";
+}
+
+/* ═══════════════════════════════════════════════
+   SIGN UP FLOW
+   ─────────────────────────────────────────────
+   Step 1 — panelSignup:    first name, last name,
+                            phone, email → Send OTP
+   Step 2 — panelSignupOTP: enter 6-digit OTP
+   Step 3 — panelSetPassword: set password →
+                            account created ✅
+═══════════════════════════════════════════════ */
+
+/* STEP 1 — Collect details & send OTP */
 function signupUser() {
-  const name     = document.getElementById("signupName").value.trim();
-  const email    = document.getElementById("signupEmail").value.trim();
-  const phone    = document.getElementById("signupPhone").value.trim();
-  const password = document.getElementById("signupPassword").value;
-  const referral = document.getElementById("signupReferral")?.value.trim().toUpperCase();
+  const firstName = document.getElementById("signupFirstName").value.trim();
+  const lastName  = document.getElementById("signupLastName").value.trim();
+  const phone     = document.getElementById("signupPhone").value.trim();
+  const email     = document.getElementById("signupEmail").value.trim();
+  const referral  = document.getElementById("signupReferral")?.value.trim().toUpperCase() || "";
 
-  if (!name)                        return showError("signupError", "⚠️ Please enter your full name.");
+  if (!firstName)
+    return showError("signupError", "⚠️ Please enter your first name.");
+  if (!lastName)
+    return showError("signupError", "⚠️ Please enter your last name.");
+  if (!/^\d{10}$/.test(phone))
+    return showError("signupError", "⚠️ Please enter a valid 10-digit mobile number.");
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
-                                    return showError("signupError", "⚠️ Please enter a valid email address.");
-  if (phone.length !== 10 || !/^\d{10}$/.test(phone))
-                                    return showError("signupError", "⚠️ Please enter a valid 10-digit mobile number.");
-  if (password.length < 6)          return showError("signupError", "⚠️ Password must be at least 6 characters.");
+    return showError("signupError", "⚠️ Please enter a valid email address.");
 
-  showError("signupError", "⏳ Sending OTP to +91 " + phone + "...", true);
-
-  const btn = document.querySelector("#panelSignup .btn-auth");
+  showError("signupError", "⏳ Sending OTP to +91 " + phone + "...", "info");
+  const btn = document.getElementById("btnSignupSendOtp");
   if (btn) { btn.disabled = true; btn.textContent = "Sending OTP..."; }
 
+  // Store details for later
+  pendingSignupData = { firstName, lastName, phone, email, referral };
+  otpPurpose = "signup";
+
+  _clearSignupRecaptcha();
+
   waitForFirebase(() => {
-    const { auth } = window._firebase;
-    pendingSignupData = { name, email, password, phone, referral };
-    otpPurpose = "signup";
-
-    if (window.recaptchaVerifier) {
-      try { window.recaptchaVerifier.clear(); } catch(e) {}
-      window.recaptchaVerifier = null;
-    }
-
-    window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier(
-      "recaptcha-container", { size: "invisible", callback: () => {} }
+    window._signupRecaptcha = new firebase.auth.RecaptchaVerifier(
+      "recaptcha-container-signup", { size: "invisible", callback: () => {} }
     );
 
-    window.recaptchaVerifier.render().then(() => {
-      auth.signInWithPhoneNumber("+91" + phone, window.recaptchaVerifier)
+    window._signupRecaptcha.render().then(() => {
+      window._firebase.auth.signInWithPhoneNumber("+91" + phone, window._signupRecaptcha)
         .then(result => {
           confirmationResult = result;
-          document.getElementById("otpSubText").textContent = `OTP sent to +91 ${phone}. Check your messages.`;
-          switchPanel("panelOTP");
-          document.querySelector(".otp-box")?.focus();
-          if (btn) { btn.disabled = false; btn.textContent = "Send OTP & Register →"; }
+          // Show OTP panel
+          document.getElementById("signupOtpPhone").textContent = "+91 " + phone;
+          switchPanel("panelSignupOTP");
+          document.getElementById("signupOtpInput").focus();
+          if (btn) { btn.disabled = false; btn.textContent = "Send OTP →"; }
         })
         .catch(err => {
-          try { window.recaptchaVerifier.clear(); } catch(e) {}
-          window.recaptchaVerifier = null;
+          _clearSignupRecaptcha();
           showError("signupError", getAuthErrorMessage(err.code));
-          if (btn) { btn.disabled = false; btn.textContent = "Send OTP & Register →"; }
+          if (btn) { btn.disabled = false; btn.textContent = "Send OTP →"; }
         });
-    }).catch(err => {
-      showError("signupError", "reCAPTCHA error. Please refresh and try again.");
-      if (btn) { btn.disabled = false; btn.textContent = "Send OTP & Register →"; }
+    }).catch(() => {
+      _clearSignupRecaptcha();
+      showError("signupError", "⚠️ reCAPTCHA error. Please refresh and try again.");
+      if (btn) { btn.disabled = false; btn.textContent = "Send OTP →"; }
     });
   });
 }
 
-function otpInput(el, index) {
-  el.value = el.value.replace(/\D/g, "");
-  if (el.value && index < 5) document.querySelectorAll(".otp-box")[index + 1]?.focus();
-}
+/* STEP 2 — Verify signup OTP */
+function verifySignupOTP() {
+  const otp = document.getElementById("signupOtpInput").value.trim();
+  if (!/^\d{6}$/.test(otp))
+    return showError("signupOtpError", "⚠️ Please enter the 6-digit OTP.");
+  if (!confirmationResult)
+    return showError("signupOtpError", "⚠️ OTP session expired. Please go back and try again.");
 
-function getOTPValue() { return Array.from(document.querySelectorAll(".otp-box")).map(b => b.value).join(""); }
-
-function verifyOTP() {
-  const code = getOTPValue();
-  if (code.length !== 6) return showError("otpError", "⚠️ Please enter all 6 digits of the OTP.");
-  if (!confirmationResult)  return showError("otpError", "⚠️ OTP session expired. Please go back and try again.");
-
-  const btn = document.querySelector("#panelOTP .btn-auth");
+  const btn = document.getElementById("btnVerifySignupOtp");
   if (btn) { btn.disabled = true; btn.textContent = "Verifying..."; }
-  showError("otpError", "⏳ Verifying OTP...", "info");
+  showError("signupOtpError", "⏳ Verifying OTP...", "info");
 
-  confirmationResult.confirm(code)
-    .then(async result => {
-      if (otpPurpose === "signup" && pendingSignupData) await completeSignup(result.user);
+  confirmationResult.confirm(otp)
+    .then(result => {
+      // OTP verified — phone user is now signed in
+      // Store the phone user reference for linking
+      pendingSignupData.phoneUser = result.user;
       if (btn) { btn.disabled = false; btn.textContent = "Verify OTP →"; }
+      // Move to set password panel
+      switchPanel("panelSetPassword");
+      document.getElementById("setPasswordInput").focus();
     })
     .catch(err => {
-      showError("otpError", getAuthErrorMessage(err.code));
+      showError("signupOtpError", getAuthErrorMessage(err.code));
       if (btn) { btn.disabled = false; btn.textContent = "Verify OTP →"; }
     });
 }
 
-async function completeSignup(phoneUser) {
+/* STEP 3 — Set password & complete signup
+   ─────────────────────────────────────────
+   The user is currently signed in as a phone-auth
+   user (from OTP). We link their email+password
+   credential to this same account. This means:
+   - One Firebase account with phone + email linked
+   - During password reset, OTP signs into THIS
+     account and updatePassword() works directly ✅
+───────────────────────────────────────────── */
+async function completeSignup() {
+  const password = document.getElementById("setPasswordInput").value;
+  const confirm  = document.getElementById("setPasswordConfirm").value;
+
+  if (password.length < 6)
+    return showError("setPasswordError", "⚠️ Password must be at least 6 characters.");
+  if (password !== confirm)
+    return showError("setPasswordError", "⚠️ Passwords do not match.");
+  if (!pendingSignupData?.phoneUser)
+    return showError("setPasswordError", "⚠️ Session expired. Please start again.");
+
+  const btn = document.getElementById("btnCompleteSignup");
+  if (btn) { btn.disabled = true; btn.textContent = "Creating account..."; }
+  showError("setPasswordError", "⏳ Creating your account...", "info");
+
+  const { firstName, lastName, phone, email, referral, phoneUser } = pendingSignupData;
+  const fullName = firstName + " " + lastName;
   const { auth, db } = window._firebase;
-  const { name, email, password, phone, referral } = pendingSignupData;
+
   try {
-    await auth.signOut();
-    const cred = await auth.createUserWithEmailAndPassword(email, password);
-    await cred.user.updateProfile({ displayName: name });
-    const refCode = cred.user.uid.slice(0, 8).toUpperCase();
-    await db.collection("users").doc(cred.user.uid).set({
-      name, email, phone, role: "customer",
-      phoneVerified: true, prefEmail: true, prefSMS: true,
+    // Link email/password credential to the phone-auth account
+    // This makes ONE account with BOTH phone & email/password
+    const emailCred = firebase.auth.EmailAuthProvider.credential(email, password);
+    await phoneUser.linkWithCredential(emailCred);
+
+    // Update display name
+    await phoneUser.updateProfile({ displayName: fullName });
+
+    // Save user to Firestore
+    const refCode = phoneUser.uid.slice(0, 8).toUpperCase();
+    await db.collection("users").doc(phoneUser.uid).set({
+      firstName, lastName, name: fullName,
+      email, phone,
+      role: "customer",
+      phoneVerified: true,
+      prefEmail: true, prefSMS: true,
       referralCode: refCode, referralCount: 0, referralCredits: 0,
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
     });
-    if (referral) await processReferral(referral, cred.user.uid);
+
+    // Process referral if any
+    if (referral) await processReferral(referral, phoneUser.uid);
+
     pendingSignupData = null;
+    _clearSignupRecaptcha();
     closeAuthModal();
-    showToast(`👋 Welcome to PackZen, ${name}!`);
+    showToast(`👋 Welcome to PackZen, ${firstName}!`);
+
   } catch (err) {
-    showError("otpError", getAuthErrorMessage(err.code));
+    if (btn) { btn.disabled = false; btn.textContent = "Create Account →"; }
+    if (err.code === "auth/email-already-in-use") {
+      showError("setPasswordError", "⚠️ This email is already registered. Please login.");
+    } else if (err.code === "auth/credential-already-in-use") {
+      showError("setPasswordError", "⚠️ This phone number is already registered.");
+    } else {
+      showError("setPasswordError", getAuthErrorMessage(err.code));
+    }
   }
 }
 
 async function processReferral(refCode, newUserUid) {
-  const { db } = window._firebase;
   try {
-    const snap = await db.collection("users").where("referralCode", "==", refCode).get();
+    const snap = await window._firebase.db.collection("users").where("referralCode", "==", refCode).get();
     if (!snap.empty) {
-      const refDoc = snap.docs[0];
-      await refDoc.ref.update({
+      await snap.docs[0].ref.update({
         referralCount:   firebase.firestore.FieldValue.increment(1),
         referralCredits: firebase.firestore.FieldValue.increment(500)
       });
-      await db.collection("users").doc(newUserUid).update({ referralDiscount: 500, referredBy: refCode });
+      await window._firebase.db.collection("users").doc(newUserUid)
+        .update({ referralDiscount: 500, referredBy: refCode });
     }
-  } catch (e) { }
+  } catch (e) {}
 }
 
-function resendOTP() {
-  document.querySelectorAll(".otp-box").forEach(b => b.value = "");
-  showError("otpError", "");
-  if (otpPurpose === "signup") switchPanel("panelSignup");
+/* Resend signup OTP */
+function resendSignupOTP() {
+  document.getElementById("signupOtpInput").value = "";
+  showError("signupOtpError", "");
+  switchPanel("panelSignup");
 }
 
-/* ============================================
-   ✅ FIXED PASSWORD RESET FLOW
-   
-   ROOT CAUSE OF OLD BUGS:
-   - Firebase has two separate auth systems: Phone Auth and Email/Password Auth
-   - The old code called updatePassword() on a PHONE AUTH user
-   - But login uses EMAIL/PASSWORD — a completely separate Firebase account
-   - So the email account's password was NEVER updated → old password kept working
-   
-   THE FIX:
-   Step 1: User enters phone number → we verify they own it via OTP
-   Step 2: After OTP verified, look up their EMAIL in Firestore by phone number
-   Step 3: Call sendPasswordResetEmail(email) → Firebase sends a secure reset link
-   Step 4: User clicks the email link → sets new password on the CORRECT account
-   Step 5: User can now login with their new password ✅
-   
-   This is the ONLY correct client-side-only solution for email/password accounts.
-   ============================================ */
+/* ═══════════════════════════════════════════════
+   LOGIN
+   ─────────────────────────────────────────────
+   Phone number + Password
+   → look up email in Firestore by phone
+   → signInWithEmailAndPassword(email, password)
+═══════════════════════════════════════════════ */
+async function loginUser() {
+  const phone = document.getElementById("loginPhone").value.trim();
+  const pass  = document.getElementById("loginPassword").value;
 
-// State for the reset flow
-let resetFlowPhone        = "";    // The phone number entered by user
-let resetFlowConfirmation = null;  // Firebase OTP confirmation result
-let resetFlowOtpVerified  = false; // Whether OTP was successfully verified
+  if (!/^\d{10}$/.test(phone))
+    return showError("loginError", "⚠️ Please enter a valid 10-digit mobile number.");
+  if (!pass)
+    return showError("loginError", "⚠️ Please enter your password.");
 
-function resetPasswordResetFlow() {
-  resetFlowPhone        = "";
-  resetFlowConfirmation = null;
-  resetFlowOtpVerified  = false;
+  const btn = document.getElementById("btnLogin");
+  if (btn) { btn.disabled = true; btn.textContent = "Signing in..."; }
+  showError("loginError", "⏳ Looking up your account...", "info");
 
-  // Clear the reCAPTCHA verifier so it can be recreated fresh
-  if (window.resetRecaptchaVerifier) {
-    try { window.resetRecaptchaVerifier.clear(); } catch(e) {}
-    window.resetRecaptchaVerifier = null;
-  }
-  const container = document.getElementById("recaptcha-reset-container");
-  if (container) container.innerHTML = "";
+  waitForFirebase(async () => {
+    const { auth, db } = window._firebase;
+    try {
+      await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(() => {});
+
+      // Look up email by phone
+      let email = null;
+      const snap1 = await db.collection("users").where("phone", "==", phone).limit(1).get();
+      if (!snap1.empty) email = snap1.docs[0].data().email;
+      if (!email) {
+        const snap2 = await db.collection("users").where("phone", "==", "+91" + phone).limit(1).get();
+        if (!snap2.empty) email = snap2.docs[0].data().email;
+      }
+      if (!email) {
+        if (btn) { btn.disabled = false; btn.textContent = "Login →"; }
+        return showError("loginError", "⚠️ No account found for this phone number. Please sign up.");
+      }
+
+      showError("loginError", "⏳ Signing you in...", "info");
+      const cred = await auth.signInWithEmailAndPassword(email, pass);
+
+      if (btn) { btn.disabled = false; btn.textContent = "Login →"; }
+      closeAuthModal();
+      const name = (cred.user.displayName || email.split("@")[0]).split(" ")[0];
+      showToast(`👋 Welcome back, ${name}!`);
+
+    } catch (err) {
+      if (btn) { btn.disabled = false; btn.textContent = "Login →"; }
+      const code = err.code || "";
+      if (["auth/wrong-password","auth/invalid-credential","auth/invalid-login-credentials"].includes(code)) {
+        showError("loginError", "⚠️ Incorrect password. Please try again or reset your password.");
+      } else if (code === "auth/too-many-requests") {
+        showError("loginError", "⚠️ Too many failed attempts. Please wait a few minutes.");
+      } else if (code === "auth/user-not-found") {
+        showError("loginError", "⚠️ No account found. Please sign up.");
+      } else {
+        showError("loginError", getAuthErrorMessage(code));
+      }
+    }
+  });
 }
 
-/* STEP 4: Send OTP to verify phone ownership */
+/* ═══════════════════════════════════════════════
+   PASSWORD RESET FLOW
+   ─────────────────────────────────────────────
+   Step 1 — panelRecover:      Enter phone → send OTP
+   Step 2 — panelResetOTP:     Verify OTP
+   Step 3 — panelResetPassword: Enter new password
+                                → updatePassword() ✅
+
+   Why this works:
+   During signup, we link the phone credential to
+   the email/password account (linkWithCredential).
+   So signInWithPhoneNumber during reset signs into
+   THE SAME ACCOUNT. Then updatePassword() directly
+   updates Firebase Auth — old password dead
+   immediately. No Firestore workaround needed.
+═══════════════════════════════════════════════ */
+
+/* STEP 1 — Enter phone, send OTP */
 async function sendResetOTP() {
   const phone = document.getElementById("resetPhone").value.trim();
-
-  if (phone.length !== 10 || !/^\d{10}$/.test(phone)) {
-    showToast("⚠️ Please enter a valid 10-digit phone number.");
-    return;
-  }
+  if (!/^\d{10}$/.test(phone))
+    return showError("recoverError", "⚠️ Please enter a valid 10-digit phone number.");
 
   resetFlowPhone = phone;
-
-  // Show the loading state on the button
-  const btn = document.getElementById("sendOtpBtn");
+  const btn = document.getElementById("btnSendResetOtp");
   if (btn) { btn.disabled = true; btn.textContent = "Sending OTP..."; }
+  showError("recoverError", "⏳ Sending OTP to +91 " + phone + "...", "info");
 
-  // Clear any previous reCAPTCHA verifier
-  if (window.resetRecaptchaVerifier) {
-    try { window.resetRecaptchaVerifier.clear(); } catch(e) {}
-    window.resetRecaptchaVerifier = null;
-  }
-  const container = document.getElementById("recaptcha-reset-container");
-  if (container) container.innerHTML = "";
+  _clearResetRecaptcha();
 
   try {
-    window.resetRecaptchaVerifier = new firebase.auth.RecaptchaVerifier(
-      "recaptcha-reset-container",
-      { size: "invisible", callback: () => {} }
+    window._resetRecaptcha = new firebase.auth.RecaptchaVerifier(
+      "recaptcha-container-reset", { size: "invisible", callback: () => {} }
+    );
+    await window._resetRecaptcha.render();
+
+    confirmationResult = await firebase.auth().signInWithPhoneNumber(
+      "+91" + phone, window._resetRecaptcha
     );
 
-    await window.resetRecaptchaVerifier.render();
-
-    resetFlowConfirmation = await firebase.auth().signInWithPhoneNumber(
-      "+91" + phone,
-      window.resetRecaptchaVerifier
-    );
-
-    // Move to OTP entry panel (Step 6 in the flow)
-    // Pre-fill the phone display
-    const dispEl = document.getElementById("resetOtpPhoneDisplay");
-    if (dispEl) dispEl.textContent = "+91 " + phone;
-
+    document.getElementById("resetOtpPhone").textContent = "+91 " + phone;
     switchPanel("panelResetOTP");
-
-    if (btn) { btn.disabled = false; btn.textContent = "Send OTP"; }
-
-    // Start the 60-second resend timer
-    startOtpResendTimer();
+    document.getElementById("resetOtpInput").focus();
+    if (btn) { btn.disabled = false; btn.textContent = "Send OTP →"; }
+    _startOtpTimer();
 
   } catch (err) {
-    if (window.resetRecaptchaVerifier) {
-      try { window.resetRecaptchaVerifier.clear(); } catch(e) {}
-      window.resetRecaptchaVerifier = null;
-    }
-    if (container) container.innerHTML = "";
-
-    if (btn) { btn.disabled = false; btn.textContent = "Send OTP"; }
-
+    _clearResetRecaptcha();
+    if (btn) { btn.disabled = false; btn.textContent = "Send OTP →"; }
     const msg = err.code === "auth/invalid-phone-number"
-      ? "⚠️ Invalid phone number format."
+      ? "⚠️ Invalid phone number."
       : err.code === "auth/too-many-requests"
-      ? "⚠️ Too many OTP requests. Please wait a few minutes."
+      ? "⚠️ Too many requests. Please wait a few minutes."
       : "⚠️ Failed to send OTP. Please try again.";
-    showToast(msg);
+    showError("recoverError", msg);
   }
 }
 
-/* 60-second resend timer */
-let otpTimerInterval = null;
+/* STEP 2 — Verify OTP
+   The user is now signed into their actual account
+   (because phone is linked to it from signup) */
+async function verifyResetOTP() {
+  const otp = document.getElementById("resetOtpInput").value.trim();
+  if (!/^\d{6}$/.test(otp))
+    return showError("resetOtpError", "⚠️ Please enter the 6-digit OTP.");
+  if (!confirmationResult)
+    return showError("resetOtpError", "⚠️ OTP session expired. Please go back and try again.");
 
-function startOtpResendTimer() {
+  const btn = document.getElementById("btnVerifyResetOtp");
+  if (btn) { btn.disabled = true; btn.textContent = "Verifying..."; }
+  showError("resetOtpError", "⏳ Verifying OTP...", "info");
+
+  try {
+    await confirmationResult.confirm(otp);
+    // ✅ User is now signed in as their real account
+    clearInterval(otpTimerInterval);
+    if (btn) { btn.disabled = false; btn.textContent = "Verify OTP →"; }
+    // Move to set new password
+    switchPanel("panelResetPassword");
+    document.getElementById("newPasswordInput").focus();
+
+  } catch (err) {
+    if (btn) { btn.disabled = false; btn.textContent = "Verify OTP →"; }
+    if (err.code === "auth/invalid-verification-code") {
+      showError("resetOtpError", "❌ Incorrect OTP. Please check and try again.");
+    } else if (["auth/session-expired","auth/code-expired"].includes(err.code)) {
+      showError("resetOtpError", "⚠️ OTP expired. Please go back and request a new one.");
+    } else {
+      showError("resetOtpError", "⚠️ Verification failed. Please try again.");
+    }
+  }
+}
+
+/* STEP 3 — Set new password
+   currentUser is now the real account (signed in
+   via phone OTP). updatePassword() changes it
+   in Firebase Auth immediately. Old password is
+   dead the instant this call succeeds. */
+async function setNewPassword() {
+  const newPass  = document.getElementById("newPasswordInput").value;
+  const confPass = document.getElementById("confirmPasswordInput").value;
+
+  if (newPass.length < 6)
+    return showError("resetPasswordError", "⚠️ Password must be at least 6 characters.");
+  if (newPass !== confPass)
+    return showError("resetPasswordError", "⚠️ Passwords do not match.");
+
+  const user = firebase.auth().currentUser;
+  if (!user)
+    return showError("resetPasswordError", "⚠️ Session expired. Please start again.");
+
+  const btn = document.getElementById("btnSetNewPassword");
+  if (btn) { btn.disabled = true; btn.textContent = "Saving..."; }
+  showError("resetPasswordError", "⏳ Updating your password...", "info");
+
+  try {
+    // ✅ Directly updates Firebase Auth password
+    // Old password stops working IMMEDIATELY
+    await user.updatePassword(newPass);
+
+    // Sign out so user logs in fresh with new password
+    await firebase.auth().signOut();
+
+    _clearResetRecaptcha();
+    resetFlowPhone = "";
+    confirmationResult = null;
+
+    closeAuthModal();
+    showToast("✅ Password updated successfully! Please log in with your new password.", 5000);
+    setTimeout(() => openAuthModal("login"), 800);
+
+  } catch (err) {
+    if (btn) { btn.disabled = false; btn.textContent = "Set New Password →"; }
+    if (err.code === "auth/requires-recent-login") {
+      showError("resetPasswordError", "⚠️ Session timed out. Please restart the reset process.");
+    } else {
+      showError("resetPasswordError", getAuthErrorMessage(err.code));
+    }
+  }
+}
+
+/* OTP resend timer */
+function _startOtpTimer() {
   let seconds = 60;
-  const timerEl   = document.getElementById("otpTimerText");
-  const resendBtn = document.getElementById("resetOtpResendBtn");
-
+  const timerEl   = document.getElementById("resetOtpTimer");
+  const resendBtn = document.getElementById("btnResendResetOtp");
   if (resendBtn) resendBtn.disabled = true;
   if (timerEl)   timerEl.textContent = "Resend in 60s";
-
   clearInterval(otpTimerInterval);
   otpTimerInterval = setInterval(() => {
     seconds--;
@@ -927,344 +1011,17 @@ function startOtpResendTimer() {
   }, 1000);
 }
 
-/* Resend OTP — goes back to phone entry panel */
 function resendResetOTP() {
   clearInterval(otpTimerInterval);
-  const otpInput = document.getElementById("resetOTP");
-  if (otpInput) otpInput.value = "";
+  document.getElementById("resetOtpInput").value = "";
+  showError("resetOtpError", "");
   switchPanel("panelRecover");
-  showToast("📱 Re-enter your phone number to resend OTP.");
-}
-
-/* STEP 7: Verify OTP → then look up email and send reset link */
-async function verifyResetOTP() {
-  const otp = document.getElementById("resetOTP").value.trim();
-
-  if (!otp || otp.length !== 6 || !/^\d{6}$/.test(otp)) {
-    showToast("⚠️ Please enter the 6-digit OTP.");
-    return;
-  }
-
-  if (!resetFlowConfirmation) {
-    showToast("⚠️ OTP session expired. Please go back and try again.");
-    switchPanel("panelRecover");
-    return;
-  }
-
-  const btn = document.querySelector("#panelResetOTP .btn-auth");
-  if (btn) { btn.disabled = true; btn.textContent = "Verifying OTP..."; }
-
-  try {
-    // ✅ STEP 1: Verify the OTP — this confirms the user owns the phone number
-    const result = await resetFlowConfirmation.confirm(otp);
-    resetFlowOtpVerified = true;
-
-    // Sign out the phone-auth session immediately (we don't want to stay logged in as phone user)
-    await firebase.auth().signOut().catch(() => {});
-
-    if (btn) { btn.disabled = false; btn.textContent = "Verify OTP & Reset Password"; }
-
-    // ✅ STEP 2: Look up the user's email in Firestore by their phone number
-    // Phone may be stored with or without +91 prefix
-    await sendPasswordResetByPhone(resetFlowPhone);
-
-  } catch (err) {
-    if (btn) { btn.disabled = false; btn.textContent = "Verify OTP & Reset Password"; }
-
-    if (err.code === "auth/invalid-verification-code") {
-      showToast("❌ Incorrect OTP. Please check and try again.");
-    } else if (err.code === "auth/session-expired") {
-      showToast("⚠️ OTP expired. Please go back and request a new one.");
-      switchPanel("panelRecover");
-    } else if (err.code === "auth/code-expired") {
-      showToast("⚠️ OTP has expired. Please request a new one.");
-      switchPanel("panelRecover");
-    } else {
-      showToast("⚠️ Verification failed. Please try again.");
-    }
-  }
-}
-
-/* 
-  ✅ STEP 3: After OTP is verified, look up email and send Firebase's
-  official password reset email to the user's ACTUAL email account.
-  This correctly updates the email/password auth account.
-*/
-async function sendPasswordResetByPhone(phone) {
-  if (!window._firebase) {
-    showToast("⚠️ Service not ready. Please refresh and try again.");
-    return;
-  }
-
-  const { db, auth } = window._firebase;
-
-  // Show loading state
-  switchPanel("panelResetOTP");
-  const btn = document.querySelector("#panelResetOTP .btn-auth");
-  if (btn) { btn.disabled = true; btn.textContent = "Looking up your account..."; }
-
-  try {
-    // Try both phone formats stored in Firestore
-    let email = null;
-
-    // Format 1: "9742700167" (without prefix)
-    const snap1 = await db.collection("users")
-      .where("phone", "==", phone)
-      .limit(1).get();
-    if (!snap1.empty) email = snap1.docs[0].data().email;
-
-    // Format 2: "+919742700167" (with +91 prefix)
-    if (!email) {
-      const snap2 = await db.collection("users")
-        .where("phone", "==", "+91" + phone)
-        .limit(1).get();
-      if (!snap2.empty) email = snap2.docs[0].data().email;
-    }
-
-    if (!email) {
-      if (btn) { btn.disabled = false; btn.textContent = "Verify OTP & Reset Password"; }
-      showToast("⚠️ No account found for this phone number. Please sign up.");
-      switchPanel("panelLogin");
-      return;
-    }
-
-    // ✅ STEP 4: Send the password reset email to the user's ACTUAL email account
-    // This is the CORRECT way to reset an email/password Firebase account
-    await auth.sendPasswordResetEmail(email);
-
-    if (btn) { btn.disabled = false; btn.textContent = "Verify OTP & Reset Password"; }
-
-    // ✅ STEP 9: Show success screen
-    showResetSuccess(email);
-
-  } catch (err) {
-    if (btn) { btn.disabled = false; btn.textContent = "Verify OTP & Reset Password"; }
-
-    if (err.code === "auth/user-not-found") {
-      showToast("⚠️ No account found for this phone number.");
-      switchPanel("panelLogin");
-    } else if (err.code === "permission-denied") {
-      showToast("⚠️ Database error. Please contact support.");
-    } else {
-      showToast("⚠️ Something went wrong. Please try again.");
-    }
-  }
-}
-
-/* ✅ STEP 9: Show the "Password Reset Email Sent" success screen */
-function showResetSuccess(email) {
-  // Mask the email for display: e.g. "us***@gmail.com"
-  const masked = email.replace(/(.{2})(.*)(@.*)/, (_, a, b, c) => a + "*".repeat(Math.min(b.length, 5)) + c);
-
-  // Check if we have a success panel, otherwise show in the recover panel
-  const successPanel = document.getElementById("panelResetSuccess");
-
-  if (successPanel) {
-    // Use dedicated success panel if it exists in HTML
-    const emailDisplay = document.getElementById("resetSuccessEmail");
-    if (emailDisplay) emailDisplay.textContent = masked;
-    switchPanel("panelResetSuccess");
-  } else {
-    // Fallback: show success message inside the recover panel
-    switchPanel("panelRecover");
-    const msgEl = document.getElementById("recoverMsg");
-    if (msgEl) {
-      msgEl.innerHTML =
-        `<div style="text-align:center;padding:16px 0">
-          <div style="font-size:2.5rem;margin-bottom:8px">🎉</div>
-          <div style="font-size:1rem;font-weight:700;color:#16a34a;margin-bottom:8px">Password Reset Email Sent!</div>
-          <div style="font-size:.85rem;color:var(--text-muted,#666);margin-bottom:4px">
-            We sent a reset link to <strong>${masked}</strong>
-          </div>
-          <div style="font-size:.82rem;color:var(--text-muted,#888)">
-            Click the link in the email to set your new password.<br>
-            Check your spam folder if you don't see it.
-          </div>
-        </div>`;
-      msgEl.style.color = "#16a34a";
-    }
-    // Hide the form fields so only the success message shows
-    const fields = document.querySelectorAll("#panelRecover input, #panelRecover button:not(.modal-x), #panelRecover label, #panelRecover .reset-header, #panelRecover .strength-bars, #panelRecover .strength-label, #panelRecover .reset-divider, #panelRecover .reset-trust-row");
-    fields.forEach(el => el.style.display = "none");
-
-    // Show a "Back to Login" button
-    setTimeout(() => {
-      const backBtn = document.createElement("button");
-      backBtn.className = "btn-auth";
-      backBtn.style.marginTop = "12px";
-      backBtn.textContent = "← Back to Login";
-      backBtn.onclick = () => {
-        // Restore hidden fields for next time
-        fields.forEach(el => el.style.display = "");
-        if (msgEl) { msgEl.innerHTML = ""; msgEl.style.color = ""; }
-        switchPanel("panelLogin");
-        resetPasswordResetFlow();
-      };
-      const panel = document.getElementById("panelRecover");
-      if (panel) panel.appendChild(backBtn);
-    }, 100);
-  }
-
-  // Clean up the reset flow state
-  clearInterval(otpTimerInterval);
-  resetFlowOtpVerified = false;
-
-  showToast("✅ Check your email for the password reset link!", 5000);
-}
-
-/* ============================================
-   RESET PANEL — Eye toggle & strength meter
-   ============================================ */
-function toggleResetPass() {
-  const input = document.getElementById("resetNewPassword");
-  const icon  = document.getElementById("resetEyeIcon");
-  if (!input || !icon) return;
-  if (input.type === "password") {
-    input.type = "text";
-    icon.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>';
-  } else {
-    input.type = "password";
-    icon.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
-  }
-}
-
-function updatePasswordStrength(val) {
-  let score = 0;
-  if (val.length >= 6)  score++;
-  if (val.length >= 10) score++;
-  if (/[A-Z]/.test(val) && /[0-9]/.test(val)) score++;
-  if (/[^A-Za-z0-9]/.test(val)) score++;
-  const colors = ["#ef4444","#f97316","#eab308","#16a34a"];
-  const labels = ["Weak","Fair","Good","Strong"];
-  [1,2,3,4].forEach(i => {
-    const bar = document.getElementById("sb" + i);
-    if (bar) bar.style.background = i <= score ? colors[score-1] : "var(--border-light)";
-  });
-  const label = document.getElementById("strengthLabel");
-  if (label) {
-    label.textContent = val.length === 0 ? "" : (labels[score-1] || "Weak");
-    label.style.color = val.length === 0 ? "" : (colors[score-1] || "#ef4444");
-  }
-}
-
-/* ============================================
-   LOGIN — Phone Number + Password
-   ============================================ */
-async function loginUser() {
-  const phone = document.getElementById("loginPhone").value.trim();
-  const pass  = document.getElementById("loginPassword").value;
-
-  if (!phone || phone.length !== 10 || !/^\d{10}$/.test(phone))
-    return showError("loginError", "⚠️ Please enter a valid 10-digit mobile number.");
-  if (!pass)
-    return showError("loginError", "⚠️ Please enter your password.");
-
-  const btn = document.querySelector("#panelLogin .btn-auth");
-  if (btn) { btn.disabled = true; btn.textContent = "Signing in..."; }
-  showError("loginError", "⏳ Looking up your account...", "info");
-
-  waitForFirebase(async () => {
-    const { auth, db } = window._firebase;
-    try {
-      const phoneWithPrefix    = "+91" + phone;
-      const phoneWithoutPrefix = phone;
-
-      let userDoc = null;
-
-      const snap1 = await db.collection("users")
-        .where("phone", "==", phoneWithoutPrefix)
-        .limit(1).get();
-      if (!snap1.empty) userDoc = snap1.docs[0];
-
-      if (!userDoc) {
-        const snap2 = await db.collection("users")
-          .where("phone", "==", phoneWithPrefix)
-          .limit(1).get();
-        if (!snap2.empty) userDoc = snap2.docs[0];
-      }
-
-      showError("loginError", "⏳ Signing you in...", "info");
-      await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(() => {});
-
-      let cred = null;
-
-      if (userDoc) {
-        const userData2 = userDoc.data();
-        const linkedEmail = userData2.email;
-        if (linkedEmail) {
-          cred = await auth.signInWithEmailAndPassword(linkedEmail, pass);
-        }
-      }
-
-      if (!cred) {
-        const fallbackEmail = phone + "@packzen.in";
-        try {
-          cred = await auth.signInWithEmailAndPassword(fallbackEmail, pass);
-        } catch(e2) {
-          if (btn) { btn.disabled = false; btn.textContent = "Login →"; }
-          return showError("loginError", "⚠️ Account not found. Please sign up or check your phone number.");
-        }
-      }
-
-      if (btn) { btn.disabled = false; btn.textContent = "Login →"; }
-      closeAuthModal();
-      const userData = userDoc ? userDoc.data() : {};
-      const name = (cred.user.displayName || userData.name || "").split(" ")[0] || "there";
-      showToast(`👋 Welcome back, ${name}!`);
-
-    } catch (err) {
-      if (btn) { btn.disabled = false; btn.textContent = "Login →"; }
-      const code = err.code || "";
-      if (code === "auth/wrong-password" || code === "auth/invalid-credential" || code === "auth/invalid-login-credentials") {
-        showError("loginError", "⚠️ Incorrect password. Please try again or use Forgot Password.");
-      } else if (code === "auth/too-many-requests") {
-        showError("loginError", "⚠️ Too many failed attempts. Please wait a few minutes.");
-      } else if (code === "auth/network-request-failed") {
-        showError("loginError", "⚠️ Network error. Please check your connection.");
-      } else if (code === "auth/user-not-found") {
-        showError("loginError", "⚠️ No account found with this phone number.");
-      } else if (code === "permission-denied") {
-        showError("loginError", "⚠️ Database access denied. Please contact support.");
-      } else {
-        showError("loginError", getAuthErrorMessage(code));
-      }
-    }
-  });
-}
-
-/* ============================================
-   NOTE: recoverAccount() below is the OLD email-based
-   recovery. The new phone+OTP flow is above.
-   This is kept as a fallback in case the user wants
-   to recover via email directly.
-   ============================================ */
-function recoverAccount() {
-  const email = document.getElementById("recoverEmail")?.value.trim();
-  if (!email) return;
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    showError("recoverMsg", "⚠️ Please enter a valid email address.");
-    return;
-  }
-
-  waitForFirebase(() => {
-    window._firebase.auth.sendPasswordResetEmail(email)
-      .then(() => {
-        showError("recoverMsg", "✅ Password reset link sent! Check your inbox.", true);
-      })
-      .catch(err => {
-        if (err.code === "auth/user-not-found") {
-          showError("recoverMsg", "⚠️ No account found with this email address.");
-        } else {
-          showError("recoverMsg", getAuthErrorMessage(err.code));
-        }
-      });
-  });
 }
 
 function signOutUser() {
   waitForFirebase(() => {
     window._firebase.auth.signOut().then(() => {
-      document.getElementById("userDropdown").classList.remove("open");
+      document.getElementById("userDropdown")?.classList.remove("open");
       showToast("✅ Signed out successfully");
     });
   });
@@ -1298,23 +1055,17 @@ function prefillBookingForm(userData) {
 }
 
 async function openDashboard() {
-  document.getElementById("userDropdown").classList.remove("open");
+  document.getElementById("userDropdown")?.classList.remove("open");
   if (!currentUser) { openAuthModal("login"); return; }
-
   const { db } = window._firebase;
   const userSnap = await db.collection("users").doc(currentUser.uid).get();
   const userData = userSnap.data() || {};
   const name = currentUser.displayName || "User";
-
-  document.getElementById("dashName").textContent = name;
-  document.getElementById("dashEmail").textContent = currentUser.email || "";
+  document.getElementById("dashName").textContent   = name;
+  document.getElementById("dashEmail").textContent  = currentUser.email || "";
   document.getElementById("dashAvatar").textContent = name.charAt(0).toUpperCase();
-
   const adminTabBtn = document.getElementById("adminTabBtn");
-  if (userData.role === "admin" && adminTabBtn) {
-    adminTabBtn.style.display = "inline-flex";
-  }
-
+  if (userData.role === "admin" && adminTabBtn) adminTabBtn.style.display = "inline-flex";
   loadUserQuotes();
   document.getElementById("dashboardModal").style.display = "flex";
   switchDashTab("quotes", document.querySelector(".dash-tab"));
@@ -1330,8 +1081,8 @@ async function loadReferralData() {
   const d = snap.data();
   const code = d.referralCode || currentUser.uid.slice(0, 8).toUpperCase();
   document.getElementById("referralCodeText").textContent = code;
-  document.getElementById("refCount").textContent    = d.referralCount   || 0;
-  document.getElementById("refEarned").textContent   = "₹" + (d.referralCredits || 0);
+  document.getElementById("refCount").textContent     = d.referralCount   || 0;
+  document.getElementById("refEarned").textContent    = "₹" + (d.referralCredits || 0);
   document.getElementById("refAvailable").textContent = "₹" + (d.referralCredits || 0);
 }
 
@@ -1347,25 +1098,19 @@ async function applyPromoCode() {
   const code  = document.getElementById("promoInput").value.trim().toUpperCase();
   const msgEl = document.getElementById("promoMsg");
   if (!code) { msgEl.textContent = "Enter a promo code."; msgEl.className = "promo-msg promo-error"; return; }
-
   waitForFirebase(async () => {
     const { db } = window._firebase;
     try {
       const snap = await db.collection("promos").doc(code).get();
       if (!snap.exists) {
         const refSnap = await db.collection("users").where("referralCode","==",code).get();
-        if (!refSnap.empty && currentUser) {
-          if (refSnap.docs[0].id !== currentUser.uid) {
-            promoDiscount = 500;
-            msgEl.textContent = `🎉 Referral code applied! ₹500 discount.`;
-            msgEl.className = "promo-msg promo-success";
-            updatePriceDisplay();
-            return;
-          }
+        if (!refSnap.empty && currentUser && refSnap.docs[0].id !== currentUser.uid) {
+          promoDiscount = 500;
+          msgEl.textContent = "🎉 Referral code applied! ₹500 discount.";
+          msgEl.className = "promo-msg promo-success";
+          updatePriceDisplay(); return;
         }
-        msgEl.textContent = "Invalid promo code.";
-        msgEl.className = "promo-msg promo-error";
-        return;
+        msgEl.textContent = "Invalid promo code."; msgEl.className = "promo-msg promo-error"; return;
       }
       const promo = snap.data();
       if (!promo.active) { msgEl.textContent = "This promo has expired."; msgEl.className = "promo-msg promo-error"; return; }
@@ -1374,12 +1119,12 @@ async function applyPromoCode() {
       msgEl.textContent = `🎉 Code applied! ₹${promoDiscount} off.`;
       msgEl.className = "promo-msg promo-success";
       updatePriceDisplay();
-    } catch (e) { msgEl.textContent = "Error checking code."; msgEl.className = "promo-msg promo-error"; }
+    } catch(e) { msgEl.textContent = "Error checking code."; msgEl.className = "promo-msg promo-error"; }
   });
 }
 
 /* ============================================
-   updatePriceDisplay
+   PRICE DISPLAY
    ============================================ */
 function updatePriceDisplay() {
   const priceEl   = document.getElementById("livePrice");
@@ -1390,55 +1135,35 @@ function updatePriceDisplay() {
   const optFull   = document.getElementById("optFullAmt");
   const optAtDrop = document.getElementById("optAtDropAmt");
   if (!priceEl) return;
-
-  const discounted   = Math.max(lastCalculatedTotal - promoDiscount, 0);
-  const fullDiscount = Math.round(discounted * 0.07);
-  const fullAmount   = discounted - fullDiscount;
-  const advanceAmt   = Math.round(discounted * 0.10);
-
+  const discounted = Math.max(lastCalculatedTotal - promoDiscount, 0);
+  const fullAmt    = Math.round(discounted * 0.93);
+  const advanceAmt = Math.round(discounted * 0.10);
   priceEl.textContent = "₹" + discounted.toLocaleString("en-IN");
   if (advanceEl) advanceEl.textContent = "₹" + advanceAmt.toLocaleString("en-IN");
-
   if (optAdv)    optAdv.textContent    = "₹" + advanceAmt.toLocaleString("en-IN");
-  if (optFull)   optFull.textContent   = "₹" + fullAmount.toLocaleString("en-IN");
+  if (optFull)   optFull.textContent   = "₹" + fullAmt.toLocaleString("en-IN");
   if (optAtDrop) optAtDrop.textContent = "₹" + discounted.toLocaleString("en-IN");
-
   if (promoDiscount > 0 && discRow) {
     discRow.style.display = "block";
     if (discAmt) discAmt.textContent = "₹" + promoDiscount.toLocaleString("en-IN");
   }
-
-  syncPayOnlineButton(discounted, advanceAmt, fullAmount);
+  syncPayOnlineButton(discounted, advanceAmt, fullAmt);
 }
 
 function syncPayOnlineButton(total, advanceAmt, fullAmt) {
   const btn = document.getElementById("btnPayOnline");
   if (!btn) return;
-  if (selectedPayment === "advance") {
-    btn.innerHTML = `💳 Pay Advance ₹${advanceAmt.toLocaleString("en-IN")} Online`;
-  } else if (selectedPayment === "full") {
-    btn.innerHTML = `💳 Pay Full ₹${fullAmt.toLocaleString("en-IN")} (Save 7%)`;
-  } else {
-    btn.innerHTML = `💳 Pay Online`;
-  }
+  if (selectedPayment === "advance") btn.innerHTML = `💳 Pay Advance ₹${advanceAmt.toLocaleString("en-IN")} Online`;
+  else if (selectedPayment === "full") btn.innerHTML = `💳 Pay Full ₹${fullAmt.toLocaleString("en-IN")} (Save 7%)`;
+  else btn.innerHTML = `💳 Pay Online`;
 }
 
-/* ============================================
-   selectPayment
-   ============================================ */
 function selectPayment(type) {
   selectedPayment = type;
-
-  ["optAdvance","optFull","optAtDrop"].forEach(id => {
-    document.getElementById(id)?.classList.remove("selected");
-  });
-  const map = { advance: "optAdvance", full: "optFull", at_drop: "optAtDrop" };
-  document.getElementById(map[type])?.classList.add("selected");
-
+  ["optAdvance","optFull","optAtDrop"].forEach(id => document.getElementById(id)?.classList.remove("selected"));
+  document.getElementById({ advance:"optAdvance", full:"optFull", at_drop:"optAtDrop" }[type])?.classList.add("selected");
   const discounted = Math.max(lastCalculatedTotal - promoDiscount, 0);
-  const advanceAmt = Math.round(discounted * 0.10);
-  const fullAmt    = Math.round(discounted * 0.93);
-  syncPayOnlineButton(discounted, advanceAmt, fullAmt);
+  syncPayOnlineButton(discounted, Math.round(discounted * 0.10), Math.round(discounted * 0.93));
 }
 
 function startRazorpayPayment() { startPayment(); }
@@ -1448,15 +1173,13 @@ function startRazorpayPayment() { startPayment(); }
    ============================================ */
 function previewPhotos(input) {
   const previews = document.getElementById("photoPreviews");
-  previews.innerHTML = "";
-  uploadedPhotos = [];
+  previews.innerHTML = ""; uploadedPhotos = [];
   Array.from(input.files).forEach(file => {
     const reader = new FileReader();
     reader.onload = e => {
       uploadedPhotos.push(e.target.result);
       const img = document.createElement("img");
-      img.src = e.target.result;
-      img.className = "photo-thumb";
+      img.src = e.target.result; img.className = "photo-thumb";
       previews.appendChild(img);
     };
     reader.readAsDataURL(file);
@@ -1464,30 +1187,28 @@ function previewPhotos(input) {
 }
 
 /* ============================================
-   SAVE QUOTE TO FIRESTORE
+   SAVE QUOTE
    ============================================ */
 async function saveQuoteToFirestore(total) {
   if (!currentUser || !window._firebase) return;
   const { db } = window._firebase;
   const houseEl   = document.getElementById("house");
   const vehicleEl = document.getElementById("vehicle");
-  const pickup    = document.getElementById("pickup");
-  const drop      = document.getElementById("drop");
   try {
     await db.collection("quotes").add({
-      uid:     currentUser.uid,
-      pickup:  pickup?.value  || "",
-      drop:    drop?.value    || "",
+      uid: currentUser.uid,
+      pickup: document.getElementById("pickup")?.value  || "",
+      drop:   document.getElementById("drop")?.value    || "",
       house:   houseEl?.options[houseEl?.selectedIndex]?.text    || "",
       vehicle: vehicleEl?.options[vehicleEl?.selectedIndex]?.text || "",
       total, date: new Date().toLocaleDateString("en-IN"),
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
     });
-  } catch (e) { }
+  } catch(e) {}
 }
 
 /* ============================================
-   GOOGLE MAPS + AUTOCOMPLETE
+   GOOGLE MAPS
    ============================================ */
 function initAutocomplete() {
   const pickupInput = document.getElementById("pickup");
@@ -1501,7 +1222,7 @@ function initAutocomplete() {
   if (toggle) {
     toggle.addEventListener("change", () => {
       if (!toggle.checked) return;
-      if (!navigator.geolocation) { showToast("⚠️ Location not supported by this browser."); toggle.checked = false; return; }
+      if (!navigator.geolocation) { showToast("⚠️ Location not supported."); toggle.checked = false; return; }
       pickupInput.value = "📍 Getting your location...";
       navigator.geolocation.getCurrentPosition(
         pos => {
@@ -1511,10 +1232,10 @@ function initAutocomplete() {
               pickupInput.value = res[0].formatted_address;
               pickupPlace = { geometry: { location: latLng } };
               showLocation("pickup"); calculateQuote(true);
-            } else { pickupInput.value = ""; toggle.checked = false; showToast("⚠️ Could not get address. Please type it manually."); }
+            } else { pickupInput.value = ""; toggle.checked = false; showToast("⚠️ Could not get address."); }
           });
         },
-        err => { pickupInput.value = ""; toggle.checked = false; showToast("❌ Location error: " + err.message); },
+        err => { pickupInput.value = ""; toggle.checked = false; showToast("❌ " + err.message); },
         { enableHighAccuracy: true, timeout: 10000 }
       );
     });
@@ -1523,9 +1244,9 @@ function initAutocomplete() {
 }
 
 function attachAutoCalculation() {
-  ["house","vehicle","pickupFloor","dropFloor","liftAvailable","cartonQty"].forEach(id => {
-    document.getElementById(id)?.addEventListener("change", () => calculateQuote(true));
-  });
+  ["house","vehicle","pickupFloor","dropFloor","liftAvailable","cartonQty"].forEach(id =>
+    document.getElementById(id)?.addEventListener("change", () => calculateQuote(true))
+  );
   document.querySelector(".furniture-grid")?.addEventListener("change", () => calculateQuote(true));
 }
 
@@ -1535,9 +1256,7 @@ function showLocation(type) {
   if (!place?.geometry) return;
   const loc = place.geometry.location;
   if (!map) {
-    mapDiv.style.display = "block";
-    mapDiv.style.height  = "200px";
-    mapDiv.style.maxHeight = "200px";
+    mapDiv.style.display = "block"; mapDiv.style.height = "200px"; mapDiv.style.maxHeight = "200px";
     map = new google.maps.Map(mapDiv, { center: loc, zoom: 14 });
     directionsService  = new google.maps.DirectionsService();
     directionsRenderer = new google.maps.DirectionsRenderer({ map, suppressMarkers: true });
@@ -1588,7 +1307,7 @@ function calculateQuote(auto = false) {
   const house   = document.getElementById("house");
   const vehicle = document.getElementById("vehicle");
   const result  = document.getElementById("result");
-  if (!pickup?.value || !drop?.value)        { if (!auto) showToast("📍 Please enter pickup & drop locations."); return; }
+  if (!pickup?.value || !drop?.value) { if (!auto) showToast("📍 Please enter pickup & drop locations."); return; }
   const houseBase   = Number(house?.value   || 0);
   const vehicleRate = Number(vehicle?.value || 0);
   if (!houseBase || (!isIntercityMove && !vehicleRate)) { if (!auto) showToast("🏠 Please select house type and vehicle."); return; }
@@ -1597,52 +1316,31 @@ function calculateQuote(auto = false) {
   let itemCount = 0;
   chargedItems.forEach(id => { if (document.getElementById(id)?.checked) itemCount++; });
   const cartonQty    = parseInt(document.getElementById("cartonQty")?.value || 0);
-  const cartonCost   = cartonQty * 50;
-  const furnitureCost = (itemCount * 150) + cartonCost;
+  const furnitureCost = (itemCount * 150) + (cartonQty * 50);
 
   function applyPrice(km) {
-    const pickupFloor = Number(document.getElementById("pickupFloor")?.value  || 0);
-    const dropFloor   = Number(document.getElementById("dropFloor")?.value    || 0);
+    const pickupFloor = Number(document.getElementById("pickupFloor")?.value || 0);
+    const dropFloor   = Number(document.getElementById("dropFloor")?.value   || 0);
     const liftAvail   = document.getElementById("liftAvailable")?.checked;
-    const packingCost = 0;
     const floorCost   = liftAvail ? Math.round((pickupFloor + dropFloor) * 0.5) : (pickupFloor + dropFloor);
-
     detectAndShowIntercityBadge(km);
 
     let total, breakdownHtml;
-
     if (km > 100) {
-      const baseRate  = getIntercityBase(house?.value || "3950", km);
-      total = Math.round(baseRate + furnitureCost + floorCost + packingCost);
+      const baseRate = getIntercityBase(house?.value || "3950", km);
+      total = Math.round(baseRate + furnitureCost + floorCost);
       const distLabel = km <= 400 ? "up to 400 km" : km <= 600 ? "up to 600 km" : km <= 1000 ? "up to 1000 km" : "1000+ km";
-      breakdownHtml =
-        `🚛 Intercity · ~${Math.round(km)} km (${distLabel})<br>` +
-        `Base: ₹${baseRate.toLocaleString("en-IN")}` +
-        `${itemCount  ? ` · Items (${itemCount} × ₹150): ₹${(itemCount*150).toLocaleString("en-IN")}` : ""}` +
-        `${cartonQty  ? ` · Cartons (${cartonQty} × ₹50): ₹${cartonCost.toLocaleString("en-IN")}`    : ""}` +
-        `${floorCost  ? ` · Floor: ₹${floorCost.toLocaleString("en-IN")}`                             : ""}` +
-        `<br><strong>Total Estimate: ₹${total.toLocaleString("en-IN")}</strong>`;
+      breakdownHtml = `🚛 Intercity · ~${Math.round(km)} km (${distLabel})<br>Base: ₹${baseRate.toLocaleString("en-IN")}${itemCount ? ` · Items: ₹${(itemCount*150).toLocaleString("en-IN")}` : ""}${cartonQty ? ` · Cartons: ₹${(cartonQty*50).toLocaleString("en-IN")}` : ""}${floorCost ? ` · Floor: ₹${floorCost.toLocaleString("en-IN")}` : ""}<br><strong>Total Estimate: ₹${total.toLocaleString("en-IN")}</strong>`;
     } else {
-      const vehicleVal = Number(vehicle?.value || 0);
-      let baseFare, perKmRate;
-      if      (vehicleVal === 88) { baseFare = 7500; perKmRate = 40; }
-      else if (vehicleVal === 69) { baseFare = 6000; perKmRate = 35; }
-      else if (vehicleVal === 54) { baseFare = 4500; perKmRate = 35; }
-      else                        { baseFare = 1999; perKmRate = 25; }
-
+      const vv = Number(vehicle?.value || 0);
+      let baseFare = 1999, perKmRate = 25;
+      if (vv === 88) { baseFare = 7500; perKmRate = 40; }
+      else if (vv === 69) { baseFare = 6000; perKmRate = 35; }
+      else if (vv === 54) { baseFare = 4500; perKmRate = 35; }
       const distanceFare = km <= 25 ? baseFare : baseFare + ((km - 25) * perKmRate);
-      total = Math.round(distanceFare + furnitureCost + floorCost + packingCost);
-
-      breakdownHtml =
-        `📍 Local · ~${km.toFixed(1)} km<br>` +
-        `Base fare: ₹${baseFare.toLocaleString("en-IN")}` +
-        `${km > 25    ? ` · Extra km: ₹${Math.round((km-25)*perKmRate).toLocaleString("en-IN")}` : ""}` +
-        `${itemCount  ? ` · Items (${itemCount} × ₹150): ₹${(itemCount*150).toLocaleString("en-IN")}` : ""}` +
-        `${cartonQty  ? ` · Cartons (${cartonQty} × ₹50): ₹${cartonCost.toLocaleString("en-IN")}` : ""}` +
-        `${floorCost  ? ` · Floor: ₹${floorCost.toLocaleString("en-IN")}` : ""}` +
-        `<br><strong>Total Estimate: ₹${total.toLocaleString("en-IN")}</strong>`;
+      total = Math.round(distanceFare + furnitureCost + floorCost);
+      breakdownHtml = `📍 Local · ~${km.toFixed(1)} km<br>Base fare: ₹${baseFare.toLocaleString("en-IN")}${km > 25 ? ` · Extra km: ₹${Math.round((km-25)*perKmRate).toLocaleString("en-IN")}` : ""}${itemCount ? ` · Items: ₹${(itemCount*150).toLocaleString("en-IN")}` : ""}${cartonQty ? ` · Cartons: ₹${(cartonQty*50).toLocaleString("en-IN")}` : ""}${floorCost ? ` · Floor: ₹${floorCost.toLocaleString("en-IN")}` : ""}<br><strong>Total Estimate: ₹${total.toLocaleString("en-IN")}</strong>`;
     }
-
     if (result) result.innerHTML = breakdownHtml;
     lastCalculatedTotal = total;
     updatePriceDisplay();
@@ -1658,14 +1356,12 @@ function calculateQuote(auto = false) {
         applyPrice(el.distance.value / 1000);
       } else {
         if (pickupPlace?.geometry && dropPlace?.geometry) {
-          const R = 6371;
-          const p1 = pickupPlace.geometry.location, p2 = dropPlace.geometry.location;
-          const lat1 = p1.lat() * Math.PI/180, lat2 = p2.lat() * Math.PI/180;
-          const dLat = lat2 - lat1, dLng = (p2.lng() - p1.lng()) * Math.PI/180;
+          const R = 6371, p1 = pickupPlace.geometry.location, p2 = dropPlace.geometry.location;
+          const lat1 = p1.lat()*Math.PI/180, lat2 = p2.lat()*Math.PI/180;
+          const dLat = lat2-lat1, dLng = (p2.lng()-p1.lng())*Math.PI/180;
           const a = Math.sin(dLat/2)**2 + Math.cos(lat1)*Math.cos(lat2)*Math.sin(dLng/2)**2;
-          const km = R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)) * 1.3;
-          applyPrice(Math.max(km, 5));
-        } else { applyPrice(15); }
+          applyPrice(Math.max(R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)) * 1.3, 5));
+        } else applyPrice(15);
       }
     });
   } catch(e) { applyPrice(15); }
@@ -1675,12 +1371,14 @@ function calculateQuote(auto = false) {
    WHATSAPP BOOKING
    ============================================ */
 function saveLead() {
-  const custName  = document.getElementById("custName");
-  const custPhone = document.getElementById("custPhone");
-  const pickup    = document.getElementById("pickup");
-  const drop      = document.getElementById("drop");
   fetch("https://script.google.com/macros/s/AKfycbwne_QGsKg2vomV1ELPCNkJQ--vMUx4qbkKxfHPvMT9zjkduNZ3t7AC5XC-lNnskEzwVg/exec", {
-    method: "POST", body: JSON.stringify({ name: custName?.value||"", phone: custPhone?.value||"", pickup: pickup?.value||"", drop: drop?.value||"" })
+    method: "POST",
+    body: JSON.stringify({
+      name:   document.getElementById("custName")?.value||"",
+      phone:  document.getElementById("custPhone")?.value||"",
+      pickup: document.getElementById("pickup")?.value||"",
+      drop:   document.getElementById("drop")?.value||""
+    })
   }).catch(() => {});
 }
 
@@ -1690,87 +1388,63 @@ async function bookOnWhatsApp() {
   const phone = document.getElementById("custPhone")?.value?.trim();
   if (!name)                       return showToast("⚠️ Please enter your name.");
   if (!phone || phone.length < 10) return showToast("⚠️ Please enter a valid phone number.");
-  if (lastCalculatedTotal === 0)   return showToast("⚠️ Price not calculated yet. Please enter pickup & drop locations.");
-
+  if (lastCalculatedTotal === 0)   return showToast("⚠️ Price not calculated yet.");
   saveLead();
-  const pickup      = document.getElementById("pickup")?.value  || "";
-  const drop        = document.getElementById("drop")?.value    || "";
-  const date        = document.getElementById("shiftDate")?.value || "";
-  const house       = document.getElementById("house");
-  const vehicle     = document.getElementById("vehicle");
-  const houseText   = house?.options[house?.selectedIndex]?.text    || "";
-  const vehicleText = vehicle?.options[vehicle?.selectedIndex]?.text || "";
+  const pickup   = document.getElementById("pickup")?.value  || "";
+  const drop     = document.getElementById("drop")?.value    || "";
+  const date     = document.getElementById("shiftDate")?.value || "";
+  const houseEl  = document.getElementById("house");
+  const vehicleEl = document.getElementById("vehicle");
+  const houseText   = houseEl?.options[houseEl?.selectedIndex]?.text    || "";
+  const vehicleText = vehicleEl?.options[vehicleEl?.selectedIndex]?.text || "";
   const bookingRef  = "WA-" + Date.now().toString(36).toUpperCase();
   const discountedTotal = Math.max(lastCalculatedTotal - promoDiscount, 0);
-
   if (window._firebase) {
     try {
       showToast("⏳ Saving booking...");
       const docRef = await window._firebase.db.collection("bookings").add({
-        bookingRef, customerUid: currentUser.uid,
-        customerName: name, phone, pickup, drop, date,
+        bookingRef, customerUid: currentUser.uid, customerName: name, phone, pickup, drop, date,
         moveType: selectedMoveType, house: houseText, vehicle: vehicleText,
         furniture: getFurnitureSummary(),
-        pickupFloor: document.getElementById("pickupFloor")?.options[document.getElementById("pickupFloor")?.selectedIndex]?.text || "",
-        dropFloor: document.getElementById("dropFloor")?.options[document.getElementById("dropFloor")?.selectedIndex]?.text || "",
+        pickupFloor: document.getElementById("pickupFloor")?.options[document.getElementById("pickupFloor")?.selectedIndex]?.text||"",
+        dropFloor:   document.getElementById("dropFloor")?.options[document.getElementById("dropFloor")?.selectedIndex]?.text||"",
         liftAvailable: !!document.getElementById("liftAvailable")?.checked,
-        packingService: false,
-        total: discountedTotal, originalTotal: lastCalculatedTotal,
-        paid: 0, status: "confirmed", source: "whatsapp",
-        promoDiscount, createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        packingService: false, total: discountedTotal, originalTotal: lastCalculatedTotal,
+        paid: 0, status: "confirmed", source: "whatsapp", promoDiscount,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
       });
       currentBookingId = docRef.id;
       localStorage.setItem("packzen_active_booking", docRef.id);
       queueSMS(phone, "booking_confirmed", { name, bookingRef, date, pickup, total: discountedTotal });
       notifyOwner(bookingRef, name, phone, pickup, drop, date, discountedTotal, "pay_later", "whatsapp");
-
-      showConfirmationCard({
-        bookingRef, name, phone, pickup, drop, date,
-        house: houseText || "—", vehicle: vehicleText || "—",
-        total: discountedTotal, paymentLabel: "Cash on moving day",
-        paymentNote: "Our team will confirm your slot shortly",
-        source: "whatsapp", showInvoice: false
-      });
-
-      pendingWhatsAppMsg =
-        "✅ *New Booking — PackZen*\n━━━━━━━━━━━━━━━━━━━━\n" +
-        `🔖 *Booking ID:* ${bookingRef}\n👤 *Name:* ${name}\n📞 *Phone:* ${phone}\n` +
-        `📍 *Pickup:* ${pickup}\n🏁 *Drop:* ${drop}\n📅 *Date:* ${date||"TBD"}\n` +
-        `🏠 *House:* ${houseText||"—"}\n🚚 *Vehicle:* ${vehicleText||"—"}\n` +
-        `💰 *Estimate:* ₹${discountedTotal.toLocaleString("en-IN")}\n━━━━━━━━━━━━━━━━━━━━\nPayment: Cash on moving day`;
+      showConfirmationCard({ bookingRef, name, phone, pickup, drop, date, house: houseText||"—", vehicle: vehicleText||"—", total: discountedTotal, paymentLabel: "Cash on moving day", paymentNote: "Our team will confirm your slot shortly", source: "whatsapp", showInvoice: false });
+      pendingWhatsAppMsg = `✅ *New Booking — PackZen*\n━━━━━━━━━━━━━━━━━━━━\n🔖 *Booking ID:* ${bookingRef}\n👤 *Name:* ${name}\n📞 *Phone:* ${phone}\n📍 *Pickup:* ${pickup}\n🏁 *Drop:* ${drop}\n📅 *Date:* ${date||"TBD"}\n🏠 *House:* ${houseText||"—"}\n🚚 *Vehicle:* ${vehicleText||"—"}\n💰 *Estimate:* ₹${discountedTotal.toLocaleString("en-IN")}\n━━━━━━━━━━━━━━━━━━━━\nPayment: Cash on moving day`;
       pendingAdminMsg = pendingWhatsAppMsg;
     } catch(e) { showToast("❌ Booking save failed: " + e.message); }
-  } else { showToast("⚠️ Service not ready. Please refresh and try again."); }
+  }
 }
 
 /* ============================================
-   RAZORPAY PAYMENT
+   RAZORPAY
    ============================================ */
 function startPayment() {
-  if (!currentUser) { showToast("👋 Please login or create an account to book."); openAuthModal("login"); return; }
+  if (!currentUser) { showToast("👋 Please login to book."); openAuthModal("login"); return; }
   if (!document.getElementById("tncAccepted")?.checked) { showToast("⚠️ Please accept the Terms & Conditions."); return; }
   const name  = document.getElementById("custName")?.value?.trim();
   const phone = document.getElementById("custPhone")?.value?.trim();
   if (!name)  return showToast("⚠️ Please enter your name.");
   if (!phone || phone.length < 10) return showToast("⚠️ Please enter a valid phone number.");
-  if (lastCalculatedTotal === 0)   return showToast("⚠️ Price not calculated yet. Please enter pickup & drop locations.");
-  if (!RAZORPAY_KEY) { showToast("⚠️ Payment not configured. Please contact support."); return; }
-
+  if (lastCalculatedTotal === 0)   return showToast("⚠️ Price not calculated yet.");
+  if (!RAZORPAY_KEY) { showToast("⚠️ Payment not configured."); return; }
   const discounted = Math.max(lastCalculatedTotal - promoDiscount, 0);
   if (selectedPayment === "at_drop") { bookWithoutPayment(); return; }
-
-  let payAmount;
-  if (selectedPayment === "full")    payAmount = Math.round(discounted * 0.93);
-  else                               payAmount = Math.round(discounted * 0.10);
+  const payAmount = selectedPayment === "full" ? Math.round(discounted * 0.93) : Math.round(discounted * 0.10);
   paymentReceiptId = "PKZ-" + Date.now();
-
   const rzp = new Razorpay({
     key: RAZORPAY_KEY, amount: payAmount * 100, currency: "INR",
     name: "PackZen Packers & Movers",
-    description: selectedPayment === "full" ? "Full Payment (7% off)" : `Advance 10% of ₹${discounted.toLocaleString("en-IN")}`,
-    receipt: paymentReceiptId,
-    prefill: { name, contact: phone },
-    theme: { color: "#ea580c" },
+    description: selectedPayment === "full" ? "Full Payment (7% off)" : `Advance 10%`,
+    receipt: paymentReceiptId, prefill: { name, contact: phone }, theme: { color: "#ea580c" },
     handler: (response) => onPaymentSuccess(response, name, phone, payAmount, discounted),
     modal: { ondismiss: () => {} }
   });
@@ -1782,32 +1456,26 @@ function onPaymentSuccess(response, name, phone, paid, total) {
   const pickup    = document.getElementById("pickup");
   const drop      = document.getElementById("drop");
   const shiftDate = document.getElementById("shiftDate");
-  const bookingRef = "PKZ-" + Date.now().toString(36).toUpperCase();
   const houseEl   = document.getElementById("house");
   const vehicleEl = document.getElementById("vehicle");
-
+  const bookingRef = "PKZ-" + Date.now().toString(36).toUpperCase();
   showConfirmationCard({
     bookingRef, name, phone,
-    pickup: pickup?.value || "—", drop: drop?.value || "—",
-    date: shiftDate?.value || "TBD",
-    house: houseEl?.options[houseEl?.selectedIndex]?.text || "—",
-    vehicle: vehicleEl?.options[vehicleEl?.selectedIndex]?.text || "—",
-    total,
-    paymentLabel: selectedPayment === "full" ? `Paid Full — ₹${paid.toLocaleString("en-IN")}` : `Advance ₹${paid.toLocaleString("en-IN")} paid`,
-    paymentNote: `Payment ID: ${response.razorpay_payment_id}`,
-    source: "payment", showInvoice: true
+    pickup: pickup?.value||"—", drop: drop?.value||"—", date: shiftDate?.value||"TBD",
+    house: houseEl?.options[houseEl?.selectedIndex]?.text||"—",
+    vehicle: vehicleEl?.options[vehicleEl?.selectedIndex]?.text||"—",
+    total, paymentLabel: selectedPayment === "full" ? `Paid Full — ₹${paid.toLocaleString("en-IN")}` : `Advance ₹${paid.toLocaleString("en-IN")} paid`,
+    paymentNote: `Payment ID: ${response.razorpay_payment_id}`, source: "payment", showInvoice: true
   });
-
   if (window._firebase) {
     window._firebase.db.collection("bookings").add({
       bookingRef, customerUid: currentUser.uid, customerName: name, phone,
-      pickup: pickup?.value||"", drop: drop?.value||"",
-      moveType: selectedMoveType,
-      house: houseEl?.options[houseEl?.selectedIndex]?.text || "",
-      vehicle: vehicleEl?.options[vehicleEl?.selectedIndex]?.text || "",
+      pickup: pickup?.value||"", drop: drop?.value||"", moveType: selectedMoveType,
+      house: houseEl?.options[houseEl?.selectedIndex]?.text||"",
+      vehicle: vehicleEl?.options[vehicleEl?.selectedIndex]?.text||"",
       furniture: getFurnitureSummary(),
-      pickupFloor: document.getElementById("pickupFloor")?.options[document.getElementById("pickupFloor")?.selectedIndex]?.text || "",
-      dropFloor: document.getElementById("dropFloor")?.options[document.getElementById("dropFloor")?.selectedIndex]?.text || "",
+      pickupFloor: document.getElementById("pickupFloor")?.options[document.getElementById("pickupFloor")?.selectedIndex]?.text||"",
+      dropFloor:   document.getElementById("dropFloor")?.options[document.getElementById("dropFloor")?.selectedIndex]?.text||"",
       liftAvailable: !!document.getElementById("liftAvailable")?.checked,
       packingService: false, total, originalTotal: lastCalculatedTotal,
       paid, paymentType: selectedPayment, promoDiscount,
@@ -1820,142 +1488,75 @@ function onPaymentSuccess(response, name, phone, paid, total) {
       localStorage.setItem("packzen_active_booking", docRef.id);
       requestPushPermission();
       subscribeToBookingNotifications(docRef.id);
-      queueSMS(phone, "booking_confirmed", {
-        name, bookingRef, date: shiftDate?.value || "TBD",
-        pickup: pickup?.value || "", total
-      });
-      notifyOwner(bookingRef, name, phone, pickup?.value || "—", drop?.value || "—", shiftDate?.value || "TBD", total, selectedPayment, "online");
+      queueSMS(phone, "booking_confirmed", { name, bookingRef, date: shiftDate?.value||"TBD", pickup: pickup?.value||"", total });
+      notifyOwner(bookingRef, name, phone, pickup?.value||"—", drop?.value||"—", shiftDate?.value||"TBD", total, selectedPayment, "online");
     }).catch(() => {});
   }
 }
 
 function downloadInvoice() {
-  if (typeof jspdf === "undefined" && typeof window.jspdf === "undefined") {
-    showToast("⚠️ PDF library loading... try again in a moment.");
-    return;
-  }
+  if (typeof window.jspdf === "undefined") { showToast("⚠️ PDF library loading..."); return; }
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF();
-  const now = new Date();
-
-  const bookingId = document.getElementById("bookingIdDisplay")?.textContent || paymentReceiptId || "—";
-  const custName  = document.getElementById("ccName")?.textContent    || "—";
-  const custPhone = document.getElementById("ccPhone")?.textContent   || "—";
-  const pickup    = document.getElementById("ccPickup")?.textContent  || "—";
-  const drop      = document.getElementById("ccDrop")?.textContent    || "—";
-  const moveDate  = document.getElementById("ccDate")?.textContent    || "—";
-  const houseType = document.getElementById("ccHouse")?.textContent   || "—";
-  const vehicle   = document.getElementById("ccVehicle")?.textContent || "—";
-  const payment   = document.getElementById("ccPayment")?.textContent || "—";
-  const amount    = document.getElementById("ccAmount")?.textContent  || "₹0";
-
-  doc.setFillColor(234, 88, 12); doc.rect(0, 0, 210, 30, "F");
+  const bookingId = document.getElementById("bookingIdDisplay")?.textContent || "—";
+  const lines = [
+    "Customer : " + (document.getElementById("ccName")?.textContent||"—"),
+    "Phone    : " + (document.getElementById("ccPhone")?.textContent||"—"),
+    "Pickup   : " + (document.getElementById("ccPickup")?.textContent||"—"),
+    "Drop     : " + (document.getElementById("ccDrop")?.textContent||"—"),
+    "Date     : " + (document.getElementById("ccDate")?.textContent||"—"),
+    "House    : " + (document.getElementById("ccHouse")?.textContent||"—"),
+    "Vehicle  : " + (document.getElementById("ccVehicle")?.textContent||"—"),
+    "Payment  : " + (document.getElementById("ccPayment")?.textContent||"—"),
+    "Amount   : " + (document.getElementById("ccAmount")?.textContent||"₹0"),
+  ];
+  doc.setFillColor(234,88,12); doc.rect(0,0,210,30,"F");
   doc.setTextColor(255,255,255); doc.setFontSize(18); doc.setFont("helvetica","bold");
-  doc.text("PackZen Packers & Movers", 14, 15);
-  doc.setFontSize(10); doc.setFont("helvetica","normal");
-  doc.text("GST Invoice", 14, 22);
-
+  doc.text("PackZen Packers & Movers",14,15);
+  doc.setFontSize(10); doc.setFont("helvetica","normal"); doc.text("GST Invoice",14,22);
   doc.setTextColor(0,0,0); doc.setFontSize(11);
   doc.text("Invoice No: " + bookingId, 14, 42);
-  doc.text("Date: " + now.toLocaleDateString("en-IN"), 14, 50);
-  const gstin = (window.ENV && window.ENV.GSTIN) ? window.ENV.GSTIN : "";
-  if (gstin) doc.text("GSTIN: " + gstin, 14, 58);
-
-  doc.setFillColor(240, 247, 255); doc.rect(14, 65, 182, 8, "F");
-  doc.setFont("helvetica","bold"); doc.text("Booking Details", 16, 71);
-  doc.setFont("helvetica","normal");
-
-  const lines = [
-    "Customer Name : " + custName,
-    "Phone         : " + custPhone,
-    "Pickup        : " + pickup,
-    "Drop          : " + drop,
-    "Move Date     : " + moveDate,
-    "House Type    : " + houseType,
-    "Vehicle       : " + vehicle,
-    "Payment Type  : " + payment,
-    "Total Amount  : " + amount,
-  ];
-
-  let y = 82;
+  doc.text("Date: " + new Date().toLocaleDateString("en-IN"), 14, 50);
+  let y = 66;
   lines.forEach(line => { doc.text(line, 14, y); y += 9; });
-  y += 4;
-  doc.setFillColor(234, 88, 12); doc.setTextColor(255,255,255);
-  doc.rect(14, y, 182, 10, "F");
-  doc.setFont("helvetica","bold");
-  doc.text("Total includes 18% GST as applicable", 16, y + 7);
-  doc.setTextColor(100,100,100); doc.setFontSize(9); doc.setFont("helvetica","normal");
-  doc.text("PackZen Packers & Movers | HSR Layout, Bangalore | Ph: 9945095453 | packzenblr.in", 14, 285);
   doc.save("PackZen-Invoice-" + bookingId + ".pdf");
 }
 
 function sendWhatsAppAfterPayment() {
   if (pendingWhatsAppMsg) {
     window.open(`https://wa.me/919945095453?text=${encodeURIComponent(pendingWhatsAppMsg)}`, "_blank");
-    if (pendingAdminMsg && pendingAdminMsg !== pendingWhatsAppMsg) {
-      setTimeout(() => window.open(`https://wa.me/919945095453?text=${encodeURIComponent(pendingAdminMsg)}`, "_blank"), 800);
-    }
-    pendingWhatsAppMsg = null; pendingAdminMsg = null;
-    return;
+    pendingWhatsAppMsg = null; pendingAdminMsg = null; return;
   }
-  const pickup = document.getElementById("pickup");
-  const drop   = document.getElementById("drop");
-  const name   = document.getElementById("custName")?.value?.trim() || "—";
-  const phone  = document.getElementById("custPhone")?.value?.trim() || "";
-  const bookingId = document.getElementById("bookingIdDisplay")?.textContent || paymentReceiptId || "—";
-  const msg =
-    `✅ *Booking Confirmed — PackZen* 🚚\n\n` +
-    `📌 *Booking ID:* ${bookingId}\n👤 *Name:* ${name}\n` +
-    `📍 *Pickup:* ${pickup?.value||"—"}\n🏁 *Drop:* ${drop?.value||"—"}\n` +
-    `💰 *Total:* ₹${lastCalculatedTotal.toLocaleString("en-IN")}\n` +
-    `💳 *Payment ID:* ${paymentReceiptId||"—"}\n\n— PackZen Packers & Movers | 📞 9945095453`;
+  const name  = document.getElementById("custName")?.value?.trim() || "—";
+  const phone = document.getElementById("custPhone")?.value?.trim() || "";
+  const id    = document.getElementById("bookingIdDisplay")?.textContent || "—";
+  const msg   = `✅ *Booking Confirmed — PackZen* 🚚\n\n📌 *ID:* ${id}\n👤 *Name:* ${name}\n💰 *Total:* ₹${lastCalculatedTotal.toLocaleString("en-IN")}\n\n— PackZen | 📞 9945095453`;
   window.open(`https://wa.me/91${phone}?text=${encodeURIComponent(msg)}`, "_blank");
 }
 
 /* ============================================
-   BOOKING CONFIRMATION CARD
+   CONFIRMATION CARD
    ============================================ */
 function showConfirmationCard({ bookingRef, name, phone, pickup, drop, date, house, vehicle, total, paymentLabel, paymentNote, source, showInvoice }) {
-  const idEl = document.getElementById("bookingIdDisplay");
-  if (idEl) idEl.textContent = bookingRef || "—";
-
-  const titleEl = document.getElementById("ccTitle");
-  const subEl   = document.getElementById("ccSubtitle");
-  if (titleEl) titleEl.textContent = source === "whatsapp" ? "Request Sent!" : "Booking Confirmed!";
-  if (subEl)   subEl.textContent   = source === "whatsapp" ? "Our team will call you shortly." : "We'll call you within 30 minutes.";
-
-  const pickupShort = (pickup||"—").split(",")[0];
-  const dropShort   = (drop||"—").split(",")[0];
-  const pickupShortEl = document.getElementById("ccPickupShort");
-  const dropShortEl   = document.getElementById("ccDropShort");
-  if (pickupShortEl) pickupShortEl.textContent = pickupShort;
-  if (dropShortEl)   dropShortEl.textContent   = dropShort;
-
-  const dateEl = document.getElementById("ccDate");
-  if (dateEl) dateEl.textContent = date || "TBD";
-
-  const amtEl = document.getElementById("ccAmount");
-  if (amtEl) amtEl.textContent = "₹" + (total || 0).toLocaleString("en-IN");
-
-  const noteEl = document.getElementById("ccPriceNote");
-  if (noteEl) noteEl.textContent = paymentNote || "Pay on delivery";
-
-  const pickupEl = document.getElementById("ccPickup");
-  const dropEl   = document.getElementById("ccDrop");
-  if (pickupEl) pickupEl.textContent = pickup || "—";
-  if (dropEl)   dropEl.textContent   = drop   || "—";
-
-  const fields = { ccName: name, ccPhone: phone, ccHouse: house||"—", ccVehicle: vehicle||"—", ccPayment: paymentLabel||"Pay on delivery" };
-  Object.entries(fields).forEach(([id, val]) => { const el = document.getElementById(id); if (el) el.textContent = val; });
-
+  const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+  set("bookingIdDisplay", bookingRef||"—");
+  set("ccTitle",   source === "whatsapp" ? "Request Sent!" : "Booking Confirmed!");
+  set("ccSubtitle",source === "whatsapp" ? "Our team will call you shortly." : "We'll call you within 30 minutes.");
+  set("ccPickupShort", (pickup||"—").split(",")[0]);
+  set("ccDropShort",   (drop||"—").split(",")[0]);
+  set("ccDate",    date||"TBD");
+  set("ccAmount",  "₹" + (total||0).toLocaleString("en-IN"));
+  set("ccPriceNote", paymentNote||"Pay on delivery");
+  set("ccPickup",  pickup||"—"); set("ccDrop", drop||"—");
+  set("ccName",    name||"—");   set("ccPhone", phone||"—");
+  set("ccHouse",   house||"—");  set("ccVehicle", vehicle||"—");
+  set("ccPayment", paymentLabel||"Pay on delivery");
   const invBtn = document.getElementById("btnInvoice");
   if (invBtn) invBtn.style.display = showInvoice ? "flex" : "none";
-
   const fullDetails = document.getElementById("ccFullDetails");
   const expandBtn   = document.getElementById("ccExpandBtn");
   if (fullDetails) fullDetails.style.display = "none";
   if (expandBtn)   expandBtn.textContent = "View Full Details ↓";
-
   document.getElementById("paymentModal").style.display = "flex";
 }
 
@@ -1979,17 +1580,15 @@ function showBookingSuccessState() {
   if (successEl) successEl.style.display = "block";
   const stepHeader = document.querySelector(".step-header");
   if (stepHeader) stepHeader.style.display = "none";
-  const bookingId = document.getElementById("bookingIdDisplay")?.textContent || "—";
   const bsId = document.getElementById("bsBookingId");
-  if (bsId) bsId.textContent = bookingId;
+  if (bsId) bsId.textContent = document.getElementById("bookingIdDisplay")?.textContent || "—";
 }
 
 function scrollToTrackBanner() {
   const banner = document.getElementById("trackOrderBanner");
   if (banner) {
     const navH = document.querySelector("nav")?.offsetHeight || 65;
-    const top  = banner.getBoundingClientRect().top + window.scrollY - navH - 8;
-    window.scrollTo({ top, behavior: "smooth" });
+    window.scrollTo({ top: banner.getBoundingClientRect().top + window.scrollY - navH - 8, behavior: "smooth" });
   }
 }
 
@@ -2005,34 +1604,27 @@ function startNewBooking() {
 function resetBookingForm() {
   currentStep = 0; showStep(0);
   ["pickup","drop","house","vehicle","moveType"].forEach(id => { const el = document.getElementById(id); if (el) el.value = ""; });
-  ["custName","custPhone","promoCode"].forEach(id => { const el = document.getElementById(id); if (el) el.value = ""; });
-  document.querySelectorAll(".move-type-card").forEach(c => c.classList.remove("selected"));
-  document.querySelectorAll(".select-card, .vehicle-card").forEach(c => c.classList.remove("selected"));
+  ["custName","custPhone"].forEach(id => { const el = document.getElementById(id); if (el) el.value = ""; });
+  document.querySelectorAll(".move-type-card, .select-card, .vehicle-card").forEach(c => c.classList.remove("selected"));
   selectedMoveType = null;
   const mapDiv = document.getElementById("map");
   if (mapDiv) { mapDiv.style.display = "none"; mapDiv.style.height = "0"; }
-  const tc = document.getElementById("agreeTerms");
-  if (tc) tc.checked = false;
-  promoDiscount = 0;
-  lastCalculatedTotal = 0;
-  updatePriceDisplay();
-  initPaymentOptions();
+  promoDiscount = 0; lastCalculatedTotal = 0;
+  updatePriceDisplay(); initPaymentOptions();
   setTimeout(() => renderSizeCards("home"), 100);
 }
 
 function showTrackOrderBanner() {
   const banner = document.getElementById("trackOrderBanner");
   if (!banner) return;
-  const bookingId = document.getElementById("bookingIdDisplay")?.textContent || "—";
   const tobId = document.getElementById("tobBookingId");
-  if (tobId) tobId.textContent = bookingId;
+  if (tobId) tobId.textContent = document.getElementById("bookingIdDisplay")?.textContent || "—";
   banner.style.display = "block";
   setTimeout(() => {
     const quoteSection = document.getElementById("quote");
     if (quoteSection) {
       const navH = document.querySelector("nav")?.offsetHeight || 65;
-      const top  = quoteSection.getBoundingClientRect().top + window.scrollY - navH - 10;
-      window.scrollTo({ top, behavior: "smooth" });
+      window.scrollTo({ top: quoteSection.getBoundingClientRect().top + window.scrollY - navH - 10, behavior: "smooth" });
     }
   }, 200);
   startBannerTracking();
@@ -2048,26 +1640,21 @@ function updateTrackBanner(b) {
   const statusOrder  = ["confirmed","assigned","packing","transit","delivered"];
   const statusLabels = { confirmed:"Confirmed", assigned:"Driver Assigned", packing:"Packing Started", transit:"In Transit 🚚", delivered:"Delivered ✅" };
   const idx = statusOrder.indexOf(b.status || "confirmed");
-
   if (b.status === "delivered" || b.status === "cancelled") {
     localStorage.removeItem("packzen_active_booking");
     setTimeout(() => dismissTrackBanner(), 3000);
   }
-
   const labelEl = document.getElementById("tobStatusLabel");
   if (labelEl) labelEl.textContent = statusLabels[b.status] || b.status || "Confirmed";
-
   const fill = document.getElementById("tobProgressFill");
   if (fill) fill.style.width = ((idx / (statusOrder.length - 1)) * 100) + "%";
-
   statusOrder.forEach((s, i) => {
     const step = document.getElementById("tobs" + i);
     if (!step) return;
     step.className = "tob-step";
-    if (i < idx)  step.classList.add("done");
+    if (i < idx)   step.classList.add("done");
     if (i === idx) step.classList.add("active");
   });
-
   const driverRow = document.getElementById("tobDriverRow");
   if (b.driverName && driverRow) {
     document.getElementById("tobDriverName").textContent = "Driver: " + b.driverName;
@@ -2075,10 +1662,9 @@ function updateTrackBanner(b) {
     if (b.driverPhone) { phoneEl.href = "tel:" + b.driverPhone; phoneEl.textContent = "📞 Call Driver"; }
     driverRow.style.display = "flex";
   }
-
   const banner = document.getElementById("trackOrderBanner");
   if (b.status === "delivered" && banner) {
-    banner.style.background = "linear-gradient(135deg, #15803d, #16a34a)";
+    banner.style.background = "linear-gradient(135deg,#15803d,#16a34a)";
     const title = banner.querySelector(".tob-title");
     if (title) title.textContent = "🎉 Your Move is Complete!";
   }
@@ -2098,7 +1684,7 @@ async function checkAndShowActiveBooking(uid) {
           if (tobId) tobId.textContent = b.bookingRef || savedId.slice(0,8).toUpperCase();
           document.getElementById("trackOrderBanner").style.display = "block";
           updateTrackBanner(b); startBannerTracking(); return;
-        } else { localStorage.removeItem("packzen_active_booking"); }
+        } else localStorage.removeItem("packzen_active_booking");
       }
     }
     const snap = await window._firebase.db.collection("bookings")
@@ -2111,7 +1697,7 @@ async function checkAndShowActiveBooking(uid) {
     if (tobId) tobId.textContent = b.bookingRef || doc.id.slice(0,8).toUpperCase();
     document.getElementById("trackOrderBanner").style.display = "block";
     updateTrackBanner(b); startBannerTracking();
-  } catch(e) { }
+  } catch(e) {}
 }
 
 function dismissTrackBanner() {
@@ -2120,7 +1706,7 @@ function dismissTrackBanner() {
 }
 
 function openTrackingOrLogin() {
-  if (!currentUser) { showToast("💡 Create an account to track your booking anytime!"); openAuthModal("login"); return; }
+  if (!currentUser) { showToast("💡 Create an account to track your booking!"); openAuthModal("login"); return; }
   openTrackingModal();
 }
 
@@ -2128,7 +1714,7 @@ function openTrackingOrLogin() {
    TRACKING MODAL
    ============================================ */
 function openTrackingModal() {
-  document.getElementById("userDropdown").classList.remove("open");
+  document.getElementById("userDropdown")?.classList.remove("open");
   if (!currentUser) { openAuthModal("login"); return; }
   document.getElementById("trackingModal").style.display = "flex";
   loadTrackingData();
@@ -2153,14 +1739,14 @@ function loadTrackingData() {
 }
 
 function updateTrackingUI(b) {
-  document.getElementById("trackingBookingId").textContent = "#" + b.id.slice(-6).toUpperCase();
-  document.getElementById("trackStatus").textContent      = capitalize(b.status||"confirmed");
-  document.getElementById("trackDriver").textContent      = b.driverName   || "Not yet assigned";
-  document.getElementById("trackDriverPhone").textContent  = b.driverPhone  || "—";
-  document.getElementById("trackDate").textContent        = b.date          || "—";
-  document.getElementById("trackPickup").textContent      = b.pickup        || "—";
-  document.getElementById("trackDrop").textContent        = b.drop          || "—";
-
+  const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+  set("trackingBookingId", "#" + b.id.slice(-6).toUpperCase());
+  set("trackStatus",       capitalize(b.status||"confirmed"));
+  set("trackDriver",       b.driverName  || "Not yet assigned");
+  set("trackDriverPhone",  b.driverPhone || "—");
+  set("trackDate",         b.date        || "—");
+  set("trackPickup",       b.pickup      || "—");
+  set("trackDrop",         b.drop        || "—");
   const order = ["confirmed","assigned","packing","transit","delivered"];
   const icons  = ["✓","🚛","📦","🚚","🎉"];
   const idx    = order.indexOf(b.status||"confirmed");
@@ -2169,8 +1755,8 @@ function updateTrackingUI(b) {
     if (!dot) return;
     dot.className = "ts-dot";
     if (i < idx)   { dot.classList.add("done"); dot.textContent = "✓"; }
-    if (i === idx)  { dot.classList.add("active"); dot.textContent = icons[i]; }
-    if (i > idx)    dot.textContent = icons[i];
+    if (i === idx) { dot.classList.add("active"); dot.textContent = icons[i]; }
+    if (i > idx)   dot.textContent = icons[i];
   });
   if (b.driverLat && b.driverLng) updateTrackingMap(b.driverLat, b.driverLng);
 }
@@ -2198,13 +1784,11 @@ function openChatModal() {
     window._firebase.db.collection("bookings").doc(currentBookingId).get().then(doc => {
       if (!doc.exists) return;
       const b = doc.data();
-      const nameEl   = document.getElementById("chatDrvName");
-      const statusEl = document.getElementById("chatDrvStatus");
-      const avatarEl = document.getElementById("chatDrvAvatar");
       if (b.driverName) {
-        if (nameEl)   nameEl.textContent   = b.driverName;
-        if (statusEl) statusEl.textContent = b.driverPhone || "Your Driver";
-        if (avatarEl) avatarEl.textContent = b.driverName.charAt(0).toUpperCase();
+        const el = id => document.getElementById(id);
+        if (el("chatDrvName"))   el("chatDrvName").textContent   = b.driverName;
+        if (el("chatDrvStatus")) el("chatDrvStatus").textContent = b.driverPhone || "Your Driver";
+        if (el("chatDrvAvatar")) el("chatDrvAvatar").textContent = b.driverName.charAt(0).toUpperCase();
       }
     });
   }
@@ -2240,13 +1824,9 @@ function listenChatMessages() {
       snap.forEach(d => {
         const msg    = d.data();
         const isMine = msg.senderUid === currentUser?.uid;
-        const time   = msg.time?.toDate ? msg.time.toDate().toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"}) : "";
+        const time   = msg.time?.toDate ? msg.time.toDate().toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"}) : "";
         const senderLabel = (!isMine && msg.senderName) ? `<span class="chat-sender">${msg.senderName}</span>` : "";
-        container.innerHTML += `
-          <div class="chat-bubble ${isMine?"mine":"theirs"}">
-            ${senderLabel}<div>${msg.text}</div>
-            <div class="chat-time">${time}</div>
-          </div>`;
+        container.innerHTML += `<div class="chat-bubble ${isMine?"mine":"theirs"}">${senderLabel}<div>${msg.text}</div><div class="chat-time">${time}</div></div>`;
       });
       container.scrollTop = container.scrollHeight;
     });
@@ -2255,8 +1835,7 @@ function listenChatMessages() {
 function sendChatMessage() {
   const input = document.getElementById("chatInput");
   const text  = input.value.trim();
-  if (!text) return;
-  if (!currentBookingId) { showToast("⚠️ No active booking to chat about."); return; }
+  if (!text || !currentBookingId) return;
   input.value = "";
   window._firebase?.db.collection("chats").doc(currentBookingId).collection("messages").add({
     text, senderUid: currentUser?.uid, senderName: currentUser?.displayName || "Customer",
@@ -2272,26 +1851,10 @@ function renderChatEmpty() {
    MOVING CHECKLIST
    ============================================ */
 const CHECKLIST_DATA = {
-  "2 Weeks Before": [
-    "Notify your landlord / society", "Contact PackZen for booking confirmation",
-    "Start collecting packing boxes", "Sort items — keep, donate, discard",
-    "Update your address with bank & insurance"
-  ],
-  "1 Week Before": [
-    "Start packing non-essential items", "Label all boxes by room",
-    "Pack fragile items with extra padding", "Defrost refrigerator",
-    "Arrange for parking at both locations"
-  ],
-  "Moving Day": [
-    "Check all rooms before leaving", "Ensure utilities are transferred",
-    "Take photos of all packed items", "Keep essentials bag with you",
-    "Verify all boxes are loaded", "Do a final walkthrough of old home"
-  ],
-  "After Moving": [
-    "Unpack essentials first", "Check all items for damage",
-    "Update Aadhaar address", "Connect utilities at new home",
-    "Leave a review for PackZen ⭐"
-  ]
+  "2 Weeks Before": ["Notify your landlord / society","Contact PackZen for booking confirmation","Start collecting packing boxes","Sort items — keep, donate, discard","Update your address with bank & insurance"],
+  "1 Week Before":  ["Start packing non-essential items","Label all boxes by room","Pack fragile items with extra padding","Defrost refrigerator","Arrange for parking at both locations"],
+  "Moving Day":     ["Check all rooms before leaving","Ensure utilities are transferred","Take photos of all packed items","Keep essentials bag with you","Verify all boxes are loaded","Do a final walkthrough of old home"],
+  "After Moving":   ["Unpack essentials first","Check all items for damage","Update Aadhaar address","Connect utilities at new home","Leave a review for PackZen ⭐"]
 };
 
 function buildChecklist() {
@@ -2315,8 +1878,7 @@ function toggleChecklist(key, el) {
   saved[key] = !saved[key];
   localStorage.setItem("packzen-checklist", JSON.stringify(saved));
   el.classList.toggle("done");
-  const check = el.querySelector(".cl-check");
-  check.textContent = el.classList.contains("done") ? "✓" : "";
+  el.querySelector(".cl-check").textContent = el.classList.contains("done") ? "✓" : "";
   updateChecklistProgress();
 }
 
@@ -2324,19 +1886,13 @@ function updateChecklistProgress() {
   const saved = JSON.parse(localStorage.getItem("packzen-checklist") || "{}");
   const total = Object.values(CHECKLIST_DATA).reduce((s, a) => s + a.length, 0);
   const done  = Object.values(saved).filter(Boolean).length;
-  const pct   = total ? Math.round(done / total * 100) : 0;
   const bar   = document.getElementById("clProgressBar");
   const score = document.getElementById("clScore");
-  if (bar)   bar.style.width = pct + "%";
+  if (bar)   bar.style.width = (total ? Math.round(done / total * 100) : 0) + "%";
   if (score) score.textContent = `${done} / ${total}`;
 }
 
-function openChecklist() {
-  document.getElementById("userDropdown")?.classList.remove("open");
-  buildChecklist();
-  document.getElementById("checklistModal").style.display = "flex";
-}
-
+function openChecklist() { document.getElementById("userDropdown")?.classList.remove("open"); buildChecklist(); document.getElementById("checklistModal").style.display = "flex"; }
 function closeChecklist() { document.getElementById("checklistModal").style.display = "none"; }
 
 /* ============================================
@@ -2347,37 +1903,32 @@ function closeReviewModal() { document.getElementById("reviewModal").style.displ
 
 function setRating(n) {
   currentRating = n;
-  document.querySelectorAll(".star-btn").forEach((btn, i) => { btn.classList.toggle("lit", i < n); });
+  document.querySelectorAll(".star-btn").forEach((btn, i) => btn.classList.toggle("lit", i < n));
 }
 
 async function submitReview() {
   const text = document.getElementById("reviewText").value.trim();
   const name = document.getElementById("reviewName").value.trim();
-  if (!currentRating)  return showError("reviewMsg", "Please select a rating.");
-  if (!text)           return showError("reviewMsg", "Please write your review.");
-  if (!name)           return showError("reviewMsg", "Please enter your name.");
-
+  if (!currentRating) return showError("reviewMsg", "Please select a rating.");
+  if (!text)          return showError("reviewMsg", "Please write your review.");
+  if (!name)          return showError("reviewMsg", "Please enter your name.");
   waitForFirebase(async () => {
-    const { db } = window._firebase;
     try {
-      await db.collection("reviews").add({
+      await window._firebase.db.collection("reviews").add({
         text, name, rating: currentRating,
-        uid: currentUser?.uid || null, email: currentUser?.email || null,
+        uid: currentUser?.uid||null, email: currentUser?.email||null,
         status: "approved", date: new Date().toLocaleDateString("en-IN"),
         createdAt: firebase.firestore.FieldValue.serverTimestamp()
       });
-      closeReviewModal();
-      showToast("🌟 Thank you for your review!");
-      loadReviewsPublic();
-    } catch (e) { showError("reviewMsg", "Error submitting: " + e.message); }
+      closeReviewModal(); showToast("🌟 Thank you for your review!"); loadReviewsPublic();
+    } catch(e) { showError("reviewMsg", "Error submitting: " + e.message); }
   });
 }
 
 async function loadReviewsPublic() {
   waitForFirebase(async () => {
-    const { db } = window._firebase;
     try {
-      const snap = await db.collection("reviews").where("status","==","approved").orderBy("createdAt","desc").limit(6).get();
+      const snap = await window._firebase.db.collection("reviews").where("status","==","approved").orderBy("createdAt","desc").limit(6).get();
       if (snap.empty) return;
       const grid    = document.getElementById("reviewsGrid");
       const countEl = document.getElementById("reviewCountLabel");
@@ -2388,7 +1939,7 @@ async function loadReviewsPublic() {
         html += `<div class="review-card"><div class="review-stars">${"★".repeat(r.rating)}${"☆".repeat(5-r.rating)}</div><p class="review-text">"${r.text}"</p><div class="review-author"><div class="review-avatar">${r.name.charAt(0).toUpperCase()}</div><div><div class="review-name">${r.name}</div><div class="review-meta">${r.date||""}</div></div></div></div>`;
       });
       if (grid) grid.innerHTML = html;
-    } catch (e) {}
+    } catch(e) {}
   });
 }
 
@@ -2397,40 +1948,23 @@ async function loadReviewsPublic() {
    ============================================ */
 let currentStep = 0;
 function getSteps() { return document.querySelectorAll(".form-step"); }
-
 const STEP_LABELS = ["What type of move?","Where are you moving?","When & what type of move?","What are you moving?","Almost done — confirm & book"];
 let selectedMoveType = "home";
 
 const MOVE_TYPE_CONFIG = {
-  home: {
-    sizeLabel: "House Type", icon: "🏠",
-    sizes: [
-      { icon:"🏠", label:"1 RK",  sub:"Studio",  value:"1750" },
-      { icon:"🏡", label:"1 BHK", sub:"Small",   value:"3950" },
-      { icon:"🏘️", label:"2 BHK", sub:"Medium",  value:"5750" },
-      { icon:"🏰", label:"3 BHK", sub:"Large",   value:"7450" },
-      { icon:"🏯", label:"4 BHK", sub:"X-Large", value:"8350" },
-      { icon:"🌇", label:"Villa", sub:"Premium", value:"10800"},
-    ]
-  },
-  office: {
-    sizeLabel: "Office Size", icon: "🏢",
-    sizes: [
-      { icon:"💼", label:"Cabin",    sub:"1–5 desks",   value:"5400"  },
-      { icon:"🏢", label:"Small",    sub:"5–15 desks",  value:"8800"  },
-      { icon:"🏬", label:"Medium",   sub:"15–30 desks", value:"13700" },
-      { icon:"🏭", label:"Large",    sub:"30+ desks",   value:"21550" },
-    ]
-  },
-  single: {
-    sizeLabel: "Item Type", icon: "📦",
-    sizes: [
-      { icon:"🛋️", label:"Furniture", sub:"Sofa, bed…",   value:"0"   },
-      { icon:"🧊", label:"Appliance", sub:"Fridge, AC…",  value:"0"   },
-      { icon:"🏍️", label:"Bike/Cycle",sub:"Two-wheeler",  value:"500" },
-      { icon:"📦", label:"Boxes",     sub:"Cartons",      value:"0"   },
-    ]
-  }
+  home: { sizeLabel:"House Type", icon:"🏠", sizes:[
+    {icon:"🏠",label:"1 RK", sub:"Studio", value:"1750"},{icon:"🏡",label:"1 BHK",sub:"Small",  value:"3950"},
+    {icon:"🏘️",label:"2 BHK",sub:"Medium",value:"5750"},{icon:"🏰",label:"3 BHK",sub:"Large",  value:"7450"},
+    {icon:"🏯",label:"4 BHK",sub:"X-Large",value:"8350"},{icon:"🌇",label:"Villa",sub:"Premium",value:"10800"}
+  ]},
+  office: { sizeLabel:"Office Size", icon:"🏢", sizes:[
+    {icon:"💼",label:"Cabin",  sub:"1–5 desks",  value:"5400"},{icon:"🏢",label:"Small", sub:"5–15 desks", value:"8800"},
+    {icon:"🏬",label:"Medium", sub:"15–30 desks",value:"13700"},{icon:"🏭",label:"Large", sub:"30+ desks",  value:"21550"}
+  ]},
+  single: { sizeLabel:"Item Type", icon:"📦", sizes:[
+    {icon:"🛋️",label:"Furniture",sub:"Sofa, bed…",  value:"0"  },{icon:"🧊",label:"Appliance",sub:"Fridge, AC…",value:"0"},
+    {icon:"🏍️",label:"Bike/Cycle",sub:"Two-wheeler",value:"500"},{icon:"📦",label:"Boxes",     sub:"Cartons",   value:"0"}
+  ]}
 };
 
 function updateStepDots(n) {
@@ -2452,77 +1986,47 @@ function showStep(n) {
   const pb = document.getElementById("progressBar");
   if (pb) pb.style.width = ((n + 1) / 5) * 100 + "%";
   updateStepDots(n);
-
   setTimeout(() => {
     const formCard = document.querySelector(".form-card");
     if (formCard) {
-      const rect    = formCard.getBoundingClientRect();
-      const navH    = document.querySelector("nav")?.offsetHeight || 65;
-      const scrollY = window.scrollY + rect.top - navH - 12;
-      window.scrollTo({ top: scrollY, behavior: "smooth" });
+      const navH = document.querySelector("nav")?.offsetHeight || 65;
+      window.scrollTo({ top: window.scrollY + formCard.getBoundingClientRect().top - navH - 12, behavior: "smooth" });
     }
   }, 50);
-
-  if (n === 2) {
-    const vehicleSelect = document.getElementById("vehicle");
-    if (!vehicleSelect?.value) {
-      const firstCard = document.querySelector(".vehicle-card");
-      if (firstCard) firstCard.click();
-    }
-  }
+  if (n === 2) { const vc = document.getElementById("vehicle"); if (!vc?.value) document.querySelector(".vehicle-card")?.click(); }
   if (n === 3) renderFurnitureGrid(selectedMoveType || "home");
-  const _steps = getSteps();
-  if (n === _steps.length - 1) { calculateQuote(true); autoFillCustomerDetails(); }
+  if (n === getSteps().length - 1) { calculateQuote(true); autoFillCustomerDetails(); }
 }
 
 function autoFillCustomerDetails() {
   if (!currentUser || !window._firebase) return;
-  const nameEl  = document.getElementById("custName");
-  const phoneEl = document.getElementById("custPhone");
   window._firebase.db.collection("users").doc(currentUser.uid).get()
     .then(doc => {
       if (!doc.exists) return;
       const d = doc.data();
+      const nameEl  = document.getElementById("custName");
+      const phoneEl = document.getElementById("custPhone");
       if (nameEl  && !nameEl.value.trim())  nameEl.value  = d.name  || currentUser.displayName || "";
       if (phoneEl && !phoneEl.value.trim()) phoneEl.value = d.phone || "";
-    })
-    .catch(() => {
-      if (document.getElementById("custName") && !document.getElementById("custName").value.trim())
-        document.getElementById("custName").value = currentUser.displayName || "";
-    });
+    }).catch(() => {});
 }
 
 function nextStep() {
-  const pickup  = document.getElementById("pickup");
-  const drop    = document.getElementById("drop");
-  const house   = document.getElementById("house");
-  const vehicle = document.getElementById("vehicle");
-
-  if (currentStep === 0) {
-    if (!document.getElementById("moveType")?.value) { showToast("👆 Please select your move type to continue"); return; }
-  }
+  if (currentStep === 0 && !document.getElementById("moveType")?.value) { showToast("👆 Please select your move type"); return; }
   if (currentStep === 1) {
-    let ok = true;
-    if (!pickup?.value.trim()) { shakeField(pickup); showToast("📍 Please enter a pickup location"); ok = false; }
-    else if (!drop?.value.trim()) { shakeField(drop); showToast("🏁 Please enter a drop location"); ok = false; }
-    if (!ok) return;
+    if (!document.getElementById("pickup")?.value.trim()) { showToast("📍 Please enter a pickup location"); return; }
+    if (!document.getElementById("drop")?.value.trim())   { showToast("🏁 Please enter a drop location"); return; }
   }
   if (currentStep === 2) {
-    let ok = true;
-    const dateVal = document.getElementById("shiftDate")?.value;
-    const timeVal = document.getElementById("shiftTime")?.value;
-    if (!dateVal) { showToast("📅 Please select a moving date"); ok = false; }
-    else if (!timeVal) { showToast("🕐 Please select a time slot"); ok = false; }
-    else if (!house?.value) { showToast("🏠 Please select your " + (selectedMoveType === "office" ? "office size" : "house type")); ok = false; }
-    else if (!isIntercityMove && !vehicle?.value) { showToast("🚚 Please select a vehicle type"); ok = false; }
-    if (!ok) return;
+    if (!document.getElementById("shiftDate")?.value) { showToast("📅 Please select a moving date"); return; }
+    if (!document.getElementById("shiftTime")?.value) { showToast("🕐 Please select a time slot"); return; }
+    if (!document.getElementById("house")?.value) { showToast("🏠 Please select your house type"); return; }
+    if (!isIntercityMove && !document.getElementById("vehicle")?.value) { showToast("🚚 Please select a vehicle type"); return; }
   }
   if (currentStep < getSteps().length - 1) { currentStep++; showStep(currentStep); }
 }
 
-function prevStep() {
-  if (currentStep > 0) { currentStep--; showStep(currentStep); }
-}
+function prevStep() { if (currentStep > 0) { currentStep--; showStep(currentStep); } }
 
 function shakeField(el) {
   if (!el) return;
@@ -2536,10 +2040,6 @@ function selectMoveType(el, type) {
   document.querySelectorAll(".move-type-card, .bs-move-card").forEach(c => c.classList.remove("selected"));
   el.classList.add("selected");
   renderSizeCards(type);
-  const houseTrigger = document.getElementById("houseTrigger");
-  const houseTriggerText = document.getElementById("houseTriggerText");
-  if (houseTrigger) houseTrigger.classList.remove("filled");
-  if (houseTriggerText) houseTriggerText.textContent = "Tap to select house type";
   const houseEl = document.getElementById("house");
   if (houseEl) houseEl.value = "";
 }
@@ -2550,15 +2050,10 @@ function renderSizeCards(type) {
   const cards  = document.getElementById("houseCards");
   const select = document.getElementById("house");
   if (label) label.textContent = config.sizeLabel;
-  if (!cards) return;
-
-  cards.innerHTML = config.sizes.map(s => `
+  if (cards) cards.innerHTML = config.sizes.map(s => `
     <div class="select-card" onclick="selectCard(this,'house','${s.value}')">
-      <div class="sc-icon">${s.icon}</div>
-      <div class="sc-label">${s.label}</div>
-      <div class="sc-sub">${s.sub}</div>
+      <div class="sc-icon">${s.icon}</div><div class="sc-label">${s.label}</div><div class="sc-sub">${s.sub}</div>
     </div>`).join("");
-
   if (select) {
     select.innerHTML = '<option value="">Select size</option>' +
       config.sizes.map(s => `<option value="${s.value}">${s.label}</option>`).join("");
@@ -2568,70 +2063,16 @@ function renderSizeCards(type) {
 
 const FURNITURE_CATEGORIES = {
   home: [
-    { id:"cat-living",  icon:"🛋️", label:"Living Room",
-      items: [
-        { id:"sofaCheck",      emoji:"🛋️", name:"Sofa"          },
-        { id:"tvCheck",        emoji:"📺", name:"TV"            },
-        { id:"tvUnitCheck",    emoji:"🗄️", name:"TV Unit"       },
-        { id:"coffeeCheck",    emoji:"☕", name:"Coffee Table"  },
-        { id:"acCheck",        emoji:"❄️", name:"AC Unit"       },
-      ]
-    },
-    { id:"cat-bedroom", icon:"🛏️", label:"Bedroom",
-      items: [
-        { id:"bedCheck",       emoji:"🛏️", name:"Bed"           },
-        { id:"wardrobeCheck",  emoji:"🚪", name:"Wardrobe"      },
-        { id:"dressingCheck",  emoji:"🪞", name:"Dressing Table"},
-        { id:"sideTableCheck", emoji:"🪑", name:"Side Table"    },
-      ]
-    },
-    { id:"cat-kitchen", icon:"🍳", label:"Kitchen",
-      items: [
-        { id:"fridgeCheck",    emoji:"🧊", name:"Fridge"              },
-        { id:"wmCheck",        emoji:"🫧", name:"Washing Machine"     },
-        { id:"microwaveCheck", emoji:"📦", name:"Microwave"           },
-        { id:"chimneyCheck",   emoji:"🔧", name:"Chimney"             },
-        { id:"diningCheck",    emoji:"🪑", name:"Dining Table+Chairs" },
-      ]
-    },
-    { id:"cat-other",   icon:"📦", label:"Other Items",
-      items: [
-        { id:"bikeCheck",  emoji:"🏍️", name:"Bike/Scooter" },
-        { id:"cycleCheck", emoji:"🚲", name:"Cycle"         },
-        { id:"plantCheck", emoji:"🪴", name:"Large Plants"  },
-        { id:"gymCheck",   emoji:"🏋️", name:"Gym Equipment" },
-      ]
-    }
+    {id:"cat-living", icon:"🛋️",label:"Living Room",items:[{id:"sofaCheck",emoji:"🛋️",name:"Sofa"},{id:"tvCheck",emoji:"📺",name:"TV"},{id:"tvUnitCheck",emoji:"🗄️",name:"TV Unit"},{id:"coffeeCheck",emoji:"☕",name:"Coffee Table"},{id:"acCheck",emoji:"❄️",name:"AC Unit"}]},
+    {id:"cat-bedroom",icon:"🛏️",label:"Bedroom",    items:[{id:"bedCheck",emoji:"🛏️",name:"Bed"},{id:"wardrobeCheck",emoji:"🚪",name:"Wardrobe"},{id:"dressingCheck",emoji:"🪞",name:"Dressing Table"},{id:"sideTableCheck",emoji:"🪑",name:"Side Table"}]},
+    {id:"cat-kitchen",icon:"🍳",label:"Kitchen",     items:[{id:"fridgeCheck",emoji:"🧊",name:"Fridge"},{id:"wmCheck",emoji:"🫧",name:"Washing Machine"},{id:"microwaveCheck",emoji:"📦",name:"Microwave"},{id:"chimneyCheck",emoji:"🔧",name:"Chimney"},{id:"diningCheck",emoji:"🪑",name:"Dining Table+Chairs"}]},
+    {id:"cat-other",  icon:"📦",label:"Other Items", items:[{id:"bikeCheck",emoji:"🏍️",name:"Bike/Scooter"},{id:"cycleCheck",emoji:"🚲",name:"Cycle"},{id:"plantCheck",emoji:"🪴",name:"Large Plants"},{id:"gymCheck",emoji:"🏋️",name:"Gym Equipment"}]}
   ],
   office: [
-    { id:"cat-workstation", icon:"🖥️", label:"Workstation",
-      items: [
-        { id:"deskCheck",    emoji:"🖥️", name:"Office Desk" },
-        { id:"chairCheck",   emoji:"🪑", name:"Chair"        },
-        { id:"serverCheck",  emoji:"💾", name:"Server/PC"    },
-        { id:"printerCheck", emoji:"🖨️", name:"Printer"      },
-      ]
-    },
-    { id:"cat-cabin", icon:"🏢", label:"Cabin / Meeting",
-      items: [
-        { id:"confCheck",        emoji:"📋", name:"Conference Table" },
-        { id:"cabinetCheck",     emoji:"🗄️", name:"Filing Cabinet"   },
-        { id:"whiteboardCheck",  emoji:"📝", name:"Whiteboard"        },
-      ]
-    },
-    { id:"cat-appliances", icon:"❄️", label:"Appliances",
-      items: [
-        { id:"fridgeCheck", emoji:"🧊", name:"Fridge"            },
-        { id:"acCheck",     emoji:"❄️", name:"AC Unit"           },
-        { id:"wmCheck",     emoji:"🫧", name:"Washing Machine"   },
-      ]
-    },
-    { id:"cat-other", icon:"📦", label:"Other Items",
-      items: [
-        { id:"plantCheck", emoji:"🪴", name:"Large Plants"   },
-        { id:"gymCheck",   emoji:"🏋️", name:"Gym Equipment"  },
-      ]
-    }
+    {id:"cat-workstation",icon:"🖥️",label:"Workstation",items:[{id:"deskCheck",emoji:"🖥️",name:"Office Desk"},{id:"chairCheck",emoji:"🪑",name:"Chair"},{id:"serverCheck",emoji:"💾",name:"Server/PC"},{id:"printerCheck",emoji:"🖨️",name:"Printer"}]},
+    {id:"cat-cabin",icon:"🏢",label:"Cabin / Meeting",items:[{id:"confCheck",emoji:"📋",name:"Conference Table"},{id:"cabinetCheck",emoji:"🗄️",name:"Filing Cabinet"},{id:"whiteboardCheck",emoji:"📝",name:"Whiteboard"}]},
+    {id:"cat-appliances",icon:"❄️",label:"Appliances",items:[{id:"fridgeCheck",emoji:"🧊",name:"Fridge"},{id:"acCheck",emoji:"❄️",name:"AC Unit"},{id:"wmCheck",emoji:"🫧",name:"Washing Machine"}]},
+    {id:"cat-other",icon:"📦",label:"Other Items",items:[{id:"plantCheck",emoji:"🪴",name:"Large Plants"},{id:"gymCheck",emoji:"🏋️",name:"Gym Equipment"}]}
   ]
 };
 
@@ -2640,22 +2081,19 @@ function renderFurnitureGrid(type) {
   if (!grid) return;
   const categories = FURNITURE_CATEGORIES[type] || FURNITURE_CATEGORIES.home;
   const FREE_CATS  = ["cat-kitchen","cat-other","cat-appliances"];
-
-  const itemCard = (item, catId) => {
-    const isFree = FREE_CATS.includes(catId);
-    return `
+  const itemCard = (item, catId) => `
     <label class="furniture-card">
       <input type="checkbox" id="${item.id}" onchange="calculateQuote(true)" aria-label="${item.name}">
       <div class="fc-body">
         <div class="fc-check">✓</div>
         <span class="fc-emoji">${item.emoji}</span>
         <span class="fc-name">${item.name}</span>
-        <span class="fc-price" style="${isFree ? 'color:#94a3b8' : ''}">${isFree ? 'FREE' : '+₹150'}</span>
+        <span class="fc-price" style="${FREE_CATS.includes(catId)?"color:#94a3b8":""}">
+          ${FREE_CATS.includes(catId)?"FREE":"+₹150"}
+        </span>
       </div>
     </label>`;
-  };
-
-  const categoryBlock = (cat) => `
+  const categoryBlock = cat => `
     <div class="fc-category">
       <div class="fc-category-header" onclick="toggleFurnitureCategory('${cat.id}')">
         <span class="fc-cat-icon">${cat.icon}</span>
@@ -2666,17 +2104,15 @@ function renderFurnitureGrid(type) {
         ${cat.items.map(item => itemCard(item, cat.id)).join("")}
       </div>
     </div>`;
-
   const cartonSection = `
     <div class="fc-category">
       <div class="fc-category-header" onclick="toggleFurnitureCategory('cat-carton')">
-        <span class="fc-cat-icon">📦</span>
-        <span class="fc-cat-label">Carton Boxes (Our Service)</span>
+        <span class="fc-cat-icon">📦</span><span class="fc-cat-label">Carton Boxes</span>
         <span class="fc-cat-arrow" id="arrow-cat-carton">▾</span>
       </div>
       <div class="fc-category-items" id="cat-carton" style="display:flex">
         <div class="carton-box-row">
-          <span class="carton-label">📦 How many carton boxes do you need?</span>
+          <span class="carton-label">📦 How many carton boxes?</span>
           <div class="carton-qty-wrap">
             <button class="qty-btn" onclick="changeCartonQty(-1)">−</button>
             <input type="number" id="cartonQty" value="0" min="0" max="50" class="fc-qty" onchange="calculateQuote(true)">
@@ -2686,7 +2122,6 @@ function renderFurnitureGrid(type) {
         </div>
       </div>
     </div>`;
-
   grid.innerHTML = categories.map(categoryBlock).join("") + cartonSection;
 }
 
@@ -2702,8 +2137,7 @@ function toggleFurnitureCategory(id) {
 function changeCartonQty(delta) {
   const input = document.getElementById("cartonQty");
   if (!input) return;
-  const newVal = Math.max(0, Math.min(50, (parseInt(input.value) || 0) + delta));
-  input.value = newVal;
+  input.value = Math.max(0, Math.min(50, (parseInt(input.value) || 0) + delta));
   calculateQuote(true);
 }
 
@@ -2719,8 +2153,7 @@ function selectCard(el, type, value) {
 function changeQty(id, delta) {
   const input = document.getElementById(id);
   if (!input) return;
-  const newVal = Math.max(1, Math.min(9, (parseInt(input.value) || 1) + delta));
-  input.value = newVal;
+  input.value = Math.max(1, Math.min(9, (parseInt(input.value) || 1) + delta));
   calculateQuote(true);
 }
 
@@ -2733,13 +2166,12 @@ function getFurnitureSummary() {
   const checks = [
     ["sofaCheck","Sofa"],["bedCheck","Bed"],["tvCheck","TV"],["tvUnitCheck","TV Unit"],
     ["coffeeCheck","Coffee Table"],["acCheck","AC Unit"],["wardrobeCheck","Wardrobe"],
-    ["dressingCheck","Dressing Table"],["sideTableCheck","Side Table"],
-    ["fridgeCheck","Fridge"],["wmCheck","Washing Machine"],["microwaveCheck","Microwave"],
-    ["chimneyCheck","Chimney"],["diningCheck","Dining Table"],["bikeCheck","Bike/Scooter"],
-    ["cycleCheck","Cycle"],["plantCheck","Large Plants"],["gymCheck","Gym Equipment"],
-    ["deskCheck","Office Desk"],["chairCheck","Chair"],["cabinetCheck","Filing Cabinet"],
-    ["serverCheck","Server/PC"],["printerCheck","Printer"],["confCheck","Conf. Table"],
-    ["whiteboardCheck","Whiteboard"],
+    ["dressingCheck","Dressing Table"],["sideTableCheck","Side Table"],["fridgeCheck","Fridge"],
+    ["wmCheck","Washing Machine"],["microwaveCheck","Microwave"],["chimneyCheck","Chimney"],
+    ["diningCheck","Dining Table"],["bikeCheck","Bike/Scooter"],["cycleCheck","Cycle"],
+    ["plantCheck","Large Plants"],["gymCheck","Gym Equipment"],["deskCheck","Office Desk"],
+    ["chairCheck","Chair"],["cabinetCheck","Filing Cabinet"],["serverCheck","Server/PC"],
+    ["printerCheck","Printer"],["confCheck","Conf. Table"],["whiteboardCheck","Whiteboard"]
   ];
   const items    = checks.filter(([id]) => document.getElementById(id)?.checked).map(([,name]) => name);
   const cartonQty = parseInt(document.getElementById("cartonQty")?.value || 0);
@@ -2748,63 +2180,34 @@ function getFurnitureSummary() {
 }
 
 /* ============================================
-   createDriver
+   CREATE DRIVER (Admin)
    ============================================ */
 async function createDriver() {
   if (!currentUser) { showToast("⚠️ Please login as admin."); return; }
-
   const name     = document.getElementById("newDriverName").value.trim();
   const email    = document.getElementById("newDriverEmail").value.trim();
   const password = document.getElementById("newDriverPassword").value.trim();
   const msg      = document.getElementById("adminMsg");
-
-  const setMsg = (text, ok) => {
-    msg.style.color = ok ? "#16a34a" : "#dc2626";
-    msg.textContent = text;
-  };
-
-  if (!name)             return setMsg("⚠️ Please enter the driver's name.", false);
-  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
-                         return setMsg("⚠️ Please enter a valid email address.", false);
+  const setMsg   = (text, ok) => { msg.style.color = ok ? "#16a34a" : "#dc2626"; msg.textContent = text; };
+  if (!name)             return setMsg("⚠️ Please enter driver name.", false);
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return setMsg("⚠️ Invalid email.", false);
   if (password.length < 6) return setMsg("⚠️ Password must be at least 6 characters.", false);
-
-  const { db } = window._firebase;
-  const adminSnap = await db.collection("users").doc(currentUser.uid).get();
-  if (!adminSnap.exists || adminSnap.data().role !== "admin") {
-    return setMsg("⚠️ Access denied. Admin role required.", false);
-  }
-
+  const adminSnap = await window._firebase.db.collection("users").doc(currentUser.uid).get();
+  if (!adminSnap.exists || adminSnap.data().role !== "admin") return setMsg("⚠️ Access denied.", false);
   setMsg("⏳ Creating driver account...", true);
-
   try {
     const secondaryApp  = firebase.initializeApp(firebase.app().options, "driverCreation_" + Date.now());
     const secondaryAuth = secondaryApp.auth();
-
-    const cred      = await secondaryAuth.createUserWithEmailAndPassword(email, password);
-    const driverUid = cred.user.uid;
-
-    await secondaryAuth.signOut();
-    await secondaryApp.delete();
-
-    await db.collection("users").doc(driverUid).set({
-      name, email, role: "driver", isOnline: false,
-      phone: "", vehicle: "", rating: 0, totalMoves: 0,
-      createdBy: currentUser.uid,
-      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    const cred = await secondaryAuth.createUserWithEmailAndPassword(email, password);
+    await secondaryAuth.signOut(); await secondaryApp.delete();
+    await window._firebase.db.collection("users").doc(cred.user.uid).set({
+      name, email, role: "driver", isOnline: false, phone: "", vehicle: "", rating: 0, totalMoves: 0,
+      createdBy: currentUser.uid, createdAt: firebase.firestore.FieldValue.serverTimestamp()
     });
-
-    setMsg(`✅ Driver "${name}" created! They can now log in at driver.html`, true);
-    document.getElementById("newDriverName").value     = "";
-    document.getElementById("newDriverEmail").value    = "";
-    document.getElementById("newDriverPassword").value = "";
-    showToast(`✅ Driver account created for ${name}`);
-
-  } catch (error) {
-    if (error.code === "auth/email-already-in-use") {
-      setMsg("⚠️ A driver with this email already exists.", false);
-    } else {
-      setMsg("⚠️ " + (error.message || "Failed to create driver."), false);
-    }
+    setMsg(`✅ Driver "${name}" created!`, true);
+    ["newDriverName","newDriverEmail","newDriverPassword"].forEach(id => { document.getElementById(id).value = ""; });
+  } catch(error) {
+    setMsg("⚠️ " + (error.code === "auth/email-already-in-use" ? "Email already exists." : error.message), false);
   }
 }
 
@@ -2812,52 +2215,34 @@ async function createDriver() {
    BOOK WITHOUT PAYMENT
    ============================================ */
 function bookWithoutPayment() {
-  if (!currentUser) { showToast("👋 Please login or create an account to book."); openAuthModal("login"); return; }
-
+  if (!currentUser) { showToast("👋 Please login to book."); openAuthModal("login"); return; }
   const nameEl  = document.getElementById("custName");
   const phoneEl = document.getElementById("custPhone");
   const name    = nameEl?.value?.trim();
   const phone   = phoneEl?.value?.trim();
-
-  if (!name) {
-    nameEl.style.borderColor = "#e53e3e"; nameEl.focus();
-    nameEl.placeholder = "⚠️ Please enter your name";
-    nameEl.addEventListener("input", () => { nameEl.style.borderColor = ""; }, { once: true });
-    return;
-  }
-  if (!phone || phone.length < 10) {
-    phoneEl.style.borderColor = "#e53e3e"; phoneEl.focus();
-    phoneEl.placeholder = "⚠️ Please enter valid 10-digit number";
-    phoneEl.addEventListener("input", () => { phoneEl.style.borderColor = ""; }, { once: true });
-    return;
-  }
-  if (lastCalculatedTotal === 0) { showToast("⚠️ Price not calculated yet. Please enter pickup & drop locations."); return; }
-
-  const pickup     = document.getElementById("pickup")?.value    || "";
-  const drop       = document.getElementById("drop")?.value      || "";
-  const date       = document.getElementById("shiftDate")?.value || "";
-  const bookingRef = "PKZ-" + Date.now().toString(36).toUpperCase().slice(-6);
-
+  if (!name)  { nameEl.style.borderColor = "#e53e3e"; nameEl.focus(); return; }
+  if (!phone || phone.length < 10) { phoneEl.style.borderColor = "#e53e3e"; phoneEl.focus(); return; }
+  if (lastCalculatedTotal === 0) { showToast("⚠️ Price not calculated yet."); return; }
   if (!window._firebase) { showToast("⚠️ Service not ready. Try again."); return; }
-
+  const pickup = document.getElementById("pickup")?.value || "";
+  const drop   = document.getElementById("drop")?.value   || "";
+  const date   = document.getElementById("shiftDate")?.value || "";
+  const bookingRef = "PKZ-" + Date.now().toString(36).toUpperCase().slice(-6);
   const btn = document.querySelector(".btn-pay");
   if (btn) { btn.disabled = true; btn.textContent = "⏳ Saving..."; }
-
-  const houseEl2   = document.getElementById("house");
-  const vehicleEl2 = document.getElementById("vehicle");
+  const houseEl   = document.getElementById("house");
+  const vehicleEl = document.getElementById("vehicle");
   const discountedTotal = Math.max(lastCalculatedTotal - promoDiscount, 0);
-
   window._firebase.db.collection("bookings").add({
-    bookingRef, customerUid: currentUser.uid, customerName: name, phone,
-    pickup, drop, date, moveType: selectedMoveType,
-    house:   houseEl2?.options[houseEl2?.selectedIndex]?.text    || "",
-    vehicle: vehicleEl2?.options[vehicleEl2?.selectedIndex]?.text || "",
+    bookingRef, customerUid: currentUser.uid, customerName: name, phone, pickup, drop, date,
+    moveType: selectedMoveType,
+    house:   houseEl?.options[houseEl?.selectedIndex]?.text    || "",
+    vehicle: vehicleEl?.options[vehicleEl?.selectedIndex]?.text || "",
     furniture: getFurnitureSummary(),
-    pickupFloor: document.getElementById("pickupFloor")?.options[document.getElementById("pickupFloor")?.selectedIndex]?.text || "",
-    dropFloor: document.getElementById("dropFloor")?.options[document.getElementById("dropFloor")?.selectedIndex]?.text || "",
+    pickupFloor: document.getElementById("pickupFloor")?.options[document.getElementById("pickupFloor")?.selectedIndex]?.text||"",
+    dropFloor:   document.getElementById("dropFloor")?.options[document.getElementById("dropFloor")?.selectedIndex]?.text||"",
     liftAvailable: !!document.getElementById("liftAvailable")?.checked,
-    packingService: false,
-    total: discountedTotal, originalTotal: lastCalculatedTotal,
+    packingService: false, total: discountedTotal, originalTotal: lastCalculatedTotal,
     paid: 0, paymentType: "pay_later", status: "confirmed", source: "direct",
     promoDiscount, photos: uploadedPhotos.slice(0, 3),
     createdAt: firebase.firestore.FieldValue.serverTimestamp()
@@ -2865,36 +2250,16 @@ function bookWithoutPayment() {
     currentBookingId = docRef.id;
     localStorage.setItem("packzen_active_booking", docRef.id);
     if (btn) { btn.disabled = false; btn.textContent = "📋 Confirm Booking · Pay on Delivery"; }
-
     queueSMS(phone, "booking_confirmed", { name, bookingRef, date, pickup, total: discountedTotal });
     notifyOwner(bookingRef, name, phone, pickup, drop, date, discountedTotal, "pay_later", "direct");
-
-    const houseEl   = document.getElementById("house");
-    const vehicleEl = document.getElementById("vehicle");
     showConfirmationCard({
       bookingRef, name, phone: "+91 " + phone, pickup, drop, date,
       house:   houseEl?.options[houseEl?.selectedIndex]?.text    || "—",
       vehicle: vehicleEl?.options[vehicleEl?.selectedIndex]?.text || "—",
       total: discountedTotal, paymentLabel: "Cash on moving day",
-      paymentNote: "Pay full amount to driver on moving day",
-      source: "direct", showInvoice: false
+      paymentNote: "Pay full amount to driver on moving day", source: "direct", showInvoice: false
     });
-
-    pendingWhatsAppMsg =
-      `✅ *Booking Confirmed — PackZen* 🚚\n\n` +
-      `📌 *Booking ID:* ${bookingRef}\n👤 *Name:* ${name}\n` +
-      `📍 *Pickup:* ${pickup}\n🏁 *Drop:* ${drop}\n` +
-      `📅 *Date:* ${date||"To be confirmed"}\n` +
-      `💰 *Estimate:* ₹${discountedTotal.toLocaleString("en-IN")}\n` +
-      `💳 *Payment:* Pay on moving day\n\n` +
-      `Our team will call you shortly.\n— PackZen Packers & Movers | 📞 9945095453`;
-
-    pendingAdminMsg =
-      `🔔 *New Booking (Pay Later)* — PackZen\n\n` +
-      `📌 ID: ${bookingRef}\n👤 ${name} | 📞 ${phone}\n` +
-      `📍 ${pickup} → ${drop}\n📅 Date: ${date||"—"}\n` +
-      `💰 Estimate: ₹${discountedTotal.toLocaleString("en-IN")}`;
-
+    pendingWhatsAppMsg = `✅ *Booking Confirmed — PackZen* 🚚\n\n📌 *Booking ID:* ${bookingRef}\n👤 *Name:* ${name}\n📍 *Pickup:* ${pickup}\n🏁 *Drop:* ${drop}\n📅 *Date:* ${date||"TBD"}\n💰 *Estimate:* ₹${discountedTotal.toLocaleString("en-IN")}\n💳 *Payment:* Pay on moving day\n\nOur team will call you shortly.\n— PackZen | 📞 9945095453`;
     showToast("✅ Booking saved! ID: " + bookingRef);
   }).catch(e => {
     if (btn) { btn.disabled = false; btn.textContent = "📋 Confirm Booking · Pay on Delivery"; }
@@ -2905,16 +2270,12 @@ function bookWithoutPayment() {
 function copyBookingId() {
   const id = document.getElementById("bookingIdDisplay")?.textContent;
   if (!id || id === "—") return;
-  navigator.clipboard.writeText(id).then(() => showToast("✅ Booking ID copied!")).catch(() => {
-    const el = document.createElement("textarea");
-    el.value = id; document.body.appendChild(el); el.select();
-    document.execCommand("copy"); document.body.removeChild(el);
-    showToast("✅ Booking ID copied!");
-  });
+  navigator.clipboard.writeText(id).then(() => showToast("✅ Booking ID copied!"))
+    .catch(() => { const el = document.createElement("textarea"); el.value = id; document.body.appendChild(el); el.select(); document.execCommand("copy"); document.body.removeChild(el); showToast("✅ Booking ID copied!"); });
 }
 
 /* ============================================
-   DASHBOARD FUNCTIONS
+   DASHBOARD
    ============================================ */
 function closeDashboard() { document.getElementById("dashboardModal").style.display = "none"; }
 
@@ -2934,19 +2295,14 @@ function switchDashTab(tab, el) {
 
 function loadUserQuotes() {
   if (!currentUser || !window._firebase) return;
-  window._firebase.db.collection("quotes").where("uid","==",currentUser.uid)
-    .orderBy("createdAt","desc").limit(10).get()
+  window._firebase.db.collection("quotes").where("uid","==",currentUser.uid).orderBy("createdAt","desc").limit(10).get()
     .then(snap => {
       const list = document.getElementById("quotesList");
       if (!list) return;
       if (snap.empty) { list.innerHTML = '<div class="dash-empty">No saved quotes yet.</div>'; return; }
       list.innerHTML = snap.docs.map(d => {
         const q = d.data();
-        return `<div class="quote-item">
-          <div class="qi-route">📍 ${q.pickup||"?"} → 🏁 ${q.drop||"?"}</div>
-          <div class="qi-details"><span>${q.house||"—"}</span><span>${q.vehicle||"—"}</span><span class="qi-price">₹${(q.total||0).toLocaleString("en-IN")}</span></div>
-          <div class="qi-date">${q.date||""}</div>
-        </div>`;
+        return `<div class="quote-item"><div class="qi-route">📍 ${q.pickup||"?"} → 🏁 ${q.drop||"?"}</div><div class="qi-details"><span>${q.house||"—"}</span><span>${q.vehicle||"—"}</span><span class="qi-price">₹${(q.total||0).toLocaleString("en-IN")}</span></div><div class="qi-date">${q.date||""}</div></div>`;
       }).join("");
     }).catch(() => {});
 }
@@ -2955,45 +2311,29 @@ function loadUserBookings() {
   if (!currentUser || !window._firebase) return;
   const list = document.getElementById("bookingsList");
   if (list) list.innerHTML = '<div class="dash-empty" style="text-align:center;padding:20px">Loading...</div>';
-
-  window._firebase.db.collection("bookings")
-    .where("customerUid","==",currentUser.uid)
-    .orderBy("createdAt","desc").limit(10).get()
+  window._firebase.db.collection("bookings").where("customerUid","==",currentUser.uid).orderBy("createdAt","desc").limit(10).get()
     .then(snap => {
       if (!list) return;
       if (snap.empty) { list.innerHTML = '<div class="dash-empty">No bookings yet.</div>'; return; }
-      const statusColors = { confirmed:"#0057ff", assigned:"#7c3aed", packing:"#0ea5e9", transit:"#f97316", delivered:"#16a34a", pending:"#d97706", cancelled:"#dc2626" };
-      const statusIcons  = { confirmed:"📋", assigned:"🚛", packing:"📦", transit:"🚚", delivered:"✅", cancelled:"❌" };
+      const statusColors = {confirmed:"#0057ff",assigned:"#7c3aed",packing:"#0ea5e9",transit:"#f97316",delivered:"#16a34a",cancelled:"#dc2626"};
+      const statusIcons  = {confirmed:"📋",assigned:"🚛",packing:"📦",transit:"🚚",delivered:"✅",cancelled:"❌"};
       list.innerHTML = snap.docs.map(d => {
-        const b     = d.data();
-        const id    = d.id;
+        const b = d.data(), id = d.id;
         const color = statusColors[b.status] || "#5a6a8a";
         const icon  = statusIcons[b.status]  || "📋";
-        const src   = b.source === "whatsapp" ? "💬 " : b.paymentType === "pay_later" ? "📋 " : "💳 ";
         const canCancel     = !["packing","transit","delivered","cancelled"].includes(b.status);
         const canReschedule = !["transit","delivered","cancelled"].includes(b.status);
         const canRate       = b.status === "delivered" && !b.driverRating;
         const canClaim      = b.status === "delivered" && !b.damageClaimed;
-        const intercityBadge = b.isIntercity ? `<span class="bk-badge ic">🚛 Intercity</span>` : "";
-        const ratingBadge    = b.driverRating ? `<span class="bk-badge rated">⭐ ${b.driverRating}/5</span>` : "";
         return `<div class="bk-card">
-          <div class="bk-card-top">
-            <div class="bk-route">${src}${(b.pickup||"?").split(",")[0]} → ${(b.drop||"?").split(",")[0]}</div>
-            <div class="bk-status" style="color:${color}">${icon} ${capitalize(b.status||"confirmed")}</div>
-          </div>
-          <div class="bk-meta">
-            <span>₹${(b.total||0).toLocaleString("en-IN")}</span>
-            <span>${b.date||"Date TBD"}</span>
-            <span style="font-size:.72rem;color:#5a6a8a">${b.bookingRef||""}</span>
-            ${intercityBadge}${ratingBadge}
-          </div>
-          ${canCancel || canReschedule || canRate || canClaim ? `
-          <div class="bk-actions">
-            ${canReschedule ? `<button class="bk-btn reschedule" onclick="openRescheduleModal('${id}','${b.bookingRef||id}','${b.date||""}')">📅 Reschedule</button>` : ""}
-            ${canCancel     ? `<button class="bk-btn cancel"     onclick="openCancelModal('${id}','${b.bookingRef||id}','${b.status||""}')">✕ Cancel</button>` : ""}
-            ${canRate       ? `<button class="bk-btn rate"       onclick="openRateDriverModal('${id}','${b.bookingRef||id}','${b.driverName||""}')">⭐ Rate Driver</button>` : ""}
-            ${canClaim      ? `<button class="bk-btn claim"      onclick="openDamageModal('${id}','${b.bookingRef||id}')">🔧 Report Damage</button>` : ""}
-          </div>` : ""}
+          <div class="bk-card-top"><div class="bk-route">${(b.pickup||"?").split(",")[0]} → ${(b.drop||"?").split(",")[0]}</div><div class="bk-status" style="color:${color}">${icon} ${capitalize(b.status||"confirmed")}</div></div>
+          <div class="bk-meta"><span>₹${(b.total||0).toLocaleString("en-IN")}</span><span>${b.date||"Date TBD"}</span><span style="font-size:.72rem;color:#5a6a8a">${b.bookingRef||""}</span></div>
+          ${canCancel||canReschedule||canRate||canClaim?`<div class="bk-actions">
+            ${canReschedule?`<button class="bk-btn reschedule" onclick="openRescheduleModal('${id}','${b.bookingRef||id}','${b.date||""}')">📅 Reschedule</button>`:""}
+            ${canCancel?`<button class="bk-btn cancel" onclick="openCancelModal('${id}','${b.bookingRef||id}','${b.status||""}')">✕ Cancel</button>`:""}
+            ${canRate?`<button class="bk-btn rate" onclick="openRateDriverModal('${id}','${b.bookingRef||id}','${b.driverName||""}')">⭐ Rate Driver</button>`:""}
+            ${canClaim?`<button class="bk-btn claim" onclick="openDamageModal('${id}','${b.bookingRef||id}')">🔧 Report Damage</button>`:""}
+          </div>`:""}
         </div>`;
       }).join("");
     }).catch(() => {});
@@ -3004,16 +2344,11 @@ function loadProfileData() {
   window._firebase.db.collection("users").doc(currentUser.uid).get().then(doc => {
     if (!doc.exists) return;
     const d = doc.data();
-    const nameEl      = document.getElementById("profileName");
-    const emailEl     = document.getElementById("profileEmail");
-    const phoneEl     = document.getElementById("profilePhone");
-    const prefEmailEl = document.getElementById("prefEmail");
-    const prefSMSEl   = document.getElementById("prefSMS");
-    if (nameEl)      nameEl.value  = d.name  || "";
-    if (emailEl)     emailEl.value = d.email || currentUser.email || "";
-    if (phoneEl)     phoneEl.value = d.phone || "";
-    if (prefEmailEl) prefEmailEl.checked = d.prefEmail !== false;
-    if (prefSMSEl)   prefSMSEl.checked   = d.prefSMS   !== false;
+    if (document.getElementById("profileName"))      document.getElementById("profileName").value  = d.name  || "";
+    if (document.getElementById("profileEmail"))     document.getElementById("profileEmail").value = d.email || currentUser.email || "";
+    if (document.getElementById("profilePhone"))     document.getElementById("profilePhone").value = d.phone || "";
+    if (document.getElementById("prefEmail"))        document.getElementById("prefEmail").checked  = d.prefEmail !== false;
+    if (document.getElementById("prefSMS"))          document.getElementById("prefSMS").checked    = d.prefSMS   !== false;
   }).catch(() => {});
 }
 
@@ -3027,201 +2362,121 @@ function saveProfile() {
       currentUser.updateProfile({ displayName: name });
       if (msgEl) { msgEl.textContent = "✅ Profile saved!"; msgEl.style.color = "#16a34a"; }
       updateNavForUser(currentUser);
-    })
-    .catch(e => { if (msgEl) { msgEl.textContent = "Error: " + e.message; msgEl.style.color = "#dc2626"; } });
+    }).catch(e => { if (msgEl) { msgEl.textContent = "Error: " + e.message; msgEl.style.color = "#dc2626"; } });
 }
 
 function savePreferences() {
   if (!currentUser || !window._firebase) return;
-  const prefEmail = document.getElementById("prefEmail")?.checked;
-  const prefSMS   = document.getElementById("prefSMS")?.checked;
-  window._firebase.db.collection("users").doc(currentUser.uid).update({ prefEmail, prefSMS }).catch(() => {});
+  window._firebase.db.collection("users").doc(currentUser.uid).update({
+    prefEmail: !!document.getElementById("prefEmail")?.checked,
+    prefSMS:   !!document.getElementById("prefSMS")?.checked
+  }).catch(() => {});
 }
 
 function openProfile() {
   document.getElementById("userDropdown")?.classList.remove("open");
   if (!currentUser) { openAuthModal("login"); return; }
   openDashboard();
-  setTimeout(() => {
-    const profileTab = document.querySelector(".dash-tab:nth-child(4)");
-    switchDashTab("profile", profileTab);
-  }, 300);
+  setTimeout(() => switchDashTab("profile", document.querySelector(".dash-tab:nth-child(4)")), 300);
 }
 
-/* ============================================================
-   INTERCITY DETECTION & PRICING
-   ============================================================ */
+/* ============================================
+   INTERCITY
+   ============================================ */
 let isIntercityMove = false;
-
 const INTERCITY_PRICING = {
-  "1750":  { "400":9000,  "600":10800, "1000":17100, "2000":24000 },
-  "3950":  { "400":9000,  "600":10800, "1000":17100, "2000":24000 },
-  "5750":  { "400":11000, "600":13200, "1000":20900, "2000":28000 },
-  "7450":  { "400":13000, "600":15600, "1000":24700, "2000":33000 },
-  "8350":  { "400":15500, "600":18600, "1000":29450, "2000":38000 },
-  "10800": { "400":18000, "600":21600, "1000":34000, "2000":45000 },
-  "5400":  { "400":10000, "600":12000, "1000":19000, "2000":26000 },
-  "8800":  { "400":15000, "600":18000, "1000":28000, "2000":38000 },
-  "13700": { "400":22000, "600":26000, "1000":40000, "2000":55000 },
-  "21550": { "400":35000, "600":42000, "1000":65000, "2000":90000 },
+  "1750": {"400":9000,"600":10800,"1000":17100,"2000":24000},
+  "3950": {"400":9000,"600":10800,"1000":17100,"2000":24000},
+  "5750": {"400":11000,"600":13200,"1000":20900,"2000":28000},
+  "7450": {"400":13000,"600":15600,"1000":24700,"2000":33000},
+  "8350": {"400":15500,"600":18600,"1000":29450,"2000":38000},
+  "10800":{"400":18000,"600":21600,"1000":34000,"2000":45000},
+  "5400": {"400":10000,"600":12000,"1000":19000,"2000":26000},
+  "8800": {"400":15000,"600":18000,"1000":28000,"2000":38000},
+  "13700":{"400":22000,"600":26000,"1000":40000,"2000":55000},
+  "21550":{"400":35000,"600":42000,"1000":65000,"2000":90000}
 };
-
 function getIntercityBase(houseVal, km) {
   const tiers = INTERCITY_PRICING[String(houseVal)];
   if (!tiers) return 15000;
-  if (km <= 400)  return tiers["400"];
-  if (km <= 600)  return tiers["600"];
-  if (km <= 1000) return tiers["1000"];
-  return tiers["2000"];
+  return km <= 400 ? tiers["400"] : km <= 600 ? tiers["600"] : km <= 1000 ? tiers["1000"] : tiers["2000"];
 }
-
 function detectAndShowIntercityBadge(km) {
   const badge = document.getElementById("intercityBadge");
   isIntercityMove = km > 100;
-  if (badge) {
-    badge.style.display = isIntercityMove ? "flex" : "none";
-    if (isIntercityMove) badge.querySelector(".ic-km").textContent = Math.round(km) + " km";
-  }
-  const vehicleGroup = document.getElementById("vehicleCardGroup");
-  if (vehicleGroup) vehicleGroup.style.display = isIntercityMove ? "none" : "block";
+  if (badge) { badge.style.display = isIntercityMove ? "flex" : "none"; if (isIntercityMove) badge.querySelector(".ic-km").textContent = Math.round(km) + " km"; }
+  const vg = document.getElementById("vehicleCardGroup");
+  if (vg) vg.style.display = isIntercityMove ? "none" : "block";
 }
 
-/* ============================================================
-   BOOKING CANCELLATION
-   ============================================================ */
+/* ============================================
+   CANCEL / RESCHEDULE / RATE / DAMAGE
+   ============================================ */
 function openCancelModal(bookingDocId, bookingRef, status) {
-  if (["packing","transit","delivered"].includes(status)) {
-    showToast("❌ Cannot cancel after packing has started.");
-    return;
-  }
+  if (["packing","transit","delivered"].includes(status)) { showToast("❌ Cannot cancel after packing has started."); return; }
   document.getElementById("cancelBookingDocId").value = bookingDocId;
   document.getElementById("cancelBookingRef").textContent = bookingRef || bookingDocId;
   document.getElementById("cancelReason").value = "";
   document.getElementById("cancelModal").style.display = "flex";
 }
-
-function closeCancelModal() {
-  document.getElementById("cancelModal").style.display = "none";
-}
+function closeCancelModal() { document.getElementById("cancelModal").style.display = "none"; }
 
 async function confirmCancellation() {
   const docId  = document.getElementById("cancelBookingDocId").value;
   const reason = document.getElementById("cancelReason").value.trim();
   if (!reason) { showToast("⚠️ Please select a cancellation reason."); return; }
   if (!currentUser || !window._firebase) return;
-
   const btn = document.getElementById("btnConfirmCancel");
   if (btn) { btn.textContent = "Cancelling..."; btn.disabled = true; }
-
   try {
-    await window._firebase.db.collection("bookings").doc(docId).update({
-      status: "cancelled",
-      cancelReason: reason,
-      cancelledAt: firebase.firestore.FieldValue.serverTimestamp(),
-      cancelledBy: "customer"
-    });
-
-    await window._firebase.db.collection("cancelRequests").add({
-      bookingDocId: docId, reason,
-      customerUid: currentUser.uid,
-      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-      resolved: false
-    }).catch(() => {});
-
-    closeCancelModal();
-    showToast("✅ Booking cancelled. Refund (if any) processed in 5–7 business days.");
-    loadUserBookings();
-
-    if (currentBookingId === docId) {
-      dismissTrackBanner();
-      localStorage.removeItem("packzen_active_booking");
-    }
-  } catch(e) {
-    showToast("❌ Error: " + e.message);
-  } finally {
-    if (btn) { btn.textContent = "Yes, Cancel Booking"; btn.disabled = false; }
-  }
+    await window._firebase.db.collection("bookings").doc(docId).update({ status:"cancelled", cancelReason:reason, cancelledAt:firebase.firestore.FieldValue.serverTimestamp(), cancelledBy:"customer" });
+    await window._firebase.db.collection("cancelRequests").add({ bookingDocId:docId, reason, customerUid:currentUser.uid, createdAt:firebase.firestore.FieldValue.serverTimestamp(), resolved:false }).catch(() => {});
+    closeCancelModal(); showToast("✅ Booking cancelled."); loadUserBookings();
+    if (currentBookingId === docId) { dismissTrackBanner(); localStorage.removeItem("packzen_active_booking"); }
+  } catch(e) { showToast("❌ Error: " + e.message); }
+  finally { if (btn) { btn.textContent = "Yes, Cancel Booking"; btn.disabled = false; } }
 }
 
-/* ============================================================
-   BOOKING RESCHEDULE
-   ============================================================ */
 function openRescheduleModal(bookingDocId, bookingRef, currentDate) {
   document.getElementById("rescheduleDocId").value = bookingDocId;
   document.getElementById("rescheduleBookingRef").textContent = bookingRef || bookingDocId;
   const dateInput = document.getElementById("rescheduleDate");
+  if (dateInput) { dateInput.value = currentDate || ""; const tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate()+1); dateInput.min = tomorrow.toISOString().split("T")[0]; }
   const timeInput = document.getElementById("rescheduleTime");
-  if (dateInput) {
-    dateInput.value = currentDate || "";
-    const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    dateInput.min = tomorrow.toISOString().split("T")[0];
-  }
   if (timeInput) timeInput.value = "";
   document.getElementById("rescheduleModal").style.display = "flex";
 }
-
-function closeRescheduleModal() {
-  document.getElementById("rescheduleModal").style.display = "none";
-}
+function closeRescheduleModal() { document.getElementById("rescheduleModal").style.display = "none"; }
 
 async function confirmReschedule() {
   const docId   = document.getElementById("rescheduleDocId").value;
   const newDate = document.getElementById("rescheduleDate").value;
   const newTime = document.getElementById("rescheduleTime").value;
-
   if (!newDate) { showToast("⚠️ Please select a new moving date."); return; }
-
-  const selected = new Date(newDate);
-  const today    = new Date(); today.setHours(0,0,0,0);
+  const selected = new Date(newDate); const today = new Date(); today.setHours(0,0,0,0);
   if (selected <= today) { showToast("⚠️ Please select a future date."); return; }
-
   if (!currentUser || !window._firebase) return;
-
   const btn = document.getElementById("btnConfirmReschedule");
   if (btn) { btn.textContent = "Saving..."; btn.disabled = true; }
-
   try {
-    await window._firebase.db.collection("bookings").doc(docId).update({
-      date: newDate,
-      time: newTime || "",
-      rescheduledAt: firebase.firestore.FieldValue.serverTimestamp(),
-      rescheduledBy: "customer",
-      status: "confirmed"
-    });
-    closeRescheduleModal();
-    showToast("✅ Booking rescheduled! We'll confirm within 2 hours.");
-    loadUserBookings();
-  } catch(e) {
-    showToast("❌ Error: " + e.message);
-  } finally {
-    if (btn) { btn.textContent = "Confirm Reschedule"; btn.disabled = false; }
-  }
+    await window._firebase.db.collection("bookings").doc(docId).update({ date:newDate, time:newTime||"", rescheduledAt:firebase.firestore.FieldValue.serverTimestamp(), rescheduledBy:"customer", status:"confirmed" });
+    closeRescheduleModal(); showToast("✅ Booking rescheduled!"); loadUserBookings();
+  } catch(e) { showToast("❌ Error: " + e.message); }
+  finally { if (btn) { btn.textContent = "Confirm Reschedule"; btn.disabled = false; } }
 }
 
-/* ============================================================
-   DRIVER RATING
-   ============================================================ */
-let ratingBookingDocId = "";
-let selectedDriverRating = 0;
-
+let ratingBookingDocId = "", selectedDriverRating = 0;
 function openRateDriverModal(bookingDocId, bookingRef, driverName) {
-  ratingBookingDocId = bookingDocId;
-  selectedDriverRating = 0;
-  document.getElementById("rateBookingRef").textContent  = bookingRef || bookingDocId;
-  document.getElementById("rateDriverName").textContent  = driverName || "your driver";
+  ratingBookingDocId = bookingDocId; selectedDriverRating = 0;
+  document.getElementById("rateBookingRef").textContent = bookingRef || bookingDocId;
+  document.getElementById("rateDriverName").textContent = driverName || "your driver";
   document.getElementById("ratingFeedback").value = "";
   document.getElementById("ratingMsg").textContent = "";
   document.querySelectorAll(".rate-star").forEach(s => s.classList.remove("active"));
   document.getElementById("rateDriverModal").style.display = "flex";
 }
-
 function closeRateDriverModal() { document.getElementById("rateDriverModal").style.display = "none"; }
-
-function selectDriverRating(n) {
-  selectedDriverRating = n;
-  document.querySelectorAll(".rate-star").forEach((s, i) => s.classList.toggle("active", i < n));
-}
+function selectDriverRating(n) { selectedDriverRating = n; document.querySelectorAll(".rate-star").forEach((s,i) => s.classList.toggle("active",i<n)); }
 
 async function submitDriverRating() {
   if (!selectedDriverRating) { showToast("⚠️ Please select a star rating."); return; }
@@ -3229,164 +2484,95 @@ async function submitDriverRating() {
   const feedback = document.getElementById("ratingFeedback").value.trim();
   const btn = document.getElementById("btnSubmitRating");
   if (btn) { btn.textContent = "Submitting..."; btn.disabled = true; }
-
   try {
-    await window._firebase.db.collection("bookings").doc(ratingBookingDocId).update({
-      driverRating: selectedDriverRating, driverFeedback: feedback,
-      ratedAt: firebase.firestore.FieldValue.serverTimestamp()
-    });
+    await window._firebase.db.collection("bookings").doc(ratingBookingDocId).update({ driverRating:selectedDriverRating, driverFeedback:feedback, ratedAt:firebase.firestore.FieldValue.serverTimestamp() });
     const bookingDoc = await window._firebase.db.collection("bookings").doc(ratingBookingDocId).get();
     const driverUid  = bookingDoc.data()?.driverUid;
     if (driverUid) {
-      await window._firebase.db.collection("driverRatings").add({
-        driverUid, bookingDocId: ratingBookingDocId,
-        rating: selectedDriverRating, feedback,
-        customerUid: currentUser.uid,
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-      });
+      await window._firebase.db.collection("driverRatings").add({ driverUid, bookingDocId:ratingBookingDocId, rating:selectedDriverRating, feedback, customerUid:currentUser.uid, createdAt:firebase.firestore.FieldValue.serverTimestamp() });
       const ratingsSnap = await window._firebase.db.collection("driverRatings").where("driverUid","==",driverUid).get();
       const ratings = ratingsSnap.docs.map(d => d.data().rating);
-      const avg = ratings.reduce((a,b) => a+b, 0) / ratings.length;
-      await window._firebase.db.collection("drivers").doc(driverUid).update({
-        avgRating: Math.round(avg * 10) / 10, totalRatings: ratings.length
-      }).catch(()=>{});
+      const avg = ratings.reduce((a,b) => a+b,0) / ratings.length;
+      await window._firebase.db.collection("drivers").doc(driverUid).update({ avgRating:Math.round(avg*10)/10, totalRatings:ratings.length }).catch(()=>{});
     }
-    closeRateDriverModal();
-    showToast("⭐ Thanks for rating your driver!");
-    loadUserBookings();
+    closeRateDriverModal(); showToast("⭐ Thanks for rating your driver!"); loadUserBookings();
   } catch(e) { showToast("Error: " + e.message); }
   finally { if (btn) { btn.textContent = "Submit Rating"; btn.disabled = false; } }
 }
 
-/* ============================================================
-   PUSH NOTIFICATIONS
-   ============================================================ */
 async function requestPushPermission() {
-  if (!("Notification" in window)) return;
-  if (!window._firebase?.messaging) return;
+  if (!("Notification" in window) || !window._firebase?.messaging) return;
   try {
-    const permission = await Notification.requestPermission();
-    if (permission !== "granted") return;
+    if (await Notification.requestPermission() !== "granted") return;
     const token = await window._firebase.messaging.getToken({ vapidKey: window.ENV?.FCM_VAPID_KEY || "" });
-    if (token && currentUser) {
-      await window._firebase.db.collection("users").doc(currentUser.uid).update({
-        fcmToken: token, fcmUpdatedAt: firebase.firestore.FieldValue.serverTimestamp()
-      });
-    }
-  } catch(e) { }
+    if (token && currentUser) await window._firebase.db.collection("users").doc(currentUser.uid).update({ fcmToken:token, fcmUpdatedAt:firebase.firestore.FieldValue.serverTimestamp() });
+  } catch(e) {}
 }
 
 function subscribeToBookingNotifications(bookingDocId) {
   if (!bookingDocId || !window._firebase) return;
-  const statusMessages = {
-    assigned: { title: "🚛 Driver Assigned!", body: "Your driver is on the way." },
-    packing:  { title: "📦 Packing Started",  body: "Our team is packing your items." },
-    transit:  { title: "🚚 On The Move!",     body: "Your goods are in transit." },
-    delivered:{ title: "🎉 Delivered!",        body: "Your move is complete. Please rate your driver." },
-    cancelled:{ title: "❌ Booking Cancelled", body: "Your booking has been cancelled." },
-  };
+  const msgs = { assigned:{title:"🚛 Driver Assigned!",body:"Your driver is on the way."}, packing:{title:"📦 Packing Started",body:"Our team is packing your items."}, transit:{title:"🚚 On The Move!",body:"Your goods are in transit."}, delivered:{title:"🎉 Delivered!",body:"Your move is complete."}, cancelled:{title:"❌ Booking Cancelled",body:"Your booking has been cancelled."} };
   let lastStatus = "";
   window._firebase.db.collection("bookings").doc(bookingDocId).onSnapshot(doc => {
     if (!doc.exists) return;
     const status = doc.data().status;
-    if (status && status !== lastStatus && statusMessages[status]) {
-      const { title, body } = statusMessages[status];
-      if (Notification.permission === "granted") new Notification(title, { body, icon: "/favicon.ico" });
+    if (status && status !== lastStatus && msgs[status]) {
+      if (Notification.permission === "granted") new Notification(msgs[status].title, { body:msgs[status].body, icon:"/favicon.ico" });
       lastStatus = status;
     }
   });
   setupStatusSMS(bookingDocId, "", "", "");
 }
 
-/* ============================================================
-   SMS NOTIFICATIONS
-   ============================================================ */
 const SMS_TEMPLATES = {
-  booking_confirmed: (d) =>
-    `Hi ${d.name}, your PackZen booking ${d.bookingRef} is confirmed for ${d.date}! Pickup: ${(d.pickup||"").split(",")[0]}. Est. cost: Rs.${Number(d.total).toLocaleString("en-IN")}. Track: packzenblr.in. Queries: 9945095453`,
-  driver_assigned: (d) =>
-    `Hi ${d.name}, your PackZen driver ${d.driverName} (${d.driverPhone}) is assigned for booking ${d.bookingRef}. Track live on packzenblr.in.`,
-  move_started: (d) =>
-    `Hi ${d.name}, your goods are now in transit for booking ${d.bookingRef}. Track live on packzenblr.in.`,
-  delivered: (d) =>
-    `Hi ${d.name}, your PackZen move ${d.bookingRef} is complete! Rate your driver on packzenblr.in. Thank you!`,
-  cancelled: (d) =>
-    `Hi ${d.name}, your PackZen booking ${d.bookingRef} has been cancelled. Refund (if any) in 5-7 business days.`,
-  damage_claim: (d) =>
-    `Hi ${d.name}, your damage claim (ID: ${d.claimId}) for booking ${d.bookingRef} has been received. We'll respond within 3 business days.`,
-  reschedule_confirmed: (d) =>
-    `Hi ${d.name}, your PackZen booking ${d.bookingRef} is rescheduled to ${d.date}. Queries: 9945095453`,
+  booking_confirmed: d => `Hi ${d.name}, your PackZen booking ${d.bookingRef} is confirmed for ${d.date}! Pickup: ${(d.pickup||"").split(",")[0]}. Est: Rs.${Number(d.total).toLocaleString("en-IN")}. Track: packzenblr.in`,
+  driver_assigned:   d => `Hi ${d.name}, your PackZen driver ${d.driverName} (${d.driverPhone}) is assigned for booking ${d.bookingRef}.`,
+  move_started:      d => `Hi ${d.name}, your goods are now in transit for booking ${d.bookingRef}. Track: packzenblr.in`,
+  delivered:         d => `Hi ${d.name}, your PackZen move ${d.bookingRef} is complete! Rate your driver on packzenblr.in.`,
+  cancelled:         d => `Hi ${d.name}, your PackZen booking ${d.bookingRef} has been cancelled.`,
+  damage_claim:      d => `Hi ${d.name}, your damage claim (${d.claimId}) for booking ${d.bookingRef} has been received.`,
 };
 
 async function queueSMS(phone, templateKey, data) {
   if (!phone || !window._firebase) return;
-  const mobile = "91" + String(phone).replace(/\D/g, "").slice(-10);
+  const mobile = "91" + String(phone).replace(/\D/g,"").slice(-10);
   if (mobile.length !== 12) return;
   const template = SMS_TEMPLATES[templateKey];
   if (!template) return;
-  const message = template(data);
-  try {
-    await window._firebase.db.collection("smsQueue").add({
-      mobile, message, template: templateKey,
-      status: "pending", createdAt: firebase.firestore.FieldValue.serverTimestamp(), retries: 0
-    });
-  } catch(e) { }
+  try { await window._firebase.db.collection("smsQueue").add({ mobile, message:template(data), template:templateKey, status:"pending", createdAt:firebase.firestore.FieldValue.serverTimestamp(), retries:0 }); } catch(e) {}
 }
 
 function setupStatusSMS(bookingDocId, customerPhone, customerName, bookingRef) {
   if (!bookingDocId || !window._firebase) return;
-  const statusSMSMap = { transit:"move_started", delivered:"delivered", cancelled:"cancelled" };
+  const map = { transit:"move_started", delivered:"delivered", cancelled:"cancelled" };
   let lastStatus = "";
   window._firebase.db.collection("bookings").doc(bookingDocId).onSnapshot(doc => {
     if (!doc.exists) return;
     const b = doc.data(); const status = b.status;
     if (!status || status === lastStatus) return;
     lastStatus = status;
-    if (statusSMSMap[status]) {
-      queueSMS(b.phone||customerPhone, statusSMSMap[status], {
-        name: b.customerName||customerName, bookingRef: b.bookingRef||bookingRef||bookingDocId,
-        driverName: b.driverName||"", driverPhone: b.driverPhone||"", date: b.date||""
-      });
-    }
-    if (status === "assigned" && b.driverName) {
-      queueSMS(b.phone||customerPhone, "driver_assigned", {
-        name: b.customerName||customerName, bookingRef: b.bookingRef||bookingDocId,
-        driverName: b.driverName, driverPhone: b.driverPhone||""
-      });
-    }
+    if (map[status]) queueSMS(b.phone||customerPhone, map[status], { name:b.customerName||customerName, bookingRef:b.bookingRef||bookingRef||bookingDocId, driverName:b.driverName||"", driverPhone:b.driverPhone||"", date:b.date||"" });
+    if (status === "assigned" && b.driverName) queueSMS(b.phone||customerPhone, "driver_assigned", { name:b.customerName||customerName, bookingRef:b.bookingRef||bookingDocId, driverName:b.driverName, driverPhone:b.driverPhone||"" });
   });
 }
 
-/* ============================================================
-   DAMAGE / CLAIM FLOW
-   ============================================================ */
-let damageBookingDocId = "";
-let damagePhotos = [];
-
+let damageBookingDocId = "", damagePhotos = [];
 function openDamageModal(bookingDocId, bookingRef) {
   damageBookingDocId = bookingDocId; damagePhotos = [];
   document.getElementById("damageBookingRef").textContent = bookingRef || bookingDocId;
-  document.getElementById("damageType").value = "";
-  document.getElementById("damageDesc").value = "";
+  ["damageType","damageDesc"].forEach(id => { const el = document.getElementById(id); if (el) el.value = ""; });
   document.getElementById("damagePhotoPreview").innerHTML = "";
   document.getElementById("damageMsg").textContent = "";
   document.getElementById("damageModal").style.display = "flex";
 }
-
 function closeDamageModal() { document.getElementById("damageModal").style.display = "none"; }
 
 function previewDamagePhotos(input) {
   const preview = document.getElementById("damagePhotoPreview");
   preview.innerHTML = ""; damagePhotos = [];
-  Array.from(input.files).slice(0, 5).forEach(file => {
+  Array.from(input.files).slice(0,5).forEach(file => {
     const reader = new FileReader();
-    reader.onload = e => {
-      damagePhotos.push(e.target.result);
-      const img = document.createElement("img");
-      img.src = e.target.result;
-      img.style.cssText = "width:70px;height:70px;object-fit:cover;border-radius:8px;border:2px solid var(--border-light)";
-      preview.appendChild(img);
-    };
+    reader.onload = e => { damagePhotos.push(e.target.result); const img = document.createElement("img"); img.src = e.target.result; img.style.cssText = "width:70px;height:70px;object-fit:cover;border-radius:8px;border:2px solid var(--border-light)"; preview.appendChild(img); };
     reader.readAsDataURL(file);
   });
 }
@@ -3394,49 +2580,21 @@ function previewDamagePhotos(input) {
 async function submitDamageClaim() {
   const damageType = document.getElementById("damageType").value;
   const damageDesc = document.getElementById("damageDesc").value.trim();
-  const msgEl      = document.getElementById("damageMsg");
-
   if (!damageType) { showToast("⚠️ Please select the type of damage."); return; }
   if (!damageDesc) { showToast("⚠️ Please describe what happened."); return; }
   if (!currentUser || !window._firebase) return;
-
   const btn = document.getElementById("btnSubmitDamage");
   if (btn) { btn.textContent = "Submitting..."; btn.disabled = true; }
-
   try {
-    const claimRef = await window._firebase.db.collection("damageClaims").add({
-      bookingDocId: damageBookingDocId, customerUid: currentUser.uid,
-      damageType, description: damageDesc,
-      photos: damagePhotos.slice(0, 5), status: "pending",
-      createdAt: firebase.firestore.FieldValue.serverTimestamp()
-    });
-
-    await window._firebase.db.collection("bookings").doc(damageBookingDocId).update({
-      damageClaimed: true, damageClaimId: claimRef.id,
-      damageClaimedAt: firebase.firestore.FieldValue.serverTimestamp()
-    });
-
-    const bookingDoc = await window._firebase.db.collection("bookings").doc(damageBookingDocId).get();
-    const b = bookingDoc.data();
-    queueSMS(b?.phone || "", "damage_claim", {
-      name: b?.customerName || "Customer",
-      bookingRef: b?.bookingRef || damageBookingDocId,
-      claimId: claimRef.id.slice(0,8).toUpperCase()
-    });
-
-    closeDamageModal();
-    showToast("✅ Claim submitted! We'll respond within 3 business days.");
-    loadUserBookings();
-  } catch(e) {
-    if (msgEl) { msgEl.textContent = "Error: " + e.message; msgEl.style.color = "#dc2626"; }
-  } finally {
-    if (btn) { btn.textContent = "Submit Claim"; btn.disabled = false; }
-  }
+    const claimRef = await window._firebase.db.collection("damageClaims").add({ bookingDocId:damageBookingDocId, customerUid:currentUser.uid, damageType, description:damageDesc, photos:damagePhotos.slice(0,5), status:"pending", createdAt:firebase.firestore.FieldValue.serverTimestamp() });
+    await window._firebase.db.collection("bookings").doc(damageBookingDocId).update({ damageClaimed:true, damageClaimId:claimRef.id, damageClaimedAt:firebase.firestore.FieldValue.serverTimestamp() });
+    const b = (await window._firebase.db.collection("bookings").doc(damageBookingDocId).get()).data();
+    queueSMS(b?.phone||"", "damage_claim", { name:b?.customerName||"Customer", bookingRef:b?.bookingRef||damageBookingDocId, claimId:claimRef.id.slice(0,8).toUpperCase() });
+    closeDamageModal(); showToast("✅ Claim submitted!"); loadUserBookings();
+  } catch(e) { const msgEl = document.getElementById("damageMsg"); if (msgEl) { msgEl.textContent = "Error: " + e.message; msgEl.style.color = "#dc2626"; } }
+  finally { if (btn) { btn.textContent = "Submit Claim"; btn.disabled = false; } }
 }
 
-/* ============================================================
-   FAQ TOGGLE
-   ============================================================ */
 function toggleFaq(btn) {
   const item = btn.closest(".faq-item");
   const isOpen = item.classList.contains("open");
