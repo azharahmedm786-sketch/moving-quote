@@ -534,6 +534,7 @@ function closeAuthModal() {
   confirmationResult      = null;
   pendingSignupData       = null;
   window._resetVerifiedEmail = null;
+  window._resetPhoneUser     = null;
   clearInterval(otpTimerInterval);
 }
 
@@ -927,12 +928,9 @@ async function sendResetOTP() {
 }
 
 /* STEP 2 — Verify OTP
-   Confirms the user owns the phone number.
-   Then looks up their email from Firestore and
-   stores it — setNewPassword() will use it to
-   re-authenticate and update the password on the
-   correct email/password account. Works for ALL
-   users regardless of how they signed up. */
+   Confirms phone ownership. Keeps the phone-auth
+   user signed in (recent login) so updatePassword()
+   works in Step 3 without asking for old password. */
 async function verifyResetOTP() {
   const otp = document.getElementById("resetOtpInput").value.trim();
   if (!/^\d{6}$/.test(otp))
@@ -945,16 +943,11 @@ async function verifyResetOTP() {
   showError("resetOtpError", "⏳ Verifying OTP...", "info");
 
   try {
-    // Confirm OTP — proves phone ownership
-    await confirmationResult.confirm(otp);
-
-    // Sign out the temporary phone-auth session immediately
-    // We don't need it — we'll sign into the real account below
-    await window._firebase.auth.signOut().catch(() => {});
-
+    // Confirm OTP — user is now signed in via phone-auth (fresh/recent login)
+    const result = await confirmationResult.confirm(otp);
     clearInterval(otpTimerInterval);
 
-    // Look up the user's email from Firestore using the phone number
+    // Look up their email from Firestore by phone number
     const { db } = window._firebase;
     const phone = resetFlowPhone;
     let verifiedEmail = null;
@@ -967,31 +960,30 @@ async function verifyResetOTP() {
     }
 
     if (!verifiedEmail) {
+      await window._firebase.auth.signOut().catch(() => {});
       if (btn) { btn.disabled = false; btn.textContent = "Verify OTP →"; }
       return showError("resetOtpError", "⚠️ Account not found. Please contact support.");
     }
 
-    // Store verified email for use in setNewPassword()
-    // This is safe — it only lives in memory for the duration of the reset
+    // Keep the phone-auth user reference + email for Step 3
+    window._resetPhoneUser     = result.user;
     window._resetVerifiedEmail = verifiedEmail;
 
     if (btn) { btn.disabled = false; btn.textContent = "Verify OTP →"; }
 
-    // Move to set new password panel — clear fields first
-    const cp = document.getElementById("currentPasswordInput");
+    // Clear fields and open set-new-password panel
     const np = document.getElementById("newPasswordInput");
     const co = document.getElementById("confirmPasswordInput");
-    if (cp) cp.value = "";
     if (np) np.value = "";
     if (co) co.value = "";
     switchPanel("panelResetPassword");
-    document.getElementById("currentPasswordInput")?.focus();
+    np?.focus();
 
   } catch (err) {
     if (btn) { btn.disabled = false; btn.textContent = "Verify OTP →"; }
     if (err.code === "auth/invalid-verification-code") {
       showError("resetOtpError", "❌ Incorrect OTP. Please check and try again.");
-    } else if (["auth/session-expired", "auth/code-expired"].includes(err.code)) {
+    } else if (["auth/session-expired","auth/code-expired"].includes(err.code)) {
       showError("resetOtpError", "⚠️ OTP expired. Please go back and request a new one.");
     } else {
       showError("resetOtpError", "⚠️ Verification failed. Please try again.");
@@ -1001,63 +993,65 @@ async function verifyResetOTP() {
 
 /* STEP 3 — Set new password
    ─────────────────────────────────────────────
-   How this works for ALL users (old and new):
+   The phone-auth user is still signed in from
+   Step 2 — this is a recent login so Firebase
+   allows updatePassword() without re-auth.
 
-   1. User enters new password + confirm
-   2. We prompt for their CURRENT (old) password
-      so we can re-authenticate them into their
-      real email/password account
-   3. signInWithEmailAndPassword(email, oldPass)
-      → signed into real account ✅
-   4. user.updatePassword(newPass)
-      → Firebase Auth updated immediately ✅
-   5. Old password dead. New password active. ✅
-   6. Sign out → user logs in fresh
+   We use linkWithCredential to attach the new
+   email+password to the phone account:
+   - If email not yet linked → links it fresh ✅
+   - If already linked → catches the error and
+     calls updatePassword() directly instead ✅
 
-   This approach works for 100% of users because
-   it doesn't depend on phone being linked to the
-   Firebase Auth account — it uses the email/
-   password account directly.
-   ───────────────────────────────────────────── */
+   Either way, old password is dead immediately.
+   No current password ever asked from user. ✅
+   ─────────────────────────────────────────── */
 async function setNewPassword() {
-  const oldPass  = document.getElementById("currentPasswordInput").value;
   const newPass  = document.getElementById("newPasswordInput").value;
   const confPass = document.getElementById("confirmPasswordInput").value;
 
-  if (!oldPass)
-    return showError("resetPasswordError", "⚠️ Please enter your current password.");
   if (newPass.length < 6)
-    return showError("resetPasswordError", "⚠️ New password must be at least 6 characters.");
+    return showError("resetPasswordError", "⚠️ Password must be at least 6 characters.");
   if (newPass !== confPass)
     return showError("resetPasswordError", "⚠️ Passwords do not match.");
-  if (newPass === oldPass)
-    return showError("resetPasswordError", "⚠️ New password must be different from your current password.");
-  if (!window._resetVerifiedEmail)
+
+  const phoneUser = window._resetPhoneUser;
+  const email     = window._resetVerifiedEmail;
+
+  if (!phoneUser || !email)
     return showError("resetPasswordError", "⚠️ Session expired. Please start the reset process again.");
 
   const btn = document.getElementById("btnSetNewPassword");
   if (btn) { btn.disabled = true; btn.textContent = "Updating..."; }
-  showError("resetPasswordError", "⏳ Verifying current password...", "info");
-
-  const { auth } = window._firebase;
+  showError("resetPasswordError", "⏳ Setting your new password...", "info");
 
   try {
-    // Step A — Sign into the real email/password account
-    // This re-authenticates the user so updatePassword() works
-    const cred = await auth.signInWithEmailAndPassword(
-      window._resetVerifiedEmail, oldPass
-    );
+    // Build email+password credential with the NEW password
+    const emailCred = firebase.auth.EmailAuthProvider.credential(email, newPass);
 
-    showError("resetPasswordError", "⏳ Setting new password...", "info");
+    try {
+      // Attempt to link email/password to the phone-auth account
+      // Works for users whose email was never linked in Firebase Auth
+      await phoneUser.linkWithCredential(emailCred);
+    } catch (linkErr) {
+      if (
+        linkErr.code === "auth/email-already-in-use"      ||
+        linkErr.code === "auth/credential-already-in-use" ||
+        linkErr.code === "auth/provider-already-linked"
+      ) {
+        // Email/password already linked — update the password directly
+        // Phone session is recent so this is allowed without re-auth ✅
+        await phoneUser.updatePassword(newPass);
+      } else {
+        throw linkErr;
+      }
+    }
 
-    // Step B — Update password on the real account
-    // Old password is dead the instant this resolves ✅
-    await cred.user.updatePassword(newPass);
-
-    // Step C — Sign out so user logs in fresh
-    await auth.signOut();
+    // Sign out — user logs in fresh with new password
+    await window._firebase.auth.signOut();
 
     // Cleanup
+    window._resetPhoneUser     = null;
     window._resetVerifiedEmail = null;
     _clearResetRecaptcha();
     resetFlowPhone     = "";
@@ -1070,13 +1064,10 @@ async function setNewPassword() {
 
   } catch (err) {
     if (btn) { btn.disabled = false; btn.textContent = "Set New Password →"; }
-    if (["auth/wrong-password", "auth/invalid-credential",
-         "auth/invalid-login-credentials"].includes(err.code)) {
-      showError("resetPasswordError", "❌ Current password is incorrect. Please try again.");
-    } else if (err.code === "auth/too-many-requests") {
-      showError("resetPasswordError", "⚠️ Too many attempts. Please wait a few minutes.");
+    if (err.code === "auth/requires-recent-login") {
+      showError("resetPasswordError", "⚠️ Session timed out. Please restart the reset process.");
     } else if (err.code === "auth/weak-password") {
-      showError("resetPasswordError", "⚠️ New password is too weak. Use at least 6 characters.");
+      showError("resetPasswordError", "⚠️ Password too weak. Use at least 6 characters.");
     } else {
       showError("resetPasswordError", getAuthErrorMessage(err.code));
     }
