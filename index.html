@@ -926,6 +926,12 @@
      with this complete block
 ═══════════════════════════════════════════ -->
 
+<!-- ═══════════════════════════════════════════
+     AUTH MODAL — Replace the entire
+     <div id="authModal" ...> block in index.html
+     with this complete block
+═══════════════════════════════════════════ -->
+
 <div id="authModal" class="modal-overlay" role="dialog" aria-modal="true" style="display:none;">
   <div class="modal-box auth-modal-box">
 
@@ -1124,17 +1130,23 @@
     </div>
 
     <!-- ══════════════════════════════════
-         PANEL 7 — NEW PASSWORD (Step 3)
-         updatePassword() → old password
-         stops working IMMEDIATELY ✅
+         PANEL 7 — SET NEW PASSWORD (Step 3)
+         OTP verified → enter current password
+         to re-authenticate → set new password
+         → old password dead immediately ✅
     ══════════════════════════════════ -->
     <div class="auth-panel" id="panelResetPassword" style="display:none;">
       <button class="modal-x" onclick="closeAuthModal()">✕</button>
       <div class="auth-logo">🔒</div>
       <h2 class="auth-title">Set New Password</h2>
-      <p class="auth-sub">Phone verified ✅ — Your new password will take effect immediately</p>
+      <p class="auth-sub">Phone verified ✅ — Enter your current password once, then choose a new one</p>
 
-      <label>New Password</label>
+      <label>Current Password</label>
+      <input id="currentPasswordInput" type="password" placeholder="Your current password"
+        class="field-input"
+        onkeydown="if(event.key==='Enter')document.getElementById('newPasswordInput').focus()">
+
+      <label style="margin-top:12px;display:block;">New Password</label>
       <input id="newPasswordInput" type="password" placeholder="Min. 6 characters"
         class="field-input"
         onkeydown="if(event.key==='Enter')document.getElementById('confirmPasswordInput').focus()">
@@ -1152,7 +1164,6 @@
 
   </div>
 </div>
-
 <!-- DASHBOARD MODAL -->
 <div id="dashboardModal" class="modal-overlay" role="dialog" aria-modal="true" style="display:none;">
   <div class="modal-box dashboard-box">
