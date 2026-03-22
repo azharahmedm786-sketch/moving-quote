@@ -11,7 +11,6 @@ let paymentReceiptId     = "";
 let confirmationResult   = null;
 let pendingSignupData    = null;
 let currentUser          = null;
-let otpPurpose           = "signup"; // "signup" | "reset"
 let promoDiscount        = 0;
 let selectedPayment      = "at_drop";
 let currentRating        = 0;
@@ -48,9 +47,7 @@ function notifyOwner(bookingRef, name, phone, pickup, drop, date, total, payType
   }, 1500);
 }
 
-const MIN_BASE_PRICE = 1999;
-const FRIDGE_PRICE   = 150;
-const RAZORPAY_KEY   = (window.ENV && window.ENV.RAZORPAY_KEY) || "";
+const RAZORPAY_KEY = (window.ENV && window.ENV.RAZORPAY_KEY) || "";
 
 /* ============================================
    UTILITY
@@ -533,9 +530,10 @@ function closeAuthModal() {
   clearAuthErrors();
   _clearSignupRecaptcha();
   _clearResetRecaptcha();
-  resetFlowPhone   = "";
-  confirmationResult = null;
-  pendingSignupData  = null;
+  resetFlowPhone          = "";
+  confirmationResult      = null;
+  pendingSignupData       = null;
+  window._resetVerifiedEmail = null;
   clearInterval(otpTimerInterval);
 }
 
@@ -639,7 +637,6 @@ function signupUser() {
 
   // Store details for later
   pendingSignupData = { firstName, lastName, phone, email, referral };
-  otpPurpose = "signup";
 
   _clearSignupRecaptcha();
 
@@ -868,50 +865,74 @@ async function loginUser() {
    immediately. No Firestore workaround needed.
 ═══════════════════════════════════════════════ */
 
-/* STEP 1 — Enter phone, send OTP */
+/* STEP 1 — Enter phone, check it exists, then send OTP */
 async function sendResetOTP() {
   const phone = document.getElementById("resetPhone").value.trim();
   if (!/^\d{10}$/.test(phone))
     return showError("recoverError", "⚠️ Please enter a valid 10-digit phone number.");
 
-  resetFlowPhone = phone;
   const btn = document.getElementById("btnSendResetOtp");
-  if (btn) { btn.disabled = true; btn.textContent = "Sending OTP..."; }
-  showError("recoverError", "⏳ Sending OTP to +91 " + phone + "...", "info");
+  if (btn) { btn.disabled = true; btn.textContent = "Checking..."; }
+  showError("recoverError", "⏳ Looking up your account...", "info");
 
-  _clearResetRecaptcha();
+  // ✅ FIX: Verify phone exists in Firestore BEFORE burning an SMS
+  waitForFirebase(async () => {
+    const { auth, db } = window._firebase;
+    try {
+      let exists = false;
+      const snap1 = await db.collection("users").where("phone", "==", phone).limit(1).get();
+      if (!snap1.empty) exists = true;
+      if (!exists) {
+        const snap2 = await db.collection("users").where("phone", "==", "+91" + phone).limit(1).get();
+        if (!snap2.empty) exists = true;
+      }
+      if (!exists) {
+        if (btn) { btn.disabled = false; btn.textContent = "Send OTP →"; }
+        return showError("recoverError", "⚠️ No account found for this phone number. Please sign up.");
+      }
 
-  try {
-    window._resetRecaptcha = new firebase.auth.RecaptchaVerifier(
-      "recaptcha-container-reset", { size: "invisible", callback: () => {} }
-    );
-    await window._resetRecaptcha.render();
+      resetFlowPhone = phone;
+      showError("recoverError", "⏳ Sending OTP to +91 " + phone + "...", "info");
+      if (btn) btn.textContent = "Sending OTP...";
 
-    confirmationResult = await firebase.auth().signInWithPhoneNumber(
-      "+91" + phone, window._resetRecaptcha
-    );
+      _clearResetRecaptcha();
 
-    document.getElementById("resetOtpPhone").textContent = "+91 " + phone;
-    switchPanel("panelResetOTP");
-    document.getElementById("resetOtpInput").focus();
-    if (btn) { btn.disabled = false; btn.textContent = "Send OTP →"; }
-    _startOtpTimer();
+      // ✅ FIX: Use window._firebase.auth consistently (not firebase.auth())
+      window._resetRecaptcha = new firebase.auth.RecaptchaVerifier(
+        "recaptcha-container-reset", { size: "invisible", callback: () => {} }
+      );
+      await window._resetRecaptcha.render();
 
-  } catch (err) {
-    _clearResetRecaptcha();
-    if (btn) { btn.disabled = false; btn.textContent = "Send OTP →"; }
-    const msg = err.code === "auth/invalid-phone-number"
-      ? "⚠️ Invalid phone number."
-      : err.code === "auth/too-many-requests"
-      ? "⚠️ Too many requests. Please wait a few minutes."
-      : "⚠️ Failed to send OTP. Please try again.";
-    showError("recoverError", msg);
-  }
+      confirmationResult = await auth.signInWithPhoneNumber(
+        "+91" + phone, window._resetRecaptcha
+      );
+
+      document.getElementById("resetOtpPhone").textContent = "+91 " + phone;
+      switchPanel("panelResetOTP");
+      document.getElementById("resetOtpInput").focus();
+      if (btn) { btn.disabled = false; btn.textContent = "Send OTP →"; }
+      _startOtpTimer();
+
+    } catch (err) {
+      _clearResetRecaptcha();
+      if (btn) { btn.disabled = false; btn.textContent = "Send OTP →"; }
+      const msg = err.code === "auth/invalid-phone-number"
+        ? "⚠️ Invalid phone number."
+        : err.code === "auth/too-many-requests"
+        ? "⚠️ Too many requests. Please wait a few minutes."
+        : "⚠️ Failed to send OTP. Please try again.";
+      showError("recoverError", msg);
+    }
+  });
 }
 
 /* STEP 2 — Verify OTP
-   The user is now signed into their actual account
-   (because phone is linked to it from signup) */
+   Confirms the user owns the phone number.
+   Then looks up their email from Firestore and
+   stores it — setNewPassword() will use it to
+   re-authenticate and update the password on the
+   correct email/password account. Works for ALL
+   users regardless of how they signed up. */
 async function verifyResetOTP() {
   const otp = document.getElementById("resetOtpInput").value.trim();
   if (!/^\d{6}$/.test(otp))
@@ -924,19 +945,53 @@ async function verifyResetOTP() {
   showError("resetOtpError", "⏳ Verifying OTP...", "info");
 
   try {
+    // Confirm OTP — proves phone ownership
     await confirmationResult.confirm(otp);
-    // ✅ User is now signed in as their real account
+
+    // Sign out the temporary phone-auth session immediately
+    // We don't need it — we'll sign into the real account below
+    await window._firebase.auth.signOut().catch(() => {});
+
     clearInterval(otpTimerInterval);
+
+    // Look up the user's email from Firestore using the phone number
+    const { db } = window._firebase;
+    const phone = resetFlowPhone;
+    let verifiedEmail = null;
+
+    const snap1 = await db.collection("users").where("phone", "==", phone).limit(1).get();
+    if (!snap1.empty) verifiedEmail = snap1.docs[0].data().email;
+    if (!verifiedEmail) {
+      const snap2 = await db.collection("users").where("phone", "==", "+91" + phone).limit(1).get();
+      if (!snap2.empty) verifiedEmail = snap2.docs[0].data().email;
+    }
+
+    if (!verifiedEmail) {
+      if (btn) { btn.disabled = false; btn.textContent = "Verify OTP →"; }
+      return showError("resetOtpError", "⚠️ Account not found. Please contact support.");
+    }
+
+    // Store verified email for use in setNewPassword()
+    // This is safe — it only lives in memory for the duration of the reset
+    window._resetVerifiedEmail = verifiedEmail;
+
     if (btn) { btn.disabled = false; btn.textContent = "Verify OTP →"; }
-    // Move to set new password
+
+    // Move to set new password panel — clear fields first
+    const cp = document.getElementById("currentPasswordInput");
+    const np = document.getElementById("newPasswordInput");
+    const co = document.getElementById("confirmPasswordInput");
+    if (cp) cp.value = "";
+    if (np) np.value = "";
+    if (co) co.value = "";
     switchPanel("panelResetPassword");
-    document.getElementById("newPasswordInput").focus();
+    document.getElementById("currentPasswordInput")?.focus();
 
   } catch (err) {
     if (btn) { btn.disabled = false; btn.textContent = "Verify OTP →"; }
     if (err.code === "auth/invalid-verification-code") {
       showError("resetOtpError", "❌ Incorrect OTP. Please check and try again.");
-    } else if (["auth/session-expired","auth/code-expired"].includes(err.code)) {
+    } else if (["auth/session-expired", "auth/code-expired"].includes(err.code)) {
       showError("resetOtpError", "⚠️ OTP expired. Please go back and request a new one.");
     } else {
       showError("resetOtpError", "⚠️ Verification failed. Please try again.");
@@ -945,47 +1000,83 @@ async function verifyResetOTP() {
 }
 
 /* STEP 3 — Set new password
-   currentUser is now the real account (signed in
-   via phone OTP). updatePassword() changes it
-   in Firebase Auth immediately. Old password is
-   dead the instant this call succeeds. */
+   ─────────────────────────────────────────────
+   How this works for ALL users (old and new):
+
+   1. User enters new password + confirm
+   2. We prompt for their CURRENT (old) password
+      so we can re-authenticate them into their
+      real email/password account
+   3. signInWithEmailAndPassword(email, oldPass)
+      → signed into real account ✅
+   4. user.updatePassword(newPass)
+      → Firebase Auth updated immediately ✅
+   5. Old password dead. New password active. ✅
+   6. Sign out → user logs in fresh
+
+   This approach works for 100% of users because
+   it doesn't depend on phone being linked to the
+   Firebase Auth account — it uses the email/
+   password account directly.
+   ───────────────────────────────────────────── */
 async function setNewPassword() {
+  const oldPass  = document.getElementById("currentPasswordInput").value;
   const newPass  = document.getElementById("newPasswordInput").value;
   const confPass = document.getElementById("confirmPasswordInput").value;
 
+  if (!oldPass)
+    return showError("resetPasswordError", "⚠️ Please enter your current password.");
   if (newPass.length < 6)
-    return showError("resetPasswordError", "⚠️ Password must be at least 6 characters.");
+    return showError("resetPasswordError", "⚠️ New password must be at least 6 characters.");
   if (newPass !== confPass)
     return showError("resetPasswordError", "⚠️ Passwords do not match.");
-
-  const user = firebase.auth().currentUser;
-  if (!user)
-    return showError("resetPasswordError", "⚠️ Session expired. Please start again.");
+  if (newPass === oldPass)
+    return showError("resetPasswordError", "⚠️ New password must be different from your current password.");
+  if (!window._resetVerifiedEmail)
+    return showError("resetPasswordError", "⚠️ Session expired. Please start the reset process again.");
 
   const btn = document.getElementById("btnSetNewPassword");
-  if (btn) { btn.disabled = true; btn.textContent = "Saving..."; }
-  showError("resetPasswordError", "⏳ Updating your password...", "info");
+  if (btn) { btn.disabled = true; btn.textContent = "Updating..."; }
+  showError("resetPasswordError", "⏳ Verifying current password...", "info");
+
+  const { auth } = window._firebase;
 
   try {
-    // ✅ Directly updates Firebase Auth password
-    // Old password stops working IMMEDIATELY
-    await user.updatePassword(newPass);
+    // Step A — Sign into the real email/password account
+    // This re-authenticates the user so updatePassword() works
+    const cred = await auth.signInWithEmailAndPassword(
+      window._resetVerifiedEmail, oldPass
+    );
 
-    // Sign out so user logs in fresh with new password
-    await firebase.auth().signOut();
+    showError("resetPasswordError", "⏳ Setting new password...", "info");
 
+    // Step B — Update password on the real account
+    // Old password is dead the instant this resolves ✅
+    await cred.user.updatePassword(newPass);
+
+    // Step C — Sign out so user logs in fresh
+    await auth.signOut();
+
+    // Cleanup
+    window._resetVerifiedEmail = null;
     _clearResetRecaptcha();
-    resetFlowPhone = "";
+    resetFlowPhone     = "";
     confirmationResult = null;
 
+    if (btn) { btn.disabled = false; btn.textContent = "Set New Password →"; }
     closeAuthModal();
-    showToast("✅ Password updated successfully! Please log in with your new password.", 5000);
+    showToast("✅ Password updated! Please log in with your new password.", 5000);
     setTimeout(() => openAuthModal("login"), 800);
 
   } catch (err) {
     if (btn) { btn.disabled = false; btn.textContent = "Set New Password →"; }
-    if (err.code === "auth/requires-recent-login") {
-      showError("resetPasswordError", "⚠️ Session timed out. Please restart the reset process.");
+    if (["auth/wrong-password", "auth/invalid-credential",
+         "auth/invalid-login-credentials"].includes(err.code)) {
+      showError("resetPasswordError", "❌ Current password is incorrect. Please try again.");
+    } else if (err.code === "auth/too-many-requests") {
+      showError("resetPasswordError", "⚠️ Too many attempts. Please wait a few minutes.");
+    } else if (err.code === "auth/weak-password") {
+      showError("resetPasswordError", "⚠️ New password is too weak. Use at least 6 characters.");
     } else {
       showError("resetPasswordError", getAuthErrorMessage(err.code));
     }
@@ -1384,6 +1475,13 @@ function saveLead() {
 
 async function bookOnWhatsApp() {
   if (!currentUser) { showToast("👋 Please login or create an account to book."); openAuthModal("login"); return; }
+
+  // ✅ FIX: T&C check
+  if (!document.getElementById("tncAccepted")?.checked) {
+    showToast("⚠️ Please accept the Terms & Conditions to continue.");
+    return;
+  }
+
   const name  = document.getElementById("custName")?.value?.trim();
   const phone = document.getElementById("custPhone")?.value?.trim();
   if (!name)                       return showToast("⚠️ Please enter your name.");
@@ -1524,8 +1622,17 @@ function downloadInvoice() {
 
 function sendWhatsAppAfterPayment() {
   if (pendingWhatsAppMsg) {
+    // Send customer copy
     window.open(`https://wa.me/919945095453?text=${encodeURIComponent(pendingWhatsAppMsg)}`, "_blank");
-    pendingWhatsAppMsg = null; pendingAdminMsg = null; return;
+    // Send admin copy if different from customer msg
+    if (pendingAdminMsg && pendingAdminMsg !== pendingWhatsAppMsg) {
+      setTimeout(() => {
+        window.open(`https://wa.me/919945095453?text=${encodeURIComponent(pendingAdminMsg)}`, "_blank");
+      }, 800);
+    }
+    pendingWhatsAppMsg = null;
+    pendingAdminMsg    = null;
+    return;
   }
   const name  = document.getElementById("custName")?.value?.trim() || "—";
   const phone = document.getElementById("custPhone")?.value?.trim() || "";
@@ -2216,6 +2323,13 @@ async function createDriver() {
    ============================================ */
 function bookWithoutPayment() {
   if (!currentUser) { showToast("👋 Please login to book."); openAuthModal("login"); return; }
+
+  // ✅ FIX: T&C check — same as startPayment()
+  if (!document.getElementById("tncAccepted")?.checked) {
+    showToast("⚠️ Please accept the Terms & Conditions to continue.");
+    return;
+  }
+
   const nameEl  = document.getElementById("custName");
   const phoneEl = document.getElementById("custPhone");
   const name    = nameEl?.value?.trim();
@@ -2431,7 +2545,18 @@ async function confirmCancellation() {
   try {
     await window._firebase.db.collection("bookings").doc(docId).update({ status:"cancelled", cancelReason:reason, cancelledAt:firebase.firestore.FieldValue.serverTimestamp(), cancelledBy:"customer" });
     await window._firebase.db.collection("cancelRequests").add({ bookingDocId:docId, reason, customerUid:currentUser.uid, createdAt:firebase.firestore.FieldValue.serverTimestamp(), resolved:false }).catch(() => {});
-    closeCancelModal(); showToast("✅ Booking cancelled."); loadUserBookings();
+
+    // ✅ FIX: Always send cancellation SMS regardless of payment type
+    const cancelledDoc = await window._firebase.db.collection("bookings").doc(docId).get();
+    if (cancelledDoc.exists) {
+      const cb = cancelledDoc.data();
+      queueSMS(cb.phone || "", "cancelled", {
+        name:       cb.customerName || "",
+        bookingRef: cb.bookingRef   || docId
+      });
+    }
+
+    closeCancelModal(); showToast("✅ Booking cancelled. Refund (if any) in 5–7 business days."); loadUserBookings();
     if (currentBookingId === docId) { dismissTrackBanner(); localStorage.removeItem("packzen_active_booking"); }
   } catch(e) { showToast("❌ Error: " + e.message); }
   finally { if (btn) { btn.textContent = "Yes, Cancel Booking"; btn.disabled = false; } }
@@ -2460,6 +2585,18 @@ async function confirmReschedule() {
   if (btn) { btn.textContent = "Saving..."; btn.disabled = true; }
   try {
     await window._firebase.db.collection("bookings").doc(docId).update({ date:newDate, time:newTime||"", rescheduledAt:firebase.firestore.FieldValue.serverTimestamp(), rescheduledBy:"customer", status:"confirmed" });
+
+    // ✅ FIX: Send reschedule confirmation SMS to customer
+    const bookingDoc = await window._firebase.db.collection("bookings").doc(docId).get();
+    if (bookingDoc.exists) {
+      const b = bookingDoc.data();
+      queueSMS(b.phone || "", "reschedule_confirmed", {
+        name:       b.customerName || "",
+        bookingRef: b.bookingRef   || docId,
+        date:       newDate
+      });
+    }
+
     closeRescheduleModal(); showToast("✅ Booking rescheduled!"); loadUserBookings();
   } catch(e) { showToast("❌ Error: " + e.message); }
   finally { if (btn) { btn.textContent = "Confirm Reschedule"; btn.disabled = false; } }
@@ -2525,12 +2662,13 @@ function subscribeToBookingNotifications(bookingDocId) {
 }
 
 const SMS_TEMPLATES = {
-  booking_confirmed: d => `Hi ${d.name}, your PackZen booking ${d.bookingRef} is confirmed for ${d.date}! Pickup: ${(d.pickup||"").split(",")[0]}. Est: Rs.${Number(d.total).toLocaleString("en-IN")}. Track: packzenblr.in`,
-  driver_assigned:   d => `Hi ${d.name}, your PackZen driver ${d.driverName} (${d.driverPhone}) is assigned for booking ${d.bookingRef}.`,
-  move_started:      d => `Hi ${d.name}, your goods are now in transit for booking ${d.bookingRef}. Track: packzenblr.in`,
-  delivered:         d => `Hi ${d.name}, your PackZen move ${d.bookingRef} is complete! Rate your driver on packzenblr.in.`,
-  cancelled:         d => `Hi ${d.name}, your PackZen booking ${d.bookingRef} has been cancelled.`,
-  damage_claim:      d => `Hi ${d.name}, your damage claim (${d.claimId}) for booking ${d.bookingRef} has been received.`,
+  booking_confirmed:    d => `Hi ${d.name}, your PackZen booking ${d.bookingRef} is confirmed for ${d.date}! Pickup: ${(d.pickup||"").split(",")[0]}. Est: Rs.${Number(d.total).toLocaleString("en-IN")}. Track: packzenblr.in`,
+  driver_assigned:      d => `Hi ${d.name}, your PackZen driver ${d.driverName} (${d.driverPhone}) is assigned for booking ${d.bookingRef}.`,
+  move_started:         d => `Hi ${d.name}, your goods are now in transit for booking ${d.bookingRef}. Track: packzenblr.in`,
+  delivered:            d => `Hi ${d.name}, your PackZen move ${d.bookingRef} is complete! Rate your driver on packzenblr.in.`,
+  cancelled:            d => `Hi ${d.name}, your PackZen booking ${d.bookingRef} has been cancelled. Refund (if any) in 5-7 business days. Queries: 9945095453`,
+  damage_claim:         d => `Hi ${d.name}, your damage claim (${d.claimId}) for booking ${d.bookingRef} has been received. We'll respond within 3 business days.`,
+  reschedule_confirmed: d => `Hi ${d.name}, your PackZen booking ${d.bookingRef} has been rescheduled to ${d.date}. Queries: 9945095453`,
 };
 
 async function queueSMS(phone, templateKey, data) {
