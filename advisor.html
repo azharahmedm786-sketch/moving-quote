@@ -1,1425 +1,1533 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PackZen BLR — Advisor Dashboard</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
-<style>
-  :root {
-    --bg: #0f1117;
-    --surface: #181c27;
-    --surface2: #1e2333;
-    --border: #2a2f45;
-    --accent: #f97316;
-    --accent2: #fb923c;
-    --text: #e8eaf0;
-    --muted: #8b91a8;
-    --green: #22c55e;
-    --red: #ef4444;
-    --blue: #3b82f6;
-    --yellow: #eab308;
-    --purple: #a855f7;
-    --radius: 12px;
-  }
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body {
-    font-family: 'DM Sans', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    display: flex;
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>PackZen — Advisor Dashboard</title>
+  <meta name="robots" content="noindex,nofollow,noarchive"/>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    :root {
+      --bg:       #0a0c0f;
+      --surface:  #111418;
+      --surface2: #181c22;
+      --border:   #232830;
+      --border2:  #2e3540;
+      --gold:     #f5a623;
+      --gold2:    #ffd166;
+      --blue:     #3d9cf5;
+      --green:    #00d17a;
+      --red:      #ff4f5e;
+      --purple:   #9b72f5;
+      --text:     #e8ecf0;
+      --muted:    #6b7686;
+      --muted2:   #4a5260;
+      --mono:     'Space Mono', monospace;
+      --sans:     'Manrope', sans-serif;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 14px; }
+    body {
+      font-family: var(--sans);
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
 
-  /* SIDEBAR */
-  .sidebar {
-    width: 240px;
-    min-height: 100vh;
-    background: var(--surface);
-    border-right: 1px solid var(--border);
-    display: flex;
-    flex-direction: column;
-    padding: 0;
-    position: fixed;
-    top: 0; left: 0;
-    z-index: 100;
-    transition: transform 0.3s;
-  }
-  .logo {
-    padding: 24px 20px 20px;
-    border-bottom: 1px solid var(--border);
-  }
-  .logo-text { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800; color: var(--text); }
-  .logo-text span { color: var(--accent); }
-  .logo-sub { font-size: 11px; color: var(--muted); letter-spacing: 1.5px; text-transform: uppercase; margin-top: 2px; }
-  .advisor-badge {
-    margin: 16px 20px;
-    background: linear-gradient(135deg, #f97316, #ea580c);
-    border-radius: 8px;
-    padding: 10px 12px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-  .advisor-avatar {
-    width: 32px; height: 32px;
-    border-radius: 50%;
-    background: rgba(255,255,255,0.2);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 13px; font-weight: 700;
-  }
-  .advisor-info .name { font-size: 13px; font-weight: 600; }
-  .advisor-info .role { font-size: 10px; opacity: 0.8; letter-spacing: 0.5px; }
-  nav { padding: 8px 0; flex: 1; }
-  .nav-section { padding: 12px 20px 4px; font-size: 10px; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; font-weight: 500; }
-  .nav-item {
-    display: flex; align-items: center; gap: 12px;
-    padding: 10px 20px;
-    cursor: pointer;
-    border-radius: 0;
-    font-size: 14px;
-    color: var(--muted);
-    transition: all 0.2s;
-    border-left: 3px solid transparent;
-    position: relative;
-  }
-  .nav-item:hover { background: var(--surface2); color: var(--text); border-left-color: var(--border); }
-  .nav-item.active { background: rgba(249,115,22,0.08); color: var(--accent); border-left-color: var(--accent); font-weight: 500; }
-  .nav-item .icon { font-size: 17px; width: 20px; text-align: center; }
-  .nav-badge { margin-left: auto; background: var(--accent); color: white; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 20px; }
-  .nav-badge.green { background: var(--green); }
-  .sidebar-footer { padding: 16px 20px; border-top: 1px solid var(--border); }
-  .status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); display: inline-block; margin-right: 6px; box-shadow: 0 0 0 2px rgba(34,197,94,0.2); }
+    /* ─── GRID NOISE TEXTURE ─── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: radial-gradient(circle at 20% 30%, rgba(245,166,35,.04) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 70%, rgba(61,156,245,.04) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: 0;
+    }
 
-  /* MAIN */
-  .main { margin-left: 240px; flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
-  .topbar {
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
-    padding: 14px 28px;
-    display: flex; align-items: center; gap: 16px;
-    position: sticky; top: 0; z-index: 50;
-  }
-  .topbar-title { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 700; flex: 1; }
-  .topbar-search {
-    display: flex; align-items: center;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 8px 14px; gap: 8px;
-    width: 260px;
-  }
-  .topbar-search input { background: none; border: none; outline: none; color: var(--text); font-size: 13px; width: 100%; font-family: 'DM Sans', sans-serif; }
-  .topbar-search input::placeholder { color: var(--muted); }
-  .btn {
-    display: inline-flex; align-items: center; gap: 6px;
-    padding: 8px 16px; border-radius: 8px; border: none;
-    cursor: pointer; font-size: 13px; font-weight: 500;
-    font-family: 'DM Sans', sans-serif; transition: all 0.2s;
-  }
-  .btn-primary { background: var(--accent); color: white; }
-  .btn-primary:hover { background: var(--accent2); }
-  .btn-ghost { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
-  .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
-  .btn-danger { background: rgba(239,68,68,0.1); color: var(--red); border: 1px solid rgba(239,68,68,0.2); }
-  .btn-success { background: rgba(34,197,94,0.1); color: var(--green); border: 1px solid rgba(34,197,94,0.2); }
-  .btn-warning { background: rgba(234,179,8,0.1); color: var(--yellow); border: 1px solid rgba(234,179,8,0.2); }
-  .btn-sm { padding: 5px 11px; font-size: 12px; }
+    /* ─── LOGIN ─── */
+    .login-wrap {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      position: relative;
+      z-index: 1;
+    }
+    .login-card {
+      width: 100%;
+      max-width: 380px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 40px 36px;
+      box-shadow: 0 40px 80px rgba(0,0,0,.6);
+    }
+    .login-logo {
+      font-family: var(--mono);
+      font-size: 1.1rem;
+      color: var(--gold);
+      letter-spacing: -.02em;
+      margin-bottom: 4px;
+    }
+    .login-tagline {
+      font-size: .78rem;
+      color: var(--muted);
+      font-weight: 500;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      margin-bottom: 32px;
+    }
+    .field-label {
+      display: block;
+      font-size: .75rem;
+      font-weight: 700;
+      color: var(--muted);
+      letter-spacing: .07em;
+      text-transform: uppercase;
+      margin-bottom: 7px;
+      margin-top: 18px;
+    }
+    .field-input {
+      width: 100%;
+      background: var(--bg);
+      border: 1.5px solid var(--border2);
+      border-radius: 10px;
+      color: var(--text);
+      font-family: var(--sans);
+      font-size: .9rem;
+      padding: 11px 14px;
+      outline: none;
+      transition: border-color .2s;
+    }
+    .field-input:focus { border-color: var(--gold); }
+    .btn-login {
+      width: 100%;
+      margin-top: 24px;
+      padding: 13px;
+      background: var(--gold);
+      color: #000;
+      border: none;
+      border-radius: 10px;
+      font-family: var(--sans);
+      font-size: .9rem;
+      font-weight: 800;
+      cursor: pointer;
+      letter-spacing: .02em;
+      transition: opacity .2s, transform .15s;
+    }
+    .btn-login:hover { opacity: .9; transform: translateY(-1px); }
+    .btn-login:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+    .login-err {
+      font-size: .8rem;
+      color: var(--red);
+      min-height: 18px;
+      margin-top: 10px;
+      font-weight: 600;
+    }
+    .login-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(245,166,35,.08);
+      border: 1px solid rgba(245,166,35,.2);
+      border-radius: 20px;
+      padding: 5px 12px;
+      font-size: .72rem;
+      color: var(--gold);
+      font-weight: 700;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+    }
 
-  /* CONTENT */
-  .content { padding: 28px; flex: 1; }
+    /* ─── SHELL ─── */
+    .shell {
+      display: none;
+      min-height: 100vh;
+      position: relative;
+      z-index: 1;
+    }
+    .shell.active { display: flex; }
 
-  /* PAGE SECTIONS */
-  .page { display: none; }
-  .page.active { display: block; }
+    /* ─── SIDEBAR ─── */
+    .sidebar {
+      width: 220px;
+      flex-shrink: 0;
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 0; left: 0; bottom: 0;
+      z-index: 100;
+      overflow-y: auto;
+    }
+    .sb-logo {
+      padding: 24px 20px 20px;
+      border-bottom: 1px solid var(--border);
+    }
+    .sb-logo-text {
+      font-family: var(--mono);
+      font-size: 1rem;
+      color: var(--gold);
+      font-weight: 700;
+    }
+    .sb-logo-sub {
+      font-size: .68rem;
+      color: var(--muted);
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      margin-top: 3px;
+    }
+    .sb-section {
+      font-size: .66rem;
+      font-weight: 800;
+      color: var(--muted2);
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      padding: 18px 20px 7px;
+    }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      padding: 10px 20px;
+      font-size: .83rem;
+      font-weight: 600;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all .15s;
+      border-left: 3px solid transparent;
+      user-select: none;
+    }
+    .nav-item:hover { color: var(--text); background: rgba(255,255,255,.03); }
+    .nav-item.active { color: var(--gold); border-left-color: var(--gold); background: rgba(245,166,35,.06); }
+    .nav-icon { font-size: 1rem; width: 18px; text-align: center; }
+    .sb-bottom {
+      margin-top: auto;
+      padding: 16px 20px;
+      border-top: 1px solid var(--border);
+    }
+    .advisor-chip {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .advisor-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--gold), #e67e00);
+      color: #000;
+      font-weight: 800;
+      font-size: .85rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .advisor-name {
+      font-size: .8rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .advisor-role {
+      font-size: .68rem;
+      color: var(--muted);
+      margin-top: 1px;
+    }
+    .btn-signout {
+      width: 100%;
+      margin-top: 12px;
+      padding: 8px;
+      background: rgba(255,79,94,.08);
+      border: 1px solid rgba(255,79,94,.2);
+      color: var(--red);
+      border-radius: 8px;
+      font-family: var(--sans);
+      font-size: .78rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background .2s;
+    }
+    .btn-signout:hover { background: rgba(255,79,94,.15); }
 
-  /* STATS */
-  .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
-  .stat-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 20px;
-    position: relative;
-    overflow: hidden;
-    transition: border-color 0.2s;
-  }
-  .stat-card:hover { border-color: var(--accent); }
-  .stat-card::before {
-    content: '';
-    position: absolute; top: 0; left: 0; right: 0;
-    height: 2px;
-  }
-  .stat-card.orange::before { background: var(--accent); }
-  .stat-card.green::before { background: var(--green); }
-  .stat-card.blue::before { background: var(--blue); }
-  .stat-card.red::before { background: var(--red); }
-  .stat-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
-  .stat-value { font-family: 'Syne', sans-serif; font-size: 28px; font-weight: 700; }
-  .stat-value.orange { color: var(--accent); }
-  .stat-value.green { color: var(--green); }
-  .stat-value.blue { color: var(--blue); }
-  .stat-value.red { color: var(--red); }
-  .stat-change { font-size: 12px; color: var(--muted); margin-top: 4px; }
-  .stat-icon { position: absolute; right: 16px; top: 16px; font-size: 26px; opacity: 0.15; }
+    /* ─── MAIN ─── */
+    .main {
+      margin-left: 220px;
+      flex: 1;
+      padding: 28px 28px 48px;
+      min-height: 100vh;
+    }
 
-  /* CARDS */
-  .card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    overflow: hidden;
-  }
-  .card-header {
-    padding: 16px 20px;
-    border-bottom: 1px solid var(--border);
-    display: flex; align-items: center; justify-content: space-between;
-  }
-  .card-title { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; }
-  .card-body { padding: 0; }
+    /* ─── TOPBAR ─── */
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 28px;
+    }
+    .topbar-left h1 {
+      font-family: var(--mono);
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -.03em;
+    }
+    .topbar-left p {
+      font-size: .78rem;
+      color: var(--muted);
+      margin-top: 3px;
+    }
+    .live-dot {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(0,209,122,.08);
+      border: 1px solid rgba(0,209,122,.2);
+      border-radius: 20px;
+      padding: 5px 12px;
+      font-size: .72rem;
+      font-weight: 700;
+      color: var(--green);
+      letter-spacing: .05em;
+    }
+    .live-dot::before {
+      content: '';
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 6px var(--green);
+      animation: pulse 1.8s infinite;
+    }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
 
-  /* TABLE */
-  table { width: 100%; border-collapse: collapse; }
-  th {
-    padding: 12px 16px;
-    text-align: left;
-    font-size: 11px;
-    font-weight: 600;
-    color: var(--muted);
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    border-bottom: 1px solid var(--border);
-    background: var(--surface2);
-  }
-  td {
-    padding: 13px 16px;
-    font-size: 13px;
-    border-bottom: 1px solid rgba(42,47,69,0.5);
-  }
-  tr:last-child td { border-bottom: none; }
-  tr:hover td { background: rgba(255,255,255,0.02); }
+    /* ─── SECTIONS ─── */
+    .section { display: none; }
+    .section.active { display: block; }
 
-  /* STATUS BADGES */
-  .badge {
-    display: inline-flex; align-items: center; gap: 5px;
-    padding: 3px 10px; border-radius: 20px;
-    font-size: 11px; font-weight: 600; letter-spacing: 0.3px;
-  }
-  .badge::before { content: '●'; font-size: 8px; }
-  .badge-confirmed { background: rgba(34,197,94,0.12); color: var(--green); }
-  .badge-pending { background: rgba(234,179,8,0.12); color: var(--yellow); }
-  .badge-cancelled { background: rgba(239,68,68,0.12); color: var(--red); }
-  .badge-rescheduled { background: rgba(59,130,246,0.12); color: var(--blue); }
-  .badge-inprogress { background: rgba(168,85,247,0.12); color: var(--purple); }
-  .badge-completed { background: rgba(34,197,94,0.12); color: var(--green); }
+    /* ─── STATS GRID ─── */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 14px;
+      margin-bottom: 22px;
+    }
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 20px 22px;
+      position: relative;
+      overflow: hidden;
+      transition: border-color .2s;
+    }
+    .stat-card:hover { border-color: var(--border2); }
+    .stat-card::after {
+      content: '';
+      position: absolute;
+      bottom: 0; right: 0;
+      width: 80px; height: 80px;
+      border-radius: 50%;
+      opacity: .06;
+      transform: translate(30%, 30%);
+    }
+    .stat-card.gold::after  { background: var(--gold); }
+    .stat-card.blue::after  { background: var(--blue); }
+    .stat-card.green::after { background: var(--green); }
+    .stat-card.purple::after{ background: var(--purple); }
+    .stat-card.red::after   { background: var(--red); }
+    .stat-icon { font-size: 1.4rem; margin-bottom: 10px; }
+    .stat-label {
+      font-size: .7rem;
+      font-weight: 700;
+      color: var(--muted);
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+    .stat-value {
+      font-family: var(--mono);
+      font-size: 1.7rem;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -.03em;
+      line-height: 1;
+    }
+    .stat-card.gold  .stat-value { color: var(--gold); }
+    .stat-card.green .stat-value { color: var(--green); }
+    .stat-sub {
+      font-size: .72rem;
+      color: var(--muted);
+      margin-top: 5px;
+    }
 
-  /* GRID LAYOUTS */
-  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    /* ─── CHART ROW ─── */
+    .chart-row {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 14px;
+      margin-bottom: 22px;
+    }
+    .chart-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 20px 22px;
+    }
+    .chart-title {
+      font-family: var(--mono);
+      font-size: .82rem;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -.01em;
+      margin-bottom: 4px;
+    }
+    .chart-sub {
+      font-size: .72rem;
+      color: var(--muted);
+      margin-bottom: 16px;
+    }
+    .donut-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .donut-legend {
+      width: 100%;
+      margin-top: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: .78rem;
+    }
+    .legend-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      margin-right: 8px;
+      flex-shrink: 0;
+    }
+    .legend-left { display: flex; align-items: center; color: var(--muted); }
+    .legend-val { font-weight: 700; color: var(--text); font-family: var(--mono); }
 
-  /* MODAL */
-  .modal-overlay {
-    display: none; position: fixed;
-    inset: 0; background: rgba(0,0,0,0.6);
-    z-index: 200; align-items: center; justify-content: center;
-    backdrop-filter: blur(4px);
-  }
-  .modal-overlay.open { display: flex; }
-  .modal {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    width: 560px; max-width: 96vw;
-    max-height: 90vh; overflow-y: auto;
-    animation: slideUp 0.25s ease;
-  }
-  @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-  .modal-header {
-    padding: 20px 24px;
-    border-bottom: 1px solid var(--border);
-    display: flex; align-items: center; justify-content: space-between;
-  }
-  .modal-title { font-family: 'Syne', sans-serif; font-size: 17px; font-weight: 700; }
-  .modal-close { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 20px; padding: 0; line-height: 1; }
-  .modal-body { padding: 24px; }
-  .modal-footer { padding: 16px 24px; border-top: 1px solid var(--border); display: flex; gap: 10px; justify-content: flex-end; }
+    /* ─── TABLE CARD ─── */
+    .table-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+    .table-hdr {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .table-title {
+      font-family: var(--mono);
+      font-size: .82rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .table-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .search-input {
+      background: var(--bg);
+      border: 1px solid var(--border2);
+      border-radius: 8px;
+      padding: 6px 12px;
+      font-family: var(--sans);
+      font-size: .78rem;
+      color: var(--text);
+      outline: none;
+      width: 160px;
+      transition: border-color .2s;
+    }
+    .search-input:focus { border-color: var(--gold); }
+    .filter-sel {
+      background: var(--bg);
+      border: 1px solid var(--border2);
+      border-radius: 8px;
+      padding: 6px 10px;
+      font-family: var(--sans);
+      font-size: .78rem;
+      color: var(--text);
+      outline: none;
+      cursor: pointer;
+    }
+    table { width: 100%; border-collapse: collapse; }
+    th {
+      padding: 10px 16px;
+      text-align: left;
+      font-size: .68rem;
+      font-weight: 700;
+      color: var(--muted);
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      background: var(--surface2);
+      border-bottom: 1px solid var(--border);
+    }
+    td {
+      padding: 12px 16px;
+      font-size: .82rem;
+      color: var(--text);
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+    }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: rgba(255,255,255,.015); }
+    .empty-td { text-align: center; color: var(--muted); padding: 40px !important; font-size: .82rem; }
 
-  /* FORMS */
-  .form-group { margin-bottom: 16px; }
-  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-  label { display: block; font-size: 12px; font-weight: 500; color: var(--muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
-  input, select, textarea {
-    width: 100%; background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 8px; padding: 10px 13px;
-    color: var(--text); font-size: 13px;
-    font-family: 'DM Sans', sans-serif;
-    outline: none; transition: border-color 0.2s;
-  }
-  input:focus, select:focus, textarea:focus { border-color: var(--accent); }
-  select option { background: var(--surface2); }
-  textarea { resize: vertical; min-height: 80px; }
+    /* ─── BADGES ─── */
+    .badge {
+      display: inline-block;
+      padding: 3px 9px;
+      border-radius: 20px;
+      font-size: .68rem;
+      font-weight: 700;
+      letter-spacing: .03em;
+    }
+    .badge-pending   { background: rgba(245,166,35,.12); color: var(--gold); }
+    .badge-confirmed { background: rgba(61,156,245,.12); color: var(--blue); }
+    .badge-assigned  { background: rgba(155,114,245,.12); color: var(--purple); }
+    .badge-packing   { background: rgba(61,156,245,.1); color: #7dd3fc; }
+    .badge-transit   { background: rgba(245,166,35,.15); color: #fbbf24; }
+    .badge-delivered { background: rgba(0,209,122,.12); color: var(--green); }
+    .badge-cancelled { background: rgba(255,79,94,.1); color: var(--red); }
 
-  /* CUSTOMER CARD */
-  .customer-card {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 14px;
-    display: flex; gap: 12px; align-items: center;
-    margin-bottom: 12px;
-  }
-  .cust-avatar {
-    width: 40px; height: 40px; border-radius: 50%;
-    background: linear-gradient(135deg, var(--accent), #c2410c);
-    display: flex; align-items: center; justify-content: center;
-    font-weight: 700; font-size: 16px; flex-shrink: 0;
-  }
-  .cust-info .cname { font-size: 14px; font-weight: 600; }
-  .cust-info .cphone { font-size: 12px; color: var(--muted); margin-top: 2px; }
+    /* ─── AMOUNT ─── */
+    .amount { font-family: var(--mono); font-weight: 700; }
 
-  /* TIMELINE */
-  .timeline { padding: 0 20px; }
-  .tl-item { display: flex; gap: 14px; padding: 14px 0; border-bottom: 1px solid var(--border); }
-  .tl-item:last-child { border-bottom: none; }
-  .tl-dot {
-    width: 34px; height: 34px; border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 15px; flex-shrink: 0; margin-top: 2px;
-  }
-  .tl-dot.orange { background: rgba(249,115,22,0.15); }
-  .tl-dot.green { background: rgba(34,197,94,0.15); }
-  .tl-dot.red { background: rgba(239,68,68,0.15); }
-  .tl-dot.blue { background: rgba(59,130,246,0.15); }
-  .tl-content .tl-action { font-size: 13px; font-weight: 500; }
-  .tl-content .tl-detail { font-size: 12px; color: var(--muted); margin-top: 3px; }
-  .tl-time { margin-left: auto; font-size: 11px; color: var(--muted); white-space: nowrap; }
+    /* ─── BOOKING REF ─── */
+    .booking-ref {
+      font-family: var(--mono);
+      font-size: .75rem;
+      color: var(--gold);
+      background: rgba(245,166,35,.08);
+      padding: 2px 7px;
+      border-radius: 5px;
+    }
 
-  /* TOAST */
-  .toast-container { position: fixed; bottom: 24px; right: 24px; z-index: 999; display: flex; flex-direction: column; gap: 10px; }
-  .toast {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 14px 18px;
-    display: flex; align-items: center; gap: 12px;
-    min-width: 280px;
-    animation: fadeIn 0.3s ease;
-    box-shadow: 0 8px 30px rgba(0,0,0,0.4);
-  }
-  .toast.success { border-left: 3px solid var(--green); }
-  .toast.error { border-left: 3px solid var(--red); }
-  .toast.info { border-left: 3px solid var(--blue); }
-  @keyframes fadeIn { from { transform: translateX(20px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+    /* ─── CUSTOMER AVATAR ─── */
+    .cust-avatar {
+      width: 30px; height: 30px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--blue), var(--purple));
+      color: #fff;
+      font-weight: 800;
+      font-size: .78rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 8px;
+      flex-shrink: 0;
+    }
+    .cust-cell { display: flex; align-items: center; }
 
-  /* QUICK ACTION CARDS */
-  .quick-actions { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 24px; }
-  .qa-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 18px;
-    cursor: pointer;
-    transition: all 0.2s;
-    text-align: center;
-  }
-  .qa-card:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(249,115,22,0.1); }
-  .qa-icon { font-size: 26px; margin-bottom: 8px; }
-  .qa-label { font-size: 13px; font-weight: 500; }
+    /* ─── ROUTE ─── */
+    .route-cell { font-size: .78rem; color: var(--muted); max-width: 180px; }
+    .route-from { color: var(--text); font-weight: 600; }
 
-  /* PRIORITY TAG */
-  .priority { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 600; }
-  .priority.high { color: var(--red); }
-  .priority.medium { color: var(--yellow); }
-  .priority.low { color: var(--green); }
+    /* ─── TOAST ─── */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(16px);
+      background: var(--surface2);
+      border: 1px solid var(--border2);
+      color: var(--text);
+      padding: 10px 20px;
+      border-radius: 50px;
+      font-size: .82rem;
+      font-weight: 600;
+      z-index: 9999;
+      opacity: 0;
+      transition: opacity .25s, transform .25s;
+      white-space: nowrap;
+      pointer-events: none;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-  /* SEARCH RESULTS */
-  .search-results { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
-  .sr-item { padding: 12px 16px; border-bottom: 1px solid var(--border); cursor: pointer; transition: background 0.15s; }
-  .sr-item:last-child { border-bottom: none; }
-  .sr-item:hover { background: rgba(249,115,22,0.06); }
+    /* ─── KPI ROW ─── */
+    .kpi-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 22px;
+    }
+    .kpi-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px 18px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .kpi-icon-wrap {
+      width: 40px; height: 40px;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem;
+      flex-shrink: 0;
+    }
+    .kpi-icon-wrap.gold   { background: rgba(245,166,35,.12); }
+    .kpi-icon-wrap.green  { background: rgba(0,209,122,.10); }
+    .kpi-icon-wrap.blue   { background: rgba(61,156,245,.10); }
+    .kpi-label { font-size: .72rem; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: .06em; }
+    .kpi-value { font-family: var(--mono); font-size: 1.2rem; font-weight: 700; color: var(--text); }
 
-  /* SCROLLBAR */
-  ::-webkit-scrollbar { width: 6px; }
-  ::-webkit-scrollbar-track { background: var(--bg); }
-  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+    /* ─── REVENUE TABLE ─── */
+    .rev-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .rev-bar-track {
+      flex: 1;
+      height: 5px;
+      background: var(--bg);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    .rev-bar-fill {
+      height: 100%;
+      border-radius: 3px;
+      background: linear-gradient(90deg, var(--gold), var(--gold2));
+      transition: width .6s ease;
+    }
 
-  /* TAB BAR */
-  .tab-bar { display: flex; gap: 4px; background: var(--surface2); padding: 4px; border-radius: 10px; margin-bottom: 20px; }
-  .tab { padding: 8px 16px; border-radius: 7px; cursor: pointer; font-size: 13px; font-weight: 500; color: var(--muted); transition: all 0.2s; }
-  .tab.active { background: var(--surface); color: var(--text); box-shadow: 0 1px 4px rgba(0,0,0,0.3); }
+    /* ─── SCROLL TABLE ─── */
+    .table-scroll { overflow-x: auto; }
 
-  .section-title { font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 700; margin-bottom: 14px; }
-  .text-muted { color: var(--muted); font-size: 12px; }
-  .gap-2 { gap: 8px; }
-  .d-flex { display: flex; }
-  .align-center { align-items: center; }
-  .mb-20 { margin-bottom: 20px; }
-  .mb-4 { margin-bottom: 16px; }
-  .ml-auto { margin-left: auto; }
+    /* ─── PHONE LINK ─── */
+    a.phone-link {
+      color: var(--blue);
+      text-decoration: none;
+      font-family: var(--mono);
+      font-size: .78rem;
+    }
+    a.phone-link:hover { text-decoration: underline; }
 
-  /* Notification dot */
-  .notif-dot {
-    width: 8px; height: 8px; border-radius: 50%;
-    background: var(--accent); position: absolute;
-    top: 10px; right: 18px;
-  }
+    /* ─── REFRESH BTN ─── */
+    .btn-refresh {
+      background: rgba(61,156,245,.08);
+      border: 1px solid rgba(61,156,245,.2);
+      color: var(--blue);
+      border-radius: 8px;
+      padding: 6px 12px;
+      font-family: var(--sans);
+      font-size: .75rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background .2s;
+    }
+    .btn-refresh:hover { background: rgba(61,156,245,.15); }
 
-  .divider { border: none; border-top: 1px solid var(--border); margin: 20px 0; }
+    /* ─── EXPORT BTN ─── */
+    .btn-export {
+      background: rgba(0,209,122,.08);
+      border: 1px solid rgba(0,209,122,.2);
+      color: var(--green);
+      border-radius: 8px;
+      padding: 6px 12px;
+      font-family: var(--sans);
+      font-size: .75rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background .2s;
+    }
+    .btn-export:hover { background: rgba(0,209,122,.15); }
 
-  .info-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(42,47,69,0.4); font-size: 13px; }
-  .info-row:last-child { border-bottom: none; }
-  .info-row .label { color: var(--muted); }
+    /* ─── LOADING SPINNER ─── */
+    .spinner {
+      width: 20px; height: 20px;
+      border: 2px solid var(--border2);
+      border-top-color: var(--gold);
+      border-radius: 50%;
+      animation: spin .8s linear infinite;
+      display: inline-block;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
 
-  @media (max-width: 1100px) {
-    .stats-grid { grid-template-columns: repeat(2, 1fr); }
-    .quick-actions { grid-template-columns: repeat(2, 1fr); }
-  }
-</style>
+    /* ─── SUMMARY STRIP ─── */
+    .summary-strip {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 18px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    .ss-item { display: flex; flex-direction: column; }
+    .ss-label { font-size: .65rem; color: var(--muted); font-weight: 700; letter-spacing: .07em; text-transform: uppercase; }
+    .ss-value { font-family: var(--mono); font-size: .95rem; font-weight: 700; color: var(--text); margin-top: 2px; }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 900px) {
+      .sidebar { width: 200px; }
+      .main    { margin-left: 200px; }
+      .chart-row { grid-template-columns: 1fr; }
+      .kpi-row   { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 650px) {
+      .sidebar { display: none; }
+      .main    { margin-left: 0; padding: 16px; }
+      .stats-grid { grid-template-columns: 1fr 1fr; }
+      .kpi-row { grid-template-columns: 1fr; }
+    }
+  </style>
 </head>
 <body>
 
-<!-- SIDEBAR -->
-<aside class="sidebar">
-  <div class="logo">
-    <div class="logo-text">Pack<span>Zen</span></div>
-    <div class="logo-sub">Advisor Portal · BLR</div>
-  </div>
-  <div class="advisor-badge">
-    <div class="advisor-avatar">PR</div>
-    <div class="advisor-info">
-      <div class="name">Priya Rajan</div>
-      <div class="role">Call Center Advisor</div>
-    </div>
-  </div>
-  <nav>
-    <div class="nav-section">Main</div>
-    <div class="nav-item active" onclick="navigate('dashboard')">
-      <span class="icon">🏠</span> Dashboard
-    </div>
-    <div class="nav-item" onclick="navigate('bookings')">
-      <span class="icon">📦</span> All Bookings
-      <span class="nav-badge">12</span>
-    </div>
-    <div class="nav-item" onclick="navigate('new-booking')">
-      <span class="icon">➕</span> New Booking
-    </div>
-    <div class="nav-section">Management</div>
-    <div class="nav-item" onclick="navigate('reschedule')">
-      <span class="icon">📅</span> Reschedule
-      <span class="nav-badge green">3</span>
-    </div>
-    <div class="nav-item" onclick="navigate('customers')">
-      <span class="icon">👥</span> Customers
-    </div>
-    <div class="nav-item" onclick="navigate('complaints')">
-      <span class="icon">⚠️</span> Complaints
-      <span class="nav-badge" style="background:var(--red)">2</span>
-    </div>
-    <div class="nav-section">Reports</div>
-    <div class="nav-item" onclick="navigate('activity')">
-      <span class="icon">📋</span> Activity Log
-    </div>
-    <div class="nav-item" onclick="navigate('stats')">
-      <span class="icon">📊</span> My Stats
-    </div>
-  </nav>
-  <div class="sidebar-footer">
-    <span class="status-dot"></span>
-    <span style="font-size:12px; color:var(--muted)">Online · Shift ends 8 PM</span>
-  </div>
-</aside>
-
-<!-- MAIN -->
-<div class="main">
-  <div class="topbar">
-    <div class="topbar-title" id="page-title">Dashboard</div>
-    <div class="topbar-search">
-      <span>🔍</span>
-      <input type="text" placeholder="Search by name, phone, booking ID..." id="global-search" oninput="globalSearch(this.value)">
-    </div>
-    <button class="btn btn-primary" onclick="openModal('new-booking-modal')">+ New Booking</button>
-    <button class="btn btn-ghost" title="Notifications" style="position:relative; padding:8px 10px;">
-      🔔 <span class="notif-dot"></span>
-    </button>
-  </div>
-
-  <div class="content">
-
-    <!-- GLOBAL SEARCH RESULTS -->
-    <div id="search-results-box" style="display:none; margin-bottom:20px;">
-      <div class="card">
-        <div class="card-header">
-          <span class="card-title">Search Results</span>
-          <button class="btn btn-ghost btn-sm" onclick="clearSearch()">✕ Clear</button>
-        </div>
-        <div class="card-body" id="search-results-list"></div>
-      </div>
-    </div>
-
-    <!-- ===== DASHBOARD PAGE ===== -->
-    <div class="page active" id="page-dashboard">
-      <div class="stats-grid">
-        <div class="stat-card orange">
-          <div class="stat-icon">📦</div>
-          <div class="stat-label">Today's Bookings</div>
-          <div class="stat-value orange">8</div>
-          <div class="stat-change">↑ 2 from yesterday</div>
-        </div>
-        <div class="stat-card green">
-          <div class="stat-icon">✅</div>
-          <div class="stat-label">Confirmed</div>
-          <div class="stat-value green">5</div>
-          <div class="stat-change">62.5% conversion</div>
-        </div>
-        <div class="stat-card blue">
-          <div class="stat-icon">📅</div>
-          <div class="stat-label">Rescheduled</div>
-          <div class="stat-value blue">3</div>
-          <div class="stat-change">Pending follow-up</div>
-        </div>
-        <div class="stat-card red">
-          <div class="stat-icon">❌</div>
-          <div class="stat-label">Cancelled Today</div>
-          <div class="stat-value red">1</div>
-          <div class="stat-change">Refund initiated</div>
-        </div>
-      </div>
-
-      <div class="quick-actions">
-        <div class="qa-card" onclick="openModal('new-booking-modal')">
-          <div class="qa-icon">📦</div>
-          <div class="qa-label">New Booking</div>
-        </div>
-        <div class="qa-card" onclick="openModal('reschedule-modal')">
-          <div class="qa-icon">📅</div>
-          <div class="qa-label">Reschedule</div>
-        </div>
-        <div class="qa-card" onclick="openModal('cancel-modal')">
-          <div class="qa-icon">❌</div>
-          <div class="qa-label">Cancel Booking</div>
-        </div>
-        <div class="qa-card" onclick="openModal('callback-modal')">
-          <div class="qa-icon">📞</div>
-          <div class="qa-label">Log Callback</div>
-        </div>
-      </div>
-
-      <div class="grid-2">
-        <!-- TODAY'S BOOKINGS -->
-        <div class="card">
-          <div class="card-header">
-            <span class="card-title">Today's Schedule</span>
-            <button class="btn btn-ghost btn-sm" onclick="navigate('bookings')">View All</button>
-          </div>
-          <div class="card-body">
-            <table>
-              <thead><tr>
-                <th>Customer</th><th>Service</th><th>Time</th><th>Status</th>
-              </tr></thead>
-              <tbody id="today-bookings-table">
-                <tr onclick="openBookingDetail('BK001')" style="cursor:pointer">
-                  <td><b>Arjun Mehta</b><br><span class="text-muted">+91 98765 43210</span></td>
-                  <td>Home Shifting<br><span class="text-muted">2BHK · Koramangala</span></td>
-                  <td>9:00 AM</td>
-                  <td><span class="badge badge-confirmed">Confirmed</span></td>
-                </tr>
-                <tr onclick="openBookingDetail('BK002')" style="cursor:pointer">
-                  <td><b>Sneha Iyer</b><br><span class="text-muted">+91 87654 32109</span></td>
-                  <td>Office Relocation<br><span class="text-muted">Indiranagar</span></td>
-                  <td>11:30 AM</td>
-                  <td><span class="badge badge-inprogress">In Progress</span></td>
-                </tr>
-                <tr onclick="openBookingDetail('BK003')" style="cursor:pointer">
-                  <td><b>Vikram Nair</b><br><span class="text-muted">+91 76543 21098</span></td>
-                  <td>Bike Transport<br><span class="text-muted">HSR Layout</span></td>
-                  <td>2:00 PM</td>
-                  <td><span class="badge badge-pending">Pending</span></td>
-                </tr>
-                <tr onclick="openBookingDetail('BK004')" style="cursor:pointer">
-                  <td><b>Divya Krishnan</b><br><span class="text-muted">+91 65432 10987</span></td>
-                  <td>Storage<br><span class="text-muted">Whitefield</span></td>
-                  <td>4:30 PM</td>
-                  <td><span class="badge badge-rescheduled">Rescheduled</span></td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <!-- ACTIVITY LOG -->
-        <div class="card">
-          <div class="card-header">
-            <span class="card-title">Recent Activity</span>
-            <span class="text-muted">Today</span>
-          </div>
-          <div class="card-body">
-            <div class="timeline">
-              <div class="tl-item">
-                <div class="tl-dot orange">📦</div>
-                <div class="tl-content">
-                  <div class="tl-action">New booking created — BK012</div>
-                  <div class="tl-detail">Rohan Sharma · Home Shifting · Jayanagar</div>
-                </div>
-                <div class="tl-time">Just now</div>
-              </div>
-              <div class="tl-item">
-                <div class="tl-dot blue">📅</div>
-                <div class="tl-content">
-                  <div class="tl-action">Rescheduled — BK009</div>
-                  <div class="tl-detail">Meena Reddy · Shifted to 30 Mar</div>
-                </div>
-                <div class="tl-time">42 min ago</div>
-              </div>
-              <div class="tl-item">
-                <div class="tl-dot red">❌</div>
-                <div class="tl-content">
-                  <div class="tl-action">Cancelled — BK007</div>
-                  <div class="tl-detail">Kiran Patel · Customer request · Refund ₹2,000</div>
-                </div>
-                <div class="tl-time">1.5 hr ago</div>
-              </div>
-              <div class="tl-item">
-                <div class="tl-dot green">📞</div>
-                <div class="tl-content">
-                  <div class="tl-action">Callback logged — Anjali Desai</div>
-                  <div class="tl-detail">Enquiry about car transport to Mumbai</div>
-                </div>
-                <div class="tl-time">2 hr ago</div>
-              </div>
-              <div class="tl-item">
-                <div class="tl-dot orange">✅</div>
-                <div class="tl-content">
-                  <div class="tl-action">Booking confirmed — BK006</div>
-                  <div class="tl-detail">Suresh Kumar · Office Relocation · MG Road</div>
-                </div>
-                <div class="tl-time">3 hr ago</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- PENDING CALLBACKS -->
-      <div class="card" style="margin-top:20px;">
-        <div class="card-header">
-          <span class="card-title">Pending Follow-ups & Callbacks</span>
-          <button class="btn btn-ghost btn-sm" onclick="openModal('callback-modal')">+ Add</button>
-        </div>
-        <div class="card-body">
-          <table>
-            <thead><tr><th>Customer</th><th>Contact</th><th>Reason</th><th>Priority</th><th>Due</th><th>Action</th></tr></thead>
-            <tbody>
-              <tr>
-                <td><b>Anjali Desai</b></td>
-                <td>+91 99887 76655</td>
-                <td>Enquiry · Car Transport to Mumbai</td>
-                <td><span class="priority high">🔴 High</span></td>
-                <td>Today 3 PM</td>
-                <td><button class="btn btn-success btn-sm" onclick="markDone(this)">✓ Done</button></td>
-              </tr>
-              <tr>
-                <td><b>Raj Malhotra</b></td>
-                <td>+91 88776 65544</td>
-                <td>Reschedule request</td>
-                <td><span class="priority medium">🟡 Medium</span></td>
-                <td>Today 5 PM</td>
-                <td><button class="btn btn-success btn-sm" onclick="markDone(this)">✓ Done</button></td>
-              </tr>
-              <tr>
-                <td><b>Pooja Shetty</b></td>
-                <td>+91 77665 54433</td>
-                <td>Quote for 3BHK shifting</td>
-                <td><span class="priority low">🟢 Low</span></td>
-                <td>Tomorrow</td>
-                <td><button class="btn btn-success btn-sm" onclick="markDone(this)">✓ Done</button></td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-
-    <!-- ===== ALL BOOKINGS PAGE ===== -->
-    <div class="page" id="page-bookings">
-      <div class="d-flex align-center mb-4" style="margin-bottom:16px;">
-        <div class="tab-bar" style="margin-bottom:0">
-          <div class="tab active" onclick="filterBookings('all', this)">All (12)</div>
-          <div class="tab" onclick="filterBookings('confirmed', this)">Confirmed (5)</div>
-          <div class="tab" onclick="filterBookings('pending', this)">Pending (3)</div>
-          <div class="tab" onclick="filterBookings('rescheduled', this)">Rescheduled (2)</div>
-          <div class="tab" onclick="filterBookings('cancelled', this)">Cancelled (2)</div>
-        </div>
-        <div class="ml-auto d-flex gap-2" style="gap:8px">
-          <select style="width:140px; padding:8px 12px;" onchange="filterByDate(this.value)">
-            <option>Today</option>
-            <option>This Week</option>
-            <option>This Month</option>
-            <option>Custom Range</option>
-          </select>
-          <button class="btn btn-primary" onclick="openModal('new-booking-modal')">+ New Booking</button>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-body">
-          <table>
-            <thead><tr>
-              <th>Booking ID</th><th>Customer</th><th>Service</th><th>Date & Time</th><th>From → To</th><th>Amount</th><th>Status</th><th>Actions</th>
-            </tr></thead>
-            <tbody id="all-bookings-table">
-              <!-- Populated by JS -->
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-
-    <!-- ===== NEW BOOKING PAGE ===== -->
-    <div class="page" id="page-new-booking">
-      <div class="card" style="max-width:720px">
-        <div class="card-header">
-          <span class="card-title">Create New Booking</span>
-        </div>
-        <div class="card-body" style="padding:24px">
-          <div class="form-row">
-            <div class="form-group">
-              <label>Customer Name *</label>
-              <input type="text" placeholder="Full name">
-            </div>
-            <div class="form-group">
-              <label>Phone Number *</label>
-              <input type="tel" placeholder="+91 XXXXX XXXXX">
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label>Email</label>
-              <input type="email" placeholder="customer@email.com">
-            </div>
-            <div class="form-group">
-              <label>Service Type *</label>
-              <select>
-                <option>Select service...</option>
-                <option>Home Shifting</option>
-                <option>Office Relocation</option>
-                <option>Car/Bike Transport</option>
-                <option>Packing Only</option>
-                <option>Storage Service</option>
-                <option>International Move</option>
-              </select>
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label>Pickup Address *</label>
-              <input type="text" placeholder="Full pickup address, Bengaluru">
-            </div>
-            <div class="form-group">
-              <label>Drop Address *</label>
-              <input type="text" placeholder="Destination address">
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label>Preferred Date *</label>
-              <input type="date">
-            </div>
-            <div class="form-group">
-              <label>Preferred Time Slot *</label>
-              <select>
-                <option>Morning (6AM–10AM)</option>
-                <option>Afternoon (10AM–2PM)</option>
-                <option>Evening (2PM–6PM)</option>
-                <option>Night (6PM–10PM)</option>
-              </select>
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label>House Type</label>
-              <select>
-                <option>1 BHK</option>
-                <option>2 BHK</option>
-                <option>3 BHK</option>
-                <option>4 BHK+</option>
-                <option>Office</option>
-                <option>N/A</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label>Floor / Elevator</label>
-              <select>
-                <option>Ground floor</option>
-                <option>With elevator</option>
-                <option>Without elevator (1–3 floors)</option>
-                <option>Without elevator (4+ floors)</option>
-              </select>
-            </div>
-          </div>
-          <div class="form-group">
-            <label>Special Instructions / Notes</label>
-            <textarea placeholder="Fragile items, piano, AC, special requests..."></textarea>
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label>Estimated Amount (₹)</label>
-              <input type="number" placeholder="e.g. 8000">
-            </div>
-            <div class="form-group">
-              <label>Advance Payment (₹)</label>
-              <input type="number" placeholder="e.g. 2000">
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label>Payment Mode</label>
-              <select>
-                <option>Cash on Delivery</option>
-                <option>UPI</option>
-                <option>Bank Transfer</option>
-                <option>Card</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label>Source of Enquiry</label>
-              <select>
-                <option>Website</option>
-                <option>Phone Call</option>
-                <option>WhatsApp</option>
-                <option>Referral</option>
-                <option>Google</option>
-                <option>Other</option>
-              </select>
-            </div>
-          </div>
-          <div style="display:flex; gap:10px; margin-top:8px">
-            <button class="btn btn-primary" onclick="createBooking()">📦 Create Booking</button>
-            <button class="btn btn-ghost">Clear Form</button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ===== RESCHEDULE PAGE ===== -->
-    <div class="page" id="page-reschedule">
-      <div class="section-title">Reschedule Requests</div>
-      <div class="card">
-        <div class="card-body">
-          <table>
-            <thead><tr><th>Booking ID</th><th>Customer</th><th>Original Date</th><th>Reason</th><th>Requested By</th><th>Action</th></tr></thead>
-            <tbody>
-              <tr>
-                <td><b>BK009</b></td>
-                <td>Meena Reddy<br><span class="text-muted">+91 98765 11111</span></td>
-                <td>27 Mar · Afternoon</td>
-                <td>Customer unavailable</td>
-                <td>Customer</td>
-                <td style="display:flex;gap:6px;flex-wrap:wrap">
-                  <button class="btn btn-warning btn-sm" onclick="openRescheduleModal('BK009', 'Meena Reddy')">📅 Reschedule</button>
-                  <button class="btn btn-ghost btn-sm">📞 Call</button>
-                </td>
-              </tr>
-              <tr>
-                <td><b>BK005</b></td>
-                <td>Amit Verma<br><span class="text-muted">+91 87654 22222</span></td>
-                <td>26 Mar · Morning</td>
-                <td>Driver unavailable</td>
-                <td>Internal</td>
-                <td style="display:flex;gap:6px;flex-wrap:wrap">
-                  <button class="btn btn-warning btn-sm" onclick="openRescheduleModal('BK005', 'Amit Verma')">📅 Reschedule</button>
-                  <button class="btn btn-ghost btn-sm">📞 Call</button>
-                </td>
-              </tr>
-              <tr>
-                <td><b>BK011</b></td>
-                <td>Kavita Sharma<br><span class="text-muted">+91 76543 33333</span></td>
-                <td>28 Mar · Evening</td>
-                <td>New property not ready</td>
-                <td>Customer</td>
-                <td style="display:flex;gap:6px;flex-wrap:wrap">
-                  <button class="btn btn-warning btn-sm" onclick="openRescheduleModal('BK011', 'Kavita Sharma')">📅 Reschedule</button>
-                  <button class="btn btn-ghost btn-sm">📞 Call</button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-
-    <!-- ===== CUSTOMERS PAGE ===== -->
-    <div class="page" id="page-customers">
-      <div class="d-flex align-center mb-4" style="margin-bottom:16px; gap:12px">
-        <input type="text" placeholder="Search customers..." style="max-width:300px">
-        <select style="width:150px">
-          <option>All Customers</option>
-          <option>Repeat Customers</option>
-          <option>New This Month</option>
-        </select>
-      </div>
-      <div class="card">
-        <div class="card-body">
-          <table>
-            <thead><tr><th>Customer</th><th>Contact</th><th>Total Bookings</th><th>Last Booking</th><th>Total Spent</th><th>Actions</th></tr></thead>
-            <tbody>
-              <tr>
-                <td><b>Arjun Mehta</b></td>
-                <td>+91 98765 43210<br><span class="text-muted">arjun@email.com</span></td>
-                <td>3</td>
-                <td>27 Mar 2025</td>
-                <td>₹18,500</td>
-                <td><button class="btn btn-ghost btn-sm" onclick="openCustomerDetail('Arjun Mehta')">View Profile</button></td>
-              </tr>
-              <tr>
-                <td><b>Sneha Iyer</b></td>
-                <td>+91 87654 32109</td>
-                <td>1</td>
-                <td>27 Mar 2025</td>
-                <td>₹45,000</td>
-                <td><button class="btn btn-ghost btn-sm" onclick="openCustomerDetail('Sneha Iyer')">View Profile</button></td>
-              </tr>
-              <tr>
-                <td><b>Vikram Nair</b></td>
-                <td>+91 76543 21098</td>
-                <td>2</td>
-                <td>15 Mar 2025</td>
-                <td>₹9,200</td>
-                <td><button class="btn btn-ghost btn-sm" onclick="openCustomerDetail('Vikram Nair')">View Profile</button></td>
-              </tr>
-              <tr>
-                <td><b>Meena Reddy</b></td>
-                <td>+91 98765 11111</td>
-                <td>1</td>
-                <td>20 Mar 2025</td>
-                <td>₹12,000</td>
-                <td><button class="btn btn-ghost btn-sm" onclick="openCustomerDetail('Meena Reddy')">View Profile</button></td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-
-    <!-- ===== COMPLAINTS PAGE ===== -->
-    <div class="page" id="page-complaints">
-      <div class="d-flex align-center mb-4" style="margin-bottom:16px; gap:12px">
-        <div class="section-title" style="margin:0">Complaints & Issues</div>
-        <button class="btn btn-primary ml-auto" onclick="openModal('complaint-modal')">+ Log Complaint</button>
-      </div>
-      <div class="card">
-        <div class="card-body">
-          <table>
-            <thead><tr><th>Complaint ID</th><th>Customer</th><th>Booking</th><th>Issue</th><th>Priority</th><th>Status</th><th>Actions</th></tr></thead>
-            <tbody>
-              <tr>
-                <td><b>CMP001</b></td>
-                <td>Ravi Kumar<br><span class="text-muted">+91 90001 11111</span></td>
-                <td>BK003</td>
-                <td>Items damaged during transit</td>
-                <td><span class="priority high">🔴 High</span></td>
-                <td><span class="badge badge-pending">Open</span></td>
-                <td><button class="btn btn-ghost btn-sm">Resolve</button></td>
-              </tr>
-              <tr>
-                <td><b>CMP002</b></td>
-                <td>Sunita Rao<br><span class="text-muted">+91 90002 22222</span></td>
-                <td>BK007</td>
-                <td>Driver arrived 3 hours late</td>
-                <td><span class="priority medium">🟡 Medium</span></td>
-                <td><span class="badge badge-rescheduled">In Progress</span></td>
-                <td><button class="btn btn-ghost btn-sm">Update</button></td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-
-    <!-- ===== ACTIVITY LOG PAGE ===== -->
-    <div class="page" id="page-activity">
-      <div class="section-title">Activity Log — Today</div>
-      <div class="card">
-        <div class="card-body">
-          <div class="timeline">
-            <div class="tl-item">
-              <div class="tl-dot orange">📦</div>
-              <div class="tl-content">
-                <div class="tl-action">Created booking BK012 for Rohan Sharma</div>
-                <div class="tl-detail">Home Shifting · Jayanagar to Whitefield · ₹14,000</div>
-              </div>
-              <div class="tl-time">10:45 AM</div>
-            </div>
-            <div class="tl-item">
-              <div class="tl-dot blue">📅</div>
-              <div class="tl-content">
-                <div class="tl-action">Rescheduled BK009 — Meena Reddy</div>
-                <div class="tl-detail">Original: 27 Mar → New: 30 Mar · Reason: Customer unavailable</div>
-              </div>
-              <div class="tl-time">10:03 AM</div>
-            </div>
-            <div class="tl-item">
-              <div class="tl-dot red">❌</div>
-              <div class="tl-content">
-                <div class="tl-action">Cancelled BK007 — Kiran Patel</div>
-                <div class="tl-detail">Reason: Customer request · Refund: ₹2,000 initiated</div>
-              </div>
-              <div class="tl-time">9:20 AM</div>
-            </div>
-            <div class="tl-item">
-              <div class="tl-dot green">📞</div>
-              <div class="tl-content">
-                <div class="tl-action">Callback logged — Anjali Desai</div>
-                <div class="tl-detail">Enquiry about car transport · High priority · Due 3 PM</div>
-              </div>
-              <div class="tl-time">9:05 AM</div>
-            </div>
-            <div class="tl-item">
-              <div class="tl-dot orange">✅</div>
-              <div class="tl-content">
-                <div class="tl-action">Confirmed BK006 — Suresh Kumar</div>
-                <div class="tl-detail">Office Relocation · MG Road · ₹38,000 advance ₹5,000 received</div>
-              </div>
-              <div class="tl-time">8:50 AM</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ===== MY STATS PAGE ===== -->
-    <div class="page" id="page-stats">
-      <div class="stats-grid">
-        <div class="stat-card orange"><div class="stat-icon">📦</div><div class="stat-label">This Month Bookings</div><div class="stat-value orange">47</div><div class="stat-change">↑ 12 from last month</div></div>
-        <div class="stat-card green"><div class="stat-icon">💰</div><div class="stat-label">Revenue Generated</div><div class="stat-value green" style="font-size:22px">₹4.2L</div><div class="stat-change">Commission: ₹8,400</div></div>
-        <div class="stat-card blue"><div class="stat-icon">⭐</div><div class="stat-label">Avg. Rating</div><div class="stat-value blue">4.8</div><div class="stat-change">Based on 31 reviews</div></div>
-        <div class="stat-card red"><div class="stat-icon">📞</div><div class="stat-label">Calls Handled</div><div class="stat-value red">128</div><div class="stat-change">Avg 4.2 min/call</div></div>
-      </div>
-      <div class="card">
-        <div class="card-header"><span class="card-title">Monthly Booking Breakdown</span></div>
-        <div class="card-body" style="padding:20px">
-          <div style="display:grid; grid-template-columns: repeat(5,1fr); gap:12px; text-align:center">
-            <div style="background:var(--surface2);padding:16px;border-radius:10px;"><div style="font-size:22px;font-weight:700;color:var(--green)">34</div><div class="text-muted" style="font-size:11px;margin-top:4px">Completed</div></div>
-            <div style="background:var(--surface2);padding:16px;border-radius:10px;"><div style="font-size:22px;font-weight:700;color:var(--blue)">6</div><div class="text-muted" style="font-size:11px;margin-top:4px">Rescheduled</div></div>
-            <div style="background:var(--surface2);padding:16px;border-radius:10px;"><div style="font-size:22px;font-weight:700;color:var(--red)">3</div><div class="text-muted" style="font-size:11px;margin-top:4px">Cancelled</div></div>
-            <div style="background:var(--surface2);padding:16px;border-radius:10px;"><div style="font-size:22px;font-weight:700;color:var(--yellow)">4</div><div class="text-muted" style="font-size:11px;margin-top:4px">Pending</div></div>
-            <div style="background:var(--surface2);padding:16px;border-radius:10px;"><div style="font-size:22px;font-weight:700;color:var(--accent)">72%</div><div class="text-muted" style="font-size:11px;margin-top:4px">Conversion</div></div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-  </div><!-- /content -->
-</div><!-- /main -->
-
-<!-- ============ MODALS ============ -->
-
-<!-- NEW BOOKING MODAL -->
-<div class="modal-overlay" id="new-booking-modal">
-  <div class="modal">
-    <div class="modal-header">
-      <span class="modal-title">📦 Create New Booking</span>
-      <button class="modal-close" onclick="closeModal('new-booking-modal')">✕</button>
-    </div>
-    <div class="modal-body">
-      <div class="form-row">
-        <div class="form-group"><label>Customer Name *</label><input type="text" id="nb-name" placeholder="Full name"></div>
-        <div class="form-group"><label>Phone *</label><input type="tel" id="nb-phone" placeholder="+91 XXXXX XXXXX"></div>
-      </div>
-      <div class="form-row">
-        <div class="form-group"><label>Service Type *</label>
-          <select id="nb-service">
-            <option>Home Shifting</option><option>Office Relocation</option>
-            <option>Car/Bike Transport</option><option>Packing Only</option><option>Storage Service</option>
-          </select>
-        </div>
-        <div class="form-group"><label>Preferred Date *</label><input type="date" id="nb-date"></div>
-      </div>
-      <div class="form-row">
-        <div class="form-group"><label>Pickup Address *</label><input type="text" id="nb-pickup" placeholder="From address"></div>
-        <div class="form-group"><label>Drop Address *</label><input type="text" id="nb-drop" placeholder="To address"></div>
-      </div>
-      <div class="form-row">
-        <div class="form-group"><label>Time Slot</label>
-          <select id="nb-slot"><option>Morning (6–10AM)</option><option>Afternoon (10AM–2PM)</option><option>Evening (2–6PM)</option></select>
-        </div>
-        <div class="form-group"><label>Estimated Amount (₹)</label><input type="number" id="nb-amount" placeholder="e.g. 8000"></div>
-      </div>
-      <div class="form-group"><label>Notes</label><textarea id="nb-notes" placeholder="Special instructions..."></textarea></div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeModal('new-booking-modal')">Cancel</button>
-      <button class="btn btn-primary" onclick="submitNewBooking()">Create Booking</button>
-    </div>
+<!-- LOGIN -->
+<div class="login-wrap" id="loginWrap">
+  <div class="login-card">
+    <div class="login-badge">🔐 Restricted Access</div>
+    <div class="login-logo">📦 PackZen</div>
+    <div class="login-tagline">Advisor Dashboard</div>
+    <label class="field-label">Email Address</label>
+    <input id="adEmail" type="email" class="field-input" placeholder="your@packzenblr.in" autocomplete="off"
+           onkeydown="if(event.key==='Enter')document.getElementById('adPass').focus()">
+    <label class="field-label">Password</label>
+    <input id="adPass" type="password" class="field-input" placeholder="••••••••"
+           onkeydown="if(event.key==='Enter')doLogin()">
+    <div id="loginErr" class="login-err"></div>
+    <button class="btn-login" id="loginBtn" onclick="doLogin()">Access Dashboard →</button>
   </div>
 </div>
 
-<!-- RESCHEDULE MODAL -->
-<div class="modal-overlay" id="reschedule-modal">
-  <div class="modal">
-    <div class="modal-header">
-      <span class="modal-title">📅 Reschedule Booking</span>
-      <button class="modal-close" onclick="closeModal('reschedule-modal')">✕</button>
-    </div>
-    <div class="modal-body">
-      <div class="form-group"><label>Booking ID</label><input type="text" id="rs-id" placeholder="e.g. BK007"></div>
-      <div id="rs-customer-info"></div>
-      <div class="form-row">
-        <div class="form-group"><label>New Date *</label><input type="date" id="rs-date"></div>
-        <div class="form-group"><label>New Time Slot *</label>
-          <select id="rs-slot"><option>Morning (6–10AM)</option><option>Afternoon (10AM–2PM)</option><option>Evening (2–6PM)</option><option>Night (6–10PM)</option></select>
-        </div>
-      </div>
-      <div class="form-group"><label>Reason for Reschedule *</label>
-        <select id="rs-reason">
-          <option>Customer unavailable</option><option>Driver unavailable</option>
-          <option>New property not ready</option><option>Packing incomplete</option><option>Weather</option><option>Other</option>
-        </select>
-      </div>
-      <div class="form-group"><label>Additional Notes</label><textarea id="rs-notes" placeholder="Anything else to note..."></textarea></div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeModal('reschedule-modal')">Cancel</button>
-      <button class="btn btn-warning" onclick="submitReschedule()">Confirm Reschedule</button>
-    </div>
-  </div>
+<!-- SHELL -->
+<div class="admin-shell" id="shell">
+  <!-- SIDEBAR injected by JS after auth -->
 </div>
 
-<!-- CANCEL MODAL -->
-<div class="modal-overlay" id="cancel-modal">
-  <div class="modal">
-    <div class="modal-header">
-      <span class="modal-title">❌ Cancel Booking</span>
-      <button class="modal-close" onclick="closeModal('cancel-modal')">✕</button>
-    </div>
-    <div class="modal-body">
-      <div class="form-group"><label>Booking ID *</label><input type="text" id="cn-id" placeholder="e.g. BK007"></div>
-      <div class="form-group"><label>Reason for Cancellation *</label>
-        <select id="cn-reason">
-          <option>Customer request</option><option>Duplicate booking</option>
-          <option>Service unavailable</option><option>Payment failed</option><option>Other</option>
-        </select>
-      </div>
-      <div class="form-group"><label>Refund Amount (₹)</label><input type="number" id="cn-refund" placeholder="0 if no refund"></div>
-      <div class="form-group"><label>Notes</label><textarea id="cn-notes" placeholder="Internal notes..."></textarea></div>
-      <div style="background:rgba(239,68,68,0.08); border:1px solid rgba(239,68,68,0.2); border-radius:8px; padding:12px; font-size:13px; color:var(--red);">
-        ⚠️ This action cannot be undone. Cancellation will notify the customer and driver.
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeModal('cancel-modal')">Go Back</button>
-      <button class="btn btn-danger" onclick="submitCancellation()">Cancel Booking</button>
-    </div>
-  </div>
-</div>
+<div class="toast" id="toast"></div>
 
-<!-- CALLBACK MODAL -->
-<div class="modal-overlay" id="callback-modal">
-  <div class="modal">
-    <div class="modal-header">
-      <span class="modal-title">📞 Log Callback / Follow-up</span>
-      <button class="modal-close" onclick="closeModal('callback-modal')">✕</button>
-    </div>
-    <div class="modal-body">
-      <div class="form-row">
-        <div class="form-group"><label>Customer Name *</label><input type="text" placeholder="Full name"></div>
-        <div class="form-group"><label>Phone *</label><input type="tel" placeholder="+91 XXXXX XXXXX"></div>
-      </div>
-      <div class="form-group"><label>Reason / Purpose *</label>
-        <select>
-          <option>New enquiry</option><option>Reschedule request</option><option>Complaint follow-up</option>
-          <option>Payment pending</option><option>Booking confirmation</option><option>Post-service feedback</option>
-        </select>
-      </div>
-      <div class="form-row">
-        <div class="form-group"><label>Priority</label>
-          <select><option>High</option><option>Medium</option><option>Low</option></select>
-        </div>
-        <div class="form-group"><label>Due Date & Time</label><input type="datetime-local"></div>
-      </div>
-      <div class="form-group"><label>Notes</label><textarea placeholder="Details of the call / enquiry..."></textarea></div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeModal('callback-modal')">Cancel</button>
-      <button class="btn btn-primary" onclick="submitCallback()">Save Callback</button>
-    </div>
-  </div>
-</div>
+<!-- Firebase SDK (same versions as your site) -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
-<!-- BOOKING DETAIL MODAL -->
-<div class="modal-overlay" id="booking-detail-modal">
-  <div class="modal" style="width:620px">
-    <div class="modal-header">
-      <span class="modal-title" id="bd-title">Booking Details</span>
-      <button class="modal-close" onclick="closeModal('booking-detail-modal')">✕</button>
-    </div>
-    <div class="modal-body" id="bd-body"></div>
-    <div class="modal-footer" id="bd-footer"></div>
-  </div>
-</div>
-
-<!-- COMPLAINT MODAL -->
-<div class="modal-overlay" id="complaint-modal">
-  <div class="modal">
-    <div class="modal-header">
-      <span class="modal-title">⚠️ Log Complaint</span>
-      <button class="modal-close" onclick="closeModal('complaint-modal')">✕</button>
-    </div>
-    <div class="modal-body">
-      <div class="form-row">
-        <div class="form-group"><label>Booking ID</label><input type="text" placeholder="e.g. BK007"></div>
-        <div class="form-group"><label>Customer Name</label><input type="text" placeholder="Customer name"></div>
-      </div>
-      <div class="form-group"><label>Issue Type *</label>
-        <select>
-          <option>Items Damaged</option><option>Late Arrival</option><option>Driver Misbehaviour</option>
-          <option>Overcharging</option><option>Missing Items</option><option>Poor Packing</option><option>Other</option>
-        </select>
-      </div>
-      <div class="form-group"><label>Priority *</label>
-        <select><option>High</option><option>Medium</option><option>Low</option></select>
-      </div>
-      <div class="form-group"><label>Description *</label><textarea placeholder="Describe the issue in detail..."></textarea></div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeModal('complaint-modal')">Cancel</button>
-      <button class="btn btn-danger" onclick="submitComplaint()">Submit Complaint</button>
-    </div>
-  </div>
-</div>
-
-<!-- TOAST CONTAINER -->
-<div class="toast-container" id="toast-container"></div>
+<!-- Load your existing Firebase config — same file, same project -->
+<script src="firebase-config.js"></script>
 
 <script>
-// ===== DATA =====
-const bookings = [
-  { id:'BK001', customer:'Arjun Mehta', phone:'+91 98765 43210', service:'Home Shifting', date:'27 Mar 2025', time:'9:00 AM', from:'Koramangala', to:'Whitefield', amount:'₹12,000', status:'confirmed', notes:'2BHK, 3rd floor, lift available' },
-  { id:'BK002', customer:'Sneha Iyer', phone:'+91 87654 32109', service:'Office Relocation', date:'27 Mar 2025', time:'11:30 AM', from:'Indiranagar', to:'MG Road', amount:'₹45,000', status:'inprogress', notes:'Full office setup' },
-  { id:'BK003', customer:'Vikram Nair', phone:'+91 76543 21098', service:'Bike Transport', date:'27 Mar 2025', time:'2:00 PM', from:'HSR Layout', to:'Pune', amount:'₹4,500', status:'pending', notes:'Activa, no damage insurance' },
-  { id:'BK004', customer:'Divya Krishnan', phone:'+91 65432 10987', service:'Storage', date:'28 Mar 2025', time:'4:30 PM', from:'Whitefield', to:'PackZen Warehouse', amount:'₹3,000/mo', status:'rescheduled', notes:'3 months storage requested' },
-  { id:'BK005', customer:'Amit Verma', phone:'+91 87654 22222', service:'Home Shifting', date:'26 Mar 2025', time:'Morning', from:'BTM Layout', to:'Hebbal', amount:'₹8,000', status:'rescheduled', notes:'' },
-  { id:'BK006', customer:'Suresh Kumar', phone:'+91 55554 44443', service:'Office Relocation', date:'28 Mar 2025', time:'Morning', from:'MG Road', to:'Electronic City', amount:'₹38,000', status:'confirmed', notes:'' },
-  { id:'BK007', customer:'Kiran Patel', phone:'+91 44443 33332', service:'Home Shifting', date:'25 Mar 2025', time:'Afternoon', from:'Rajajinagar', to:'Mysuru', amount:'₹15,000', status:'cancelled', notes:'Refund: ₹2,000' },
-  { id:'BK008', customer:'Rohan Sharma', phone:'+91 33332 22221', service:'Home Shifting', date:'30 Mar 2025', time:'Morning', from:'Jayanagar', to:'Whitefield', amount:'₹14,000', status:'confirmed', notes:'' },
-  { id:'BK009', customer:'Meena Reddy', phone:'+91 98765 11111', service:'Home Shifting', date:'30 Mar 2025', time:'Afternoon', from:'Banashankari', to:'Yelahanka', amount:'₹12,000', status:'rescheduled', notes:'' },
-  { id:'BK010', customer:'Priya Nambiar', phone:'+91 22221 11110', service:'Packing Only', date:'29 Mar 2025', time:'Morning', from:'Marathahalli', to:'N/A', amount:'₹2,500', status:'confirmed', notes:'' },
-  { id:'BK011', customer:'Kavita Sharma', phone:'+91 76543 33333', service:'Home Shifting', date:'1 Apr 2025', time:'Evening', from:'JP Nagar', to:'Devanahalli', amount:'₹18,000', status:'pending', notes:'' },
-  { id:'BK012', customer:'Rohan Sharma', phone:'+91 11110 00009', service:'Home Shifting', date:'2 Apr 2025', time:'Morning', from:'Jayanagar', to:'Whitefield', amount:'₹14,000', status:'pending', notes:'' },
+/* ════════════════════════════════════════════
+   CONFIG — who can log into the Advisor panel
+   ════════════════════════════════════════════ */
+const ADVISOR_ROLES = ["admin", "advisor", "manager"];
+const ADMIN_EMAILS  = [
+  "admin@packzen.com",
+  "support@packzenblr.in",
+  "azharahmedm786@gmail.com",
+  "moveeasyblr@gmail.com"
 ];
 
-const statusMap = {
-  confirmed: 'badge-confirmed',
-  pending: 'badge-pending',
-  cancelled: 'badge-cancelled',
-  rescheduled: 'badge-rescheduled',
-  inprogress: 'badge-inprogress',
-  completed: 'badge-completed'
-};
+/* ════════════════════════════════════════════
+   STATE
+   ════════════════════════════════════════════ */
+let db, auth;
+let advisorUser = null;
+let allBookings = [], allCustomers = [], allDrivers = [];
+let bookingsChart = null, statusChart = null;
+let activeSection = "overview";
+let unsubBookings, unsubCustomers, unsubDrivers;
 
-// ===== NAVIGATION =====
-function navigate(page) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  const target = document.getElementById('page-' + page);
-  if (target) target.classList.add('active');
-  const nav = document.querySelector(`.nav-item[onclick="navigate('${page}')"]`);
-  if (nav) nav.classList.add('active');
-  const titles = { dashboard: 'Dashboard', bookings: 'All Bookings', 'new-booking': 'New Booking', reschedule: 'Reschedule', customers: 'Customers', complaints: 'Complaints', activity: 'Activity Log', stats: 'My Stats' };
-  document.getElementById('page-title').textContent = titles[page] || page;
-  if (page === 'bookings') renderBookingsTable(bookings);
-  clearSearch();
+/* ════════════════════════════════════════════
+   FIREBASE INIT — wait for firebase-config.js
+   ════════════════════════════════════════════ */
+function waitFB(cb, n = 0) {
+  if (window._firebase) { db = window._firebase.db; auth = window._firebase.auth; cb(); return; }
+  if (n > 40) { document.getElementById("loginErr").textContent = "⚠️ Firebase config not loaded. Check firebase-config.js"; return; }
+  setTimeout(() => waitFB(cb, n + 1), 200);
 }
 
-// ===== BOOKINGS TABLE =====
-function renderBookingsTable(data) {
-  const tbody = document.getElementById('all-bookings-table');
-  tbody.innerHTML = data.map(b => `
-    <tr style="cursor:pointer" onclick="openBookingDetail('${b.id}')">
-      <td><b>${b.id}</b></td>
-      <td>${b.customer}<br><span class="text-muted">${b.phone}</span></td>
-      <td>${b.service}</td>
-      <td>${b.date}<br><span class="text-muted">${b.time}</span></td>
-      <td>${b.from}<br><span class="text-muted">→ ${b.to}</span></td>
-      <td>${b.amount}</td>
-      <td><span class="badge ${statusMap[b.status]}">${b.status.charAt(0).toUpperCase()+b.status.slice(1)}</span></td>
-      <td onclick="event.stopPropagation()" style="display:flex;gap:4px;flex-wrap:wrap">
-        <button class="btn btn-ghost btn-sm" onclick="openBookingDetail('${b.id}')">View</button>
-        ${b.status !== 'cancelled' && b.status !== 'completed' ? `<button class="btn btn-warning btn-sm" onclick="openRescheduleModal('${b.id}', '${b.customer}')">📅</button>` : ''}
-        ${b.status !== 'cancelled' && b.status !== 'completed' ? `<button class="btn btn-danger btn-sm" onclick="openCancelModal('${b.id}')">✕</button>` : ''}
-      </td>
-    </tr>
-  `).join('');
-}
-
-function filterBookings(status, el) {
-  document.querySelectorAll('.tab-bar .tab').forEach(t => t.classList.remove('active'));
-  el.classList.add('active');
-  const filtered = status === 'all' ? bookings : bookings.filter(b => b.status === status);
-  renderBookingsTable(filtered);
-}
-
-function filterByDate(val) { renderBookingsTable(bookings); }
-
-// ===== BOOKING DETAIL MODAL =====
-function openBookingDetail(id) {
-  const b = bookings.find(x => x.id === id);
-  if (!b) return;
-  document.getElementById('bd-title').textContent = `Booking Details — ${b.id}`;
-  document.getElementById('bd-body').innerHTML = `
-    <div class="customer-card">
-      <div class="cust-avatar">${b.customer[0]}</div>
-      <div class="cust-info">
-        <div class="cname">${b.customer}</div>
-        <div class="cphone">${b.phone}</div>
-      </div>
-      <span class="badge ${statusMap[b.status]}" style="margin-left:auto">${b.status}</span>
-    </div>
-    <div class="info-row"><span class="label">Service</span><span>${b.service}</span></div>
-    <div class="info-row"><span class="label">Date & Time</span><span>${b.date} · ${b.time}</span></div>
-    <div class="info-row"><span class="label">Pickup</span><span>${b.from}</span></div>
-    <div class="info-row"><span class="label">Drop</span><span>${b.to}</span></div>
-    <div class="info-row"><span class="label">Amount</span><span><b>${b.amount}</b></span></div>
-    <div class="info-row"><span class="label">Notes</span><span>${b.notes || '—'}</span></div>
-  `;
-  document.getElementById('bd-footer').innerHTML = `
-    <button class="btn btn-ghost" onclick="closeModal('booking-detail-modal')">Close</button>
-    ${b.status !== 'cancelled' && b.status !== 'completed' ? `<button class="btn btn-warning" onclick="closeModal('booking-detail-modal'); openRescheduleModal('${b.id}', '${b.customer}')">📅 Reschedule</button>` : ''}
-    ${b.status !== 'cancelled' && b.status !== 'completed' ? `<button class="btn btn-danger" onclick="closeModal('booking-detail-modal'); openCancelModal('${b.id}')">❌ Cancel</button>` : ''}
-  `;
-  openModal('booking-detail-modal');
-}
-
-function openCustomerDetail(name) {
-  showToast(`Viewing profile of ${name}`, 'info');
-}
-
-// ===== MODAL HELPERS =====
-function openModal(id) { document.getElementById(id).classList.add('open'); }
-function closeModal(id) { document.getElementById(id).classList.remove('open'); }
-
-document.querySelectorAll('.modal-overlay').forEach(overlay => {
-  overlay.addEventListener('click', e => { if (e.target === overlay) overlay.classList.remove('open'); });
+/* ════════════════════════════════════════════
+   AUTO LOGIN CHECK
+   ════════════════════════════════════════════ */
+document.addEventListener("DOMContentLoaded", () => {
+  waitFB(() => {
+    auth.onAuthStateChanged(async user => {
+      if (!user) return;
+      const ok = await isAdvisor(user);
+      if (ok) { advisorUser = user; buildShell(); }
+    });
+  });
 });
 
-function openRescheduleModal(id, name) {
-  document.getElementById('rs-id').value = id;
-  document.getElementById('rs-customer-info').innerHTML = name ? `<div class="customer-card" style="margin-bottom:12px"><div class="cust-avatar">${name[0]}</div><div class="cust-info"><div class="cname">${name}</div><div class="cphone">Booking: ${id}</div></div></div>` : '';
-  openModal('reschedule-modal');
+/* ════════════════════════════════════════════
+   LOGIN
+   ════════════════════════════════════════════ */
+async function doLogin() {
+  const email = document.getElementById("adEmail").value.trim().toLowerCase();
+  const pass  = document.getElementById("adPass").value;
+  const err   = document.getElementById("loginErr");
+  const btn   = document.getElementById("loginBtn");
+  err.textContent = "";
+  if (!email || !pass) { err.textContent = "⚠️ Please enter email and password."; return; }
+  btn.disabled = true; btn.textContent = "Signing in...";
+  waitFB(async () => {
+    try {
+      const cred = await auth.signInWithEmailAndPassword(email, pass);
+      const ok   = await isAdvisor(cred.user);
+      if (!ok) {
+        await auth.signOut();
+        err.textContent = "⚠️ Access denied. Your account does not have advisor permissions.";
+        btn.disabled = false; btn.textContent = "Access Dashboard →";
+        return;
+      }
+      advisorUser = cred.user;
+      buildShell();
+    } catch (e) {
+      const msgs = {
+        "auth/wrong-password":            "⚠️ Incorrect password.",
+        "auth/invalid-credential":        "⚠️ Incorrect email or password.",
+        "auth/user-not-found":            "⚠️ No account found for this email.",
+        "auth/invalid-email":             "⚠️ Invalid email address.",
+        "auth/too-many-requests":         "⚠️ Too many attempts. Please wait.",
+      };
+      err.textContent = msgs[e.code] || ("⚠️ " + e.message);
+      btn.disabled = false; btn.textContent = "Access Dashboard →";
+    }
+  });
 }
 
-function openCancelModal(id) {
-  document.getElementById('cn-id').value = id;
-  openModal('cancel-modal');
+async function isAdvisor(user) {
+  if (ADMIN_EMAILS.includes((user.email || "").toLowerCase())) return true;
+  try {
+    const doc = await db.collection("users").doc(user.uid).get();
+    const role = doc.exists ? (doc.data() || {}).role : null;
+    return ADVISOR_ROLES.includes(role);
+  } catch (e) { return false; }
 }
 
-// ===== SUBMIT ACTIONS =====
-function submitNewBooking() {
-  const name = document.getElementById('nb-name').value;
-  if (!name) { showToast('Please fill in the required fields', 'error'); return; }
-  const newId = 'BK' + String(bookings.length + 1).padStart(3, '0');
-  const b = {
-    id: newId, customer: name, phone: document.getElementById('nb-phone').value,
-    service: document.getElementById('nb-service').value, date: document.getElementById('nb-date').value || 'TBD',
-    time: document.getElementById('nb-slot').value, from: document.getElementById('nb-pickup').value,
-    to: document.getElementById('nb-drop').value, amount: '₹' + (document.getElementById('nb-amount').value || '0'),
-    status: 'pending', notes: document.getElementById('nb-notes').value
-  };
-  bookings.unshift(b);
-  closeModal('new-booking-modal');
-  showToast(`Booking ${newId} created for ${name}!`, 'success');
-  renderBookingsTable(bookings);
-}
+/* ════════════════════════════════════════════
+   BUILD SHELL (only after auth)
+   ════════════════════════════════════════════ */
+function buildShell() {
+  document.getElementById("loginWrap").style.display = "none";
+  const name   = advisorUser.displayName || advisorUser.email?.split("@")[0] || "Advisor";
+  const initLetter = name.charAt(0).toUpperCase();
+  const shell  = document.getElementById("shell");
 
-function submitReschedule() {
-  const id = document.getElementById('rs-id').value;
-  if (!id) { showToast('Enter a Booking ID', 'error'); return; }
-  const b = bookings.find(x => x.id === id.toUpperCase());
-  if (b) {
-    b.status = 'rescheduled';
-    b.date = document.getElementById('rs-date').value || 'TBD';
-    b.time = document.getElementById('rs-slot').value;
-  }
-  closeModal('reschedule-modal');
-  showToast(`Booking ${id} rescheduled successfully!`, 'success');
-  renderBookingsTable(bookings);
-}
-
-function submitCancellation() {
-  const id = document.getElementById('cn-id').value;
-  if (!id) { showToast('Enter a Booking ID', 'error'); return; }
-  const b = bookings.find(x => x.id === id.toUpperCase());
-  if (b) b.status = 'cancelled';
-  closeModal('cancel-modal');
-  showToast(`Booking ${id} has been cancelled.`, 'error');
-  renderBookingsTable(bookings);
-}
-
-function submitCallback() {
-  closeModal('callback-modal');
-  showToast('Callback logged successfully!', 'success');
-}
-
-function submitComplaint() {
-  closeModal('complaint-modal');
-  showToast('Complaint submitted. Escalated to manager.', 'info');
-}
-
-function createBooking() {
-  showToast('Booking created successfully!', 'success');
-}
-
-function markDone(btn) {
-  btn.closest('tr').style.opacity = '0.4';
-  btn.textContent = '✓ Done';
-  btn.disabled = true;
-  showToast('Follow-up marked as done!', 'success');
-}
-
-// ===== GLOBAL SEARCH =====
-function globalSearch(q) {
-  const box = document.getElementById('search-results-box');
-  const list = document.getElementById('search-results-list');
-  if (!q.trim()) { box.style.display = 'none'; return; }
-  box.style.display = 'block';
-  const results = bookings.filter(b =>
-    b.customer.toLowerCase().includes(q.toLowerCase()) ||
-    b.phone.includes(q) ||
-    b.id.toLowerCase().includes(q.toLowerCase())
-  );
-  if (!results.length) {
-    list.innerHTML = '<div style="padding:16px; color:var(--muted); text-align:center">No bookings found</div>';
-    return;
-  }
-  list.innerHTML = '<div class="search-results">' + results.map(b => `
-    <div class="sr-item" onclick="openBookingDetail('${b.id}')">
-      <div style="display:flex; justify-content:space-between; align-items:center">
-        <div><b>${b.customer}</b> &nbsp; <span class="text-muted">${b.phone}</span></div>
-        <span class="badge ${statusMap[b.status]}">${b.status}</span>
-      </div>
-      <div class="text-muted" style="margin-top:4px">${b.id} · ${b.service} · ${b.date}</div>
+  shell.innerHTML = `
+  <aside class="sidebar">
+    <div class="sb-logo">
+      <div class="sb-logo-text">📦 PackZen</div>
+      <div class="sb-logo-sub">Advisor Console</div>
     </div>
-  `).join('') + '</div>';
+    <div class="sb-section">Analytics</div>
+    <div class="nav-item active" onclick="showSection('overview',this)"><span class="nav-icon">📊</span> Overview</div>
+    <div class="nav-item" onclick="showSection('revenue',this)"><span class="nav-icon">💰</span> Revenue</div>
+    <div class="sb-section">Operations</div>
+    <div class="nav-item" onclick="showSection('bookings',this)"><span class="nav-icon">📦</span> All Bookings</div>
+    <div class="nav-item" onclick="showSection('customers',this)"><span class="nav-icon">👥</span> Customers</div>
+    <div class="nav-item" onclick="showSection('drivers',this)"><span class="nav-icon">🚚</span> Drivers</div>
+    <div class="sb-bottom">
+      <div class="advisor-chip">
+        <div class="advisor-avatar">${initLetter}</div>
+        <div>
+          <div class="advisor-name">${name.split(" ")[0]}</div>
+          <div class="advisor-role">Advisor Access</div>
+        </div>
+      </div>
+      <button class="btn-signout" onclick="doSignOut()">Sign Out</button>
+    </div>
+  </aside>
+
+  <main class="main" id="main">
+    <div class="topbar">
+      <div class="topbar-left">
+        <h1 id="sectionTitle">Overview</h1>
+        <p id="sectionSub">Real-time data from packzenblr.in</p>
+      </div>
+      <div class="live-dot">Live Data</div>
+    </div>
+
+    <!-- OVERVIEW -->
+    <div class="section active" id="secOverview">
+      <div class="stats-grid">
+        <div class="stat-card gold">
+          <div class="stat-icon">📦</div>
+          <div class="stat-label">Total Bookings</div>
+          <div class="stat-value" id="stTotal">—</div>
+          <div class="stat-sub">All time</div>
+        </div>
+        <div class="stat-card green">
+          <div class="stat-icon">💰</div>
+          <div class="stat-label">Total Revenue</div>
+          <div class="stat-value" id="stRevenue" style="font-size:1.2rem">—</div>
+          <div class="stat-sub">Sum of all bookings</div>
+        </div>
+        <div class="stat-card blue">
+          <div class="stat-icon">✅</div>
+          <div class="stat-label">Delivered</div>
+          <div class="stat-value" id="stDelivered">—</div>
+          <div class="stat-sub">Completed moves</div>
+        </div>
+        <div class="stat-card purple">
+          <div class="stat-icon">⏳</div>
+          <div class="stat-label">In Progress</div>
+          <div class="stat-value" id="stActive">—</div>
+          <div class="stat-sub">Ongoing moves</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">👥</div>
+          <div class="stat-label">Customers</div>
+          <div class="stat-value" id="stCustomers">—</div>
+          <div class="stat-sub">Registered users</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">🚚</div>
+          <div class="stat-label">Drivers</div>
+          <div class="stat-value" id="stDrivers">—</div>
+          <div class="stat-sub">Active fleet</div>
+        </div>
+      </div>
+
+      <div class="chart-row">
+        <div class="chart-card">
+          <div class="chart-title">Monthly Bookings & Revenue</div>
+          <div class="chart-sub">2026 — live from Firestore</div>
+          <canvas id="overviewChart" height="160"></canvas>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">Booking Status</div>
+          <div class="chart-sub">Current distribution</div>
+          <div class="donut-wrap">
+            <canvas id="statusChart" width="180" height="180"></canvas>
+            <div class="donut-legend" id="statusLegend"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="table-card">
+        <div class="table-hdr">
+          <div class="table-title">Recent Bookings</div>
+          <button class="btn-refresh" onclick="loadAll()">↻ Refresh</button>
+        </div>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th>Ref</th><th>Customer</th><th>Route</th><th>Date</th><th>Amount</th><th>Status</th></tr></thead>
+            <tbody id="recentTable"><tr><td class="empty-td" colspan="6"><span class="spinner"></span></td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- REVENUE -->
+    <div class="section" id="secRevenue">
+      <div class="kpi-row">
+        <div class="kpi-card">
+          <div class="kpi-icon-wrap gold">💰</div>
+          <div><div class="kpi-label">Total Revenue</div><div class="kpi-value" id="kpiRevTotal">—</div></div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-icon-wrap green">✅</div>
+          <div><div class="kpi-label">Avg. Booking Value</div><div class="kpi-value" id="kpiAvg">—</div></div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-icon-wrap blue">📅</div>
+          <div><div class="kpi-label">This Month</div><div class="kpi-value" id="kpiThisMonth">—</div></div>
+        </div>
+      </div>
+      <div class="chart-card" style="margin-bottom:20px">
+        <div class="chart-title">Revenue by Move Type</div>
+        <div class="chart-sub">Breakdown across home / office / single item</div>
+        <canvas id="revenueTypeChart" height="160"></canvas>
+      </div>
+      <div class="table-card">
+        <div class="table-hdr">
+          <div class="table-title">Monthly Breakdown</div>
+          <button class="btn-export" onclick="exportRevenueCSV()">⬇ Export CSV</button>
+        </div>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th>Month</th><th>Bookings</th><th>Revenue</th><th>Avg. Value</th><th>% of Total</th></tr></thead>
+            <tbody id="revTable"><tr><td class="empty-td" colspan="5"><span class="spinner"></span></td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- BOOKINGS -->
+    <div class="section" id="secBookings">
+      <div class="summary-strip" id="bookingSummary"></div>
+      <div class="table-card">
+        <div class="table-hdr">
+          <div class="table-title">All Bookings</div>
+          <div class="table-actions">
+            <input class="search-input" placeholder="Search name / ref…" oninput="filterBookings(this.value)" id="bookingSearch">
+            <select class="filter-sel" onchange="filterBookingsByStatus(this.value)" id="statusFilter">
+              <option value="">All Statuses</option>
+              <option value="pending">Pending</option>
+              <option value="confirmed">Confirmed</option>
+              <option value="assigned">Assigned</option>
+              <option value="packing">Packing</option>
+              <option value="transit">In Transit</option>
+              <option value="delivered">Delivered</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+            <button class="btn-export" onclick="exportBookingsCSV()">⬇ CSV</button>
+          </div>
+        </div>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th>Ref</th><th>Customer</th><th>Phone</th><th>Route</th><th>Date</th><th>Amount</th><th>Payment</th><th>Status</th><th>Driver</th></tr></thead>
+            <tbody id="bookingsTable"><tr><td class="empty-td" colspan="9"><span class="spinner"></span></td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- CUSTOMERS -->
+    <div class="section" id="secCustomers">
+      <div class="table-card">
+        <div class="table-hdr">
+          <div class="table-title">Registered Customers</div>
+          <div class="table-actions">
+            <input class="search-input" placeholder="Search name / email…" oninput="filterCustomers(this.value)" id="custSearch">
+            <button class="btn-export" onclick="exportCustomersCSV()">⬇ CSV</button>
+          </div>
+        </div>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th>Customer</th><th>Phone</th><th>Email</th><th>Bookings</th><th>Total Spent</th><th>Joined</th></tr></thead>
+            <tbody id="customersTable"><tr><td class="empty-td" colspan="6"><span class="spinner"></span></td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- DRIVERS -->
+    <div class="section" id="secDrivers">
+      <div class="stats-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:20px">
+        <div class="stat-card">
+          <div class="stat-icon">🚚</div>
+          <div class="stat-label">Total Drivers</div>
+          <div class="stat-value" id="drvTotal">—</div>
+        </div>
+        <div class="stat-card green">
+          <div class="stat-icon">🟢</div>
+          <div class="stat-label">Online Now</div>
+          <div class="stat-value" id="drvOnline">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">📦</div>
+          <div class="stat-label">On a Job</div>
+          <div class="stat-value" id="drvOnJob">—</div>
+        </div>
+      </div>
+      <div class="table-card">
+        <div class="table-hdr">
+          <div class="table-title">Driver Fleet</div>
+          <button class="btn-refresh" onclick="renderDrivers()">↻ Refresh</button>
+        </div>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th>Driver</th><th>Email</th><th>Phone</th><th>Vehicle</th><th>Status</th><th>Current Job</th><th>Rating</th><th>Total Moves</th></tr></thead>
+            <tbody id="driversTable"><tr><td class="empty-td" colspan="8"><span class="spinner"></span></td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>`;
+
+  shell.classList.add("active");
+  document.getElementById("shell").style.display = "flex";
+  loadAll();
 }
 
-function clearSearch() {
-  document.getElementById('global-search').value = '';
-  document.getElementById('search-results-box').style.display = 'none';
+/* ════════════════════════════════════════════
+   LOAD ALL DATA (real-time Firestore listeners)
+   ════════════════════════════════════════════ */
+function loadAll() {
+  // Clean up existing listeners
+  if (unsubBookings)  unsubBookings();
+  if (unsubCustomers) unsubCustomers();
+  if (unsubDrivers)   unsubDrivers();
+
+  // Live bookings
+  unsubBookings = db.collection("bookings").orderBy("createdAt","desc")
+    .onSnapshot(snap => {
+      allBookings = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      updateStats();
+      renderRecentTable();
+      renderBookingsTable(allBookings);
+      renderCharts();
+      renderRevenue();
+    }, err => toast("⚠️ Bookings: " + err.message));
+
+  // Customers
+  unsubCustomers = db.collection("users").where("role","==","customer")
+    .onSnapshot(snap => {
+      allCustomers = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      document.getElementById("stCustomers").textContent = allCustomers.length;
+      renderCustomers(allCustomers);
+    }, () => {});
+
+  // Drivers
+  unsubDrivers = db.collection("users").where("role","==","driver")
+    .onSnapshot(snap => {
+      allDrivers = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      document.getElementById("stDrivers").textContent = allDrivers.length;
+      renderDrivers();
+    }, () => {});
 }
 
-// ===== TOAST =====
-function showToast(msg, type = 'info') {
-  const container = document.getElementById('toast-container');
-  const toast = document.createElement('div');
-  const icons = { success: '✅', error: '❌', info: 'ℹ️' };
-  toast.className = `toast ${type}`;
-  toast.innerHTML = `<span style="font-size:18px">${icons[type]}</span><span style="font-size:13px">${msg}</span>`;
-  container.appendChild(toast);
-  setTimeout(() => toast.remove(), 3500);
+/* ════════════════════════════════════════════
+   STATS
+   ════════════════════════════════════════════ */
+function updateStats() {
+  const total     = allBookings.length;
+  const delivered = allBookings.filter(b => b.status === "delivered").length;
+  const active    = allBookings.filter(b => ["assigned","packing","transit"].includes(b.status)).length;
+  const revenue   = allBookings.reduce((s, b) => s + (b.total || 0), 0);
+
+  setText("stTotal",     total);
+  setText("stDelivered", delivered);
+  setText("stActive",    active);
+  setText("stRevenue",   fmt(revenue));
 }
 
-// Init
-renderBookingsTable(bookings);
+/* ════════════════════════════════════════════
+   RECENT TABLE
+   ════════════════════════════════════════════ */
+function renderRecentTable() {
+  const tbody = document.getElementById("recentTable");
+  if (!tbody) return;
+  const recent = allBookings.slice(0, 10);
+  if (!recent.length) { tbody.innerHTML = '<tr><td class="empty-td" colspan="6">No bookings yet</td></tr>'; return; }
+  tbody.innerHTML = recent.map(b => `
+    <tr>
+      <td><span class="booking-ref">${b.bookingRef || b.id.slice(-6).toUpperCase()}</span></td>
+      <td>${b.customerName || "—"}</td>
+      <td>
+        <div class="route-cell">
+          <div class="route-from">${shortAddr(b.pickup)}</div>
+          <div>→ ${shortAddr(b.drop)}</div>
+        </div>
+      </td>
+      <td>${b.date || "—"}</td>
+      <td class="amount">₹${(b.total||0).toLocaleString("en-IN")}</td>
+      <td><span class="badge badge-${b.status||"pending"}">${cap(b.status||"pending")}</span></td>
+    </tr>`).join("");
+}
+
+/* ════════════════════════════════════════════
+   BOOKINGS TABLE
+   ════════════════════════════════════════════ */
+let filteredBookings = null;
+
+function renderBookingsTable(list) {
+  const tbody = document.getElementById("bookingsTable");
+  if (!tbody) return;
+  if (!list.length) { tbody.innerHTML = '<tr><td class="empty-td" colspan="9">No bookings found</td></tr>'; return; }
+
+  // Build summary strip
+  const total   = list.reduce((s,b) => s+(b.total||0), 0);
+  const strip   = document.getElementById("bookingSummary");
+  if (strip) {
+    strip.innerHTML = `
+      <div class="ss-item"><div class="ss-label">Showing</div><div class="ss-value">${list.length} bookings</div></div>
+      <div class="ss-item"><div class="ss-label">Revenue</div><div class="ss-value">₹${total.toLocaleString("en-IN")}</div></div>
+      <div class="ss-item"><div class="ss-label">Delivered</div><div class="ss-value">${list.filter(b=>b.status==="delivered").length}</div></div>
+      <div class="ss-item"><div class="ss-label">Pending</div><div class="ss-value">${list.filter(b=>!b.driverUid&&b.status!=="delivered"&&b.status!=="cancelled").length}</div></div>
+      <div class="ss-item"><div class="ss-label">Cancelled</div><div class="ss-value">${list.filter(b=>b.status==="cancelled").length}</div></div>`;
+  }
+
+  tbody.innerHTML = list.map(b => `
+    <tr>
+      <td><span class="booking-ref">${b.bookingRef||b.id.slice(-6).toUpperCase()}</span></td>
+      <td>
+        <div class="cust-cell">
+          <div class="cust-avatar">${(b.customerName||"?").charAt(0).toUpperCase()}</div>
+          ${b.customerName||"—"}
+        </div>
+      </td>
+      <td><a href="tel:${b.phone}" class="phone-link">${b.phone||"—"}</a></td>
+      <td>
+        <div class="route-cell">
+          <div class="route-from">${shortAddr(b.pickup)}</div>
+          <div>→ ${shortAddr(b.drop)}</div>
+        </div>
+      </td>
+      <td>${b.date||"—"}</td>
+      <td class="amount">₹${(b.total||0).toLocaleString("en-IN")}</td>
+      <td style="font-size:.75rem;color:var(--muted)">${payLabel(b)}</td>
+      <td><span class="badge badge-${b.status||"pending"}">${cap(b.status||"pending")}</span></td>
+      <td style="font-size:.78rem">${b.driverName||'<span style="color:var(--muted2)">Unassigned</span>'}</td>
+    </tr>`).join("");
+}
+
+function filterBookings(q) {
+  const stat = document.getElementById("statusFilter")?.value || "";
+  let list = allBookings.filter(b =>
+    (b.customerName||"").toLowerCase().includes(q.toLowerCase()) ||
+    (b.id||"").toLowerCase().includes(q.toLowerCase()) ||
+    (b.bookingRef||"").toLowerCase().includes(q.toLowerCase()) ||
+    (b.phone||"").includes(q)
+  );
+  if (stat) list = list.filter(b => b.status === stat);
+  filteredBookings = list;
+  renderBookingsTable(list);
+}
+
+function filterBookingsByStatus(stat) {
+  const q = document.getElementById("bookingSearch")?.value || "";
+  let list = q ? allBookings.filter(b =>
+    (b.customerName||"").toLowerCase().includes(q.toLowerCase()) ||
+    (b.id||"").toLowerCase().includes(q.toLowerCase()) ||
+    (b.bookingRef||"").toLowerCase().includes(q.toLowerCase())
+  ) : [...allBookings];
+  if (stat) list = list.filter(b => b.status === stat);
+  filteredBookings = list;
+  renderBookingsTable(list);
+}
+
+/* ════════════════════════════════════════════
+   CUSTOMERS TABLE
+   ════════════════════════════════════════════ */
+function renderCustomers(list) {
+  const tbody = document.getElementById("customersTable");
+  if (!tbody) return;
+  if (!list.length) { tbody.innerHTML = '<tr><td class="empty-td" colspan="6">No customers yet</td></tr>'; return; }
+  tbody.innerHTML = list.map(c => {
+    const bookings = allBookings.filter(b => b.customerUid === c.id);
+    const spent    = bookings.reduce((s, b) => s + (b.total || 0), 0);
+    const joined   = c.createdAt?.toDate ? c.createdAt.toDate().toLocaleDateString("en-IN") : "—";
+    return `<tr>
+      <td>
+        <div class="cust-cell">
+          <div class="cust-avatar">${(c.name||"?").charAt(0).toUpperCase()}</div>
+          <div>
+            <div style="font-weight:600">${c.name||"—"}</div>
+            <div style="font-size:.72rem;color:var(--muted)">${c.referralCode||""}</div>
+          </div>
+        </div>
+      </td>
+      <td><a href="tel:${c.phone}" class="phone-link">${c.phone||"—"}</a></td>
+      <td style="font-size:.78rem;color:var(--muted)">${c.email||"—"}</td>
+      <td class="amount">${bookings.length}</td>
+      <td class="amount" style="color:var(--green)">₹${spent.toLocaleString("en-IN")}</td>
+      <td style="font-size:.78rem;color:var(--muted)">${joined}</td>
+    </tr>`;
+  }).join("");
+}
+
+function filterCustomers(q) {
+  const list = allCustomers.filter(c =>
+    (c.name||"").toLowerCase().includes(q.toLowerCase()) ||
+    (c.email||"").toLowerCase().includes(q.toLowerCase()) ||
+    (c.phone||"").includes(q)
+  );
+  renderCustomers(list);
+}
+
+/* ════════════════════════════════════════════
+   DRIVERS TABLE
+   ════════════════════════════════════════════ */
+function renderDrivers() {
+  const tbody = document.getElementById("driversTable");
+  if (!tbody) return;
+  const online = allDrivers.filter(d => d.isOnline).length;
+  const onJob  = allDrivers.filter(d => d.currentBooking).length;
+  setText("drvTotal",  allDrivers.length);
+  setText("drvOnline", online);
+  setText("drvOnJob",  onJob);
+  if (!allDrivers.length) { tbody.innerHTML = '<tr><td class="empty-td" colspan="8">No drivers registered</td></tr>'; return; }
+  tbody.innerHTML = allDrivers.map(d => `
+    <tr>
+      <td>
+        <div class="cust-cell">
+          <div class="cust-avatar" style="background:linear-gradient(135deg,#f5a623,#e67e00)">${(d.name||"D").charAt(0)}</div>
+          <span style="font-weight:600">${d.name||"—"}</span>
+        </div>
+      </td>
+      <td style="font-size:.78rem;color:var(--muted)">${d.email||"—"}</td>
+      <td><a href="tel:${d.phone}" class="phone-link">${d.phone||"—"}</a></td>
+      <td style="font-size:.8rem">${d.vehicle||"—"}</td>
+      <td><span class="badge ${d.isOnline?"badge-delivered":"badge-cancelled"}">${d.isOnline?"🟢 Online":"⚫ Offline"}</span></td>
+      <td style="font-size:.78rem">${d.currentBooking ? `<span class="booking-ref">${d.currentBooking.slice(-6).toUpperCase()}</span>` : '<span style="color:var(--muted2)">Free</span>'}</td>
+      <td>${d.rating ? `<span style="color:#fbbf24;font-weight:700">★ ${d.rating}</span>` : "—"}</td>
+      <td class="amount">${d.totalMoves || 0}</td>
+    </tr>`).join("");
+}
+
+/* ════════════════════════════════════════════
+   CHARTS
+   ════════════════════════════════════════════ */
+function renderCharts() {
+  // Monthly bookings + revenue (overview)
+  const months      = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  const booksPerMo  = new Array(12).fill(0);
+  const revPerMo    = new Array(12).fill(0);
+  allBookings.forEach(b => {
+    const d = b.createdAt?.toDate?.();
+    if (!d) return;
+    booksPerMo[d.getMonth()]++;
+    revPerMo[d.getMonth()] += b.total || 0;
+  });
+
+  const gColor = alpha => `rgba(245,166,35,${alpha})`;
+  const bColor = alpha => `rgba(61,156,245,${alpha})`;
+
+  const ctx1 = document.getElementById("overviewChart");
+  if (ctx1) {
+    if (bookingsChart) bookingsChart.destroy();
+    bookingsChart = new Chart(ctx1, {
+      type: "bar",
+      data: {
+        labels: months,
+        datasets: [
+          { label: "Bookings", data: booksPerMo, backgroundColor: bColor(.4), borderColor: bColor(1), borderWidth: 2, borderRadius: 5, yAxisID: "y" },
+          { label: "Revenue (₹)", data: revPerMo, type: "line", borderColor: gColor(1), backgroundColor: gColor(.1), borderWidth: 2, tension: .4, pointBackgroundColor: gColor(1), pointRadius: 3, yAxisID: "y1" }
+        ]
+      },
+      options: {
+        responsive: true,
+        interaction: { mode: "index", intersect: false },
+        plugins: { legend: { labels: { color: "#6b7686", font: { family: "'Manrope',sans-serif", size: 11 } } } },
+        scales: {
+          x:  { grid: { color: "rgba(255,255,255,.04)" }, ticks: { color: "#6b7686", font: { size: 10 } } },
+          y:  { grid: { color: "rgba(255,255,255,.04)" }, ticks: { color: "#6b7686", font: { size: 10 } }, position: "left" },
+          y1: { grid: { display: false }, ticks: { color: "#f5a623", font: { size: 10 }, callback: v => "₹" + (v >= 1000 ? (v/1000).toFixed(1)+"k" : v) }, position: "right" }
+        }
+      }
+    });
+  }
+
+  // Status donut
+  const statusMap = {};
+  allBookings.forEach(b => { statusMap[b.status||"pending"] = (statusMap[b.status||"pending"]||0) + 1; });
+  const statusColors = {
+    confirmed: "#3d9cf5", assigned: "#9b72f5", packing: "#7dd3fc",
+    transit: "#fbbf24", delivered: "#00d17a", cancelled: "#ff4f5e", pending: "#f5a623"
+  };
+  const labels = Object.keys(statusMap), values = Object.values(statusMap);
+  const ctx2 = document.getElementById("statusChart");
+  if (ctx2) {
+    if (statusChart) statusChart.destroy();
+    statusChart = new Chart(ctx2, {
+      type: "doughnut",
+      data: { labels, datasets: [{ data: values, backgroundColor: labels.map(l => statusColors[l]||"#555"), borderColor: "var(--surface)", borderWidth: 3, hoverOffset: 6 }] },
+      options: { responsive: false, cutout: "68%", plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ` ${ctx.label}: ${ctx.raw}` } } } }
+    });
+    const legend = document.getElementById("statusLegend");
+    if (legend) {
+      legend.innerHTML = labels.map((l, i) => `
+        <div class="legend-item">
+          <div class="legend-left"><div class="legend-dot" style="background:${statusColors[l]||"#555"}"></div>${cap(l)}</div>
+          <div class="legend-val">${values[i]}</div>
+        </div>`).join("");
+    }
+  }
+}
+
+/* ════════════════════════════════════════════
+   REVENUE SECTION
+   ════════════════════════════════════════════ */
+let revenueTypeChart = null;
+
+function renderRevenue() {
+  const total    = allBookings.reduce((s,b)=>s+(b.total||0),0);
+  const avg      = allBookings.length ? Math.round(total/allBookings.length) : 0;
+  const thisM    = allBookings.filter(b => {
+    const d = b.createdAt?.toDate?.();
+    return d && d.getMonth() === new Date().getMonth() && d.getFullYear() === new Date().getFullYear();
+  }).reduce((s,b)=>s+(b.total||0),0);
+
+  setText("kpiRevTotal",   fmt(total));
+  setText("kpiAvg",        "₹"+avg.toLocaleString("en-IN"));
+  setText("kpiThisMonth",  fmt(thisM));
+
+  // Monthly breakdown table
+  const months      = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  const booksPerMo  = new Array(12).fill(0);
+  const revPerMo    = new Array(12).fill(0);
+  allBookings.forEach(b => {
+    const d = b.createdAt?.toDate?.();
+    if (!d) return;
+    booksPerMo[d.getMonth()]++;
+    revPerMo[d.getMonth()] += b.total || 0;
+  });
+  const maxRev = Math.max(...revPerMo, 1);
+  const tbody  = document.getElementById("revTable");
+  if (tbody) {
+    tbody.innerHTML = months.map((m, i) => {
+      if (!booksPerMo[i] && !revPerMo[i]) return "";
+      const pct = ((revPerMo[i] / total) * 100).toFixed(1);
+      return `<tr>
+        <td style="font-weight:600">${m} 2026</td>
+        <td class="amount">${booksPerMo[i]}</td>
+        <td>
+          <div class="rev-bar">
+            <div class="rev-bar-track"><div class="rev-bar-fill" style="width:${(revPerMo[i]/maxRev)*100}%"></div></div>
+            <span class="amount" style="min-width:80px">₹${revPerMo[i].toLocaleString("en-IN")}</span>
+          </div>
+        </td>
+        <td class="amount">₹${booksPerMo[i] ? Math.round(revPerMo[i]/booksPerMo[i]).toLocaleString("en-IN") : 0}</td>
+        <td style="color:var(--gold)">${pct}%</td>
+      </tr>`;
+    }).filter(Boolean).join("") || '<tr><td class="empty-td" colspan="5">No revenue data yet</td></tr>';
+  }
+
+  // Revenue by move type chart
+  const typeRev = { home: 0, office: 0, single: 0, other: 0 };
+  allBookings.forEach(b => {
+    const t = b.moveType || "other";
+    if (typeRev[t] !== undefined) typeRev[t] += b.total || 0;
+    else typeRev.other += b.total || 0;
+  });
+  const ctx3 = document.getElementById("revenueTypeChart");
+  if (ctx3) {
+    if (revenueTypeChart) revenueTypeChart.destroy();
+    revenueTypeChart = new Chart(ctx3, {
+      type: "bar",
+      data: {
+        labels: ["🏠 Home Move", "🏢 Office Shift", "📦 Single Item", "Other"],
+        datasets: [{
+          data: [typeRev.home, typeRev.office, typeRev.single, typeRev.other],
+          backgroundColor: ["rgba(245,166,35,.5)","rgba(61,156,245,.5)","rgba(0,209,122,.5)","rgba(155,114,245,.5)"],
+          borderColor:     ["#f5a623","#3d9cf5","#00d17a","#9b72f5"],
+          borderWidth: 2, borderRadius: 6
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { grid: { color: "rgba(255,255,255,.04)" }, ticks: { color: "#6b7686" } },
+          y: { grid: { color: "rgba(255,255,255,.04)" }, ticks: { color: "#6b7686", callback: v => "₹" + (v>=1000?(v/1000).toFixed(1)+"k":v) } }
+        }
+      }
+    });
+  }
+}
+
+/* ════════════════════════════════════════════
+   SECTION NAV
+   ════════════════════════════════════════════ */
+const sectionMeta = {
+  overview:  { title: "Overview",   sub: "Live snapshot of your business" },
+  revenue:   { title: "Revenue",    sub: "Sales analytics & breakdown" },
+  bookings:  { title: "Bookings",   sub: "All move orders from packzenblr.in" },
+  customers: { title: "Customers",  sub: "Registered users & spending" },
+  drivers:   { title: "Drivers",    sub: "Fleet status & performance" }
+};
+
+function showSection(name, navEl) {
+  document.querySelectorAll(".section").forEach(s => s.classList.remove("active"));
+  document.querySelectorAll(".nav-item").forEach(n => n.classList.remove("active"));
+  const sec = document.getElementById("sec" + cap(name));
+  if (sec) sec.classList.add("active");
+  if (navEl) navEl.classList.add("active");
+  const meta = sectionMeta[name] || {};
+  setText("sectionTitle", meta.title || cap(name));
+  setText("sectionSub",   meta.sub   || "Real-time data");
+  activeSection = name;
+  if (name === "overview") renderCharts();
+  if (name === "revenue")  renderRevenue();
+  if (name === "drivers")  renderDrivers();
+}
+
+/* ════════════════════════════════════════════
+   EXPORT CSV
+   ════════════════════════════════════════════ */
+function exportBookingsCSV() {
+  const list = filteredBookings || allBookings;
+  const rows = [["Ref","Customer","Phone","Pickup","Drop","Date","Amount","Payment","Status","Driver"]];
+  list.forEach(b => rows.push([
+    b.bookingRef||b.id.slice(-6), b.customerName||"", b.phone||"",
+    (b.pickup||"").replace(/,/g," "), (b.drop||"").replace(/,/g," "),
+    b.date||"", b.total||0, payLabel(b), b.status||"", b.driverName||""
+  ]));
+  downloadCSV(rows, "PackZen-Bookings");
+}
+
+function exportCustomersCSV() {
+  const rows = [["Name","Email","Phone","Bookings","Total Spent","Joined"]];
+  allCustomers.forEach(c => {
+    const bookings = allBookings.filter(b=>b.customerUid===c.id);
+    const spent    = bookings.reduce((s,b)=>s+(b.total||0),0);
+    rows.push([c.name||"", c.email||"", c.phone||"", bookings.length, spent,
+               c.createdAt?.toDate?c.createdAt.toDate().toLocaleDateString("en-IN"):"—"]);
+  });
+  downloadCSV(rows, "PackZen-Customers");
+}
+
+function exportRevenueCSV() {
+  const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  const booksM = new Array(12).fill(0), revM = new Array(12).fill(0);
+  allBookings.forEach(b => { const d=b.createdAt?.toDate?.(); if(!d) return; booksM[d.getMonth()]++; revM[d.getMonth()]+=b.total||0; });
+  const total = revM.reduce((a,b)=>a+b,0);
+  const rows  = [["Month","Bookings","Revenue","Avg Value","% of Total"]];
+  months.forEach((m,i) => { if(!booksM[i]) return; rows.push([`${m} 2026`, booksM[i], revM[i], booksM[i]?Math.round(revM[i]/booksM[i]):0, total?((revM[i]/total)*100).toFixed(1)+"%":"0%"]); });
+  downloadCSV(rows, "PackZen-Revenue");
+}
+
+function downloadCSV(rows, name) {
+  const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g,'""')}"`).join(",")).join("\n");
+  const a   = document.createElement("a");
+  a.href    = "data:text/csv;charset=utf-8," + encodeURIComponent(csv);
+  a.download = `${name}-${new Date().toLocaleDateString("en-IN").replace(/\//g,"-")}.csv`;
+  a.click();
+  toast("📥 CSV downloaded");
+}
+
+/* ════════════════════════════════════════════
+   SIGN OUT
+   ════════════════════════════════════════════ */
+function doSignOut() {
+  if (unsubBookings)  unsubBookings();
+  if (unsubCustomers) unsubCustomers();
+  if (unsubDrivers)   unsubDrivers();
+  auth.signOut().then(() => {
+    const shell = document.getElementById("shell");
+    shell.innerHTML = ""; shell.classList.remove("active");
+    shell.style.display = "none";
+    document.getElementById("loginWrap").style.display = "flex";
+    advisorUser = null; allBookings=[]; allCustomers=[]; allDrivers=[];
+  });
+}
+
+/* ════════════════════════════════════════════
+   UTILS
+   ════════════════════════════════════════════ */
+function cap(s)        { return s ? s.charAt(0).toUpperCase()+s.slice(1) : ""; }
+function setText(id,v) { const el=document.getElementById(id); if(el) el.textContent=v; }
+function shortAddr(a)  { return a ? a.split(",")[0].trim() : "—"; }
+function fmt(n)        { return n >= 100000 ? "₹"+(n/100000).toFixed(1)+"L" : "₹"+n.toLocaleString("en-IN"); }
+function payLabel(b)   {
+  if (b.paymentType==="full")     return "Full Paid";
+  if (b.paymentType==="advance")  return "Advance";
+  if (b.source==="whatsapp")      return "WhatsApp";
+  return "Pay on Day";
+}
+
+/* ─── TOAST ─── */
+function toast(msg, dur=3000) {
+  const t = document.getElementById("toast");
+  t.textContent = msg; t.classList.add("show");
+  clearTimeout(t._t); t._t = setTimeout(()=>t.classList.remove("show"), dur);
+}
 </script>
 </body>
 </html>
