@@ -63,10 +63,10 @@ measurementId: "G-9JXKP58GP3"
 console.log("✅ Firebase initialized with Auth API key");
 
 // Enable Firebase App Check
-firebase.appCheck().activate(
-"6LerkI8sAAAAAIQQeOb-zS6teh__8STzmVigHgOD",
-true
-);
+// firebase.appCheck().activate(
+//   "6LerkI8sAAAAAIQQeOb-zS6teh__8STzmVigHgOD",
+//   true
+// );
 
 console.log("🛡 Firebase App Check activated");
 
