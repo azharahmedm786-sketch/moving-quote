@@ -1129,28 +1129,132 @@ function showToast(msg, dur = 3000) {
 /* ============================================
    DASHBOARD
    ============================================ */
+/* ============================================
+   DASHBOARD (FINAL CLEAN VERSION)
+   ============================================ */
+
 function prefillBookingForm(userData) {
   const nameEl  = document.getElementById("custName");
   const phoneEl = document.getElementById("custPhone");
-  if (nameEl  && !nameEl.value.trim()  && userData?.name)  nameEl.value  = userData.name;
-  if (phoneEl && !phoneEl.value.trim() && userData?.phone) phoneEl.value = userData.phone.replace("+91","").trim();
+
+  if (nameEl && !nameEl.value.trim() && userData?.name) {
+    nameEl.value = userData.name;
+  }
+
+  if (phoneEl && !phoneEl.value.trim() && userData?.phone) {
+    phoneEl.value = userData.phone.replace("+91","").trim();
+  }
 }
 
+/* ================================
+   OPEN DASHBOARD
+================================ */
 async function openDashboard() {
   document.getElementById("userDropdown")?.classList.remove("open");
-  if (!currentUser) { openAuthModal("login"); return; }
+
+  if (!currentUser) {
+    openAuthModal("login");
+    return;
+  }
+
+  if (!window._firebase) {
+    console.log("Firebase not ready");
+    return;
+  }
+
   const { db } = window._firebase;
-  const userSnap = await db.collection("users").doc(currentUser.uid).get();
-  const userData = userSnap.data() || {};
-  const name = currentUser.displayName || "User";
-  document.getElementById("dashName").textContent   = name;
-  document.getElementById("dashEmail").textContent  = currentUser.email || "";
-  document.getElementById("dashAvatar").textContent = name.charAt(0).toUpperCase();
-  const adminTabBtn = document.getElementById("adminTabBtn");
-  if (userData.role === "admin" && adminTabBtn) adminTabBtn.style.display = "inline-flex";
-  loadUserQuotes();
-  document.getElementById("dashboardModal").style.display = "flex";
-  switchDashTab("quotes", document.querySelector(".dash-tab"));
+
+  try {
+    const userSnap = await db.collection("users")
+      .doc(currentUser.uid)
+      .get();
+
+    const userData = userSnap.data() || {};
+    const name = currentUser.displayName || "User";
+
+    document.getElementById("dashName").textContent   = name;
+    document.getElementById("dashEmail").textContent  = currentUser.email || "";
+    document.getElementById("dashAvatar").textContent = name.charAt(0).toUpperCase();
+
+    const adminTabBtn = document.getElementById("adminTabBtn");
+    if (userData.role === "admin" && adminTabBtn) {
+      adminTabBtn.style.display = "inline-flex";
+    }
+
+    // 🔥 Load quotes safely
+    await loadQuotes();
+
+    document.getElementById("dashboardModal").style.display = "flex";
+    switchDashTab("quotes", document.querySelector(".dash-tab"));
+
+  } catch (e) {
+    console.error("Dashboard error:", e);
+  }
+}
+
+/* ================================
+   LOAD USER QUOTES (SAFE + FILTERED)
+================================ */
+async function loadQuotes() {
+  if (!window._firebase || !currentUser) {
+    console.log("Firebase or user not ready");
+    return;
+  }
+
+  const db = window._firebase.db;
+  const container = document.getElementById("quotesList");
+
+  if (!container) return;
+
+  container.innerHTML = "⏳ Loading your quotes...";
+
+  try {
+    const snapshot = await db.collection("quotes")
+      .where("uid", "==", currentUser.uid) // 🔒 SECURITY FIX
+      .orderBy("createdAt", "desc")
+      .get();
+
+    if (snapshot.empty) {
+      container.innerHTML = `
+        <div style="opacity:0.7; text-align:center; padding:20px;">
+          No quotes found yet 🚚
+        </div>
+      `;
+      return;
+    }
+
+    container.innerHTML = "";
+
+    snapshot.forEach(doc => {
+      const data = doc.data();
+
+      container.innerHTML += `
+        <div style="
+          padding:12px;
+          margin-bottom:12px;
+          border:1px solid #333;
+          border-radius:10px;
+          background:#0f172a;
+        ">
+          <div style="font-weight:600;">
+            ${data.pickup || "N/A"} → ${data.drop || "N/A"}
+          </div>
+
+          <div style="margin-top:6px;">
+            💰 ₹${data.total || 0}
+          </div>
+
+          <div style="font-size:12px; opacity:0.7;">
+            📅 ${data.date || ""}
+          </div>
+        </div>
+      `;
+    });
+
+  } catch (error) {
+    console.error("Error loading quotes:", error);
+    container.innerHTML = "❌ Failed to load quotes";
+  }
 }
 
 /* ============================================
@@ -2438,6 +2542,7 @@ function loadUserBookings() {
             ${canCancel?`<button class="bk-btn cancel" onclick="openCancelModal('${id}','${b.bookingRef||id}','${b.status||""}')">✕ Cancel</button>`:""}
             ${canRate?`<button class="bk-btn rate" onclick="openRateDriverModal('${id}','${b.bookingRef||id}','${b.driverName||""}')">⭐ Rate Driver</button>`:""}
             ${canClaim?`<button class="bk-btn claim" onclick="openDamageModal('${id}','${b.bookingRef||id}')">🔧 Report Damage</button>`:""}
+         
           </div>`:""}
         </div>`;
       }).join("");
