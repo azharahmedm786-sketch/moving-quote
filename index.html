@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en-IN">
 <head>
@@ -91,6 +90,26 @@
   <link rel="stylesheet" href="style.css">
 
   <style>
+    /* ── SERVICE CARD IMAGE BANNERS (replaces broken <img> tags) ── */
+    .sc-banner {
+      width: 100%;
+      height: 160px;
+      border-radius: 12px 12px 0 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    .sc-banner svg {
+      width: 80px;
+      height: 80px;
+    }
+    .sc-banner-home   { background: linear-gradient(135deg, #fde8dc 0%, #fbc4a7 100%); }
+    .sc-banner-office { background: linear-gradient(135deg, #dce8fd 0%, #a7c4fb 100%); }
+    .sc-banner-local  { background: linear-gradient(135deg, #dcfde8 0%, #a7fbc4 100%); }
+    .sc-banner-load   { background: linear-gradient(135deg, #fdf8dc 0%, #fbe5a7 100%); }
+
     /* HERO UPDATES */
     .hero-desc { font-size:.9rem; color:rgba(255,255,255,0.90); line-height:1.7; margin:10px 0 14px; max-width:480px; }
     .hero-checklist { display:flex; flex-direction:column; gap:6px; margin-bottom:16px; }
@@ -266,6 +285,7 @@
 
   </div>
 </header>
+
 <!-- BOOKING FORM -->
 <main>
 <section class="quote-section" id="quote">
@@ -645,31 +665,82 @@
     <p>Purpose-built services for Bangalore's homes and offices — handled with care from day one.</p>
   </div>
   <div class="services-grid reveal-stagger">
+
+    <!-- Home Relocation -->
     <div class="service-card">
-      <img src="assets/images/service-home.jpg" alt="Home Relocation Bangalore" width="400" height="200" loading="lazy">
+      <div class="sc-banner sc-banner-home" role="img" aria-label="Home Relocation Bangalore">
+        <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <polygon points="8,42 40,12 72,42" fill="#e8490a" opacity="0.7"/>
+          <rect x="16" y="42" width="48" height="26" rx="3" fill="#e8490a" opacity="0.4"/>
+          <rect x="30" y="52" width="20" height="16" rx="2" fill="#fff" opacity="0.85"/>
+          <rect x="20" y="46" width="12" height="12" rx="1" fill="#fff" opacity="0.7"/>
+          <rect x="48" y="46" width="12" height="12" rx="1" fill="#fff" opacity="0.7"/>
+          <rect x="37" y="56" width="6" height="12" rx="1" fill="#e8490a" opacity="0.5"/>
+        </svg>
+      </div>
       <div class="sc-icon">🏠</div>
       <h3>Home Relocation</h3>
       <p>Safe &amp; secure home shifting with full packing, loading and unpacking at destination.</p>
       <div class="sc-badge">Most Popular</div>
     </div>
+
+    <!-- Office Shifting -->
     <div class="service-card">
-      <img src="assets/images/service-office.jpg" alt="Office Shifting Bangalore" width="400" height="200" loading="lazy">
+      <div class="sc-banner sc-banner-office" role="img" aria-label="Office Shifting Bangalore">
+        <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <rect x="10" y="18" width="60" height="50" rx="3" fill="#2563eb" opacity="0.25"/>
+          <rect x="10" y="10" width="60" height="14" rx="3" fill="#2563eb" opacity="0.55"/>
+          <rect x="18" y="30" width="12" height="12" rx="2" fill="#2563eb" opacity="0.65"/>
+          <rect x="34" y="30" width="12" height="12" rx="2" fill="#2563eb" opacity="0.65"/>
+          <rect x="50" y="30" width="12" height="12" rx="2" fill="#2563eb" opacity="0.65"/>
+          <rect x="18" y="46" width="12" height="12" rx="2" fill="#2563eb" opacity="0.65"/>
+          <rect x="34" y="46" width="12" height="12" rx="2" fill="#2563eb" opacity="0.65"/>
+          <rect x="50" y="46" width="12" height="22" rx="2" fill="#2563eb" opacity="0.4"/>
+          <rect x="32" y="56" width="16" height="12" rx="2" fill="#fff" opacity="0.8"/>
+        </svg>
+      </div>
       <div class="sc-icon">🏢</div>
       <h3>Office Shifting</h3>
       <p>Minimal downtime office relocation with IT equipment handling and furniture setup.</p>
     </div>
+
+    <!-- Local Shifting -->
     <div class="service-card">
-      <img src="assets/images/service-truck.jpg" alt="Local Shifting Bangalore" width="400" height="200" loading="lazy">
+      <div class="sc-banner sc-banner-local" role="img" aria-label="Local Shifting Bangalore">
+        <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <circle cx="40" cy="30" r="14" fill="#16a34a" opacity="0.25"/>
+          <circle cx="40" cy="30" r="8" fill="#16a34a" opacity="0.55"/>
+          <circle cx="40" cy="30" r="3" fill="#16a34a" opacity="0.9"/>
+          <line x1="40" y1="44" x2="40" y2="62" stroke="#16a34a" stroke-width="3.5" stroke-linecap="round" opacity="0.7"/>
+          <ellipse cx="40" cy="64" rx="10" ry="3" fill="#16a34a" opacity="0.2"/>
+          <path d="M16 54 Q28 44 40 50 Q52 56 64 46" stroke="#16a34a" stroke-width="2" fill="none" stroke-dasharray="4,3" opacity="0.5" stroke-linecap="round"/>
+        </svg>
+      </div>
       <div class="sc-icon">📍</div>
       <h3>Local Shifting</h3>
       <p>Fast &amp; affordable within-Bangalore shifting. Same day delivery available.</p>
     </div>
+
+    <!-- Loading & Unloading -->
     <div class="service-card">
-      <img src="assets/images/service-loading.jpg" alt="Loading and Unloading Service" width="400" height="200" loading="lazy">
+      <div class="sc-banner sc-banner-load" role="img" aria-label="Loading and Unloading Service">
+        <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <rect x="10" y="44" width="36" height="20" rx="3" fill="#b45309" opacity="0.3"/>
+          <rect x="46" y="50" width="22" height="14" rx="2" fill="#b45309" opacity="0.3"/>
+          <path d="M10 44 L24 28 L46 28 L46 44Z" fill="#b45309" opacity="0.45"/>
+          <rect x="46" y="36" width="22" height="8" rx="2" fill="#b45309" opacity="0.35"/>
+          <circle cx="22" cy="66" r="6" fill="#b45309" opacity="0.6"/>
+          <circle cx="54" cy="66" r="6" fill="#b45309" opacity="0.6"/>
+          <circle cx="22" cy="66" r="2.5" fill="#fef3c7"/>
+          <circle cx="54" cy="66" r="2.5" fill="#fef3c7"/>
+          <line x1="4" y1="52" x2="10" y2="52" stroke="#b45309" stroke-width="3" stroke-linecap="round" opacity="0.6"/>
+        </svg>
+      </div>
       <div class="sc-icon">💪</div>
       <h3>Loading &amp; Unloading</h3>
       <p>Trained manpower for heavy furniture and appliance handling with care.</p>
     </div>
+
   </div>
 </section>
 
@@ -917,238 +988,133 @@
 <!-- ======================== MODALS ======================== -->
 
 <!-- AUTH MODAL -->
-<!-- ═══════════════════════════════════════════
-     AUTH MODAL — Replace the entire
-     <div id="authModal" ...> block in index.html
-     with this complete block
-═══════════════════════════════════════════ -->
-
 <div id="authModal" class="modal-overlay" role="dialog" aria-modal="true" style="display:none;">
   <div class="modal-box auth-modal-box">
 
-    <!-- ══════════════════════════════════
-         PANEL 1 — LOGIN
-         Phone + Password
-    ══════════════════════════════════ -->
     <div class="auth-panel" id="panelLogin">
       <button class="modal-x" onclick="closeAuthModal()">✕</button>
       <div class="auth-logo">📦 PackZen</div>
       <h2 class="auth-title">Welcome Back</h2>
       <p class="auth-sub">Login with your phone number and password</p>
-
       <label>Phone Number</label>
       <div class="phone-row">
         <span class="phone-prefix">+91</span>
-        <input id="loginPhone" type="tel" placeholder="10-digit mobile number"
-          maxlength="10" class="field-input" style="flex:1;"
-          onkeydown="if(event.key==='Enter')document.getElementById('loginPassword').focus()">
+        <input id="loginPhone" type="tel" placeholder="10-digit mobile number" maxlength="10" class="field-input" style="flex:1;" onkeydown="if(event.key==='Enter')document.getElementById('loginPassword').focus()">
       </div>
-
       <label style="margin-top:12px;display:block;">Password</label>
-      <input id="loginPassword" type="password" placeholder="Enter your password"
-        class="field-input"
-        onkeydown="if(event.key==='Enter')loginUser()">
-
+      <input id="loginPassword" type="password" placeholder="Enter your password" class="field-input" onkeydown="if(event.key==='Enter')loginUser()">
       <div id="loginError" class="auth-error"></div>
       <button class="btn-auth" id="btnLogin" onclick="loginUser()">Login →</button>
-
       <div class="auth-divider"><span>or</span></div>
       <button class="btn-auth-outline" onclick="switchPanel('panelSignup')">Create New Account</button>
       <p class="auth-link" onclick="switchPanel('panelRecover')">Forgot password?</p>
     </div>
 
-    <!-- ══════════════════════════════════
-         PANEL 2 — SIGN UP (Step 1)
-         Collect details → Send OTP
-    ══════════════════════════════════ -->
     <div class="auth-panel" id="panelSignup" style="display:none;">
       <button class="modal-x" onclick="closeAuthModal()">✕</button>
       <div class="auth-logo">📦 PackZen</div>
       <h2 class="auth-title">Create Account</h2>
       <p class="auth-sub">Enter your details — we'll verify your phone number</p>
-
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
         <div>
           <label>First Name</label>
-          <input id="signupFirstName" type="text" placeholder="First name"
-            class="field-input"
-            onkeydown="if(event.key==='Enter')document.getElementById('signupLastName').focus()">
+          <input id="signupFirstName" type="text" placeholder="First name" class="field-input" onkeydown="if(event.key==='Enter')document.getElementById('signupLastName').focus()">
         </div>
         <div>
           <label>Last Name</label>
-          <input id="signupLastName" type="text" placeholder="Last name"
-            class="field-input"
-            onkeydown="if(event.key==='Enter')document.getElementById('signupPhone').focus()">
+          <input id="signupLastName" type="text" placeholder="Last name" class="field-input" onkeydown="if(event.key==='Enter')document.getElementById('signupPhone').focus()">
         </div>
       </div>
-
       <label style="margin-top:12px;display:block;">Phone Number</label>
       <div class="phone-row">
         <span class="phone-prefix">+91</span>
-        <input id="signupPhone" type="tel" placeholder="10-digit mobile number"
-          maxlength="10"
-          onkeydown="if(event.key==='Enter')document.getElementById('signupEmail').focus()">
+        <input id="signupPhone" type="tel" placeholder="10-digit mobile number" maxlength="10" onkeydown="if(event.key==='Enter')document.getElementById('signupEmail').focus()">
       </div>
-
       <label style="margin-top:12px;display:block;">Email Address</label>
-      <input id="signupEmail" type="email" placeholder="your@email.com"
-        class="field-input"
-        onkeydown="if(event.key==='Enter')signupUser()">
-
+      <input id="signupEmail" type="email" placeholder="your@email.com" class="field-input" onkeydown="if(event.key==='Enter')signupUser()">
       <label style="margin-top:12px;display:block;">Referral Code <span style="font-weight:400;color:var(--text-muted,#888)">(optional)</span></label>
-      <input id="signupReferral" type="text" placeholder="Enter referral code"
-        class="field-input" style="text-transform:uppercase;">
-
-      <!-- Invisible reCAPTCHA anchor for signup -->
+      <input id="signupReferral" type="text" placeholder="Enter referral code" class="field-input" style="text-transform:uppercase;">
       <div id="recaptcha-container-signup"></div>
-
       <div id="signupError" class="auth-error"></div>
-      <button class="btn-auth" id="btnSignupSendOtp" onclick="signupUser()" style="margin-top:16px;">
-        Send OTP →
-      </button>
+      <button class="btn-auth" id="btnSignupSendOtp" onclick="signupUser()" style="margin-top:16px;">Send OTP →</button>
       <p class="auth-link" onclick="switchPanel('panelLogin')">Already have an account? Login</p>
     </div>
 
-    <!-- ══════════════════════════════════
-         PANEL 3 — SIGN UP OTP (Step 2)
-         Verify phone OTP
-    ══════════════════════════════════ -->
     <div class="auth-panel" id="panelSignupOTP" style="display:none;">
       <button class="modal-x" onclick="closeAuthModal()">✕</button>
       <div class="auth-logo">📱</div>
       <h2 class="auth-title">Verify Your Phone</h2>
       <p class="auth-sub">We sent a 6-digit OTP to</p>
       <p id="signupOtpPhone" style="text-align:center;font-weight:700;font-size:.95rem;margin-bottom:20px;color:var(--text,#1a2332);">your phone</p>
-
       <label>Enter OTP</label>
-      <input id="signupOtpInput" type="text" inputmode="numeric" maxlength="6"
-        placeholder="• • • • • •" class="field-input"
-        style="text-align:center;font-size:1.6rem;font-weight:800;letter-spacing:8px;"
-        onkeydown="if(event.key==='Enter')verifySignupOTP()">
-
+      <input id="signupOtpInput" type="text" inputmode="numeric" maxlength="6" placeholder="• • • • • •" class="field-input" style="text-align:center;font-size:1.6rem;font-weight:800;letter-spacing:8px;" onkeydown="if(event.key==='Enter')verifySignupOTP()">
       <div id="signupOtpError" class="auth-error"></div>
-      <button class="btn-auth" id="btnVerifySignupOtp" onclick="verifySignupOTP()" style="margin-top:16px;">
-        Verify OTP →
-      </button>
+      <button class="btn-auth" id="btnVerifySignupOtp" onclick="verifySignupOTP()" style="margin-top:16px;">Verify OTP →</button>
       <p class="auth-link" onclick="resendSignupOTP()">Didn't receive? Go back & resend</p>
     </div>
 
-    <!-- ══════════════════════════════════
-         PANEL 4 — SET PASSWORD (Step 3)
-         After OTP verified → set password
-         → account created
-    ══════════════════════════════════ -->
     <div class="auth-panel" id="panelSetPassword" style="display:none;">
       <button class="modal-x" onclick="closeAuthModal()">✕</button>
       <div class="auth-logo">🔒</div>
       <h2 class="auth-title">Set Your Password</h2>
       <p class="auth-sub">Phone verified ✅ — Choose a strong password to complete signup</p>
-
       <label>Password</label>
-      <input id="setPasswordInput" type="password" placeholder="Min. 6 characters"
-        class="field-input"
-        onkeydown="if(event.key==='Enter')document.getElementById('setPasswordConfirm').focus()">
-
+      <input id="setPasswordInput" type="password" placeholder="Min. 6 characters" class="field-input" onkeydown="if(event.key==='Enter')document.getElementById('setPasswordConfirm').focus()">
       <label style="margin-top:12px;display:block;">Confirm Password</label>
-      <input id="setPasswordConfirm" type="password" placeholder="Re-enter password"
-        class="field-input"
-        onkeydown="if(event.key==='Enter')completeSignup()">
-
+      <input id="setPasswordConfirm" type="password" placeholder="Re-enter password" class="field-input" onkeydown="if(event.key==='Enter')completeSignup()">
       <div id="setPasswordError" class="auth-error"></div>
-      <button class="btn-auth" id="btnCompleteSignup" onclick="completeSignup()" style="margin-top:16px;">
-        Create Account →
-      </button>
+      <button class="btn-auth" id="btnCompleteSignup" onclick="completeSignup()" style="margin-top:16px;">Create Account →</button>
     </div>
 
-    <!-- ══════════════════════════════════
-         PANEL 5 — FORGOT PASSWORD (Step 1)
-         Enter phone → send OTP
-    ══════════════════════════════════ -->
     <div class="auth-panel" id="panelRecover" style="display:none;">
       <button class="modal-x" onclick="closeAuthModal()">✕</button>
       <div class="auth-logo">🔑</div>
       <h2 class="auth-title">Reset Password</h2>
       <p class="auth-sub">Enter your registered phone number. We'll send an OTP to verify it's you.</p>
-
       <label>Phone Number</label>
       <div class="phone-row">
         <span class="phone-prefix">+91</span>
-        <input id="resetPhone" type="tel" placeholder="10-digit mobile number"
-          maxlength="10" class="field-input" style="flex:1;"
-          onkeydown="if(event.key==='Enter')sendResetOTP()">
+        <input id="resetPhone" type="tel" placeholder="10-digit mobile number" maxlength="10" class="field-input" style="flex:1;" onkeydown="if(event.key==='Enter')sendResetOTP()">
       </div>
-
-      <!-- Invisible reCAPTCHA anchor for reset -->
       <div id="recaptcha-container-reset"></div>
-
       <div id="recoverError" class="auth-error"></div>
-      <button class="btn-auth" id="btnSendResetOtp" onclick="sendResetOTP()" style="margin-top:16px;">
-        Send OTP →
-      </button>
+      <button class="btn-auth" id="btnSendResetOtp" onclick="sendResetOTP()" style="margin-top:16px;">Send OTP →</button>
       <p class="auth-link" onclick="switchPanel('panelLogin')">← Back to Login</p>
     </div>
 
-    <!-- ══════════════════════════════════
-         PANEL 6 — RESET OTP (Step 2)
-         Verify OTP → signs into real account
-    ══════════════════════════════════ -->
     <div class="auth-panel" id="panelResetOTP" style="display:none;">
       <button class="modal-x" onclick="closeAuthModal()">✕</button>
       <div class="auth-logo">📱</div>
       <h2 class="auth-title">Enter OTP</h2>
       <p class="auth-sub">We sent a 6-digit code to</p>
       <p id="resetOtpPhone" style="text-align:center;font-weight:700;font-size:.95rem;margin-bottom:20px;color:var(--text,#1a2332);">your phone</p>
-
       <label>6-Digit OTP</label>
-      <input id="resetOtpInput" type="text" inputmode="numeric" maxlength="6"
-        placeholder="• • • • • •" class="field-input"
-        style="text-align:center;font-size:1.6rem;font-weight:800;letter-spacing:8px;"
-        onkeydown="if(event.key==='Enter')verifyResetOTP()">
-
+      <input id="resetOtpInput" type="text" inputmode="numeric" maxlength="6" placeholder="• • • • • •" class="field-input" style="text-align:center;font-size:1.6rem;font-weight:800;letter-spacing:8px;" onkeydown="if(event.key==='Enter')verifyResetOTP()">
       <div id="resetOtpError" class="auth-error"></div>
-      <button class="btn-auth" id="btnVerifyResetOtp" onclick="verifyResetOTP()" style="margin-top:16px;">
-        Verify OTP →
-      </button>
-
+      <button class="btn-auth" id="btnVerifyResetOtp" onclick="verifyResetOTP()" style="margin-top:16px;">Verify OTP →</button>
       <div style="text-align:center;margin-top:12px;display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;">
         <span id="resetOtpTimer" style="font-size:.82rem;color:var(--text-muted,#888);"></span>
-        <button id="btnResendResetOtp" onclick="resendResetOTP()" disabled
-          style="background:none;border:none;color:#f97316;font-size:.85rem;font-weight:600;cursor:pointer;padding:0;">
-          Resend OTP
-        </button>
+        <button id="btnResendResetOtp" onclick="resendResetOTP()" disabled style="background:none;border:none;color:#f97316;font-size:.85rem;font-weight:600;cursor:pointer;padding:0;">Resend OTP</button>
       </div>
       <p class="auth-link" onclick="switchPanel('panelRecover')">← Change phone number</p>
     </div>
 
-    <!-- ══════════════════════════════════
-         PANEL 7 — SET NEW PASSWORD (Step 3)
-         OTP verified → just set new password
-         No current password needed ✅
-    ══════════════════════════════════ -->
     <div class="auth-panel" id="panelResetPassword" style="display:none;">
       <button class="modal-x" onclick="closeAuthModal()">✕</button>
       <div class="auth-logo">🔒</div>
       <h2 class="auth-title">Set New Password</h2>
       <p class="auth-sub">Phone verified ✅ — Choose your new password</p>
-
       <label>New Password</label>
-      <input id="newPasswordInput" type="password" placeholder="Min. 6 characters"
-        class="field-input"
-        onkeydown="if(event.key==='Enter')document.getElementById('confirmPasswordInput').focus()">
-
+      <input id="newPasswordInput" type="password" placeholder="Min. 6 characters" class="field-input" onkeydown="if(event.key==='Enter')document.getElementById('confirmPasswordInput').focus()">
       <label style="margin-top:12px;display:block;">Confirm New Password</label>
-      <input id="confirmPasswordInput" type="password" placeholder="Re-enter new password"
-        class="field-input"
-        onkeydown="if(event.key==='Enter')setNewPassword()">
-
+      <input id="confirmPasswordInput" type="password" placeholder="Re-enter new password" class="field-input" onkeydown="if(event.key==='Enter')setNewPassword()">
       <div id="resetPasswordError" class="auth-error"></div>
-      <button class="btn-auth" id="btnSetNewPassword" onclick="setNewPassword()" style="margin-top:16px;">
-        Set New Password →
-      </button>
+      <button class="btn-auth" id="btnSetNewPassword" onclick="setNewPassword()" style="margin-top:16px;">Set New Password →</button>
     </div>
 
   </div>
 </div>
+
 <!-- DASHBOARD MODAL -->
 <div id="dashboardModal" class="modal-overlay" role="dialog" aria-modal="true" style="display:none;">
   <div class="modal-box dashboard-box">
