@@ -224,11 +224,17 @@ body.dark-mode .navbar { background: #06101f; }
    HERO
    ============================================ */
 .hero {
-  position: relative; min-height: 100vh;
-  display: flex; align-items: center;
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
   padding: 90px 2.5rem 5rem;
-  overflow: hidden; color: white;
-  background: url('https://raw.githubusercontent.com/azharahmedm786-sketch/moving-quote/main/images/hero-bg.jpg') center/cover no-repeat;
+  overflow: hidden;
+  color: white;
+
+  background: 
+    linear-gradient(rgba(10,25,47,0.6), rgba(10,25,47,0.5)),
+    url("images/mainbackground.jpg") center/cover no-repeat;
 }
 .hero::before {
   content: '';
