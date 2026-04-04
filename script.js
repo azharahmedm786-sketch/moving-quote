@@ -607,15 +607,7 @@ function _clearResetRecaptcha() {
 
 /* ═══════════════════════════════════════════════
    SIGN UP FLOW
-   ─────────────────────────────────────────────
-   Step 1 — panelSignup:    first name, last name,
-                            phone, email → Send OTP
-   Step 2 — panelSignupOTP: enter 6-digit OTP
-   Step 3 — panelSetPassword: set password →
-                            account created ✅
 ═══════════════════════════════════════════════ */
-
-/* STEP 1 — Collect details & send OTP */
 function signupUser() {
   const firstName = document.getElementById("signupFirstName").value.trim();
   const lastName  = document.getElementById("signupLastName").value.trim();
@@ -636,9 +628,7 @@ function signupUser() {
   const btn = document.getElementById("btnSignupSendOtp");
   if (btn) { btn.disabled = true; btn.textContent = "Sending OTP..."; }
 
-  // Store details for later
   pendingSignupData = { firstName, lastName, phone, email, referral };
-
   _clearSignupRecaptcha();
 
   waitForFirebase(() => {
@@ -650,7 +640,6 @@ function signupUser() {
       window._firebase.auth.signInWithPhoneNumber("+91" + phone, window._signupRecaptcha)
         .then(result => {
           confirmationResult = result;
-          // Show OTP panel
           document.getElementById("signupOtpPhone").textContent = "+91 " + phone;
           switchPanel("panelSignupOTP");
           document.getElementById("signupOtpInput").focus();
@@ -669,7 +658,6 @@ function signupUser() {
   });
 }
 
-/* STEP 2 — Verify signup OTP */
 function verifySignupOTP() {
   const otp = document.getElementById("signupOtpInput").value.trim();
   if (!/^\d{6}$/.test(otp))
@@ -683,11 +671,8 @@ function verifySignupOTP() {
 
   confirmationResult.confirm(otp)
     .then(result => {
-      // OTP verified — phone user is now signed in
-      // Store the phone user reference for linking
       pendingSignupData.phoneUser = result.user;
       if (btn) { btn.disabled = false; btn.textContent = "Verify OTP →"; }
-      // Move to set password panel
       switchPanel("panelSetPassword");
       document.getElementById("setPasswordInput").focus();
     })
@@ -697,15 +682,6 @@ function verifySignupOTP() {
     });
 }
 
-/* STEP 3 — Set password & complete signup
-   ─────────────────────────────────────────
-   The user is currently signed in as a phone-auth
-   user (from OTP). We link their email+password
-   credential to this same account. This means:
-   - One Firebase account with phone + email linked
-   - During password reset, OTP signs into THIS
-     account and updatePassword() works directly ✅
-───────────────────────────────────────────── */
 async function completeSignup() {
   const password = document.getElementById("setPasswordInput").value;
   const confirm  = document.getElementById("setPasswordConfirm").value;
@@ -726,15 +702,10 @@ async function completeSignup() {
   const { auth, db } = window._firebase;
 
   try {
-    // Link email/password credential to the phone-auth account
-    // This makes ONE account with BOTH phone & email/password
     const emailCred = firebase.auth.EmailAuthProvider.credential(email, password);
     await phoneUser.linkWithCredential(emailCred);
-
-    // Update display name
     await phoneUser.updateProfile({ displayName: fullName });
 
-    // Save user to Firestore
     const refCode = phoneUser.uid.slice(0, 8).toUpperCase();
     await db.collection("users").doc(phoneUser.uid).set({
       firstName, lastName, name: fullName,
@@ -746,7 +717,6 @@ async function completeSignup() {
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
     });
 
-    // Process referral if any
     if (referral) await processReferral(referral, phoneUser.uid);
 
     pendingSignupData = null;
@@ -780,7 +750,6 @@ async function processReferral(refCode, newUserUid) {
   } catch (e) {}
 }
 
-/* Resend signup OTP */
 function resendSignupOTP() {
   document.getElementById("signupOtpInput").value = "";
   showError("signupOtpError", "");
@@ -789,10 +758,6 @@ function resendSignupOTP() {
 
 /* ═══════════════════════════════════════════════
    LOGIN
-   ─────────────────────────────────────────────
-   Phone number + Password
-   → look up email in Firestore by phone
-   → signInWithEmailAndPassword(email, password)
 ═══════════════════════════════════════════════ */
 async function loginUser() {
   const phone = document.getElementById("loginPhone").value.trim();
@@ -812,7 +777,6 @@ async function loginUser() {
     try {
       await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(() => {});
 
-      // Look up email by phone
       let email = null;
       const snap1 = await db.collection("users").where("phone", "==", phone).limit(1).get();
       if (!snap1.empty) email = snap1.docs[0].data().email;
@@ -851,19 +815,6 @@ async function loginUser() {
 
 /* ═══════════════════════════════════════════════
    PASSWORD RESET FLOW
-   ─────────────────────────────────────────────
-   Step 1 — panelRecover:      Enter phone → send OTP
-   Step 2 — panelResetOTP:     Verify OTP
-   Step 3 — panelResetPassword: Enter new password
-                                → updatePassword() ✅
-
-   Why this works:
-   During signup, we link the phone credential to
-   the email/password account (linkWithCredential).
-   So signInWithPhoneNumber during reset signs into
-   THE SAME ACCOUNT. Then updatePassword() directly
-   updates Firebase Auth — old password dead
-   immediately. No Firestore workaround needed.
 ═══════════════════════════════════════════════ */
 
 /* STEP 1 — Enter phone, check it exists, then send OTP */
@@ -876,7 +827,6 @@ async function sendResetOTP() {
   if (btn) { btn.disabled = true; btn.textContent = "Checking..."; }
   showError("recoverError", "⏳ Looking up your account...", "info");
 
-  // ✅ FIX: Verify phone exists in Firestore BEFORE burning an SMS
   waitForFirebase(async () => {
     const { auth, db } = window._firebase;
     try {
@@ -898,7 +848,6 @@ async function sendResetOTP() {
 
       _clearResetRecaptcha();
 
-      // ✅ FIX: Use window._firebase.auth consistently (not firebase.auth())
       window._resetRecaptcha = new firebase.auth.RecaptchaVerifier(
         "recaptcha-container-reset", { size: "invisible", callback: () => {} }
       );
@@ -927,10 +876,7 @@ async function sendResetOTP() {
   });
 }
 
-/* STEP 2 — Verify OTP
-   Confirms phone ownership. Keeps the phone-auth
-   user signed in (recent login) so updatePassword()
-   works in Step 3 without asking for old password. */
+/* STEP 2 — Verify OTP */
 async function verifyResetOTP() {
   const otp = document.getElementById("resetOtpInput").value.trim();
   if (!/^\d{6}$/.test(otp))
@@ -943,11 +889,9 @@ async function verifyResetOTP() {
   showError("resetOtpError", "⏳ Verifying OTP...", "info");
 
   try {
-    // Confirm OTP — user is now signed in via phone-auth (fresh/recent login)
     const result = await confirmationResult.confirm(otp);
     clearInterval(otpTimerInterval);
 
-    // Look up their email from Firestore by phone number
     const { db } = window._firebase;
     const phone = resetFlowPhone;
     let verifiedEmail = null;
@@ -965,13 +909,11 @@ async function verifyResetOTP() {
       return showError("resetOtpError", "⚠️ Account not found. Please contact support.");
     }
 
-    // Keep the phone-auth user reference + email for Step 3
     window._resetPhoneUser     = result.user;
     window._resetVerifiedEmail = verifiedEmail;
 
     if (btn) { btn.disabled = false; btn.textContent = "Verify OTP →"; }
 
-    // Clear fields and open set-new-password panel
     const np = document.getElementById("newPasswordInput");
     const co = document.getElementById("confirmPasswordInput");
     if (np) np.value = "";
@@ -991,28 +933,21 @@ async function verifyResetOTP() {
   }
 }
 
-/* STEP 3 — Set new password
+/* ═══════════════════════════════════════════════
+   STEP 3 — Set new password  ✅ FIXED
    ─────────────────────────────────────────────
-   The phone-auth user is still signed in from
-   Step 2 — this is a recent login so Firebase
-   allows updatePassword() without re-auth.
-
-   We use linkWithCredential to attach the new
-   email+password to the phone account:
-   - If email not yet linked → links it fresh ✅
-   - If already linked → catches the error and
-     calls updatePassword() directly instead ✅
-
-   Either way, old password is dead immediately.
-   No current password ever asked from user. ✅
-   ─────────────────────────────────────────── */
+   Phone-auth user is signed in from Step 2.
+   We attempt linkWithCredential first (new accounts).
+   If already linked, we call updatePassword() directly.
+   Token is force-refreshed, then user is signed out
+   so the new password takes effect immediately.
+═══════════════════════════════════════════════ */
 async function setNewPassword() {
   const newPass  = document.getElementById("newPasswordInput").value;
   const confPass = document.getElementById("confirmPasswordInput").value;
 
   if (newPass.length < 6)
     return showError("resetPasswordError", "⚠️ Password must be at least 6 characters.");
-
   if (newPass !== confPass)
     return showError("resetPasswordError", "⚠️ Passwords do not match.");
 
@@ -1024,54 +959,33 @@ async function setNewPassword() {
 
   const btn = document.getElementById("btnSetNewPassword");
   if (btn) { btn.disabled = true; btn.textContent = "Updating..."; }
+  showError("resetPasswordError", "⏳ Updating password...", "info");
 
   try {
-    const auth = window._firebase.auth;
-
-    // 🔥 STEP 1: Create email credential with NEW password
+    const auth      = window._firebase.auth;
     const emailCred = firebase.auth.EmailAuthProvider.credential(email, newPass);
 
     try {
-      // 🔥 Try linking (for safety)
+      // Try linking — works if this is the first time email is being linked
       await phoneUser.linkWithCredential(emailCred);
-    } catch (err) {
+    } catch (linkErr) {
       if (
-        err.code === "auth/email-already-in-use" ||
-        err.code === "auth/credential-already-in-use" ||
-        err.code === "auth/provider-already-linked"
+        linkErr.code === "auth/email-already-in-use"      ||
+        linkErr.code === "auth/credential-already-in-use" ||
+        linkErr.code === "auth/provider-already-linked"
       ) {
-        // 🔥 IMPORTANT FIX
+        // Email already linked to this account — update password directly
         await phoneUser.updatePassword(newPass);
       } else {
-        throw err;
+        throw linkErr;
       }
     }
 
-    // 🔥 FORCE REFRESH TOKEN (VERY IMPORTANT)
+    // Force token refresh so the old session/password is fully invalidated
     await phoneUser.getIdToken(true);
 
-    // 🔥 SIGN OUT to clear old session
+    // Sign out — user logs in fresh with the new password
     await auth.signOut();
-
-    // Cleanup
-    window._resetPhoneUser     = null;
-    window._resetVerifiedEmail = null;
-
-    showToast("✅ Password updated successfully! Please login.");
-
-    closeAuthModal();
-    setTimeout(() => openAuthModal("login"), 500);
-
-  } catch (err) {
-    console.error(err);
-    showError("resetPasswordError", "⚠️ Failed to update password. Try again.");
-  } finally {
-    if (btn) { btn.disabled = false; btn.textContent = "Set New Password →"; }
-  }
-}
-
-    // Sign out — user logs in fresh with new password
-    await window._firebase.auth.signOut();
 
     // Cleanup
     window._resetPhoneUser     = null;
@@ -1086,6 +1000,7 @@ async function setNewPassword() {
     setTimeout(() => openAuthModal("login"), 800);
 
   } catch (err) {
+    console.error("setNewPassword error:", err);
     if (btn) { btn.disabled = false; btn.textContent = "Set New Password →"; }
     if (err.code === "auth/requires-recent-login") {
       showError("resetPasswordError", "⚠️ Session timed out. Please restart the reset process.");
@@ -1152,10 +1067,6 @@ function showToast(msg, dur = 3000) {
 /* ============================================
    DASHBOARD
    ============================================ */
-/* ============================================
-   DASHBOARD (FINAL CLEAN VERSION)
-   ============================================ */
-
 function prefillBookingForm(userData) {
   const nameEl  = document.getElementById("custName");
   const phoneEl = document.getElementById("custPhone");
@@ -1169,9 +1080,6 @@ function prefillBookingForm(userData) {
   }
 }
 
-/* ================================
-   OPEN DASHBOARD
-================================ */
 async function openDashboard() {
   document.getElementById("userDropdown")?.classList.remove("open");
 
@@ -1204,7 +1112,6 @@ async function openDashboard() {
       adminTabBtn.style.display = "inline-flex";
     }
 
-    // 🔥 Load quotes safely
     await loadQuotes();
 
     document.getElementById("dashboardModal").style.display = "flex";
@@ -1215,9 +1122,6 @@ async function openDashboard() {
   }
 }
 
-/* ================================
-   LOAD USER QUOTES (SAFE + FILTERED)
-================================ */
 async function loadQuotes() {
   if (!window._firebase || !currentUser) {
     console.log("Firebase or user not ready");
@@ -1233,7 +1137,7 @@ async function loadQuotes() {
 
   try {
     const snapshot = await db.collection("quotes")
-      .where("uid", "==", currentUser.uid) // 🔒 SECURITY FIX
+      .where("uid", "==", currentUser.uid)
       .orderBy("createdAt", "desc")
       .get();
 
@@ -1594,7 +1498,6 @@ function saveLead() {
 async function bookOnWhatsApp() {
   if (!currentUser) { showToast("👋 Please login or create an account to book."); openAuthModal("login"); return; }
 
-  // ✅ FIX: T&C check
   if (!document.getElementById("tncAccepted")?.checked) {
     showToast("⚠️ Please accept the Terms & Conditions to continue.");
     return;
@@ -1740,9 +1643,7 @@ function downloadInvoice() {
 
 function sendWhatsAppAfterPayment() {
   if (pendingWhatsAppMsg) {
-    // Send customer copy
     window.open(`https://wa.me/919945095453?text=${encodeURIComponent(pendingWhatsAppMsg)}`, "_blank");
-    // Send admin copy if different from customer msg
     if (pendingAdminMsg && pendingAdminMsg !== pendingWhatsAppMsg) {
       setTimeout(() => {
         window.open(`https://wa.me/919945095453?text=${encodeURIComponent(pendingAdminMsg)}`, "_blank");
@@ -2442,7 +2343,6 @@ async function createDriver() {
 function bookWithoutPayment() {
   if (!currentUser) { showToast("👋 Please login to book."); openAuthModal("login"); return; }
 
-  // ✅ FIX: T&C check — same as startPayment()
   if (!document.getElementById("tncAccepted")?.checked) {
     showToast("⚠️ Please accept the Terms & Conditions to continue.");
     return;
@@ -2507,7 +2407,7 @@ function copyBookingId() {
 }
 
 /* ============================================
-   DASHBOARD
+   DASHBOARD TABS
    ============================================ */
 function closeDashboard() { document.getElementById("dashboardModal").style.display = "none"; }
 
@@ -2565,7 +2465,6 @@ function loadUserBookings() {
             ${canCancel?`<button class="bk-btn cancel" onclick="openCancelModal('${id}','${b.bookingRef||id}','${b.status||""}')">✕ Cancel</button>`:""}
             ${canRate?`<button class="bk-btn rate" onclick="openRateDriverModal('${id}','${b.bookingRef||id}','${b.driverName||""}')">⭐ Rate Driver</button>`:""}
             ${canClaim?`<button class="bk-btn claim" onclick="openDamageModal('${id}','${b.bookingRef||id}')">🔧 Report Damage</button>`:""}
-         
           </div>`:""}
         </div>`;
       }).join("");
@@ -2665,7 +2564,6 @@ async function confirmCancellation() {
     await window._firebase.db.collection("bookings").doc(docId).update({ status:"cancelled", cancelReason:reason, cancelledAt:firebase.firestore.FieldValue.serverTimestamp(), cancelledBy:"customer" });
     await window._firebase.db.collection("cancelRequests").add({ bookingDocId:docId, reason, customerUid:currentUser.uid, createdAt:firebase.firestore.FieldValue.serverTimestamp(), resolved:false }).catch(() => {});
 
-    // ✅ FIX: Always send cancellation SMS regardless of payment type
     const cancelledDoc = await window._firebase.db.collection("bookings").doc(docId).get();
     if (cancelledDoc.exists) {
       const cb = cancelledDoc.data();
@@ -2705,7 +2603,6 @@ async function confirmReschedule() {
   try {
     await window._firebase.db.collection("bookings").doc(docId).update({ date:newDate, time:newTime||"", rescheduledAt:firebase.firestore.FieldValue.serverTimestamp(), rescheduledBy:"customer", status:"confirmed" });
 
-    // ✅ FIX: Send reschedule confirmation SMS to customer
     const bookingDoc = await window._firebase.db.collection("bookings").doc(docId).get();
     if (bookingDoc.exists) {
       const b = bookingDoc.data();
