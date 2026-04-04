@@ -1012,6 +1012,7 @@ async function setNewPassword() {
 
   if (newPass.length < 6)
     return showError("resetPasswordError", "⚠️ Password must be at least 6 characters.");
+
   if (newPass !== confPass)
     return showError("resetPasswordError", "⚠️ Passwords do not match.");
 
@@ -1019,33 +1020,55 @@ async function setNewPassword() {
   const email     = window._resetVerifiedEmail;
 
   if (!phoneUser || !email)
-    return showError("resetPasswordError", "⚠️ Session expired. Please start the reset process again.");
+    return showError("resetPasswordError", "⚠️ Session expired. Please restart.");
 
   const btn = document.getElementById("btnSetNewPassword");
   if (btn) { btn.disabled = true; btn.textContent = "Updating..."; }
-  showError("resetPasswordError", "⏳ Setting your new password...", "info");
 
   try {
-    // Build email+password credential with the NEW password
+    const auth = window._firebase.auth;
+
+    // 🔥 STEP 1: Create email credential with NEW password
     const emailCred = firebase.auth.EmailAuthProvider.credential(email, newPass);
 
     try {
-      // Attempt to link email/password to the phone-auth account
-      // Works for users whose email was never linked in Firebase Auth
+      // 🔥 Try linking (for safety)
       await phoneUser.linkWithCredential(emailCred);
-    } catch (linkErr) {
+    } catch (err) {
       if (
-        linkErr.code === "auth/email-already-in-use"      ||
-        linkErr.code === "auth/credential-already-in-use" ||
-        linkErr.code === "auth/provider-already-linked"
+        err.code === "auth/email-already-in-use" ||
+        err.code === "auth/credential-already-in-use" ||
+        err.code === "auth/provider-already-linked"
       ) {
-        // Email/password already linked — update the password directly
-        // Phone session is recent so this is allowed without re-auth ✅
+        // 🔥 IMPORTANT FIX
         await phoneUser.updatePassword(newPass);
       } else {
-        throw linkErr;
+        throw err;
       }
     }
+
+    // 🔥 FORCE REFRESH TOKEN (VERY IMPORTANT)
+    await phoneUser.getIdToken(true);
+
+    // 🔥 SIGN OUT to clear old session
+    await auth.signOut();
+
+    // Cleanup
+    window._resetPhoneUser     = null;
+    window._resetVerifiedEmail = null;
+
+    showToast("✅ Password updated successfully! Please login.");
+
+    closeAuthModal();
+    setTimeout(() => openAuthModal("login"), 500);
+
+  } catch (err) {
+    console.error(err);
+    showError("resetPasswordError", "⚠️ Failed to update password. Try again.");
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = "Set New Password →"; }
+  }
+}
 
     // Sign out — user logs in fresh with new password
     await window._firebase.auth.signOut();
