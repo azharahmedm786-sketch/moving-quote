@@ -151,14 +151,19 @@ img { max-width: 100%; height: auto; display: block; }
 body.dark-mode .navbar { background: #06101f; }
 .nav-inner {
   max-width: 1200px; margin: 0 auto;
-  padding: 0 1.5rem; height: 64px;
+  padding: 0 2rem; height: 70px;
   display: flex; align-items: center; justify-content: space-between; gap: 1rem;
 }
 @media (max-width: 768px) { .nav-inner { padding: 0 1rem; height: 58px; } }
-.logo-wrap { display: flex; align-items: center; text-decoration: none; flex-shrink: 0; }
+.logo-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
 .logo-img {
-  height: 42px; width: auto; max-width: 145px;
-  object-fit: contain; object-position: left center; display: block;
+  height: 48px;
+  width: auto;
+  filter: drop-shadow(0 2px 6px rgba(0,0,0,0.25));
 }
 @media (max-width: 480px) { .logo-img { height: 34px; max-width: 115px; } }
 .nav-links { display: flex; align-items: center; gap: 1.5rem; }
@@ -252,8 +257,6 @@ body.dark-mode .navbar { background: #06101f; }
 }
 .blob { position: absolute; border-radius: 50%; filter: blur(100px); z-index: 1; will-change: transform; pointer-events: none; }
 .blob-1 { width: 700px; height: 700px; background: rgba(26,86,219,0.06); top: -250px; right: -200px; animation: blobFloat 14s ease-in-out infinite; }
-.blob-2 { width: 450px; height: 450px; background: rgba(234,88,12,0.04); bottom: -80px; right: 10%; animation: blobFloat 11s ease-in-out infinite reverse; }
-.blob-3 { width: 320px; height: 320px; background: rgba(12,27,58,0.04); top: 25%; left: -80px; animation: blobFloat 17s ease-in-out infinite 4s; }
 @keyframes blobFloat {
   0%,100% { transform: translate(0,0) scale(1); }
   33%      { transform: translate(30px,-22px) scale(1.05); }
