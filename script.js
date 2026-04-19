@@ -530,11 +530,12 @@ function closeAuthModal() {
   clearAuthErrors();
   _clearSignupRecaptcha();
   _clearResetRecaptcha();
-  resetFlowPhone          = "";
-  confirmationResult      = null;
-  pendingSignupData       = null;
-  window._resetVerifiedEmail = null;
-  window._resetPhoneUser     = null;
+  resetFlowPhone                         = "";
+  confirmationResult                     = null;
+  pendingSignupData                      = null;
+  window._resetVerifiedEmail             = null;
+  window._resetPhoneUser                 = null;
+  window._resetConfirmationVerificationId = null;
   clearInterval(otpTimerInterval);
 }
 
@@ -857,6 +858,9 @@ async function sendResetOTP() {
         "+91" + phone, window._resetRecaptcha
       );
 
+      // ✅ Store verificationId for fallback use
+      window._resetConfirmationVerificationId = confirmationResult.verificationId;
+
       document.getElementById("resetOtpPhone").textContent = "+91 " + phone;
       switchPanel("panelResetOTP");
       document.getElementById("resetOtpInput").focus();
@@ -891,6 +895,10 @@ async function verifyResetOTP() {
   try {
     const result = await confirmationResult.confirm(otp);
     clearInterval(otpTimerInterval);
+
+    // ✅ Store verificationId for fallback password update
+    window._resetConfirmationVerificationId = confirmationResult.verificationId;
+    window._resetOtpCode = otp;
 
     const { db } = window._firebase;
     const phone = resetFlowPhone;
@@ -936,11 +944,12 @@ async function verifyResetOTP() {
 /* ═══════════════════════════════════════════════
    STEP 3 — Set new password  ✅ FIXED
    ─────────────────────────────────────────────
-   Phone-auth user is signed in from Step 2.
-   We attempt linkWithCredential first (new accounts).
-   If already linked, we call updatePassword() directly.
-   Token is force-refreshed, then user is signed out
-   so the new password takes effect immediately.
+   Phone OTP was just verified in Step 2.
+   The correct approach is:
+   1. Try updatePassword() directly (phone user is freshly authenticated)
+   2. If that fails with requires-recent-login, re-sign-in with phone credential
+      then try again
+   3. As last resort, link/re-link the email credential
 ═══════════════════════════════════════════════ */
 async function setNewPassword() {
   const newPass  = document.getElementById("newPasswordInput").value;
@@ -961,43 +970,73 @@ async function setNewPassword() {
   if (btn) { btn.disabled = true; btn.textContent = "Updating..."; }
   showError("resetPasswordError", "⏳ Updating password...", "info");
 
-  try {
-    const auth      = window._firebase.auth;
-    const emailCred = firebase.auth.EmailAuthProvider.credential(email, newPass);
+  const auth = window._firebase.auth;
 
+  try {
+    // ── ATTEMPT 1: updatePassword directly ──────────────────────────────
+    // This is the correct method when user just signed in via phone OTP
     try {
-      // Try linking — works if this is the first time email is being linked
+      await phoneUser.updatePassword(newPass);
+      // If we reach here, password was updated successfully
+      await _finaliseReset(auth, btn);
+      return;
+    } catch (updateErr) {
+      if (updateErr.code !== "auth/requires-recent-login") {
+        // Some other error — rethrow
+        throw updateErr;
+      }
+      // requires-recent-login — need to re-authenticate first
+    }
+
+    // ── ATTEMPT 2: Re-authenticate with phone credential then update ─────
+    const verificationId = window._resetConfirmationVerificationId;
+    const otpCode        = window._resetOtpCode;
+
+    if (verificationId && otpCode) {
+      try {
+        const phoneCred  = firebase.auth.PhoneAuthProvider.credential(verificationId, otpCode);
+        const reauthed   = await auth.signInWithCredential(phoneCred);
+        await reauthed.user.updatePassword(newPass);
+        await _finaliseReset(auth, btn);
+        return;
+      } catch (reAuthErr) {
+        if (reAuthErr.code !== "auth/invalid-verification-code" &&
+            reAuthErr.code !== "auth/session-expired") {
+          // If it's not an OTP issue, rethrow
+          throw reAuthErr;
+        }
+        // OTP expired or invalid — fall through to email-link approach
+      }
+    }
+
+    // ── ATTEMPT 3: Link/update via email credential ──────────────────────
+    // This handles the case where phone OTP has expired but we still have the user
+    const emailCred = firebase.auth.EmailAuthProvider.credential(email, newPass);
+    try {
       await phoneUser.linkWithCredential(emailCred);
     } catch (linkErr) {
       if (
-        linkErr.code === "auth/email-already-in-use"      ||
-        linkErr.code === "auth/credential-already-in-use" ||
-        linkErr.code === "auth/provider-already-linked"
+        linkErr.code === "auth/provider-already-linked" ||
+        linkErr.code === "auth/credential-already-in-use"
       ) {
-        // Email already linked to this account — update password directly
+        // Email already linked to this same account — reauthenticate then update
+        await phoneUser.reauthenticateWithCredential(emailCred).catch(() => {});
         await phoneUser.updatePassword(newPass);
+      } else if (linkErr.code === "auth/email-already-in-use") {
+        // Email belongs to a different account — sign into that account and update
+        // We can't do this without the old password, so show a helpful error
+        showError(
+          "resetPasswordError",
+          "⚠️ Unable to update password automatically. Please contact support at support@packzenblr.in"
+        );
+        if (btn) { btn.disabled = false; btn.textContent = "Set New Password →"; }
+        return;
       } else {
         throw linkErr;
       }
     }
 
-    // Force token refresh so the old session/password is fully invalidated
-    await phoneUser.getIdToken(true);
-
-    // Sign out — user logs in fresh with the new password
-    await auth.signOut();
-
-    // Cleanup
-    window._resetPhoneUser     = null;
-    window._resetVerifiedEmail = null;
-    _clearResetRecaptcha();
-    resetFlowPhone     = "";
-    confirmationResult = null;
-
-    if (btn) { btn.disabled = false; btn.textContent = "Set New Password →"; }
-    closeAuthModal();
-    showToast("✅ Password updated! Please log in with your new password.", 5000);
-    setTimeout(() => openAuthModal("login"), 800);
+    await _finaliseReset(auth, btn);
 
   } catch (err) {
     console.error("setNewPassword error:", err);
@@ -1010,6 +1049,29 @@ async function setNewPassword() {
       showError("resetPasswordError", getAuthErrorMessage(err.code));
     }
   }
+}
+
+/* Helper: clean up and redirect after successful password update */
+async function _finaliseReset(auth, btn) {
+  // Force token refresh so old cached sessions are invalidated
+  try { await auth.currentUser?.getIdToken(true); } catch (e) {}
+
+  // Sign out so user logs in fresh with the new password
+  await auth.signOut().catch(() => {});
+
+  // Cleanup all reset state
+  window._resetPhoneUser                 = null;
+  window._resetVerifiedEmail             = null;
+  window._resetConfirmationVerificationId = null;
+  window._resetOtpCode                   = null;
+  _clearResetRecaptcha();
+  resetFlowPhone     = "";
+  confirmationResult = null;
+
+  if (btn) { btn.disabled = false; btn.textContent = "Set New Password →"; }
+  closeAuthModal();
+  showToast("✅ Password updated! Please log in with your new password.", 5000);
+  setTimeout(() => openAuthModal("login"), 800);
 }
 
 /* OTP resend timer */
