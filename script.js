@@ -958,11 +958,10 @@ async function setNewPassword() {
   if (newPass !== confPass)
     return showError("resetPasswordError", "⚠️ Passwords do not match.");
 
-  const email          = window._resetVerifiedEmail;
-  const verificationId = window._resetConfirmationVerificationId;
-  const otpCode        = window._resetOtpCode;
+  const email     = window._resetVerifiedEmail;
+  const freshUser = window._resetPhoneUser;
 
-  if (!email || !verificationId || !otpCode)
+  if (!email || !freshUser)
     return showError("resetPasswordError", "⚠️ Session expired. Please restart the reset process.");
 
   const btn = document.getElementById("btnSetNewPassword");
@@ -972,54 +971,35 @@ async function setNewPassword() {
   const auth = window._firebase.auth;
 
   try {
-    // ── Re-authenticate with the phone credential freshly ────────────────
-    // This guarantees Firebase accepts updatePassword() without
-    // the "requires-recent-login" error.
-    const phoneCred  = firebase.auth.PhoneAuthProvider.credential(verificationId, otpCode);
-    const phoneResult = await auth.signInWithCredential(phoneCred);
-    const freshUser   = phoneResult.user;
-
-    // ── Now update the password on this freshly authenticated user ────────
     try {
       await freshUser.updatePassword(newPass);
-      // Password updated on the linked email credential — done!
       await _finaliseReset(auth, btn);
       return;
     } catch (updateErr) {
-      // updatePassword failed — email might not be linked yet (rare edge case)
-      if (updateErr.code !== "auth/user-token-expired" &&
-          updateErr.code !== "auth/requires-recent-login") {
-        // If email not linked, link it now with the new password
-        if (updateErr.code === "auth/no-such-provider" ||
-            updateErr.code === "auth/invalid-user-token") {
-          // Fall through to linking below
-        } else {
-          throw updateErr;
-        }
+      if (updateErr.code === "auth/requires-recent-login") {
+        showError("resetPasswordError",
+          "⚠️ Session timed out. Please go back and verify OTP again.");
+        if (btn) { btn.disabled = false; btn.textContent = "Set New Password →"; }
+        return;
+      }
+      if (updateErr.code !== "auth/no-such-provider" &&
+          updateErr.code !== "auth/user-mismatch") {
+        throw updateErr;
       }
     }
 
-    // ── Fallback: Link email credential with new password ────────────────
-    // Handles case where email/password provider isn't linked yet
     const emailCred = firebase.auth.EmailAuthProvider.credential(email, newPass);
     try {
       await freshUser.linkWithCredential(emailCred);
       await _finaliseReset(auth, btn);
     } catch (linkErr) {
-      if (
-        linkErr.code === "auth/provider-already-linked" ||
-        linkErr.code === "auth/credential-already-in-use"
-      ) {
-        // Already linked — just update the password directly
+      if (linkErr.code === "auth/provider-already-linked" ||
+          linkErr.code === "auth/credential-already-in-use") {
         await freshUser.updatePassword(newPass);
         await _finaliseReset(auth, btn);
       } else if (linkErr.code === "auth/email-already-in-use") {
-        // Email belongs to a different Firebase account entirely
-        // This means the account structure is inconsistent — handle gracefully
-        showError(
-          "resetPasswordError",
-          "⚠️ Unable to update automatically. Please contact support at support@packzenblr.in"
-        );
+        showError("resetPasswordError",
+          "⚠️ Unable to update. Please contact support@packzenblr.in");
         if (btn) { btn.disabled = false; btn.textContent = "Set New Password →"; }
       } else {
         throw linkErr;
@@ -1029,20 +1009,7 @@ async function setNewPassword() {
   } catch (err) {
     console.error("setNewPassword error:", err);
     if (btn) { btn.disabled = false; btn.textContent = "Set New Password →"; }
-
-    if (err.code === "auth/invalid-verification-code" ||
-        err.code === "auth/session-expired" ||
-        err.code === "auth/code-expired") {
-      showError(
-        "resetPasswordError",
-        "⚠️ OTP has expired. Please go back and request a new one."
-      );
-    } else if (err.code === "auth/requires-recent-login") {
-      showError(
-        "resetPasswordError",
-        "⚠️ Session timed out. Please restart the reset process."
-      );
-    } else if (err.code === "auth/weak-password") {
+    if (err.code === "auth/weak-password") {
       showError("resetPasswordError", "⚠️ Password too weak. Use at least 6 characters.");
     } else if (err.code === "auth/too-many-requests") {
       showError("resetPasswordError", "⚠️ Too many attempts. Please wait a few minutes.");
@@ -1050,64 +1017,6 @@ async function setNewPassword() {
       showError("resetPasswordError", getAuthErrorMessage(err.code));
     }
   }
-}
-
-/* Helper: clean up and redirect after successful password update */
-async function _finaliseReset(auth, btn) {
-  // Force token refresh so old cached sessions are invalidated
-  try { await auth.currentUser?.getIdToken(true); } catch (e) {}
-
-  // Sign out so user logs in fresh with the new password
-  await auth.signOut().catch(() => {});
-
-  // Cleanup all reset state
-  window._resetPhoneUser                  = null;
-  window._resetVerifiedEmail              = null;
-  window._resetConfirmationVerificationId = null;
-  window._resetOtpCode                    = null;
-  _clearResetRecaptcha();
-  resetFlowPhone     = "";
-  confirmationResult = null;
-
-  if (btn) { btn.disabled = false; btn.textContent = "Set New Password →"; }
-  closeAuthModal();
-  showToast("✅ Password updated! Please log in with your new password.", 5000);
-  setTimeout(() => openAuthModal("login"), 800);
-}
-
-/* OTP resend timer */
-function _startOtpTimer() {
-  let seconds = 60;
-  const timerEl   = document.getElementById("resetOtpTimer");
-  const resendBtn = document.getElementById("btnResendResetOtp");
-  if (resendBtn) resendBtn.disabled = true;
-  if (timerEl)   timerEl.textContent = "Resend in 60s";
-  clearInterval(otpTimerInterval);
-  otpTimerInterval = setInterval(() => {
-    seconds--;
-    if (timerEl) timerEl.textContent = seconds > 0 ? `Resend in ${seconds}s` : "";
-    if (seconds <= 0) {
-      clearInterval(otpTimerInterval);
-      if (resendBtn) resendBtn.disabled = false;
-      if (timerEl)   timerEl.textContent = "";
-    }
-  }, 1000);
-}
-
-function resendResetOTP() {
-  clearInterval(otpTimerInterval);
-  document.getElementById("resetOtpInput").value = "";
-  showError("resetOtpError", "");
-  switchPanel("panelRecover");
-}
-
-function signOutUser() {
-  waitForFirebase(() => {
-    window._firebase.auth.signOut().then(() => {
-      document.getElementById("userDropdown")?.classList.remove("open");
-      showToast("✅ Signed out successfully");
-    });
-  });
 }
 
 /* ============================================
