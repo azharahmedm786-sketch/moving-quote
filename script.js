@@ -958,11 +958,13 @@ async function setNewPassword() {
   if (newPass !== confPass)
     return showError("resetPasswordError", "⚠️ Passwords do not match.");
 
-  const email     = window._resetVerifiedEmail;
-  const freshUser = window._resetPhoneUser;
+  const email          = window._resetVerifiedEmail;
+  const verificationId = window._resetConfirmationVerificationId;
+  const otpCode        = window._resetOtpCode;
+  const freshUser      = window._resetPhoneUser;
 
   if (!email || !freshUser)
-    return showError("resetPasswordError", "⚠️ Session expired. Please restart the reset process.");
+    return showError("resetPasswordError", "⚠️ Session expired. Please restart.");
 
   const btn = document.getElementById("btnSetNewPassword");
   if (btn) { btn.disabled = true; btn.textContent = "Updating..."; }
@@ -971,31 +973,46 @@ async function setNewPassword() {
   const auth = window._firebase.auth;
 
   try {
+    // Strategy: Try updatePassword first, if it fails with requires-recent-login,
+    // re-sign-in using stored OTP credential and try again
+    let targetUser = freshUser;
+
     try {
-      await freshUser.updatePassword(newPass);
+      await targetUser.updatePassword(newPass);
       await _finaliseReset(auth, btn);
       return;
-    } catch (updateErr) {
-      if (updateErr.code === "auth/requires-recent-login") {
-        showError("resetPasswordError",
-          "⚠️ Session timed out. Please go back and verify OTP again.");
-        if (btn) { btn.disabled = false; btn.textContent = "Set New Password →"; }
-        return;
-      }
-      if (updateErr.code !== "auth/no-such-provider" &&
-          updateErr.code !== "auth/user-mismatch") {
-        throw updateErr;
+    } catch (firstErr) {
+      console.log("First attempt error:", firstErr.code);
+
+      if (firstErr.code === "auth/requires-recent-login") {
+        // Re-authenticate using stored phone credential
+        if (verificationId && otpCode) {
+          try {
+            const phoneCred = firebase.auth.PhoneAuthProvider.credential(verificationId, otpCode);
+            await targetUser.reauthenticateWithCredential(phoneCred);
+            await targetUser.updatePassword(newPass);
+            await _finaliseReset(auth, btn);
+            return;
+          } catch (reAuthErr) {
+            console.log("Re-auth error:", reAuthErr.code);
+            // OTP expired — fall through to email linking
+          }
+        }
+      } else if (firstErr.code !== "auth/no-such-provider") {
+        throw firstErr;
       }
     }
 
+    // Final fallback: link/update via email credential
     const emailCred = firebase.auth.EmailAuthProvider.credential(email, newPass);
     try {
-      await freshUser.linkWithCredential(emailCred);
+      await targetUser.linkWithCredential(emailCred);
       await _finaliseReset(auth, btn);
     } catch (linkErr) {
+      console.log("Link error:", linkErr.code);
       if (linkErr.code === "auth/provider-already-linked" ||
           linkErr.code === "auth/credential-already-in-use") {
-        await freshUser.updatePassword(newPass);
+        await targetUser.updatePassword(newPass);
         await _finaliseReset(auth, btn);
       } else if (linkErr.code === "auth/email-already-in-use") {
         showError("resetPasswordError",
@@ -1007,18 +1024,20 @@ async function setNewPassword() {
     }
 
   } catch (err) {
-    console.error("setNewPassword error:", err);
+    console.error("setNewPassword final error:", err.code, err);
     if (btn) { btn.disabled = false; btn.textContent = "Set New Password →"; }
-    if (err.code === "auth/weak-password") {
+    if (err.code === "auth/requires-recent-login") {
+      showError("resetPasswordError",
+        "⚠️ Session timed out. Please go back and request a new OTP.");
+    } else if (err.code === "auth/weak-password") {
       showError("resetPasswordError", "⚠️ Password too weak. Use at least 6 characters.");
     } else if (err.code === "auth/too-many-requests") {
       showError("resetPasswordError", "⚠️ Too many attempts. Please wait a few minutes.");
     } else {
-      showError("resetPasswordError", getAuthErrorMessage(err.code));
+      showError("resetPasswordError", "⚠️ " + (err.code || err.message || "Something went wrong."));
     }
   }
 }
-
 /* ============================================
    TOAST
    ============================================ */
