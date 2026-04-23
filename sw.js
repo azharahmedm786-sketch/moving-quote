@@ -9,18 +9,16 @@ const DYNAMIC_CACHE = `${CACHE_VERSION}-dynamic`;
 
 // Core assets cached on install (app shell)
 const STATIC_ASSETS = [
-  '/moving-quote/',
-  '/moving-quote/index.html',
-'/moving-quote/offline.html',
-  '/moving-quote/style.css',
-  '/moving-quote/script.js',
-  '/moving-quote/manifest.json',
-  '/moving-quote/assets/logo/packzen-logo.png',
+  '/',
+  '/index.html',
+  '/Offline.html',
+  '/style.css',
+  '/script.js',
+  '/manifest.json',
+  '/assets/logo/packzen-logo.png',
   'https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap',
 ];
-
-// Offline fallback page
-const OFFLINE_PAGE = '/moving-quote/offline.html';
+const OFFLINE_PAGE = '/Offline.html';
 
 // ── Install: cache static shell ──────────────────
 self.addEventListener('install', (event) => {
