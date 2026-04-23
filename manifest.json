@@ -40,13 +40,3 @@
     }
   ]
 }
-```
-
-Also update your **robots.txt** — add one more line to block the Cloudflare worker config file:
-```
-# PackZen Packers & Movers — robots.txt
-User-agent: *
-Allow: /
-Disallow: /admin.html
-Disallow: /firebase-config.js
-Sitemap: https://packzenblr.in/sitemap.xml
