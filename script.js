@@ -2819,3 +2819,40 @@ window._finaliseReset = async function (auth, btn) {
     }
   }
 };
+// ==============================
+// FINALISE PASSWORD RESET
+// ==============================
+window._finaliseReset = async function (auth, btn) {
+  try {
+    // Refresh session
+    try {
+      await auth.currentUser?.getIdToken(true);
+    } catch (e) {}
+
+    // Logout user
+    await auth.signOut().catch(() => {});
+
+    // Clear reset state
+    window._resetVerifiedEmail = null;
+    window._resetPhoneUser = null;
+    window._resetConfirmationVerificationId = null;
+    window._resetOtpCode = null;
+
+    // Show success
+    showToast("✅ Password updated successfully. Please login again.");
+
+    // Close modal → open login
+    closeAuthModal();
+    setTimeout(() => openAuthModal("login"), 400);
+
+  } catch (err) {
+    console.error("Finalise reset error:", err);
+
+    showError("resetPasswordError", "⚠️ Something went wrong. Try again.");
+
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = "Set New Password →";
+    }
+  }
+};
