@@ -2782,42 +2782,39 @@ function signOutUser() {
     });
   });
 }
-// ─── Finalise Reset ──────────────────────────
-async function _finaliseReset(auth, btn) {
+// ==============================
+// FINALISE PASSWORD RESET FIX
+// ==============================
+window._finaliseReset = async function (auth, btn) {
   try {
-    await auth.signOut();
-  } catch(e) {}
-  
-  window._resetVerifiedEmail              = null;
-  window._resetPhoneUser                  = null;
-  window._resetConfirmationVerificationId = null;
-  window._resetOtpCode                    = null;
-  resetFlowPhone                          = "";
-  confirmationResult                      = null;
-  
-  if (btn) { 
-    btn.disabled = false; 
-    btn.textContent = "Set New Password →"; 
-  }
-  
-  closeAuthModal();
-  showToast("✅ Password updated! Please login with your new password.");
-}
-window._finaliseReset = async function () {
-  try {
-    const user = firebase.auth().currentUser;
+    // Refresh token (optional safety)
+    try {
+      await auth.currentUser?.getIdToken(true);
+    } catch (e) {}
 
-    if (user) {
-      await user.getIdToken(true);
+    // Logout user
+    await auth.signOut().catch(() => {});
+
+    // Clear reset state
+    window._resetVerifiedEmail = null;
+    window._resetPhoneUser = null;
+    window._resetConfirmationVerificationId = null;
+    window._resetOtpCode = null;
+
+    showToast("✅ Password updated successfully. Please login again.");
+
+    // Close modal and go to login
+    closeAuthModal();
+    setTimeout(() => openAuthModal("login"), 400);
+
+  } catch (err) {
+    console.error("Finalise reset error:", err);
+
+    showError("resetPasswordError", "⚠️ Something went wrong. Try again.");
+
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = "Set New Password →";
     }
-
-    await firebase.auth().signOut();
-
-    alert("✅ Password updated successfully. Please login again.");
-    window.location.href = "/login.html";
-
-  } catch (error) {
-    console.error(error);
-    alert("❌ Something went wrong. Try again.");
   }
 };
