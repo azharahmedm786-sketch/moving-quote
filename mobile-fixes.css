@@ -786,3 +786,154 @@ html, body {
     text-align: center;
   }
 }
+
+/* ============================================
+   PATCH 2 — 6 ADDITIONAL FIXES
+   ============================================ */
+
+/* ── FIX 1: Move type grid — mobile-first ── */
+.move-type-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 600px) {
+  .move-type-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (min-width: 900px) {
+  .move-type-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+/* Row layout for mobile cards */
+@media (max-width: 599px) {
+  .move-type-card {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center;
+    gap: 0.9rem;
+    padding: 0.95rem 1rem;
+    text-align: left;
+  }
+  .mt-icon {
+    font-size: 2rem;
+    margin-bottom: 0;
+    flex-shrink: 0;
+    width: 40px;
+    text-align: center;
+  }
+  .mt-label {
+    font-size: 0.92rem;
+    margin-bottom: 0.15rem;
+  }
+  .mt-sub {
+    font-size: 0.72rem;
+  }
+}
+
+/* ── FIX 2: Step header — less heavy on mobile ── */
+@media (max-width: 768px) {
+  .step-header {
+    padding: 12px 14px !important;
+  }
+  .step-counter {
+    font-size: 1.4rem !important;
+  }
+  .step-header-label {
+    font-size: 0.76rem !important;
+  }
+  .step-progress-track {
+    margin-bottom: 0.9rem;
+  }
+}
+
+/* ── FIX 3: Step body bottom buffer ── */
+@media (max-width: 768px) {
+  .step-body {
+    padding-bottom: 100px !important;
+  }
+}
+
+/* ── FIX 4: Toggle row — full row clickable ── */
+.toggle-row {
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.toggle-row:active {
+  background: var(--bg-tertiary);
+}
+
+/* ── FIX 5: Selection feedback on cards ── */
+.move-type-card.selected,
+.move-type-card:focus-visible {
+  border: 2px solid var(--primary) !important;
+  background: var(--primary-tint) !important;
+  box-shadow: 0 0 0 3px var(--primary-ring) !important;
+}
+.time-slot-btn.selected {
+  border: 2px solid var(--primary) !important;
+  background: var(--primary-tint) !important;
+  box-shadow: 0 0 0 3px var(--primary-ring) !important;
+}
+.time-slot-btn.selected .ts-label,
+.time-slot-btn.selected .ts-time {
+  color: var(--primary-dark) !important;
+}
+/* Tap feedback animation */
+.move-type-card:active,
+.time-slot-btn:active,
+.vehicle-card:active,
+.select-card:active {
+  transform: scale(0.97);
+  transition: transform 0.1s ease;
+}
+
+/* ── FIX 6: Location step — cleaner layout ── */
+@media (max-width: 768px) {
+  /* Push map and distance badge to be less prominent */
+  #map {
+    height: 140px !important;
+    max-height: 140px !important;
+    margin-top: 0.6rem;
+    border-radius: var(--radius-md);
+    opacity: 0.85;
+  }
+  #map:empty {
+    display: none !important;
+  }
+  #distanceInfo {
+    font-size: 0.78rem;
+    padding: 0.35rem 0.75rem;
+    margin-top: 0.4rem;
+  }
+  #intercityBadge {
+    padding: 0.75rem 0.875rem;
+    margin-top: 0.6rem;
+  }
+  .ic-icon {
+    font-size: 1.3rem;
+  }
+  .ic-title {
+    font-size: 0.82rem;
+  }
+  .ic-sub {
+    font-size: 0.68rem;
+  }
+  /* Make pickup/drop fields more prominent */
+  #pickup,
+  #drop {
+    font-size: 16px !important;
+    padding: 0.95rem 1rem;
+  }
+  /* Tighten the "use my location" toggle */
+  .toggle-row {
+    padding: 0.6rem 0.875rem;
+    margin-top: 0.25rem;
+  }
+  .toggle-text {
+    font-size: 0.8rem;
+  }
+}
