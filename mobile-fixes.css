@@ -1,694 +1,17 @@
 /* ============================================
-   PACKZEN — MOBILE UX FIXES
-   Add this file AFTER style.css
-   <link rel="stylesheet" href="mobile-fixes.css">
+   PACKZEN — MOBILE UX FIXES (FINAL CLEAN)
+   Add after style.css in index.html
    ============================================ */
 
 /* ─────────────────────────────────────────────
-   1. BODY — prevent content hiding under
-      the two fixed floating buttons
-   ───────────────────────────────────────────── */
-body {
-  padding-bottom: calc(64px + max(1.5rem, env(safe-area-inset-bottom, 1.5rem)));
-}
-
-/* ─────────────────────────────────────────────
-   2. HERO — don't force 100 vh on mobile;
-      the CTA form is the priority, not height
-   ───────────────────────────────────────────── */
-@media (max-width: 768px) {
-  .hero {
-    min-height: unset;
-    padding-top: 86px;
-    padding-bottom: 3rem;
-  }
-  .hero::after {
-    height: 48px;
-  }
-}
-@media (max-width: 480px) {
-  .hero {
-    padding-top: 78px;
-    padding-bottom: 2.5rem;
-  }
-  .hero::after {
-    height: 32px;
-  }
-}
-
-/* ─────────────────────────────────────────────
-   3. QUOTE SECTION — on single-column layout
-      hide the left perks list (not the heading)
-      so the form is the first thing users see
-   ───────────────────────────────────────────── */
-@media (max-width: 1024px) {
-  .quote-section {
-    padding: 2.5rem 1rem;
-  }
-  .quote-wrapper {
-    gap: 1.25rem;
-  }
-  .quote-left .quote-perks {
-    display: none;
-  }
-  .quote-left h2 {
-    font-size: clamp(1.4rem, 4vw, 1.8rem) !important;
-    margin-bottom: 0.4rem;
-  }
-  .quote-left p {
-    font-size: 0.88rem;
-    margin-bottom: 0;
-  }
-}
-
-/* ─────────────────────────────────────────────
-   4. STEP HEADER — 5 indicators on narrow
-      screens: shrink dots, hide labels at 400px
-   ───────────────────────────────────────────── */
-@media (max-width: 480px) {
-  .step-header {
-    padding: 1rem 1rem 0.9rem;
-  }
-  .step-counter {
-    font-size: 1.6rem;
-  }
-  .step-header-label {
-    font-size: 0.78rem;
-  }
-  .dot-icon {
-    width: 32px;
-    height: 32px;
-    font-size: 0.78rem;
-  }
-  .dot-label {
-    font-size: 0.54rem;
-  }
-  .step-line {
-    max-width: 16px;
-  }
-}
-@media (max-width: 380px) {
-  .step-indicators {
-    gap: 1px;
-  }
-  .dot-icon {
-    width: 28px;
-    height: 28px;
-    font-size: 0.7rem;
-  }
-  .dot-label {
-    display: none; /* hide labels, keep dot icons at very narrow widths */
-  }
-  .step-line {
-    max-width: 10px;
-  }
-}
-
-/* ─────────────────────────────────────────────
-   5. STEP BODY — reliable max-height on mobile
-      accounts for: 58px navbar + ~130px step
-      header + 80px footer = ~268px chrome
-   ───────────────────────────────────────────── */
-@media (max-width: 480px) {
-  .step-body {
-    max-height: calc(100svh - 268px);
-    /* fallback for browsers without svh */
-    max-height: calc(100vh - 268px);
-  }
-}
-@media (max-width: 480px) and (max-height: 680px) {
-  .step-body {
-    max-height: calc(100svh - 240px);
-    max-height: calc(100vh - 240px);
-  }
-}
-
-/* ─────────────────────────────────────────────
-   6. MOVE TYPE CARDS — switch to a tappable
-      vertical list on mobile instead of 3-cols
-   ───────────────────────────────────────────── */
-@media (max-width: 600px) {
-  .move-type-grid {
-    grid-template-columns: 1fr;
-    gap: 0.55rem;
-  }
-  .move-type-card {
-    display: flex !important;
-    flex-direction: row !important;
-    align-items: center;
-    gap: 0.9rem;
-    padding: 0.95rem 1rem;
-    text-align: left;
-    border-radius: var(--radius-lg);
-  }
-  .mt-icon {
-    font-size: 2rem;
-    margin-bottom: 0;
-    flex-shrink: 0;
-    width: 40px;
-    text-align: center;
-  }
-  .mt-label {
-    font-size: 0.92rem;
-    margin-bottom: 0.15rem;
-  }
-  .mt-sub {
-    font-size: 0.72rem;
-  }
-  /* keep the checkmark positioned correctly in row layout */
-  .move-type-card.selected::after {
-    top: 50%;
-    transform: translateY(-50%);
-  }
-}
-
-/* ─────────────────────────────────────────────
-   7. TIME SLOT BUTTONS — 2 columns on all
-      mobile viewports, larger tap targets
-   ───────────────────────────────────────────── */
-@media (max-width: 768px) {
-  .time-slots-grid {
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-  }
-  .time-slot-btn {
-    padding: 14px 8px;
-    min-height: 88px;
-  }
-  .ts-emoji {
-    font-size: 1.5rem;
-    margin-bottom: 5px;
-  }
-  .ts-label {
-    font-size: 0.75rem;
-  }
-  .ts-time {
-    font-size: 0.65rem;
-  }
-}
-
-/* ─────────────────────────────────────────────
-   8. HOUSE TYPE SELECT CARDS — 2 cols on mobile
-      with better tap height
-   ───────────────────────────────────────────── */
-@media (max-width: 600px) {
-  .select-cards {
-    grid-template-columns: 1fr 1fr;
-    gap: 0.5rem;
-  }
-  .select-card {
-    padding: 0.9rem 0.35rem;
-    min-height: 72px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-  }
-}
-
-/* ─────────────────────────────────────────────
-   9. VEHICLE CARDS — ensure text doesn't clip;
-      stack rate badge on a new line on very
-      narrow screens
-   ───────────────────────────────────────────── */
-@media (max-width: 420px) {
-  .vehicle-card {
-    flex-wrap: wrap;
-    gap: 0.6rem 0.75rem;
-    padding: 0.85rem 0.875rem;
-    align-items: flex-start;
-  }
-  .vc-info {
-    flex: 1 1 auto;
-  }
-  .vc-rate {
-    flex: 0 0 auto;
-    font-size: 0.8rem;
-    padding: 0.25rem 0.65rem;
-    align-self: center;
-  }
-  .vc-name {
-    font-size: 0.88rem;
-  }
-}
-
-/* ─────────────────────────────────────────────
-   10. FURNITURE GRID — 3 cols on mobile instead
-       of the full-width flex column; keeps the
-       grid scannable without too much scrolling
-   ───────────────────────────────────────────── */
-@media (max-width: 600px) {
-  .furniture-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
-    flex-direction: unset; /* override the flex column */
-  }
-  .furniture-card {
-    width: 100%;
-  }
-  .fc-body {
-    padding: 0.75rem 0.25rem 0.6rem;
-  }
-  .fc-emoji {
-    font-size: 1.35rem;
-  }
-  .fc-name {
-    font-size: 0.65rem;
-  }
-}
-@media (max-width: 380px) {
-  .furniture-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-/* ─────────────────────────────────────────────
-   11. PAYMENT OPTIONS — 1 column on mobile with
-       proper heights; 3 columns only on ≥520px
-   ───────────────────────────────────────────── */
-@media (max-width: 519px) {
-  .payment-opts {
-    grid-template-columns: 1fr;
-    gap: 0.55rem;
-  }
-  .payment-opt {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    padding: 0.875rem 1rem;
-    text-align: left;
-  }
-  .po-badge {
-    /* keep badge at top of card even in row layout */
-    position: absolute;
-    left: auto;
-    right: 0.75rem;
-    top: 50%;
-    transform: translateY(-50%);
-    border-radius: var(--radius-pill);
-  }
-  .po-icon {
-    font-size: 1.5rem;
-    margin: 0;
-    flex-shrink: 0;
-  }
-  .po-label {
-    font-size: 0.72rem;
-    margin-bottom: 0.1rem;
-  }
-  .po-amount {
-    font-size: 1.1rem;
-    margin: 0;
-  }
-  .po-note {
-    font-size: 0.65rem;
-  }
-}
-
-/* ─────────────────────────────────────────────
-   12. BOOK ACTIONS BUTTONS — full width,
-       better stacking on mobile
-   ───────────────────────────────────────────── */
-@media (max-width: 600px) {
-  .book-actions {
-    gap: 0.55rem;
-    margin-top: 0.75rem;
-  }
-  .btn-pay {
-    font-size: 0.9rem;
-    padding: 0.95rem 1rem;
-    letter-spacing: 0;
-  }
-  .btn-whatsapp-alt {
-    font-size: 0.85rem;
-    padding: 0.9rem 1rem;
-  }
-  .btn-checklist {
-    padding: 0.8rem 1rem;
-    font-size: 0.82rem;
-  }
-}
-
-/* ─────────────────────────────────────────────
-   13. DATE STRIP CARDS — slightly taller with
-       bigger date numbers on mobile
-   ───────────────────────────────────────────── */
-@media (max-width: 600px) {
-  .date-card {
-    min-width: 56px;
-    padding: 10px 6px;
-  }
-  .dc-num {
-    font-size: 1.2rem;
-  }
-  .dc-day {
-    font-size: 0.6rem;
-  }
-  .dc-month {
-    font-size: 0.58rem;
-  }
-}
-
-/* ─────────────────────────────────────────────
-   14. FLOOR SELECT ROW — single column on small
-       screens so dropdowns have enough width
-   ───────────────────────────────────────────── */
-@media (max-width: 420px) {
-  .field-row-2 {
-    grid-template-columns: 1fr;
-    gap: 0.75rem;
-  }
-}
-
-/* ─────────────────────────────────────────────
-   15. FLOATING BUTTONS — tuck them in more on
-       very small phones; ensure they never
-       overlap each other
-   ───────────────────────────────────────────── */
-@media (max-width: 360px) {
-  .float-call {
-    left: max(0.5rem, env(safe-area-inset-left, 0.5rem));
-    bottom: max(0.75rem, env(safe-area-inset-bottom, 0.75rem));
-    padding: 0.55rem 0.85rem;
-    font-size: 0.78rem;
-    gap: 0.3rem;
-  }
-  .float-wa {
-    right: max(0.5rem, env(safe-area-inset-right, 0.5rem));
-    bottom: max(0.75rem, env(safe-area-inset-bottom, 0.75rem));
-    padding: 0.55rem 0.85rem;
-    font-size: 0.78rem;
-    gap: 0.3rem;
-  }
-}
-/* Reduce float button label to icon-only below 340px */
-@media (max-width: 340px) {
-  .float-call .btn-text,
-  .float-wa .btn-text {
-    display: none;
-  }
-  .float-call,
-  .float-wa {
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    justify-content: center;
-    padding: 0;
-    font-size: 1.25rem;
-  }
-}
-
-/* ─────────────────────────────────────────────
-   16. STATS BAR — keep text from overflowing
-       on narrow screens
-   ───────────────────────────────────────────── */
-@media (max-width: 480px) {
-  .stat-item {
-    padding: 1.1rem 1rem;
-    min-width: 0;
-  }
-  .stat-number {
-    font-size: clamp(1.4rem, 6vw, 2rem);
-  }
-  .stat-suffix {
-    font-size: clamp(0.9rem, 3.5vw, 1.3rem);
-  }
-  .stat-label {
-    font-size: 0.62rem;
-    letter-spacing: 0.8px;
-  }
-}
-
-/* ─────────────────────────────────────────────
-   17. SERVICES GRID — single column below 480px
-   ───────────────────────────────────────────── */
-@media (max-width: 480px) {
-  .services-grid {
-    grid-template-columns: 1fr;
-    gap: 1rem;
-  }
-  .service-card {
-    padding: 1.5rem 1.25rem;
-  }
-  .sc-banner {
-    height: 130px;
-  }
-}
-
-/* ─────────────────────────────────────────────
-   18. HOW IT WORKS — vertical stack on mobile
-       with full-width cards
-   ───────────────────────────────────────────── */
-@media (max-width: 600px) {
-  .hiw-steps {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 1.25rem;
-  }
-  .hiw-step {
-    min-width: unset;
-    max-width: unset;
-    width: 100%;
-  }
-  .hiw-connector {
-    display: none;
-  }
-}
-
-/* ─────────────────────────────────────────────
-   19. WHY SECTION — 2→1 column
-   ───────────────────────────────────────────── */
-@media (max-width: 480px) {
-  .why-grid {
-    grid-template-columns: 1fr !important;
-    gap: 12px !important;
-  }
-  .why-card {
-    padding: 1.25rem 1rem !important;
-  }
-}
-
-/* ─────────────────────────────────────────────
-   20. TRUST SIGNALS — always stack to 2 cols
-       on very narrow screens
-   ───────────────────────────────────────────── */
-@media (max-width: 420px) {
-  .ts-inner {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0;
-  }
-  .ts-badge {
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    padding: 12px 8px;
-    gap: 6px;
-  }
-  .ts-divider {
-    display: none;
-  }
-  .ts-val {
-    font-size: 0.82rem !important;
-  }
-  .ts-lbl {
-    font-size: 0.65rem;
-  }
-}
-
-/* ─────────────────────────────────────────────
-   21. MODALS — better sizing and safe areas
-   ───────────────────────────────────────────── */
-@media (max-width: 480px) {
-  .modal-overlay {
-    padding: 0.5rem 0.5rem
-      calc(0.5rem + env(safe-area-inset-bottom, 0.5rem));
-  }
-  .modal-box {
-    max-height: calc(96vh - env(safe-area-inset-bottom, 0px));
-    border-radius: var(--radius-lg);
-  }
-  /* auth modal inputs — ensure 16px to prevent iOS zoom */
-  .auth-modal-box input {
-    font-size: 16px !important;
-  }
-}
-
-/* ─────────────────────────────────────────────
-   22. CHAT MODAL — fill more of the viewport
-       on short phones (landscape mode)
-   ───────────────────────────────────────────── */
-@media (max-width: 768px) and (orientation: landscape) {
-  .chat-box {
-    height: 90vh;
-    max-height: 90vh;
-  }
-  .step-body {
-    max-height: 42vh;
-  }
-}
-
-/* ─────────────────────────────────────────────
-   23. REVIEW CARDS — single column below 480px
-   ───────────────────────────────────────────── */
-@media (max-width: 480px) {
-  .reviews-grid {
-    grid-template-columns: 1fr;
-    gap: 1rem;
-  }
-  .review-card {
-    padding: 1.25rem 1rem;
-  }
-}
-
-/* ─────────────────────────────────────────────
-   24. PRICING TABLE — horizontal scroll on
-       mobile with sticky first column
-   ───────────────────────────────────────────── */
-@media (max-width: 600px) {
-  .pricing-table-wrap {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    border-radius: var(--radius-md);
-  }
-  .pricing-table {
-    min-width: 320px;
-  }
-  .pricing-table th,
-  .pricing-table td {
-    padding: 12px 16px;
-    font-size: 0.83rem;
-    white-space: nowrap;
-  }
-}
-
-/* ─────────────────────────────────────────────
-   25. FAQ — better tap targets
-   ───────────────────────────────────────────── */
-@media (max-width: 600px) {
-  .faq-q {
-    font-size: 0.88rem;
-    padding: 15px 16px;
-    min-height: 52px;
-  }
-  .faq-a {
-    font-size: 0.84rem;
-    padding: 0 16px;
-  }
-  .faq-item.open .faq-a {
-    padding: 10px 16px 14px;
-  }
-}
-
-/* ─────────────────────────────────────────────
-   26. FINAL CTA — better stack on mobile
-   ───────────────────────────────────────────── */
-@media (max-width: 480px) {
-  .final-cta-section {
-    padding: 52px 1rem !important;
-  }
-  .final-cta-inner h2 {
-    font-size: 1.5rem !important;
-  }
-  .fcta-actions {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 0.6rem;
-  }
-  .fcta-btn {
-    width: 100% !important;
-    max-width: 100% !important;
-    text-align: center;
-    justify-content: center;
-    padding: 14px 20px;
-  }
-}
-
-/* ─────────────────────────────────────────────
-   27. FOOTER — better mobile layout
-   ───────────────────────────────────────────── */
-@media (max-width: 480px) {
-  .footer {
-    padding: 2.5rem 1rem 1.25rem;
-  }
-  .footer-logo {
-    font-size: 1.6rem;
-  }
-  .footer-inner {
-    gap: 1.75rem;
-  }
-  .footer-bottom {
-    gap: 0.4rem;
-    font-size: 0.72rem;
-  }
-  .footer-bottom a {
-    margin: 0 6px;
-  }
-}
-
-/* ─────────────────────────────────────────────
-   28. TRACK ORDER BANNER — tighten on mobile
-   ───────────────────────────────────────────── */
-@media (max-width: 480px) {
-  #trackOrderBanner {
-    margin: 0.5rem 0.75rem;
-  }
-  .tob-title {
-    font-size: 0.78rem;
-  }
-  .tob-id {
-    font-size: 0.7rem;
-  }
-  .tob-step-label {
-    font-size: 0.5rem;
-  }
-  .tob-btn-track {
-    padding: 0.32rem 0.7rem;
-    font-size: 0.72rem;
-  }
-}
-
-/* ─────────────────────────────────────────────
-   29. GENERAL TOUCH TARGETS — 44px minimum on
-       all interactive elements (WCAG 2.5.5)
-   ───────────────────────────────────────────── */
-@media (max-width: 768px) {
-  .faq-q,
-  .dash-tab,
-  .bk-btn,
-  .btn-copy,
-  .tob-btn-track,
-  .cc-expand-btn,
-  .leave-review-btn,
-  .btn-checklist,
-  .btn-whatsapp-alt,
-  .btn-promo,
-  .date-more-btn,
-  .time-slot-btn,
-  .vehicle-card,
-  .select-card,
-  .move-type-card,
-  .payment-opt {
-    min-height: 44px;
-  }
-  .modal-x,
-  .cc-close,
-  .modal-close,
-  .chat-close-btn,
-  .tob-dismiss {
-    min-width: 44px;
-    min-height: 44px;
-  }
-}
-
-/* ─────────────────────────────────────────────
-   30. PREVENT HORIZONTAL SCROLL — global safety
-       on all content-heavy sections
+   GLOBAL
    ───────────────────────────────────────────── */
 html, body {
   overflow-x: hidden;
   max-width: 100vw;
+}
+body {
+  padding-bottom: calc(64px + max(1.5rem, env(safe-area-inset-bottom, 1.5rem)));
 }
 .hero,
 .booking-inline-section,
@@ -707,10 +30,7 @@ html, body {
   overflow-x: hidden;
 }
 
-/* ─────────────────────────────────────────────
-   31. iOS SAFARI INPUT ZOOM FIX — all inputs
-       must be 16px to prevent auto-zoom
-   ───────────────────────────────────────────── */
+/* iOS Safari — prevent input zoom */
 @media (max-width: 768px) {
   input[type="text"],
   input[type="tel"],
@@ -724,10 +44,7 @@ html, body {
   }
 }
 
-/* ─────────────────────────────────────────────
-   32. SMOOTH SCROLL on iOS — ensure all scroll
-       containers have momentum scrolling
-   ───────────────────────────────────────────── */
+/* Momentum scrolling on scroll containers */
 .step-body,
 .modal-box,
 .chat-messages,
@@ -738,76 +55,92 @@ html, body {
 }
 
 /* ─────────────────────────────────────────────
-   33. NAVBAR — ensure logo + name + buttons
-       never clip on phones under 360px
+   HERO
+   ───────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .hero {
+    min-height: unset;
+    padding-top: 86px;
+    padding-bottom: 3rem;
+  }
+  .hero::after { height: 48px; }
+}
+@media (max-width: 480px) {
+  .hero {
+    padding-top: 78px;
+    padding-bottom: 2.5rem;
+  }
+  .hero::after { height: 32px; }
+}
+
+/* ─────────────────────────────────────────────
+   NAVBAR
    ───────────────────────────────────────────── */
 @media (max-width: 360px) {
-  .nav-inner {
-    padding: 0 0.6rem;
-    gap: 0.4rem;
+  .nav-inner { padding: 0 0.6rem; gap: 0.4rem; }
+  .nav-auth-btn { padding: 0.35rem 0.6rem; font-size: 0.72rem; }
+}
+
+/* ─────────────────────────────────────────────
+   QUOTE SECTION
+   ───────────────────────────────────────────── */
+@media (max-width: 1024px) {
+  .quote-section { padding: 2.5rem 1rem; }
+  .quote-wrapper { gap: 1.25rem; }
+  .quote-left .quote-perks { display: none; }
+  .quote-left h2 {
+    font-size: clamp(1.4rem, 4vw, 1.8rem) !important;
+    margin-bottom: 0.4rem;
   }
-  .nav-auth-btn {
-    padding: 0.35rem 0.6rem;
-    font-size: 0.72rem;
+  .quote-left p { font-size: 0.88rem; margin-bottom: 0; }
+}
+
+/* ─────────────────────────────────────────────
+   STEP HEADER — lighter on mobile
+   ───────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .step-header {
+    padding: 12px 14px !important;
+  }
+  .step-counter { font-size: 1.4rem !important; }
+  .step-header-label { font-size: 0.76rem !important; }
+  .step-progress-track { margin-bottom: 0.9rem; }
+
+  /* Hide indicators — reduces cognitive load on small screens */
+  .step-indicators,
+  .step-line,
+  .dot-label {
+    display: none !important;
   }
 }
 
 /* ─────────────────────────────────────────────
-   34. SECTION SPACING — reduce large padding
-       on very small screens
+   STEP BODY — no inner scroll trap on mobile
    ───────────────────────────────────────────── */
-@media (max-width: 480px) {
-  .services-section,
-  .why-section,
-  .reviews-section {
-    padding: 2.5rem 1rem;
-  }
-  .section-header {
-    margin-bottom: 1.75rem;
-  }
-  .section-header h2 {
-    font-size: clamp(1.5rem, 6vw, 2rem);
-  }
-  .section-header p {
-    font-size: 0.88rem;
+@media (max-width: 768px) {
+  .step-body {
+    max-height: none !important;
+    overflow: visible !important;
+    padding-bottom: 100px !important;
   }
 }
 
 /* ─────────────────────────────────────────────
-   35. PROMO ROW — stack on very narrow screens
+   MOVE TYPE GRID — mobile-first 1 column
    ───────────────────────────────────────────── */
-@media (max-width: 380px) {
-  .promo-row {
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-  .btn-promo {
-    width: 100%;
-    text-align: center;
-  }
-}
-
-/* ============================================
-   PATCH 2 — 6 ADDITIONAL FIXES
-   ============================================ */
-
-/* ── FIX 1: Move type grid — mobile-first ── */
 .move-type-grid {
   display: grid;
   gap: 12px;
   grid-template-columns: 1fr;
 }
 @media (min-width: 600px) {
-  .move-type-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
+  .move-type-grid { grid-template-columns: repeat(2, 1fr); }
 }
 @media (min-width: 900px) {
-  .move-type-grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
+  .move-type-grid { grid-template-columns: repeat(3, 1fr); }
 }
-/* Row layout for mobile cards */
+
+/* Row layout for move cards on mobile */
 @media (max-width: 599px) {
   .move-type-card {
     display: flex !important;
@@ -824,49 +157,17 @@ html, body {
     width: 40px;
     text-align: center;
   }
-  .mt-label {
-    font-size: 0.92rem;
-    margin-bottom: 0.15rem;
-  }
-  .mt-sub {
-    font-size: 0.72rem;
-  }
-}
-
-/* ── FIX 2: Step header — less heavy on mobile ── */
-@media (max-width: 768px) {
-  .step-header {
-    padding: 12px 14px !important;
-  }
-  .step-counter {
-    font-size: 1.4rem !important;
-  }
-  .step-header-label {
-    font-size: 0.76rem !important;
-  }
-  .step-progress-track {
-    margin-bottom: 0.9rem;
+  .mt-label { font-size: 0.92rem; margin-bottom: 0.15rem; }
+  .mt-sub   { font-size: 0.72rem; }
+  .move-type-card.selected::after {
+    top: 50%;
+    transform: translateY(-50%);
   }
 }
 
-/* ── FIX 3: Step body bottom buffer ── */
-@media (max-width: 768px) {
-  .step-body {
-    padding-bottom: 100px !important;
-  }
-}
-
-/* ── FIX 4: Toggle row — full row clickable ── */
-.toggle-row {
-  cursor: pointer;
-  user-select: none;
-  -webkit-user-select: none;
-}
-.toggle-row:active {
-  background: var(--bg-tertiary);
-}
-
-/* ── FIX 5: Selection feedback on cards ── */
+/* ─────────────────────────────────────────────
+   SELECTION FEEDBACK
+   ───────────────────────────────────────────── */
 .move-type-card.selected,
 .move-type-card:focus-visible {
   border: 2px solid var(--primary) !important;
@@ -882,7 +183,6 @@ html, body {
 .time-slot-btn.selected .ts-time {
   color: var(--primary-dark) !important;
 }
-/* Tap feedback animation */
 .move-type-card:active,
 .time-slot-btn:active,
 .vehicle-card:active,
@@ -891,19 +191,107 @@ html, body {
   transition: transform 0.1s ease;
 }
 
-/* ── FIX 6: Location step — cleaner layout ── */
+/* ─────────────────────────────────────────────
+   TIME SLOTS — 2 columns on mobile
+   ───────────────────────────────────────────── */
 @media (max-width: 768px) {
-  /* Push map and distance badge to be less prominent */
-  #map {
-    height: 140px !important;
-    max-height: 140px !important;
-    margin-top: 0.6rem;
-    border-radius: var(--radius-md);
-    opacity: 0.85;
+  .time-slots-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
   }
-  #map:empty {
-    display: none !important;
+  .time-slot-btn {
+    padding: 14px 8px;
+    min-height: 88px;
   }
+  .ts-emoji  { font-size: 1.5rem; margin-bottom: 5px; }
+  .ts-label  { font-size: 0.75rem; }
+  .ts-time   { font-size: 0.65rem; }
+}
+
+/* ─────────────────────────────────────────────
+   HOUSE TYPE CARDS — 2 columns on mobile
+   ───────────────────────────────────────────── */
+@media (max-width: 600px) {
+  .select-cards {
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+  }
+  .select-card {
+    padding: 0.9rem 0.35rem;
+    min-height: 72px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+/* ─────────────────────────────────────────────
+   VEHICLE CARDS
+   ───────────────────────────────────────────── */
+@media (max-width: 420px) {
+  .vehicle-card {
+    flex-wrap: wrap;
+    gap: 0.6rem 0.75rem;
+    padding: 0.85rem 0.875rem;
+    align-items: flex-start;
+  }
+  .vc-info   { flex: 1 1 auto; }
+  .vc-rate   { font-size: 0.8rem; padding: 0.25rem 0.65rem; align-self: center; }
+  .vc-name   { font-size: 0.88rem; }
+}
+
+/* ─────────────────────────────────────────────
+   FURNITURE GRID — 3-column grid on mobile
+   ───────────────────────────────────────────── */
+@media (max-width: 600px) {
+  .furniture-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    flex-direction: unset;
+  }
+  .furniture-card { width: 100%; }
+  .fc-body  { padding: 0.75rem 0.25rem 0.6rem; }
+  .fc-emoji { font-size: 1.35rem; }
+  .fc-name  { font-size: 0.65rem; }
+}
+@media (max-width: 380px) {
+  .furniture-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* ─────────────────────────────────────────────
+   FLOOR SELECT — single column on narrow phones
+   ───────────────────────────────────────────── */
+@media (max-width: 420px) {
+  .field-row-2 {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+}
+
+/* ─────────────────────────────────────────────
+   MAP — hide until JS shows it after both
+   addresses are entered (controlled by script.js)
+   ───────────────────────────────────────────── */
+#map {
+  display: none;
+}
+
+/* ─────────────────────────────────────────────
+   TOGGLE ROW — entire row clickable
+   ───────────────────────────────────────────── */
+.toggle-row {
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.toggle-row:active { background: var(--bg-tertiary); }
+
+/* ─────────────────────────────────────────────
+   LOCATION STEP — keep it clean
+   ───────────────────────────────────────────── */
+@media (max-width: 768px) {
   #distanceInfo {
     font-size: 0.78rem;
     padding: 0.35rem 0.75rem;
@@ -913,27 +301,473 @@ html, body {
     padding: 0.75rem 0.875rem;
     margin-top: 0.6rem;
   }
-  .ic-icon {
-    font-size: 1.3rem;
-  }
-  .ic-title {
-    font-size: 0.82rem;
-  }
-  .ic-sub {
-    font-size: 0.68rem;
-  }
-  /* Make pickup/drop fields more prominent */
-  #pickup,
-  #drop {
+  .ic-icon  { font-size: 1.3rem; }
+  .ic-title { font-size: 0.82rem; }
+  .ic-sub   { font-size: 0.68rem; }
+  #pickup, #drop {
     font-size: 16px !important;
     padding: 0.95rem 1rem;
   }
-  /* Tighten the "use my location" toggle */
-  .toggle-row {
-    padding: 0.6rem 0.875rem;
-    margin-top: 0.25rem;
+  .toggle-row  { padding: 0.6rem 0.875rem; margin-top: 0.25rem; }
+  .toggle-text { font-size: 0.8rem; }
+}
+
+/* ─────────────────────────────────────────────
+   PAYMENT OPTIONS — single column on mobile
+   ───────────────────────────────────────────── */
+@media (max-width: 519px) {
+  .payment-opts { grid-template-columns: 1fr; gap: 0.55rem; }
+  .payment-opt {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.875rem 1rem;
+    text-align: left;
   }
-  .toggle-text {
+  .po-badge {
+    position: absolute;
+    left: auto;
+    right: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    border-radius: var(--radius-pill);
+  }
+  .po-icon   { font-size: 1.5rem; margin: 0; flex-shrink: 0; }
+  .po-label  { font-size: 0.72rem; margin-bottom: 0.1rem; }
+  .po-amount { font-size: 1.1rem; margin: 0; }
+  .po-note   { font-size: 0.65rem; }
+}
+
+/* ─────────────────────────────────────────────
+   BOOK ACTIONS
+   ───────────────────────────────────────────── */
+@media (max-width: 600px) {
+  .book-actions { gap: 0.55rem; margin-top: 0.75rem; }
+  .btn-pay           { font-size: 0.9rem; padding: 0.95rem 1rem; letter-spacing: 0; }
+  .btn-whatsapp-alt  { font-size: 0.85rem; padding: 0.9rem 1rem; }
+  .btn-checklist     { padding: 0.8rem 1rem; font-size: 0.82rem; }
+}
+
+/* ─────────────────────────────────────────────
+   PROMO ROW
+   ───────────────────────────────────────────── */
+@media (max-width: 380px) {
+  .promo-row { flex-direction: column; gap: 0.5rem; }
+  .btn-promo { width: 100%; text-align: center; }
+}
+
+/* ─────────────────────────────────────────────
+   DATE STRIP CARDS
+   ───────────────────────────────────────────── */
+@media (max-width: 600px) {
+  .date-card   { min-width: 56px; padding: 10px 6px; }
+  .dc-num      { font-size: 1.2rem; }
+  .dc-day      { font-size: 0.6rem; }
+  .dc-month    { font-size: 0.58rem; }
+}
+
+/* ─────────────────────────────────────────────
+   STATS BAR
+   ───────────────────────────────────────────── */
+@media (max-width: 480px) {
+  .stat-item   { padding: 1.1rem 1rem; min-width: 0; }
+  .stat-number { font-size: clamp(1.4rem, 6vw, 2rem); }
+  .stat-suffix { font-size: clamp(0.9rem, 3.5vw, 1.3rem); }
+  .stat-label  { font-size: 0.62rem; letter-spacing: 0.8px; }
+}
+
+/* ─────────────────────────────────────────────
+   SERVICES
+   ───────────────────────────────────────────── */
+@media (max-width: 480px) {
+  .services-grid { grid-template-columns: 1fr; gap: 1rem; }
+  .service-card  { padding: 1.5rem 1.25rem; }
+  .sc-banner     { height: 130px; }
+}
+
+/* ─────────────────────────────────────────────
+   HOW IT WORKS
+   ───────────────────────────────────────────── */
+@media (max-width: 600px) {
+  .hiw-steps {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1.25rem;
+  }
+  .hiw-step      { min-width: unset; max-width: unset; width: 100%; }
+  .hiw-connector { display: none; }
+}
+
+/* ─────────────────────────────────────────────
+   WHY SECTION
+   ───────────────────────────────────────────── */
+@media (max-width: 480px) {
+  .why-grid  { grid-template-columns: 1fr !important; gap: 12px !important; }
+  .why-card  { padding: 1.25rem 1rem !important; }
+}
+
+/* ─────────────────────────────────────────────
+   TRUST SIGNALS
+   ───────────────────────────────────────────── */
+@media (max-width: 420px) {
+  .ts-inner {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+  }
+  .ts-badge {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 12px 8px;
+    gap: 6px;
+  }
+  .ts-divider { display: none; }
+  .ts-val     { font-size: 0.82rem !important; }
+  .ts-lbl     { font-size: 0.65rem; }
+}
+
+/* ─────────────────────────────────────────────
+   REVIEWS
+   ───────────────────────────────────────────── */
+@media (max-width: 480px) {
+  .reviews-grid { grid-template-columns: 1fr; gap: 1rem; }
+  .review-card  { padding: 1.25rem 1rem; }
+}
+
+/* ─────────────────────────────────────────────
+   FAQ
+   ───────────────────────────────────────────── */
+@media (max-width: 600px) {
+  .faq-q {
+    font-size: 0.88rem;
+    padding: 15px 16px;
+    min-height: 52px;
+  }
+  .faq-a                    { font-size: 0.84rem; padding: 0 16px; }
+  .faq-item.open .faq-a     { padding: 10px 16px 14px; }
+}
+
+/* ─────────────────────────────────────────────
+   PRICING TABLE
+   ───────────────────────────────────────────── */
+@media (max-width: 600px) {
+  .pricing-table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border-radius: var(--radius-md);
+  }
+  .pricing-table { min-width: 320px; }
+  .pricing-table th,
+  .pricing-table td {
+    padding: 12px 16px;
+    font-size: 0.83rem;
+    white-space: nowrap;
+  }
+}
+
+/* ─────────────────────────────────────────────
+   FINAL CTA
+   ───────────────────────────────────────────── */
+@media (max-width: 480px) {
+  .final-cta-section   { padding: 52px 1rem !important; }
+  .final-cta-inner h2  { font-size: 1.5rem !important; }
+  .fcta-actions {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.6rem;
+  }
+  .fcta-btn {
+    width: 100% !important;
+    max-width: 100% !important;
+    text-align: center;
+    justify-content: center;
+    padding: 14px 20px;
+  }
+}
+
+/* ─────────────────────────────────────────────
+   MODALS
+   ───────────────────────────────────────────── */
+@media (max-width: 480px) {
+  .modal-overlay {
+    padding: 0.5rem 0.5rem
+      calc(0.5rem + env(safe-area-inset-bottom, 0.5rem));
+  }
+  .modal-box {
+    max-height: calc(96vh - env(safe-area-inset-bottom, 0px));
+    border-radius: var(--radius-lg);
+  }
+  .auth-modal-box input { font-size: 16px !important; }
+}
+@media (max-width: 768px) and (orientation: landscape) {
+  .chat-box { height: 90vh; max-height: 90vh; }
+}
+
+/* ─────────────────────────────────────────────
+   FLOATING BUTTONS
+   ───────────────────────────────────────────── */
+@media (max-width: 360px) {
+  .float-call {
+    left: max(0.5rem, env(safe-area-inset-left, 0.5rem));
+    bottom: max(0.75rem, env(safe-area-inset-bottom, 0.75rem));
+    padding: 0.55rem 0.85rem;
+    font-size: 0.78rem;
+  }
+  .float-wa {
+    right: max(0.5rem, env(safe-area-inset-right, 0.5rem));
+    bottom: max(0.75rem, env(safe-area-inset-bottom, 0.75rem));
+    padding: 0.55rem 0.85rem;
+    font-size: 0.78rem;
+  }
+}
+
+/* ─────────────────────────────────────────────
+   TRACK ORDER BANNER
+   ───────────────────────────────────────────── */
+@media (max-width: 480px) {
+  #trackOrderBanner { margin: 0.5rem 0.75rem; }
+  .tob-title        { font-size: 0.78rem; }
+  .tob-id           { font-size: 0.7rem; }
+  .tob-step-label   { font-size: 0.5rem; }
+  .tob-btn-track    { padding: 0.32rem 0.7rem; font-size: 0.72rem; }
+}
+
+/* ─────────────────────────────────────────────
+   FOOTER
+   ───────────────────────────────────────────── */
+@media (max-width: 480px) {
+  .footer        { padding: 2.5rem 1rem 1.25rem; }
+  .footer-logo   { font-size: 1.6rem; }
+  .footer-inner  { gap: 1.75rem; }
+  .footer-bottom { gap: 0.4rem; font-size: 0.72rem; }
+  .footer-bottom a { margin: 0 6px; }
+}
+
+/* ─────────────────────────────────────────────
+   SECTION SPACING
+   ───────────────────────────────────────────── */
+@media (max-width: 480px) {
+  .services-section,
+  .why-section,
+  .reviews-section { padding: 2.5rem 1rem; }
+  .section-header  { margin-bottom: 1.75rem; }
+  .section-header h2 { font-size: clamp(1.5rem, 6vw, 2rem); }
+  .section-header p  { font-size: 0.88rem; }
+}
+
+/* ─────────────────────────────────────────────
+   TOUCH TARGETS — 44px minimum (WCAG 2.5.5)
+   ───────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .faq-q, .dash-tab, .bk-btn, .btn-copy,
+  .tob-btn-track, .cc-expand-btn,
+  .leave-review-btn, .btn-checklist,
+  .btn-whatsapp-alt, .btn-promo,
+  .date-more-btn, .time-slot-btn,
+  .vehicle-card, .select-card,
+  .move-type-card, .payment-opt { min-height: 44px; }
+
+  .modal-x, .cc-close,
+  .modal-close, .chat-close-btn,
+  .tob-dismiss { min-width: 44px; min-height: 44px; }
+}
+
+/* ============================================
+   PATCH 3 — BOOKING FORM DEEP FIXES
+   Covers elements missed in previous passes
+   ============================================ */
+
+/* ── form-card: no border-radius clash on mobile ── */
+@media (max-width: 480px) {
+  .form-card {
+    border-radius: var(--radius-lg);
+  }
+}
+
+/* ── step-footer: tighter side padding on mobile ── */
+@media (max-width: 600px) {
+  .step-footer {
+    padding: 0.75rem 1rem 1.25rem;
+    gap: 0.6rem;
+    height: auto;
+    min-height: 72px;
+  }
+}
+
+/* ── btn-next / btn-back: comfortable thumb targets ── */
+@media (max-width: 600px) {
+  .btn-next {
+    font-size: 0.9rem;
+    padding: 0 1.1rem;
+    height: 50px;
+    min-height: 50px;
+  }
+  .btn-back {
+    font-size: 0.85rem;
+    padding: 0 0.875rem;
+    height: 50px;
+    min-height: 50px;
+  }
+}
+
+/* ── price-amount: prevent overflow on narrow screens ── */
+@media (max-width: 480px) {
+  .price-amount {
+    font-size: 1.7rem !important;
+  }
+  .price-box {
+    padding: 0.9rem 1rem;
+  }
+  .price-box-top {
+    gap: 0.6rem;
+    flex-wrap: wrap;
+  }
+  .price-label {
+    font-size: 0.65rem;
+  }
+  .price-breakdown {
+    font-size: 0.74rem;
+  }
+  .advance-info {
+    font-size: 0.74rem;
+  }
+}
+
+/* ── tnc-row: prevent text/checkbox misalignment ── */
+@media (max-width: 480px) {
+  .tnc-row {
+    padding: 0.75rem;
+    font-size: 0.78rem;
+    gap: 0.5rem;
+    align-items: flex-start;
+  }
+  .tnc-row input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+}
+
+/* ── qty-btn: 44px touch target (was 22×22px) ── */
+.qty-btn {
+  width: 36px !important;
+  height: 36px !important;
+  font-size: 1.1rem !important;
+  flex-shrink: 0;
+}
+.fc-qty-row {
+  gap: 0.4rem;
+}
+.fc-qty {
+  width: 32px;
+  font-size: 0.88rem;
+}
+@media (max-width: 480px) {
+  .qty-btn {
+    width: 32px !important;
+    height: 32px !important;
+  }
+}
+
+/* ── photo upload area ── */
+@media (max-width: 480px) {
+  .photo-upload-area {
+    padding: 1rem;
+  }
+  .upload-icon {
+    font-size: 1.3rem;
+    margin-bottom: 0.3rem;
+  }
+  .photo-upload-area div {
+    font-size: 0.82rem;
+  }
+  .upload-sub {
+    font-size: 0.68rem;
+  }
+  .photo-thumb {
+    width: 52px;
+    height: 52px;
+  }
+}
+
+/* ── field-label: readable on tiny screens ── */
+@media (max-width: 380px) {
+  .field-label {
+    font-size: 0.68rem;
+    letter-spacing: 0.5px;
+  }
+}
+
+/* ── step-hint: less margin to save vertical space ── */
+@media (max-width: 600px) {
+  .step-hint {
     font-size: 0.8rem;
+    margin-bottom: 0.75rem;
+    line-height: 1.5;
+  }
+}
+
+/* ── booking success state ── */
+@media (max-width: 480px) {
+  .booking-success-body {
+    padding: 2rem 1rem 1.5rem;
+    gap: 0.65rem;
+  }
+  .bs-icon  { font-size: 2.5rem; }
+  .bs-title { font-size: 1.2rem; }
+  .bs-subtitle {
+    font-size: 0.83rem;
+    max-width: 240px;
+  }
+  .bs-track-btn,
+  .bs-new-btn {
+    max-width: 100%;
+    width: 100%;
+  }
+  .bs-track-btn {
+    padding: 0.85rem 1rem;
+    font-size: 0.88rem;
+  }
+}
+
+/* ── intercity badge: compact on mobile ── */
+@media (max-width: 480px) {
+  .intercity-badge {
+    padding: 0.7rem 0.875rem;
+    gap: 0.65rem;
+    margin-top: 0.6rem;
+  }
+  .ic-icon  { font-size: 1.3rem; }
+  .ic-title { font-size: 0.8rem; }
+  .ic-sub   { font-size: 0.66rem; }
+}
+
+/* ── distance badge ── */
+@media (max-width: 480px) {
+  .distance-badge {
+    font-size: 0.75rem;
+    padding: 0.35rem 0.7rem;
+  }
+}
+
+/* ── quote section right col: no side padding bleed ── */
+@media (max-width: 480px) {
+  .quote-right {
+    margin: 0 -0.25rem;
+  }
+}
+
+/* ── overall form: ensure nothing clips or overflows ── */
+.form-card * {
+  max-width: 100%;
+  box-sizing: border-box;
+}
+@media (max-width: 480px) {
+  .form-card input,
+  .form-card select,
+  .form-card textarea {
+    width: 100%;
   }
 }
