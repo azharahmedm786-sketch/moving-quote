@@ -2782,3 +2782,24 @@ function signOutUser() {
     });
   });
 }
+// ─── Finalise Reset ──────────────────────────
+async function _finaliseReset(auth, btn) {
+  try {
+    await auth.signOut();
+  } catch(e) {}
+  
+  window._resetVerifiedEmail              = null;
+  window._resetPhoneUser                  = null;
+  window._resetConfirmationVerificationId = null;
+  window._resetOtpCode                    = null;
+  resetFlowPhone                          = "";
+  confirmationResult                      = null;
+  
+  if (btn) { 
+    btn.disabled = false; 
+    btn.textContent = "Set New Password →"; 
+  }
+  
+  closeAuthModal();
+  showToast("✅ Password updated! Please login with your new password.");
+}
