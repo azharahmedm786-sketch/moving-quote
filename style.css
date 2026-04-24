@@ -774,9 +774,21 @@ body.dark-mode .form-card { background: var(--bg-secondary); }
 .step-line.done { background: #34d399; }
 .form-step { display: none; }
 .form-step.active { display: block; }
-.step-body { padding: 1.7rem 1.75rem 0.5rem; animation: stepReveal 0.3s ease; overflow-x: hidden; overflow-y: auto; max-height: 70vh; -webkit-overflow-scrolling: touch; }
+.step-body { padding: 1.7rem 1.75rem 0.5rem; animation: stepReveal 0.3s ease; overflow-x: hidden; -webkit-overflow-scrolling: touch; }
 @keyframes stepReveal { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 .step-footer { display: flex; gap: 0.75rem; padding: 1rem 1.75rem 1.5rem; align-items: center; height: 80px; flex-shrink: 0; }
+@media (max-width: 768px) {
+  .step-footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: #ffffff;
+    padding: 10px;
+    z-index: 9999;
+    box-shadow: 0 -4px 16px rgba(0,0,0,0.08);
+  }
+}
 .step-footer.back-only { padding-top: 0; }
 .step-hint { font-size: 0.82rem; color: var(--text-muted); margin-bottom: 1rem; }
 .field-group { margin-bottom: 1.1rem; }
