@@ -990,6 +990,7 @@ async function setNewPassword() {
           try {
             const phoneCred = firebase.auth.PhoneAuthProvider.credential(verificationId, otpCode);
             await targetUser.reauthenticateWithCredential(phoneCred);
+             await targetUser.reload(); 
             await targetUser.updatePassword(newPass);
             await _finaliseReset(auth, btn);
             return;
