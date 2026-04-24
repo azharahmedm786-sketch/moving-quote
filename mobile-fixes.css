@@ -771,3 +771,18 @@ body {
     width: 100%;
   }
 }
+@media (max-width: 768px) {
+  .step-footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: white;
+    z-index: 9999;
+    padding: 10px;
+  }
+
+  body {
+    padding-bottom: 100px;
+  }
+}
