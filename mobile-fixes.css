@@ -442,8 +442,44 @@ body.dark-mode .step-footer {
   background: var(--bg-secondary);
 }
 
+/*
+  STEP FOOTER — MOBILE FIXED POSITIONING
+  ────────────────────────────────────────
+  KEY RULES:
+  1. Step 0 has NO footer at all (cards auto-advance on tap).
+     Hide it unconditionally — even on mobile where `fixed`
+     would escape the form-step's stacking context and appear
+     as a ghost bar at the bottom of the screen.
+  2. Only show the fixed footer when its parent .form-step
+     is the ACTIVE step. Because `.form-step` uses
+     `display:none` for inactive steps, any footer inside
+     an inactive step is already hidden — but on mobile the
+     `position:fixed` would pull it out of flow and make it
+     visible anyway. We solve this by scoping the fixed rule
+     to `.form-step.active .step-footer`.
+*/
+
+/* Step 0: absolutely no footer, ever */
+.form-step:first-child .step-footer {
+  display: none !important;
+}
+
+/* Desktop / large screens: footer sits naturally inside the card */
+.step-footer {
+  display: flex;
+  gap: 0.75rem;
+  padding: 1rem 1.5rem 1.25rem;
+  align-items: center;
+  background: var(--bg-primary);
+  flex-shrink: 0;
+  border-top: 1px solid var(--border-light);
+  /* Ensure no accidental fixed bleed-through on desktop */
+  position: static;
+}
+
+/* Mobile: fix ONLY the footer that belongs to the ACTIVE step */
 @media (max-width: 768px) {
-  .step-footer {
+  .form-step.active .step-footer {
     position: fixed;
     bottom: 0;
     left: 0;
@@ -453,28 +489,39 @@ body.dark-mode .step-footer {
     gap: 0.6rem;
     box-shadow: 0 -4px 24px rgba(12, 27, 58, 0.12);
     border-top: 2px solid var(--border-light);
+    background: var(--bg-primary);
+  }
+
+  body.dark-mode .form-step.active .step-footer {
+    background: var(--bg-secondary);
+  }
+
+  /* Step 0 active: still no footer */
+  .form-step:first-child.active .step-footer {
+    display: none !important;
+    position: static !important;
   }
 }
 
 @media (max-width: 480px) {
-  .step-footer {
+  .form-step.active .step-footer {
     padding: 0.7rem 0.875rem calc(0.7rem + var(--safe-bottom));
     gap: 0.5rem;
   }
 }
 
-/* Back-only footer (Step 4) needs less top padding */
+/* Back-only footer (Step 4) — no extra top padding needed */
 .step-footer.back-only {
   padding-top: 0.5rem;
 }
 
 @media (max-width: 768px) {
-  .step-footer.back-only {
+  .form-step.active .step-footer.back-only {
     padding-top: 0.6rem;
   }
 }
 
-/* Nav buttons */
+/* ── Nav buttons ── */
 .btn-next {
   flex: 2;
   height: 52px;
@@ -515,11 +562,6 @@ body.dark-mode .step-footer {
     font-size: 0.78rem;
     padding: 0 0.75rem;
   }
-}
-
-/* Step 0 has no footer (auto-advance on card tap) — keep consistent */
-.form-step:first-child .step-footer {
-  display: none;
 }
 
 
