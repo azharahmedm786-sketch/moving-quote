@@ -381,32 +381,8 @@ textarea {
    09. STEP BODY (NO SCROLL TRAP)
    ============================================================ */
 
-/*
-  KEY FIX: .step-body must NEVER have max-height + overflow:auto
-  on mobile. Page-level scroll handles everything. The only reason
-  to lock scroll is inside modal overlays, handled separately.
-*/
-.step-body {
-  padding: 1.5rem 1.5rem 1rem;
-  overflow-x: hidden;
-  overflow-y: visible;
-  /* No max-height — allow natural document flow */
-}
-
-@media (max-width: 768px) {
-  .step-body {
-    padding: 1.25rem 1rem;
-    /* Extra bottom room so the fixed footer never covers the last card */
-    padding-bottom: calc(var(--footer-h-mobile) + 1.5rem + var(--safe-bottom));
-  }
-}
-
-@media (max-width: 480px) {
-  .step-body {
-    padding: 1rem 0.875rem;
-    padding-bottom: calc(var(--footer-h-mobile) + 2rem + var(--safe-bottom));
-  }
-}
+/* step-body padding is set in section 10 alongside the footer
+   so both are always in sync. Only hint styles live here. */
 
 .step-hint {
   font-size: 0.83rem;
@@ -425,99 +401,87 @@ textarea {
 
 /* ============================================================
    10. STEP FOOTER
-   Static on desktop, fixed at bottom on mobile.
-   Uses padding-bottom on .step-body (above) to prevent overlap.
+   ──────────────────────────────────────────────────────────
+   STRATEGY: NEVER use position:fixed for the step footer.
+   Fixed positioning rips the element out of document flow,
+   causing it to float over unrelated page sections (stats
+   bar, floating call/WA buttons, etc.) and leaving a giant
+   blank gap inside the form card.
+
+   The footer is ALWAYS static inside the form card, sitting
+   naturally below the step body content. The form-card uses
+   flex-direction:column so the footer renders immediately
+   after content — exactly like Porter / Urban Company flows.
    ============================================================ */
+
+/* ── Base footer — all screen sizes ── */
 .step-footer {
   display: flex;
   gap: 0.75rem;
-  padding: 1rem 1.5rem 1.25rem;
+  padding: 1rem 1.5rem 1.5rem;
   align-items: center;
   background: var(--bg-primary);
   flex-shrink: 0;
   border-top: 1px solid var(--border-light);
+  position: static;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 body.dark-mode .step-footer {
   background: var(--bg-secondary);
 }
 
-/*
-  STEP FOOTER — MOBILE FIXED POSITIONING
-  ────────────────────────────────────────
-  KEY RULES:
-  1. Step 0 has NO footer at all (cards auto-advance on tap).
-     Hide it unconditionally — even on mobile where `fixed`
-     would escape the form-step's stacking context and appear
-     as a ghost bar at the bottom of the screen.
-  2. Only show the fixed footer when its parent .form-step
-     is the ACTIVE step. Because `.form-step` uses
-     `display:none` for inactive steps, any footer inside
-     an inactive step is already hidden — but on mobile the
-     `position:fixed` would pull it out of flow and make it
-     visible anyway. We solve this by scoping the fixed rule
-     to `.form-step.active .step-footer`.
-*/
-
-/* Step 0: absolutely no footer, ever */
+/* Step 0: no footer — cards auto-advance on tap */
 .form-step:first-child .step-footer {
   display: none !important;
 }
 
-/* Desktop / large screens: footer sits naturally inside the card */
-.step-footer {
-  display: flex;
-  gap: 0.75rem;
-  padding: 1rem 1.5rem 1.25rem;
-  align-items: center;
-  background: var(--bg-primary);
-  flex-shrink: 0;
-  border-top: 1px solid var(--border-light);
-  /* Ensure no accidental fixed bleed-through on desktop */
-  position: static;
-}
-
-/* Mobile: fix ONLY the footer that belongs to the ACTIVE step */
+/* Mobile padding */
 @media (max-width: 768px) {
-  .form-step.active .step-footer {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    z-index: 500;
-    padding: 0.75rem 1rem calc(0.75rem + var(--safe-bottom));
+  .step-footer {
+    padding: 0.875rem 1rem calc(1rem + var(--safe-bottom));
     gap: 0.6rem;
-    box-shadow: 0 -4px 24px rgba(12, 27, 58, 0.12);
     border-top: 2px solid var(--border-light);
-    background: var(--bg-primary);
-  }
-
-  body.dark-mode .form-step.active .step-footer {
-    background: var(--bg-secondary);
-  }
-
-  /* Step 0 active: still no footer */
-  .form-step:first-child.active .step-footer {
-    display: none !important;
-    position: static !important;
+    box-shadow: 0 -2px 12px rgba(12, 27, 58, 0.07);
   }
 }
 
 @media (max-width: 480px) {
-  .form-step.active .step-footer {
-    padding: 0.7rem 0.875rem calc(0.7rem + var(--safe-bottom));
+  .step-footer {
+    padding: 0.75rem 0.875rem calc(0.875rem + var(--safe-bottom));
     gap: 0.5rem;
   }
 }
 
-/* Back-only footer (Step 4) — no extra top padding needed */
+/* Back-only footer (Step 4 last screen) */
 .step-footer.back-only {
   padding-top: 0.5rem;
+  border-top: none;
+  box-shadow: none;
+}
+
+/* Remove body padding-bottom — no fixed footer means no gap needed */
+body {
+  padding-bottom: 0;
+}
+
+/* Step body: normal padding, no bottom reserve */
+.step-body {
+  padding: 1.5rem 1.5rem 0.5rem;
+  overflow-x: hidden;
+  overflow-y: visible;
 }
 
 @media (max-width: 768px) {
-  .form-step.active .step-footer.back-only {
-    padding-top: 0.6rem;
+  .step-body {
+    padding: 1.25rem 1rem 0.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .step-body {
+    padding: 1rem 0.875rem 0.5rem;
   }
 }
 
@@ -1423,17 +1387,7 @@ body.dark-mode .step-footer {
 }
 
 
-/* ============================================================
-   16. BOTTOM SPACING GUARD
-   Ensure page body has enough room for fixed footer on mobile.
-   JS may also set this; we use CSS as a safety net.
-   ============================================================ */
-@media (max-width: 768px) {
-  body {
-    /* Generous minimum so nothing is permanently obscured */
-    padding-bottom: calc(var(--footer-h-mobile) + var(--safe-bottom) + 8px);
-  }
-}
+/* Section 16: Bottom spacing guard removed — footer is now static, no reserve needed */
 
 
 /* ============================================================
