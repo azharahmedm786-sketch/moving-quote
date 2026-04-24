@@ -2803,3 +2803,21 @@ async function _finaliseReset(auth, btn) {
   closeAuthModal();
   showToast("✅ Password updated! Please login with your new password.");
 }
+window._finaliseReset = async function () {
+  try {
+    const user = firebase.auth().currentUser;
+
+    if (user) {
+      await user.getIdToken(true);
+    }
+
+    await firebase.auth().signOut();
+
+    alert("✅ Password updated successfully. Please login again.");
+    window.location.href = "/login.html";
+
+  } catch (error) {
+    console.error(error);
+    alert("❌ Something went wrong. Try again.");
+  }
+};
