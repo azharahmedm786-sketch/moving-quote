@@ -786,3 +786,15 @@ body {
     padding-bottom: 100px;
   }
 }
+/* STEP 1: FULL WIDTH FIX */
+.quote-section,
+.quote-wrapper,
+.quote-right,
+.form-card {
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  padding-left: 10px !important;
+  padding-right: 10px !important;
+}
+
