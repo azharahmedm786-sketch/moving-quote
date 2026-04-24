@@ -2746,3 +2746,39 @@ function toggleFaq(btn) {
   document.querySelectorAll(".faq-item.open").forEach(i => i.classList.remove("open"));
   if (!isOpen) item.classList.add("open");
 }
+// ─── OTP Timer for Password Reset ───────────
+function _startOtpTimer() {
+  clearInterval(otpTimerInterval);
+  let seconds = 60;
+  const timerEl  = document.getElementById("resetOtpTimer");
+  const resendBtn = document.getElementById("btnResendResetOtp");
+  if (resendBtn) resendBtn.disabled = true;
+  if (timerEl)   timerEl.textContent = "Resend in 60s";
+  otpTimerInterval = setInterval(() => {
+    seconds--;
+    if (timerEl) timerEl.textContent = seconds > 0 ? `Resend in ${seconds}s` : "";
+    if (seconds <= 0) {
+      clearInterval(otpTimerInterval);
+      if (resendBtn) resendBtn.disabled = false;
+    }
+  }, 1000);
+}
+
+// ─── Resend Reset OTP ────────────────────────
+function resendResetOTP() {
+  switchPanel("panelRecover");
+  document.getElementById("resetOtpInput").value = "";
+  showError("recoverError", "");
+  _clearResetRecaptcha();
+}
+
+// ─── Sign Out ────────────────────────────────
+function signOutUser() {
+  waitForFirebase(() => {
+    window._firebase.auth.signOut().then(() => {
+      currentUser = null;
+      closeUserMenu();
+      showToast("👋 Signed out successfully.");
+    });
+  });
+}
