@@ -820,15 +820,14 @@ window.signInWithGoogle = async function () {
 
     const provider = new firebase.auth.GoogleAuthProvider();
 
-    // IMPORTANT FIX
     provider.setCustomParameters({
       prompt: "select_account"
     });
 
     try {
-      await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
-
+      // 🔥 Force popup only
       const result = await auth.signInWithPopup(provider);
+
       const user = result.user;
 
       const userRef = db.collection("users").doc(user.uid);
@@ -851,14 +850,17 @@ window.signInWithGoogle = async function () {
     } catch (err) {
       console.error("Google login error:", err);
 
-      // DEBUG THIS
-      alert(err.message);
-
-      showError("loginError", "⚠️ Google login failed");
+      // 🚨 IMPORTANT: detect popup issues
+      if (err.code === "auth/popup-blocked") {
+        alert("Popup blocked. Please allow popups and try again.");
+      } else if (err.code === "auth/popup-closed-by-user") {
+        alert("Popup closed before login.");
+      } else {
+        alert(err.message);
+      }
     }
   });
 };
-
 /* ═══════════════════════════════════════════════
    PASSWORD RESET FLOW
 ═══════════════════════════════════════════════ */
