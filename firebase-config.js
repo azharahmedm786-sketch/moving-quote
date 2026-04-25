@@ -71,7 +71,7 @@ console.log("✅ Firebase initialized with Auth API key");
 console.log("🛡 Firebase App Check activated");
 
 // Improve login persistence
-firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+
 
 }
 
