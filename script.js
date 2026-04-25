@@ -799,64 +799,91 @@ async function loginUser() {
       const name = (cred.user.displayName || email.split("@")[0]).split(" ")[0];
       showToast(`👋 Welcome back, ${name}!`);
 
-    } catch (err) {
-      if (btn) { btn.disabled = false; btn.textContent = "Login →"; }
-      const code = err.code || "";
-      if (["auth/wrong-password","auth/invalid-credential","auth/invalid-login-credentials"].includes(code)) {
-        showError("loginError", "⚠️ Incorrect password. Please try again or reset your password.");
-      } else if (code === "auth/too-many-requests") {
-        showError("loginError", "⚠️ Too many failed attempts. Please wait a few minutes.");
-      } else if (code === "auth/user-not-found") {
-        showError("loginError", "⚠️ No account found. Please sign up.");
+} catch (err) {
+      console.error("Google Sign-In error:", err.code, err.message);
+      if (err.code === "auth/popup-blocked") {
+        showError("loginError", "⚠️ Popup blocked — please allow popups for this site and try again.");
+      } else if (err.code === "auth/popup-closed-by-user" ||
+                 err.code === "auth/cancelled-popup-request") {
+        // silent — user intentionally closed or double-clicked
+      } else if (err.code === "auth/unauthorized-domain") {
+        showError("loginError", "⚠️ Domain not authorized. Add it in Firebase Console → Authentication → Authorized Domains.");
       } else {
-        showError("loginError", getAuthErrorMessage(code));
+        showError("loginError", getAuthErrorMessage(err.code));
       }
     }
-  });
+// ─── Google Sign-In: user doc handler (duplicate-safe) ──────────────────────
+async function _handleGoogleUser(user, db) {
+  const userRef = db.collection("users").doc(user.uid);
+  const existingDoc = await userRef.get();
+
+  if (existingDoc.exists) {
+    await userRef.update({
+      lastLoginAt: firebase.firestore.FieldValue.serverTimestamp(),
+      loginMethod: "google"
+    });
+    return;
+  }
+
+  const emailSnap = await db.collection("users")
+    .where("email", "==", user.email)
+    .limit(1)
+    .get();
+
+  if (!emailSnap.empty) {
+    const existingData = emailSnap.docs[0].data();
+    const oldDocId = emailSnap.docs[0].id;
+    await userRef.set({
+      ...existingData,
+      loginMethod: "google",
+      googleLinked: true,
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    if (oldDocId !== user.uid) {
+      await db.collection("users").doc(oldDocId).delete().catch(() => {});
+    }
+  } else {
+    const refCode = user.uid.slice(0, 8).toUpperCase();
+    await userRef.set({
+      name: user.displayName || "",
+      email: user.email || "",
+      phone: user.phoneNumber || "",
+      role: "customer",
+      loginMethod: "google",
+      phoneVerified: false,
+      prefEmail: true,
+      prefSMS: true,
+      referralCode: refCode,
+      referralCount: 0,
+      referralCredits: 0,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+  }
 }
 window.signInWithGoogle = async function () {
   waitForFirebase(async () => {
     const { auth, db } = window._firebase;
-
     const provider = new firebase.auth.GoogleAuthProvider();
-
-    provider.setCustomParameters({
-      prompt: "select_account"
-    });
+    provider.setCustomParameters({ prompt: "select_account" });
 
     try {
-      // 🔥 Force popup only
       const result = await auth.signInWithPopup(provider);
-
       const user = result.user;
-
-      const userRef = db.collection("users").doc(user.uid);
-      const doc = await userRef.get();
-
-      if (!doc.exists) {
-        await userRef.set({
-          name: user.displayName || "",
-          email: user.email || "",
-          phone: user.phoneNumber || "",
-          role: "customer",
-          loginMethod: "google",
-          createdAt: firebase.firestore.FieldValue.serverTimestamp()
-        });
-      }
-
+      await _handleGoogleUser(user, db);
       closeAuthModal();
-      showToast("✅ Logged in with Google");
+      const name = (user.displayName || user.email?.split("@")[0] || "User").split(" ")[0];
+      showToast(`👋 Welcome, ${name}!`);
 
     } catch (err) {
-      console.error("Google login error:", err);
-
-      // 🚨 IMPORTANT: detect popup issues
+      console.error("Google Sign-In error:", err.code, err.message);
       if (err.code === "auth/popup-blocked") {
-        alert("Popup blocked. Please allow popups and try again.");
+        showError("loginError", "⚠️ Popup blocked — please allow popups for this site and try again.");
       } else if (err.code === "auth/popup-closed-by-user") {
-        alert("Popup closed before login.");
+        // silent — user intentionally closed
+      } else if (err.code === "auth/unauthorized-domain") {
+        showError("loginError", "⚠️ Domain not authorized. Add it in Firebase Console → Authentication → Authorized Domains.");
       } else {
-        alert(err.message);
+        showError("loginError", getAuthErrorMessage(err.code));
       }
     }
   });
