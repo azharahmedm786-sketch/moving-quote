@@ -762,52 +762,38 @@ function resendSignupOTP() {
    LOGIN
 ═══════════════════════════════════════════════ */
 async function loginUser() {
-  const phone = document.getElementById("loginPhone").value.trim();
+  const email = document.getElementById("loginEmail").value.trim();
   const pass  = document.getElementById("loginPassword").value;
-  if (!/^\d{10}$/.test(phone))
-    return showError("loginError", "⚠️ Please enter a valid 10-digit mobile number.");
-  if (!pass)
-    return showError("loginError", "⚠️ Please enter your password.");
+
+  if (!email || !pass) {
+    return showError("loginError", "⚠️ Enter email and password");
+  }
+
   const btn = document.getElementById("btnLogin");
-  if (btn) { btn.disabled = true; btn.textContent = "Signing in..."; }
-  showError("loginError", "⏳ Looking up your account...", "info");
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = "Signing in...";
+  }
+
   waitForFirebase(async () => {
-    const { auth, db } = window._firebase;
+    const { auth } = window._firebase;
+
     try {
-      await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(() => {});
-      let email = null;
-      const snap1 = await db.collection("users").where("phone", "==", phone).limit(1).get();
-      if (!snap1.empty) email = snap1.docs[0].data().email;
-      if (!email) {
-        const snap2 = await db.collection("users").where("phone", "==", "+91" + phone).limit(1).get();
-        if (!snap2.empty) email = snap2.docs[0].data().email;
-      }
-      if (!email) {
-        if (btn) { btn.disabled = false; btn.textContent = "Login →"; }
-        return showError("loginError", "⚠️ No account found for this phone number. Please sign up.");
-      }
-      showError("loginError", "⏳ Signing you in...", "info");
-      const cred = await auth.signInWithEmailAndPassword(email, pass);
-      if (btn) { btn.disabled = false; btn.textContent = "Login →"; }
+      await auth.signInWithEmailAndPassword(email, pass);
+
       closeAuthModal();
-      const name = (cred.user.displayName || email.split("@")[0]).split(" ")[0];
-      showToast(`👋 Welcome back, ${name}!`);
+      showToast("✅ Login successful");
+
     } catch (err) {
-      if (btn) { btn.disabled = false; btn.textContent = "Login →"; }
-      const code = err.code || "";
-      if (["auth/wrong-password","auth/invalid-credential","auth/invalid-login-credentials"].includes(code)) {
-        showError("loginError", "⚠️ Incorrect password. Please try again or reset your password.");
-      } else if (code === "auth/too-many-requests") {
-        showError("loginError", "⚠️ Too many failed attempts. Please wait a few minutes.");
-      } else if (code === "auth/user-not-found") {
-        showError("loginError", "⚠️ No account found. Please sign up.");
-      } else {
-        showError("loginError", getAuthErrorMessage(code));
+      showError("loginError", "⚠️ Incorrect email or password");
+    } finally {
+      if (btn) {
+        btn.disabled = false;
+        btn.textContent = "Login →";
       }
     }
   });
 }
-
 async function _handleGoogleUser(user, db) {
   const userRef = db.collection("users").doc(user.uid);
   const existingDoc = await userRef.get();
