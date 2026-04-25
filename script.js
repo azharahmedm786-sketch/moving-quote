@@ -814,7 +814,7 @@ async function loginUser() {
     }
   });
 }
-async function signInWithGoogle() {
+window.signInWithGoogle = async function () {
   waitForFirebase(async () => {
     const { auth, db } = window._firebase;
 
