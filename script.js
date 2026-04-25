@@ -821,7 +821,18 @@ window.signInWithGoogle = async function () {
     const provider = new firebase.auth.GoogleAuthProvider();
 
     try {
-      const result = await auth.signInWithPopup(provider);
+      await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+
+      let result;
+
+      try {
+        result = await auth.signInWithPopup(provider);
+      } catch (err) {
+        console.warn("Popup failed, trying redirect...");
+        await auth.signInWithRedirect(provider);
+        return;
+      }
+
       const user = result.user;
 
       const userRef = db.collection("users").doc(user.uid);
@@ -846,7 +857,7 @@ window.signInWithGoogle = async function () {
       showError("loginError", "⚠️ Google login failed");
     }
   });
-}
+};
 
 /* ═══════════════════════════════════════════════
    PASSWORD RESET FLOW
