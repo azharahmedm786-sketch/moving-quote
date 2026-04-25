@@ -800,18 +800,21 @@ async function loginUser() {
       showToast(`👋 Welcome back, ${name}!`);
 
 } catch (err) {
-      console.error("Google Sign-In error:", err.code, err.message);
-      if (err.code === "auth/popup-blocked") {
-        showError("loginError", "⚠️ Popup blocked — please allow popups for this site and try again.");
-      } else if (err.code === "auth/popup-closed-by-user" ||
-                 err.code === "auth/cancelled-popup-request") {
-        // silent — user intentionally closed or double-clicked
-      } else if (err.code === "auth/unauthorized-domain") {
-        showError("loginError", "⚠️ Domain not authorized. Add it in Firebase Console → Authentication → Authorized Domains.");
+      if (btn) { btn.disabled = false; btn.textContent = "Login →"; }
+      const code = err.code || "";
+      if (["auth/wrong-password","auth/invalid-credential","auth/invalid-login-credentials"].includes(code)) {
+        showError("loginError", "⚠️ Incorrect password. Please try again or reset your password.");
+      } else if (code === "auth/too-many-requests") {
+        showError("loginError", "⚠️ Too many failed attempts. Please wait a few minutes.");
+      } else if (code === "auth/user-not-found") {
+        showError("loginError", "⚠️ No account found. Please sign up.");
       } else {
-        showError("loginError", getAuthErrorMessage(err.code));
+        showError("loginError", getAuthErrorMessage(code));
       }
     }
+  });   // ← closes waitForFirebase
+}       // ← closes loginUser
+
 // ─── Google Sign-In: user doc handler (duplicate-safe) ──────────────────────
 async function _handleGoogleUser(user, db) {
   const userRef = db.collection("users").doc(user.uid);
