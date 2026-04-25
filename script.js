@@ -2852,27 +2852,47 @@ function signOutUser() {
 
 // ─── Finalise Reset ──────────────────────────
 async function _finaliseReset(auth, btn) {
-  // Clear all reset state first
-  window._resetVerifiedEmail              = null;
-  window._resetPhoneUser                  = null;
-  window._resetConfirmationVerificationId = null;
-  window._resetOtpCode                    = null;
-  resetFlowPhone                          = "";
-  confirmationResult                      = null;
+  try {
+    const newPassword = document.getElementById("setPasswordInput").value;
 
-  if (btn) {
-    btn.disabled = false;
-    btn.textContent = "Set New Password →";
+    if (!newPassword || newPassword.length < 6) {
+      return showError("resetPasswordError", "⚠️ Enter at least 6 characters");
+    }
+
+    if (!auth.currentUser) {
+      return showError("resetPasswordError", "⚠️ Session expired. Please try again.");
+    }
+
+    if (btn) {
+      btn.disabled = true;
+      btn.textContent = "Updating...";
+    }
+
+    // 🔥 THIS IS THE ACTUAL FIX
+    await auth.currentUser.updatePassword(newPassword);
+
+    // logout after reset
+    await auth.signOut();
+
+    showToast("✅ Password updated. Please login again.");
+
+    closeAuthModal();
+
+    setTimeout(() => openAuthModal("login"), 500);
+
+  } catch (err) {
+    console.error(err);
+
+    if (err.code === "auth/requires-recent-login") {
+      showError("resetPasswordError", "⚠️ Please login again and retry.");
+    } else {
+      showError("resetPasswordError", err.message);
+    }
+
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = "Set New Password →";
+    }
   }
-
-  // Sign out after short delay so password saves first
-  setTimeout(() => {
-    auth.signOut().catch(() => {});
-  }, 800);
-
-  showToast("✅ Password updated! Please login with your new password.");
-  closeAuthModal();
-
-  // Auto-open login after modal closes
-  setTimeout(() => openAuthModal("login"), 500);
 }
