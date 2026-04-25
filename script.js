@@ -814,6 +814,39 @@ async function loginUser() {
     }
   });
 }
+async function signInWithGoogle() {
+  waitForFirebase(async () => {
+    const { auth, db } = window._firebase;
+
+    const provider = new firebase.auth.GoogleAuthProvider();
+
+    try {
+      const result = await auth.signInWithPopup(provider);
+      const user = result.user;
+
+      const userRef = db.collection("users").doc(user.uid);
+      const doc = await userRef.get();
+
+      if (!doc.exists) {
+        await userRef.set({
+          name: user.displayName || "",
+          email: user.email || "",
+          phone: user.phoneNumber || "",
+          role: "customer",
+          loginMethod: "google",
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+      }
+
+      closeAuthModal();
+      showToast("✅ Logged in with Google");
+
+    } catch (err) {
+      console.error(err);
+      showError("loginError", "⚠️ Google login failed");
+    }
+  });
+}
 
 /* ═══════════════════════════════════════════════
    PASSWORD RESET FLOW
