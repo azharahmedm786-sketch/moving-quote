@@ -2838,29 +2838,40 @@ function signOutUser() {
 
 // ─── Finalise Reset ──────────────────────────
 async function _finaliseReset(auth, btn) {
+
+  const newPass = document.getElementById("resetPasswordInput")?.value;
+  const confirm = document.getElementById("resetPasswordConfirm")?.value;
+
+  if (!newPass || newPass.length < 6) {
+    return showError("resetPasswordError", "⚠️ Minimum 6 characters required");
+  }
+
+  if (newPass !== confirm) {
+    return showError("resetPasswordError", "⚠️ Passwords do not match");
+  }
+
+  if (!auth.currentUser) {
+    return showError("resetPasswordError", "⚠️ Session expired. Try again.");
+  }
+
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = "Updating...";
+  }
+
   try {
-    const newPassword = document.getElementById("setPasswordInput").value;
+    // 🔥 THIS IS THE MOST IMPORTANT LINE
+    await auth.currentUser.updatePassword(newPass);
 
-    if (!newPassword || newPassword.length < 6) {
-      return showError("resetPasswordError", "⚠️ Enter at least 6 characters");
-    }
+    // NOW clear state AFTER success
+    window._resetVerifiedEmail = null;
+    window._resetPhoneUser = null;
+    window._resetConfirmationVerificationId = null;
+    window._resetOtpCode = null;
+    resetFlowPhone = "";
+    confirmationResult = null;
 
-    if (!auth.currentUser) {
-      return showError("resetPasswordError", "⚠️ Session expired. Please try again.");
-    }
-
-    if (btn) {
-      btn.disabled = true;
-      btn.textContent = "Updating...";
-    }
-
-    // 🔥 THIS IS THE ACTUAL FIX
-    await auth.currentUser.updatePassword(newPassword);
-
-    // logout after reset
-    await auth.signOut();
-
-    showToast("✅ Password updated. Please login again.");
+    showToast("✅ Password updated successfully");
 
     closeAuthModal();
 
@@ -2868,12 +2879,7 @@ async function _finaliseReset(auth, btn) {
 
   } catch (err) {
     console.error(err);
-
-    if (err.code === "auth/requires-recent-login") {
-      showError("resetPasswordError", "⚠️ Please login again and retry.");
-    } else {
-      showError("resetPasswordError", err.message);
-    }
+    showError("resetPasswordError", "⚠️ Failed to update password");
 
   } finally {
     if (btn) {
