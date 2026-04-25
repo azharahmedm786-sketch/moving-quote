@@ -764,21 +764,17 @@ function resendSignupOTP() {
 async function loginUser() {
   const phone = document.getElementById("loginPhone").value.trim();
   const pass  = document.getElementById("loginPassword").value;
-
   if (!/^\d{10}$/.test(phone))
     return showError("loginError", "⚠️ Please enter a valid 10-digit mobile number.");
   if (!pass)
     return showError("loginError", "⚠️ Please enter your password.");
-
   const btn = document.getElementById("btnLogin");
   if (btn) { btn.disabled = true; btn.textContent = "Signing in..."; }
   showError("loginError", "⏳ Looking up your account...", "info");
-
   waitForFirebase(async () => {
     const { auth, db } = window._firebase;
     try {
       await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(() => {});
-
       let email = null;
       const snap1 = await db.collection("users").where("phone", "==", phone).limit(1).get();
       if (!snap1.empty) email = snap1.docs[0].data().email;
@@ -790,16 +786,13 @@ async function loginUser() {
         if (btn) { btn.disabled = false; btn.textContent = "Login →"; }
         return showError("loginError", "⚠️ No account found for this phone number. Please sign up.");
       }
-
       showError("loginError", "⏳ Signing you in...", "info");
       const cred = await auth.signInWithEmailAndPassword(email, pass);
-
       if (btn) { btn.disabled = false; btn.textContent = "Login →"; }
       closeAuthModal();
       const name = (cred.user.displayName || email.split("@")[0]).split(" ")[0];
       showToast(`👋 Welcome back, ${name}!`);
-
-} catch (err) {
+    } catch (err) {
       if (btn) { btn.disabled = false; btn.textContent = "Login →"; }
       const code = err.code || "";
       if (["auth/wrong-password","auth/invalid-credential","auth/invalid-login-credentials"].includes(code)) {
@@ -812,14 +805,12 @@ async function loginUser() {
         showError("loginError", getAuthErrorMessage(code));
       }
     }
-  });   // ← closes waitForFirebase
-}       // ← closes loginUser
+  });
+}
 
-// ─── Google Sign-In: user doc handler (duplicate-safe) ──────────────────────
 async function _handleGoogleUser(user, db) {
   const userRef = db.collection("users").doc(user.uid);
   const existingDoc = await userRef.get();
-
   if (existingDoc.exists) {
     await userRef.update({
       lastLoginAt: firebase.firestore.FieldValue.serverTimestamp(),
@@ -827,12 +818,10 @@ async function _handleGoogleUser(user, db) {
     });
     return;
   }
-
   const emailSnap = await db.collection("users")
     .where("email", "==", user.email)
     .limit(1)
     .get();
-
   if (!emailSnap.empty) {
     const existingData = emailSnap.docs[0].data();
     const oldDocId = emailSnap.docs[0].id;
@@ -863,26 +852,25 @@ async function _handleGoogleUser(user, db) {
     });
   }
 }
+
 window.signInWithGoogle = async function () {
   waitForFirebase(async () => {
     const { auth, db } = window._firebase;
     const provider = new firebase.auth.GoogleAuthProvider();
     provider.setCustomParameters({ prompt: "select_account" });
-
     try {
       const result = await auth.signInWithPopup(provider);
-      const user = result.user;
-      await _handleGoogleUser(user, db);
+      await _handleGoogleUser(result.user, db);
       closeAuthModal();
-      const name = (user.displayName || user.email?.split("@")[0] || "User").split(" ")[0];
+      const name = (result.user.displayName || result.user.email?.split("@")[0] || "User").split(" ")[0];
       showToast(`👋 Welcome, ${name}!`);
-
     } catch (err) {
       console.error("Google Sign-In error:", err.code, err.message);
       if (err.code === "auth/popup-blocked") {
         showError("loginError", "⚠️ Popup blocked — please allow popups for this site and try again.");
-      } else if (err.code === "auth/popup-closed-by-user") {
-        // silent — user intentionally closed
+      } else if (err.code === "auth/popup-closed-by-user" ||
+                 err.code === "auth/cancelled-popup-request") {
+        // silent
       } else if (err.code === "auth/unauthorized-domain") {
         showError("loginError", "⚠️ Domain not authorized. Add it in Firebase Console → Authentication → Authorized Domains.");
       } else {
@@ -891,6 +879,8 @@ window.signInWithGoogle = async function () {
     }
   });
 };
+
+
 /* ═══════════════════════════════════════════════
    PASSWORD RESET FLOW
 ═══════════════════════════════════════════════ */
