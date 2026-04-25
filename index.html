@@ -992,12 +992,9 @@
       <button class="modal-x" onclick="closeAuthModal()">✕</button>
       <div class="auth-logo">📦 PackZen</div>
       <h2 class="auth-title">Welcome Back</h2>
-      <p class="auth-sub">Login with your phone number and password</p>
-      <label>Phone Number</label>
-      <div class="phone-row">
-        <span class="phone-prefix">+91</span>
-        <input id="loginPhone" type="tel" placeholder="10-digit mobile number" maxlength="10" class="field-input" style="flex:1;" onkeydown="if(event.key==='Enter')document.getElementById('loginPassword').focus()">
-      </div>
+      <p class="auth-sub">Login with your email and password</p>
+      <label>Email</label>
+<input id="loginEmail" type="email" placeholder="Enter your email" class="field-input">
       <label style="margin-top:12px;display:block;">Password</label>
       <input id="loginPassword" type="password" placeholder="Enter your password" class="field-input" onkeydown="if(event.key==='Enter')loginUser()">
       <div id="loginError" class="auth-error"></div>
