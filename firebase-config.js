@@ -58,8 +58,8 @@ storageBucket: "packzen-e7539.firebasestorage.app",
 messagingSenderId: "270978358338",
 appId: "1:270978358338:web:20827d29d23b654925e1db",
 measurementId: "G-9JXKP58GP3"
-  const functions = firebase.app().functions("us-central1");
 });
+  const functions = firebase.app().functions("us-central1");
 
 console.log("✅ Firebase initialized with Auth API key");
 
