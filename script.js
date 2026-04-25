@@ -820,18 +820,15 @@ window.signInWithGoogle = async function () {
 
     const provider = new firebase.auth.GoogleAuthProvider();
 
+    // IMPORTANT FIX
+    provider.setCustomParameters({
+      prompt: "select_account"
+    });
+
     try {
       await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
 
-      let result;
-
-      try {
-        result = await auth.signInWithPopup(provider);
-      } catch (err) {
-        console.warn("Popup failed, trying redirect...");
-   
-      }
-
+      const result = await auth.signInWithPopup(provider);
       const user = result.user;
 
       const userRef = db.collection("users").doc(user.uid);
@@ -852,7 +849,11 @@ window.signInWithGoogle = async function () {
       showToast("✅ Logged in with Google");
 
     } catch (err) {
-      console.error(err);
+      console.error("Google login error:", err);
+
+      // DEBUG THIS
+      alert(err.message);
+
       showError("loginError", "⚠️ Google login failed");
     }
   });
