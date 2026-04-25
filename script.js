@@ -829,8 +829,7 @@ window.signInWithGoogle = async function () {
         result = await auth.signInWithPopup(provider);
       } catch (err) {
         console.warn("Popup failed, trying redirect...");
-        await auth.signInWithRedirect(provider);
-        return;
+   
       }
 
       const user = result.user;
