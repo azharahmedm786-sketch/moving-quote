@@ -1001,8 +1001,16 @@
       <label style="margin-top:12px;display:block;">Password</label>
       <input id="loginPassword" type="password" placeholder="Enter your password" class="field-input" onkeydown="if(event.key==='Enter')loginUser()">
       <div id="loginError" class="auth-error"></div>
-      <button class="btn-auth" id="btnLogin" onclick="loginUser()">Login →</button>
-      <div class="auth-divider"><span>or</span></div>
+    <button class="btn-auth" id="btnLogin" onclick="loginUser()">Login →</button>
+
+<!-- GOOGLE BUTTON -->
+<div style="margin-top:15px; text-align:center;">
+  <button onclick="signInWithGoogle()" class="btn-auth-outline" style="width:100%;">
+    🔵 Continue with Google
+  </button>
+</div>
+
+<div class="auth-divider"><span>or</span></div>
       <button class="btn-auth-outline" onclick="switchPanel('panelSignup')">Create New Account</button>
       <p class="auth-link" onclick="switchPanel('panelRecover')">Forgot password?</p>
     </div>
