@@ -2783,76 +2783,30 @@ function signOutUser() {
     });
   });
 }
-// ==============================
-// FINALISE PASSWORD RESET FIX
-// ==============================
-window._finaliseReset = async function (auth, btn) {
-  try {
-    // Refresh token (optional safety)
-    try {
-      await auth.currentUser?.getIdToken(true);
-    } catch (e) {}
 
-    // Logout user
-    await auth.signOut().catch(() => {});
+// ─── Finalise Reset ──────────────────────────
+async function _finaliseReset(auth, btn) {
+  // Clear all reset state first
+  window._resetVerifiedEmail              = null;
+  window._resetPhoneUser                  = null;
+  window._resetConfirmationVerificationId = null;
+  window._resetOtpCode                    = null;
+  resetFlowPhone                          = "";
+  confirmationResult                      = null;
 
-    // Clear reset state
-    window._resetVerifiedEmail = null;
-    window._resetPhoneUser = null;
-    window._resetConfirmationVerificationId = null;
-    window._resetOtpCode = null;
-
-    showToast("✅ Password updated successfully. Please login again.");
-
-    // Close modal and go to login
-    closeAuthModal();
-    setTimeout(() => openAuthModal("login"), 400);
-
-  } catch (err) {
-    console.error("Finalise reset error:", err);
-
-    showError("resetPasswordError", "⚠️ Something went wrong. Try again.");
-
-    if (btn) {
-      btn.disabled = false;
-      btn.textContent = "Set New Password →";
-    }
+  if (btn) {
+    btn.disabled = false;
+    btn.textContent = "Set New Password →";
   }
-};
-// ==============================
-// FINALISE PASSWORD RESET
-// ==============================
-window._finaliseReset = async function (auth, btn) {
-  try {
-    // Refresh session
-    try {
-      await auth.currentUser?.getIdToken(true);
-    } catch (e) {}
 
-    // Logout user
-    await auth.signOut().catch(() => {});
+  // Sign out after short delay so password saves first
+  setTimeout(() => {
+    auth.signOut().catch(() => {});
+  }, 800);
 
-    // Clear reset state
-    window._resetVerifiedEmail = null;
-    window._resetPhoneUser = null;
-    window._resetConfirmationVerificationId = null;
-    window._resetOtpCode = null;
+  showToast("✅ Password updated! Please login with your new password.");
+  closeAuthModal();
 
-    // Show success
-    showToast("✅ Password updated successfully. Please login again.");
-
-    // Close modal → open login
-    closeAuthModal();
-    setTimeout(() => openAuthModal("login"), 400);
-
-  } catch (err) {
-    console.error("Finalise reset error:", err);
-
-    showError("resetPasswordError", "⚠️ Something went wrong. Try again.");
-
-    if (btn) {
-      btn.disabled = false;
-      btn.textContent = "Set New Password →";
-    }
-  }
-};
+  // Auto-open login after modal closes
+  setTimeout(() => openAuthModal("login"), 500);
+}
