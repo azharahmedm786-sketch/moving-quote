@@ -884,19 +884,27 @@ async function sendResetOTP() {
   waitForFirebase(async () => {
     const { auth, db } = window._firebase;
     try {
-      let exists = false;
-      const snap1 = await db.collection("users").where("phone", "==", phone).limit(1).get();
-      if (!snap1.empty) exists = true;
-      if (!exists) {
-        const snap2 = await db.collection("users").where("phone", "==", "+91" + phone).limit(1).get();
-        if (!snap2.empty) exists = true;
-      }
-      if (!exists) {
+    const resetEmail = document.getElementById("resetEmail").value.trim();
+      if (!resetEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(resetEmail)) {
         if (btn) { btn.disabled = false; btn.textContent = "Send OTP →"; }
-        return showError("recoverError", "⚠️ No account found for this phone number. Please sign up.");
+        return showError("recoverError", "⚠️ Please enter a valid email address.");
+      }
+
+      const emailSnap = await db.collection("users").where("email", "==", resetEmail).limit(1).get();
+      if (emailSnap.empty) {
+        if (btn) { btn.disabled = false; btn.textContent = "Send OTP →"; }
+        return showError("recoverError", "⚠️ No account found with this email. Please sign up.");
+      }
+
+      const userData = emailSnap.docs[0].data();
+      const storedPhone = (userData.phone || "").replace("+91", "").trim();
+      if (storedPhone !== phone) {
+        if (btn) { btn.disabled = false; btn.textContent = "Send OTP →"; }
+        return showError("recoverError", "⚠️ Phone number does not match this email account.");
       }
 
       resetFlowPhone = phone;
+   
       showError("recoverError", "⏳ Sending OTP to +91 " + phone + "...", "info");
       if (btn) btn.textContent = "Sending OTP...";
 
