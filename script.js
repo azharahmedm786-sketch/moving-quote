@@ -2838,55 +2838,23 @@ function signOutUser() {
 
 // ─── Finalise Reset ──────────────────────────
 async function _finaliseReset(auth, btn) {
-
- const newPass = document.getElementById("newPasswordInput").value;
-const confirm = document.getElementById("confirmPasswordInput").value;
-   console.log("NewPass:", newPass);
-  console.log("Confirm:", confirm);
-
-  if (!newPass || newPass.length < 6) {
-    return showError("resetPasswordError", "⚠️ Minimum 6 characters required");
-  }
-
-  if (newPass !== confirm) {
-    return showError("resetPasswordError", "⚠️ Passwords do not match");
-  }
-
-  if (!auth.currentUser) {
-    return showError("resetPasswordError", "⚠️ Session expired. Try again.");
-  }
+  // Clean up all reset state
+  window._resetVerifiedEmail              = null;
+  window._resetPhoneUser                  = null;
+  window._resetConfirmationVerificationId = null;
+  window._resetOtpCode                    = null;
+  resetFlowPhone                          = "";
+  confirmationResult                      = null;
 
   if (btn) {
-    btn.disabled = true;
-    btn.textContent = "Updating...";
+    btn.disabled    = false;
+    btn.textContent = "Set New Password →";
   }
 
-  try {
-    // 🔥 THIS IS THE MOST IMPORTANT LINE
-    await auth.currentUser.updatePassword(newPass);
+  // Sign out after short delay so password saves first
+  setTimeout(() => { auth.signOut().catch(() => {}); }, 800);
 
-    // NOW clear state AFTER success
-    window._resetVerifiedEmail = null;
-    window._resetPhoneUser = null;
-    window._resetConfirmationVerificationId = null;
-    window._resetOtpCode = null;
-    resetFlowPhone = "";
-    confirmationResult = null;
-
-    showToast("✅ Password updated successfully");
-
-    closeAuthModal();
-
-    setTimeout(() => openAuthModal("login"), 500);
-
-  } catch (err) {
-    console.error(err);
-    showError("resetPasswordError", "⚠️ Failed to update password");
-
-  } finally {
-    if (btn) {
-      btn.disabled = false;
-      btn.textContent = "Set New Password →";
-    }
-  }
+  showToast("✅ Password updated! Please login with your new password.");
+  closeAuthModal();
+  setTimeout(() => openAuthModal("login"), 500);
 }
