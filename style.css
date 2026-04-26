@@ -429,6 +429,8 @@ body.dark-mode .navbar { background: #06101f; }
 
 .hero-trust {
   display: flex; gap: 1.75rem; flex-wrap: wrap;
+   margin-top: 1.5rem; /* Pushes it away from the buttons above */
+  padding-bottom: 2rem; /* Lifts it up so the floating buttons don't cover it */
 }
 .hero-trust span {
   display: flex; align-items: center; gap: 0.35rem;
