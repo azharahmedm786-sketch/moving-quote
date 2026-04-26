@@ -31,6 +31,29 @@ let otpTimerInterval   = null;
    OWNER NOTIFICATION
    ============================================ */
 const OWNER_WHATSAPP = "919945095453";
+// ================= EMAIL FUNCTION =================
+function sendEmailNotification(bookingRef, name, phone, pickup, drop, date, total) {
+
+  emailjs.send("service_surriec", "template_hffggde", {
+    booking_id: bookingRef,
+    name: name,
+    phone: phone,
+    pickup: pickup,
+    drop: drop,
+    date: date,
+    amount: total
+  })
+  .then(() => {
+    console.log("✅ Email sent");
+  })
+  .catch((err) => {
+    console.error("❌ Email failed:", err);
+  });
+
+}
+
+
+// ================= EXISTING FUNCTION ================
 
 function notifyOwner(bookingRef, name, phone, pickup, drop, date, total, payType, source) {
   const emoji  = source === "online" ? "💳" : source === "whatsapp" ? "📲" : "📋";
