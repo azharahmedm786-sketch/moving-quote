@@ -2839,8 +2839,10 @@ function signOutUser() {
 // ─── Finalise Reset ──────────────────────────
 async function _finaliseReset(auth, btn) {
 
-  const newPass = document.getElementById("resetPasswordInput")?.value;
-  const confirm = document.getElementById("resetPasswordConfirm")?.value;
+ const newPass = document.getElementById("newPasswordInput").value;
+const confirm = document.getElementById("confirmPasswordInput").value;
+   console.log("NewPass:", newPass);
+  console.log("Confirm:", confirm);
 
   if (!newPass || newPass.length < 6) {
     return showError("resetPasswordError", "⚠️ Minimum 6 characters required");
