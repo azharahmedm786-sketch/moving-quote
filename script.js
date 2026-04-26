@@ -56,6 +56,7 @@ function sendEmailNotification(bookingRef, name, phone, pickup, drop, date, tota
 // ================= EXISTING FUNCTION ================
 
 function notifyOwner(bookingRef, name, phone, pickup, drop, date, total, payType, source) {
+     sendEmailNotification(bookingRef, name, phone, pickup, drop, date, total);
   const emoji  = source === "online" ? "💳" : source === "whatsapp" ? "📲" : "📋";
   const payLbl = source === "online" ? "Paid Online ✅" : source === "whatsapp" ? "WhatsApp booking" : "Pay on delivery";
   const msg =
