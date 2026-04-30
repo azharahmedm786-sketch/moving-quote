@@ -1370,10 +1370,29 @@ function calculateQuote(auto = false) {
   const vehicle = document.getElementById("vehicle");
   const result  = document.getElementById("result");
 
-  if (!pickup?.value || !drop?.value) {
-    if (!auto) showToast("📍 Please enter pickup & drop locations.");
+if (!pickup?.value || !drop?.value) {
+
+  // ✅ Allow single item without location
+  if (hasItems && !houseBase && !vehicleRate) {
+    const total = 499 + furnitureCost;
+
+    lastCalculatedTotal = total;
+    updatePriceDisplay();
+
+    if (result) {
+      result.innerHTML = `
+        🪑 Single Item Move<br>
+        Base: ₹499 + Items: ₹${furnitureCost}<br>
+        <strong>Total: ₹${total}</strong>
+      `;
+    }
+
     return;
   }
+
+  if (!auto) showToast("📍 Please enter pickup & drop locations.");
+  return;
+}
 
   // Count chargeable items
   const chargedItems = ["sofaCheck","tvCheck","tvUnitCheck","coffeeCheck","acCheck","bedCheck","wardrobeCheck","dressingCheck","sideTableCheck"];
