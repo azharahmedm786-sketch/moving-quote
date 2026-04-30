@@ -1499,15 +1499,31 @@ function calculateQuote(auto = false) {
   if (!pickup?.value || !drop?.value) { if (!auto) showToast("📍 Please enter pickup & drop locations."); return; }
   const houseBase   = Number(house?.value   || 0);
   const vehicleRate = Number(vehicle?.value || 0);
-  if (!houseBase || (!isIntercityMove && !vehicleRate)) { if (!auto) showToast("🏠 Please select house type and vehicle."); return; }
-
   const chargedItems = ["sofaCheck","tvCheck","tvUnitCheck","coffeeCheck","acCheck","bedCheck","wardrobeCheck","dressingCheck","sideTableCheck"];
   let itemCount = 0;
   chargedItems.forEach(id => { if (document.getElementById(id)?.checked) itemCount++; });
   const cartonQty    = parseInt(document.getElementById("cartonQty")?.value || 0);
   const furnitureCost = (itemCount * 150) + (cartonQty * 50);
+const hasItems = itemCount > 0 || cartonQty > 0;
+   // ✅ HANDLE SINGLE ITEM WITHOUT DISTANCE
+if (!houseBase && !vehicleRate && hasItems) {
+  let total = 499 + furnitureCost;
 
-  function applyPrice(km) {
+  lastCalculatedTotal = total;
+  updatePriceDisplay();
+
+  if (result) {
+    result.innerHTML = `
+      🪑 Single Item Move<br>
+      Base: ₹499 + Items: ₹${furnitureCost}<br>
+      <strong>Total: ₹${total}</strong>
+    `;
+  }
+
+  return; // ⛔ STOP here (no need for distance)
+
+}
+
     const pickupFloor = Number(document.getElementById("pickupFloor")?.value || 0);
     const dropFloor   = Number(document.getElementById("dropFloor")?.value   || 0);
     const liftAvail   = document.getElementById("liftAvailable")?.checked;
@@ -2609,6 +2625,7 @@ function getIntercityBase(houseVal, km) {
   if (!tiers) return 15000;
   return km <= 400 ? tiers["400"] : km <= 600 ? tiers["600"] : km <= 1000 ? tiers["1000"] : tiers["2000"];
 }
+let km = 0;
 function detectAndShowIntercityBadge(km) {
   const badge = document.getElementById("intercityBadge");
   isIntercityMove = km > 100;
