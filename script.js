@@ -1,5 +1,5 @@
 /* ============================================
-   PackZen — script.js  (Full Feature Set)
+   PackZen — script.js  (Full Feature Set — FIXED)
    ============================================ */
 
 // ─── State ───────────────────────────────────
@@ -31,9 +31,9 @@ let otpTimerInterval   = null;
    OWNER NOTIFICATION
    ============================================ */
 const OWNER_WHATSAPP = "919945095453";
+
 // ================= EMAIL FUNCTION =================
 function sendEmailNotification(bookingRef, name, phone, pickup, drop, date, total) {
-
   emailjs.send("service_surriec", "template_hffggde", {
     booking_id: bookingRef,
     name: name,
@@ -43,20 +43,13 @@ function sendEmailNotification(bookingRef, name, phone, pickup, drop, date, tota
     date: date,
     amount: total
   })
-  .then(() => {
-    console.log("✅ Email sent");
-  })
-  .catch((err) => {
-    console.error("❌ Email failed:", err);
-  });
-
+  .then(() => { console.log("✅ Email sent"); })
+  .catch((err) => { console.error("❌ Email failed:", err); });
 }
 
-
-// ================= EXISTING FUNCTION ================
-
+// ================= NOTIFY OWNER =================
 function notifyOwner(bookingRef, name, phone, pickup, drop, date, total, payType, source) {
-     sendEmailNotification(bookingRef, name, phone, pickup, drop, date, total);
+  sendEmailNotification(bookingRef, name, phone, pickup, drop, date, total);
   const emoji  = source === "online" ? "💳" : source === "whatsapp" ? "📲" : "📋";
   const payLbl = source === "online" ? "Paid Online ✅" : source === "whatsapp" ? "WhatsApp booking" : "Pay on delivery";
   const msg =
@@ -88,7 +81,7 @@ let _activeBs = null;
 
 function openBottomSheet(id) {
   closeAllBottomSheets();
-  const sheet = document.getElementById(id);
+  const sheet   = document.getElementById(id);
   const overlay = document.getElementById("bsOverlay");
   if (!sheet || !overlay) return;
   if (id === "bsDate")  buildBsDateStrip();
@@ -120,7 +113,7 @@ function buildBsDateStrip() {
   for (let i = 0; i < 14; i++) {
     const d = new Date(today);
     d.setDate(today.getDate() + i);
-    const ds = d.toISOString().split("T")[0];
+    const ds   = d.toISOString().split("T")[0];
     const card = document.createElement("div");
     card.className = "bs-date-card" + (i === 0 ? " today-card" : "") + (ds === selected ? " selected" : "");
     card.dataset.date = ds;
@@ -291,7 +284,7 @@ function openCustomDate() {
 
 function onCustomDatePicked(val) {
   if (!val) return;
-  const d = new Date(val + "T00:00:00");
+  const d     = new Date(val + "T00:00:00");
   const today = new Date(); today.setHours(0,0,0,0);
   if (d < today) { showToast("⚠️ Please select today or a future date."); return; }
   document.querySelectorAll(".date-card").forEach(c => c.classList.remove("selected"));
@@ -382,11 +375,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
   document.querySelectorAll("button, .btn-primary, .btn-ghost").forEach(btn => {
     btn.addEventListener("click", function (e) {
-      const r = document.createElement("span"); r.classList.add("ripple");
+      const r    = document.createElement("span"); r.classList.add("ripple");
       const rect = this.getBoundingClientRect(), size = Math.max(rect.width, rect.height);
-      r.style.width = r.style.height = size + "px";
-      r.style.left = e.clientX - rect.left - size / 2 + "px";
-      r.style.top  = e.clientY - rect.top  - size / 2 + "px";
+      r.style.width  = r.style.height = size + "px";
+      r.style.left   = e.clientX - rect.left - size / 2 + "px";
+      r.style.top    = e.clientY - rect.top  - size / 2 + "px";
       this.appendChild(r); r.addEventListener("animationend", () => r.remove());
     });
   });
@@ -404,9 +397,11 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   const navbar = document.querySelector(".navbar");
-  window.addEventListener("scroll", () => {
-    navbar.style.background = window.scrollY > 50 ? "rgba(5,13,26,0.97)" : "rgba(5,13,26,0.85)";
-  }, { passive: true });
+  if (navbar) {
+    window.addEventListener("scroll", () => {
+      navbar.style.background = window.scrollY > 50 ? "rgba(5,13,26,0.97)" : "rgba(5,13,26,0.85)";
+    }, { passive: true });
+  }
 
   document.addEventListener("click", (e) => {
     if (!e.target.closest(".nav-user")) document.getElementById("userDropdown")?.classList.remove("open");
@@ -566,8 +561,8 @@ function closeAuthModal() {
 
 function switchPanel(id) {
   [
-    "panelLogin", "panelSignup", "panelSignupOTP",
-    "panelSetPassword", "panelRecover", "panelResetOTP", "panelResetPassword"
+    "panelLogin","panelSignup","panelSignupOTP",
+    "panelSetPassword","panelRecover","panelResetOTP","panelResetPassword"
   ].forEach(p => {
     const el = document.getElementById(p);
     if (el) el.style.display = p === id ? "block" : "none";
@@ -576,8 +571,8 @@ function switchPanel(id) {
 
 function clearAuthErrors() {
   [
-    "loginError", "signupError", "signupOtpError",
-    "setPasswordError", "recoverError", "resetOtpError", "resetPasswordError"
+    "loginError","signupError","signupOtpError",
+    "setPasswordError","recoverError","resetOtpError","resetPasswordError"
   ].forEach(id => {
     const el = document.getElementById(id);
     if (el) { el.textContent = ""; el.style.color = "#dc2626"; }
@@ -593,19 +588,19 @@ function showError(id, msg, type = "error") {
 
 function getAuthErrorMessage(code) {
   const map = {
-    "auth/user-not-found":               "⚠️ No account found. Please sign up first.",
-    "auth/wrong-password":               "⚠️ Incorrect password. Please try again.",
-    "auth/invalid-credential":           "⚠️ Incorrect details. Please try again.",
-    "auth/invalid-login-credentials":    "⚠️ Incorrect details. Please try again.",
-    "auth/email-already-in-use":         "⚠️ This email is already registered.",
-    "auth/weak-password":                "⚠️ Password too weak. Use at least 6 characters.",
-    "auth/network-request-failed":       "⚠️ Network error. Check your connection.",
-    "auth/too-many-requests":            "⚠️ Too many attempts. Please wait a few minutes.",
-    "auth/invalid-phone-number":         "⚠️ Invalid phone number.",
-    "auth/session-expired":              "⚠️ OTP expired. Please request a new one.",
-    "auth/invalid-verification-code":    "⚠️ Incorrect OTP. Please try again.",
-    "auth/quota-exceeded":               "⚠️ SMS quota exceeded. Try again later.",
-    "auth/credential-already-in-use":    "⚠️ This phone number is already linked to another account.",
+    "auth/user-not-found":            "⚠️ No account found. Please sign up first.",
+    "auth/wrong-password":            "⚠️ Incorrect password. Please try again.",
+    "auth/invalid-credential":        "⚠️ Incorrect details. Please try again.",
+    "auth/invalid-login-credentials": "⚠️ Incorrect details. Please try again.",
+    "auth/email-already-in-use":      "⚠️ This email is already registered.",
+    "auth/weak-password":             "⚠️ Password too weak. Use at least 6 characters.",
+    "auth/network-request-failed":    "⚠️ Network error. Check your connection.",
+    "auth/too-many-requests":         "⚠️ Too many attempts. Please wait a few minutes.",
+    "auth/invalid-phone-number":      "⚠️ Invalid phone number.",
+    "auth/session-expired":           "⚠️ OTP expired. Please request a new one.",
+    "auth/invalid-verification-code": "⚠️ Incorrect OTP. Please try again.",
+    "auth/quota-exceeded":            "⚠️ SMS quota exceeded. Try again later.",
+    "auth/credential-already-in-use": "⚠️ This phone number is already linked to another account.",
   };
   return map[code] || ("⚠️ " + (code || "Something went wrong. Please try again."));
 }
@@ -641,14 +636,10 @@ function signupUser() {
   const email     = document.getElementById("signupEmail").value.trim();
   const referral  = document.getElementById("signupReferral")?.value.trim().toUpperCase() || "";
 
-  if (!firstName)
-    return showError("signupError", "⚠️ Please enter your first name.");
-  if (!lastName)
-    return showError("signupError", "⚠️ Please enter your last name.");
-  if (!/^\d{10}$/.test(phone))
-    return showError("signupError", "⚠️ Please enter a valid 10-digit mobile number.");
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
-    return showError("signupError", "⚠️ Please enter a valid email address.");
+  if (!firstName) return showError("signupError", "⚠️ Please enter your first name.");
+  if (!lastName)  return showError("signupError", "⚠️ Please enter your last name.");
+  if (!/^\d{10}$/.test(phone)) return showError("signupError", "⚠️ Please enter a valid 10-digit mobile number.");
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return showError("signupError", "⚠️ Please enter a valid email address.");
 
   showError("signupError", "⏳ Sending OTP to +91 " + phone + "...", "info");
   const btn = document.getElementById("btnSignupSendOtp");
@@ -661,7 +652,6 @@ function signupUser() {
     window._signupRecaptcha = new firebase.auth.RecaptchaVerifier(
       "recaptcha-container-signup", { size: "invisible", callback: () => {} }
     );
-
     window._signupRecaptcha.render().then(() => {
       window._firebase.auth.signInWithPhoneNumber("+91" + phone, window._signupRecaptcha)
         .then(result => {
@@ -686,10 +676,8 @@ function signupUser() {
 
 function verifySignupOTP() {
   const otp = document.getElementById("signupOtpInput").value.trim();
-  if (!/^\d{6}$/.test(otp))
-    return showError("signupOtpError", "⚠️ Please enter the 6-digit OTP.");
-  if (!confirmationResult)
-    return showError("signupOtpError", "⚠️ OTP session expired. Please go back and try again.");
+  if (!/^\d{6}$/.test(otp))    return showError("signupOtpError", "⚠️ Please enter the 6-digit OTP.");
+  if (!confirmationResult)      return showError("signupOtpError", "⚠️ OTP session expired. Please go back and try again.");
 
   const btn = document.getElementById("btnVerifySignupOtp");
   if (btn) { btn.disabled = true; btn.textContent = "Verifying..."; }
@@ -712,12 +700,9 @@ async function completeSignup() {
   const password = document.getElementById("setPasswordInput").value;
   const confirm  = document.getElementById("setPasswordConfirm").value;
 
-  if (password.length < 6)
-    return showError("setPasswordError", "⚠️ Password must be at least 6 characters.");
-  if (password !== confirm)
-    return showError("setPasswordError", "⚠️ Passwords do not match.");
-  if (!pendingSignupData?.phoneUser)
-    return showError("setPasswordError", "⚠️ Session expired. Please start again.");
+  if (password.length < 6)  return showError("setPasswordError", "⚠️ Password must be at least 6 characters.");
+  if (password !== confirm)  return showError("setPasswordError", "⚠️ Passwords do not match.");
+  if (!pendingSignupData?.phoneUser) return showError("setPasswordError", "⚠️ Session expired. Please start again.");
 
   const btn = document.getElementById("btnCompleteSignup");
   if (btn) { btn.disabled = true; btn.textContent = "Creating account..."; }
@@ -789,75 +774,45 @@ async function loginUser() {
   const email = document.getElementById("loginEmail").value.trim();
   const pass  = document.getElementById("loginPassword").value;
 
-  if (!email || !pass) {
-    return showError("loginError", "⚠️ Enter email and password");
-  }
+  if (!email || !pass) return showError("loginError", "⚠️ Enter email and password");
 
   const btn = document.getElementById("btnLogin");
-  if (btn) {
-    btn.disabled = true;
-    btn.textContent = "Signing in...";
-  }
+  if (btn) { btn.disabled = true; btn.textContent = "Signing in..."; }
 
   waitForFirebase(async () => {
     const { auth } = window._firebase;
-
     try {
       await auth.signInWithEmailAndPassword(email, pass);
-
       closeAuthModal();
       showToast("✅ Login successful");
-
     } catch (err) {
       showError("loginError", "⚠️ Incorrect email or password");
     } finally {
-      if (btn) {
-        btn.disabled = false;
-        btn.textContent = "Login →";
-      }
+      if (btn) { btn.disabled = false; btn.textContent = "Login →"; }
     }
   });
 }
+
 async function _handleGoogleUser(user, db) {
-  const userRef = db.collection("users").doc(user.uid);
+  const userRef     = db.collection("users").doc(user.uid);
   const existingDoc = await userRef.get();
   if (existingDoc.exists) {
-    await userRef.update({
-      lastLoginAt: firebase.firestore.FieldValue.serverTimestamp(),
-      loginMethod: "google"
-    });
+    await userRef.update({ lastLoginAt: firebase.firestore.FieldValue.serverTimestamp(), loginMethod: "google" });
     return;
   }
-  const emailSnap = await db.collection("users")
-    .where("email", "==", user.email)
-    .limit(1)
-    .get();
+  const emailSnap = await db.collection("users").where("email", "==", user.email).limit(1).get();
   if (!emailSnap.empty) {
     const existingData = emailSnap.docs[0].data();
-    const oldDocId = emailSnap.docs[0].id;
-    await userRef.set({
-      ...existingData,
-      loginMethod: "google",
-      googleLinked: true,
-      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-    });
-    if (oldDocId !== user.uid) {
-      await db.collection("users").doc(oldDocId).delete().catch(() => {});
-    }
+    const oldDocId     = emailSnap.docs[0].id;
+    await userRef.set({ ...existingData, loginMethod: "google", googleLinked: true, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
+    if (oldDocId !== user.uid) await db.collection("users").doc(oldDocId).delete().catch(() => {});
   } else {
     const refCode = user.uid.slice(0, 8).toUpperCase();
     await userRef.set({
-      name: user.displayName || "",
-      email: user.email || "",
-      phone: user.phoneNumber || "",
-      role: "customer",
-      loginMethod: "google",
-      phoneVerified: false,
-      prefEmail: true,
-      prefSMS: true,
-      referralCode: refCode,
-      referralCount: 0,
-      referralCredits: 0,
+      name: user.displayName || "", email: user.email || "", phone: user.phoneNumber || "",
+      role: "customer", loginMethod: "google", phoneVerified: false,
+      prefEmail: true, prefSMS: true,
+      referralCode: refCode, referralCount: 0, referralCredits: 0,
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
     });
   }
@@ -875,11 +830,9 @@ window.signInWithGoogle = async function () {
       const name = (result.user.displayName || result.user.email?.split("@")[0] || "User").split(" ")[0];
       showToast(`👋 Welcome, ${name}!`);
     } catch (err) {
-      console.error("Google Sign-In error:", err.code, err.message);
       if (err.code === "auth/popup-blocked") {
         showError("loginError", "⚠️ Popup blocked — please allow popups for this site and try again.");
-      } else if (err.code === "auth/popup-closed-by-user" ||
-                 err.code === "auth/cancelled-popup-request") {
+      } else if (err.code === "auth/popup-closed-by-user" || err.code === "auth/cancelled-popup-request") {
         // silent
       } else if (err.code === "auth/unauthorized-domain") {
         showError("loginError", "⚠️ Domain not authorized. Add it in Firebase Console → Authentication → Authorized Domains.");
@@ -890,16 +843,12 @@ window.signInWithGoogle = async function () {
   });
 };
 
-
 /* ═══════════════════════════════════════════════
    PASSWORD RESET FLOW
 ═══════════════════════════════════════════════ */
-
-/* STEP 1 — Enter phone, check it exists, then send OTP */
 async function sendResetOTP() {
   const phone = document.getElementById("resetPhone").value.trim();
-  if (!/^\d{10}$/.test(phone))
-    return showError("recoverError", "⚠️ Please enter a valid 10-digit phone number.");
+  if (!/^\d{10}$/.test(phone)) return showError("recoverError", "⚠️ Please enter a valid 10-digit phone number.");
 
   const btn = document.getElementById("btnSendResetOtp");
   if (btn) { btn.disabled = true; btn.textContent = "Checking..."; }
@@ -908,49 +857,37 @@ async function sendResetOTP() {
   waitForFirebase(async () => {
     const { auth, db } = window._firebase;
     try {
-    const resetEmail = document.getElementById("resetEmail").value.trim();
+      const resetEmail = document.getElementById("resetEmail").value.trim();
       if (!resetEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(resetEmail)) {
         if (btn) { btn.disabled = false; btn.textContent = "Send OTP →"; }
         return showError("recoverError", "⚠️ Please enter a valid email address.");
       }
-
       const emailSnap = await db.collection("users").where("email", "==", resetEmail).limit(1).get();
       if (emailSnap.empty) {
         if (btn) { btn.disabled = false; btn.textContent = "Send OTP →"; }
         return showError("recoverError", "⚠️ No account found with this email. Please sign up.");
       }
-
-      const userData = emailSnap.docs[0].data();
+      const userData    = emailSnap.docs[0].data();
       const storedPhone = (userData.phone || "").replace("+91", "").trim();
       if (storedPhone !== phone) {
         if (btn) { btn.disabled = false; btn.textContent = "Send OTP →"; }
         return showError("recoverError", "⚠️ Phone number does not match this email account.");
       }
-
       resetFlowPhone = phone;
-   
       showError("recoverError", "⏳ Sending OTP to +91 " + phone + "...", "info");
       if (btn) btn.textContent = "Sending OTP...";
-
       _clearResetRecaptcha();
-
       window._resetRecaptcha = new firebase.auth.RecaptchaVerifier(
         "recaptcha-container-reset", { size: "invisible", callback: () => {} }
       );
       await window._resetRecaptcha.render();
-
-      confirmationResult = await auth.signInWithPhoneNumber(
-        "+91" + phone, window._resetRecaptcha
-      );
-
+      confirmationResult = await auth.signInWithPhoneNumber("+91" + phone, window._resetRecaptcha);
       window._resetConfirmationVerificationId = confirmationResult.verificationId;
-
       document.getElementById("resetOtpPhone").textContent = "+91 " + phone;
       switchPanel("panelResetOTP");
       document.getElementById("resetOtpInput").focus();
       if (btn) { btn.disabled = false; btn.textContent = "Send OTP →"; }
       _startOtpTimer();
-
     } catch (err) {
       _clearResetRecaptcha();
       if (btn) { btn.disabled = false; btn.textContent = "Send OTP →"; }
@@ -964,13 +901,10 @@ async function sendResetOTP() {
   });
 }
 
-/* STEP 2 — Verify OTP */
 async function verifyResetOTP() {
   const otp = document.getElementById("resetOtpInput").value.trim();
-  if (!/^\d{6}$/.test(otp))
-    return showError("resetOtpError", "⚠️ Please enter the 6-digit OTP.");
-  if (!confirmationResult)
-    return showError("resetOtpError", "⚠️ OTP session expired. Please go back and try again.");
+  if (!/^\d{6}$/.test(otp)) return showError("resetOtpError", "⚠️ Please enter the 6-digit OTP.");
+  if (!confirmationResult)   return showError("resetOtpError", "⚠️ OTP session expired. Please go back and try again.");
 
   const btn = document.getElementById("btnVerifyResetOtp");
   if (btn) { btn.disabled = true; btn.textContent = "Verifying..."; }
@@ -979,14 +913,12 @@ async function verifyResetOTP() {
   try {
     const result = await confirmationResult.confirm(otp);
     clearInterval(otpTimerInterval);
-
-    // Store both for use in setNewPassword
     window._resetConfirmationVerificationId = confirmationResult.verificationId;
-    window._resetOtpCode  = otp;
+    window._resetOtpCode   = otp;
     window._resetPhoneUser = result.user;
 
     const { db } = window._firebase;
-    const phone = resetFlowPhone;
+    const phone  = resetFlowPhone;
     let verifiedEmail = null;
 
     const snap1 = await db.collection("users").where("phone", "==", phone).limit(1).get();
@@ -995,24 +927,19 @@ async function verifyResetOTP() {
       const snap2 = await db.collection("users").where("phone", "==", "+91" + phone).limit(1).get();
       if (!snap2.empty) verifiedEmail = snap2.docs[0].data().email;
     }
-
     if (!verifiedEmail) {
       await window._firebase.auth.signOut().catch(() => {});
       if (btn) { btn.disabled = false; btn.textContent = "Verify OTP →"; }
       return showError("resetOtpError", "⚠️ Account not found. Please contact support.");
     }
-
     window._resetVerifiedEmail = verifiedEmail;
-
     if (btn) { btn.disabled = false; btn.textContent = "Verify OTP →"; }
-
     const np = document.getElementById("newPasswordInput");
     const co = document.getElementById("confirmPasswordInput");
     if (np) np.value = "";
     if (co) co.value = "";
     switchPanel("panelResetPassword");
     np?.focus();
-
   } catch (err) {
     if (btn) { btn.disabled = false; btn.textContent = "Verify OTP →"; }
     if (err.code === "auth/invalid-verification-code") {
@@ -1025,30 +952,19 @@ async function verifyResetOTP() {
   }
 }
 
-/* ═══════════════════════════════════════════════
-   STEP 3 — Set new password  ✅ FIXED
-   ─────────────────────────────────────────────
-   Strategy:
-   1. Re-sign in fresh with the stored phone credential
-   2. Call updatePassword() on that freshly authenticated user
-   3. If email not yet linked, link it instead (new accounts edge case)
-═══════════════════════════════════════════════ */
 async function setNewPassword() {
   const newPass  = document.getElementById("newPasswordInput").value;
   const confPass = document.getElementById("confirmPasswordInput").value;
 
-  if (newPass.length < 6)
-    return showError("resetPasswordError", "⚠️ Password must be at least 6 characters.");
-  if (newPass !== confPass)
-    return showError("resetPasswordError", "⚠️ Passwords do not match.");
+  if (newPass.length < 6)  return showError("resetPasswordError", "⚠️ Password must be at least 6 characters.");
+  if (newPass !== confPass) return showError("resetPasswordError", "⚠️ Passwords do not match.");
 
   const email          = window._resetVerifiedEmail;
   const verificationId = window._resetConfirmationVerificationId;
   const otpCode        = window._resetOtpCode;
   const freshUser      = window._resetPhoneUser;
 
-  if (!email || !freshUser)
-    return showError("resetPasswordError", "⚠️ Session expired. Please restart.");
+  if (!email || !freshUser) return showError("resetPasswordError", "⚠️ Session expired. Please restart.");
 
   const btn = document.getElementById("btnSetNewPassword");
   if (btn) { btn.disabled = true; btn.textContent = "Updating..."; }
@@ -1057,63 +973,48 @@ async function setNewPassword() {
   const auth = window._firebase.auth;
 
   try {
-    // Strategy: Try updatePassword first, if it fails with requires-recent-login,
-    // re-sign-in using stored OTP credential and try again
     let targetUser = freshUser;
-
     try {
       await targetUser.updatePassword(newPass);
       await _finaliseReset(auth, btn);
       return;
     } catch (firstErr) {
-      console.log("First attempt error:", firstErr.code);
-
       if (firstErr.code === "auth/requires-recent-login") {
-        // Re-authenticate using stored phone credential
         if (verificationId && otpCode) {
           try {
             const phoneCred = firebase.auth.PhoneAuthProvider.credential(verificationId, otpCode);
             await targetUser.reauthenticateWithCredential(phoneCred);
-             await targetUser.reload(); 
+            await targetUser.reload();
             await targetUser.updatePassword(newPass);
             await _finaliseReset(auth, btn);
             return;
           } catch (reAuthErr) {
-            console.log("Re-auth error:", reAuthErr.code);
-            // OTP expired — fall through to email linking
+            // fall through to email linking
           }
         }
       } else if (firstErr.code !== "auth/no-such-provider") {
         throw firstErr;
       }
     }
-
-    // Final fallback: link/update via email credential
     const emailCred = firebase.auth.EmailAuthProvider.credential(email, newPass);
     try {
       await targetUser.linkWithCredential(emailCred);
       await _finaliseReset(auth, btn);
     } catch (linkErr) {
-      console.log("Link error:", linkErr.code);
-      if (linkErr.code === "auth/provider-already-linked" ||
-          linkErr.code === "auth/credential-already-in-use") {
+      if (linkErr.code === "auth/provider-already-linked" || linkErr.code === "auth/credential-already-in-use") {
         await targetUser.updatePassword(newPass);
         await _finaliseReset(auth, btn);
       } else if (linkErr.code === "auth/email-already-in-use") {
-        showError("resetPasswordError",
-          "⚠️ Unable to update. Please contact support@packzenblr.in");
+        showError("resetPasswordError", "⚠️ Unable to update. Please contact support@packzenblr.in");
         if (btn) { btn.disabled = false; btn.textContent = "Set New Password →"; }
       } else {
         throw linkErr;
       }
     }
-
   } catch (err) {
-    console.error("setNewPassword final error:", err.code, err);
     if (btn) { btn.disabled = false; btn.textContent = "Set New Password →"; }
     if (err.code === "auth/requires-recent-login") {
-      showError("resetPasswordError",
-        "⚠️ Session timed out. Please go back and request a new OTP.");
+      showError("resetPasswordError", "⚠️ Session timed out. Please go back and request a new OTP.");
     } else if (err.code === "auth/weak-password") {
       showError("resetPasswordError", "⚠️ Password too weak. Use at least 6 characters.");
     } else if (err.code === "auth/too-many-requests") {
@@ -1123,6 +1024,7 @@ async function setNewPassword() {
     }
   }
 }
+
 /* ============================================
    TOAST
    ============================================ */
@@ -1146,116 +1048,53 @@ function showToast(msg, dur = 3000) {
 function prefillBookingForm(userData) {
   const nameEl  = document.getElementById("custName");
   const phoneEl = document.getElementById("custPhone");
-
-  if (nameEl && !nameEl.value.trim() && userData?.name) {
-    nameEl.value = userData.name;
-  }
-
-  if (phoneEl && !phoneEl.value.trim() && userData?.phone) {
-    phoneEl.value = userData.phone.replace("+91","").trim();
-  }
+  if (nameEl  && !nameEl.value.trim()  && userData?.name)  nameEl.value  = userData.name;
+  if (phoneEl && !phoneEl.value.trim() && userData?.phone) phoneEl.value = userData.phone.replace("+91","").trim();
 }
 
 async function openDashboard() {
   document.getElementById("userDropdown")?.classList.remove("open");
-
-  if (!currentUser) {
-    openAuthModal("login");
-    return;
-  }
-
-  if (!window._firebase) {
-    console.log("Firebase not ready");
-    return;
-  }
-
+  if (!currentUser) { openAuthModal("login"); return; }
+  if (!window._firebase) return;
   const { db } = window._firebase;
-
   try {
-    const userSnap = await db.collection("users")
-      .doc(currentUser.uid)
-      .get();
-
+    const userSnap = await db.collection("users").doc(currentUser.uid).get();
     const userData = userSnap.data() || {};
-    const name = currentUser.displayName || "User";
-
+    const name     = currentUser.displayName || "User";
     document.getElementById("dashName").textContent   = name;
     document.getElementById("dashEmail").textContent  = currentUser.email || "";
     document.getElementById("dashAvatar").textContent = name.charAt(0).toUpperCase();
-
     const adminTabBtn = document.getElementById("adminTabBtn");
-    if (userData.role === "admin" && adminTabBtn) {
-      adminTabBtn.style.display = "inline-flex";
-    }
-
+    if (userData.role === "admin" && adminTabBtn) adminTabBtn.style.display = "inline-flex";
     await loadQuotes();
-
     document.getElementById("dashboardModal").style.display = "flex";
     switchDashTab("quotes", document.querySelector(".dash-tab"));
-
-  } catch (e) {
-    console.error("Dashboard error:", e);
-  }
+  } catch (e) { console.error("Dashboard error:", e); }
 }
 
 async function loadQuotes() {
-  if (!window._firebase || !currentUser) {
-    console.log("Firebase or user not ready");
-    return;
-  }
-
-  const db = window._firebase.db;
+  if (!window._firebase || !currentUser) return;
+  const db        = window._firebase.db;
   const container = document.getElementById("quotesList");
-
   if (!container) return;
-
   container.innerHTML = "⏳ Loading your quotes...";
-
   try {
-    const snapshot = await db.collection("quotes")
-      .where("uid", "==", currentUser.uid)
-      .orderBy("createdAt", "desc")
-      .get();
-
+    const snapshot = await db.collection("quotes").where("uid", "==", currentUser.uid).orderBy("createdAt", "desc").get();
     if (snapshot.empty) {
-      container.innerHTML = `
-        <div style="opacity:0.7; text-align:center; padding:20px;">
-          No quotes found yet 🚚
-        </div>
-      `;
+      container.innerHTML = `<div style="opacity:0.7;text-align:center;padding:20px;">No quotes found yet 🚚</div>`;
       return;
     }
-
     container.innerHTML = "";
-
     snapshot.forEach(doc => {
       const data = doc.data();
-
       container.innerHTML += `
-        <div style="
-          padding:12px;
-          margin-bottom:12px;
-          border:1px solid #333;
-          border-radius:10px;
-          background:#0f172a;
-        ">
-          <div style="font-weight:600;">
-            ${data.pickup || "N/A"} → ${data.drop || "N/A"}
-          </div>
-
-          <div style="margin-top:6px;">
-            💰 ₹${data.total || 0}
-          </div>
-
-          <div style="font-size:12px; opacity:0.7;">
-            📅 ${data.date || ""}
-          </div>
-        </div>
-      `;
+        <div style="padding:12px;margin-bottom:12px;border:1px solid #333;border-radius:10px;background:#0f172a;">
+          <div style="font-weight:600;">${data.pickup||"N/A"} → ${data.drop||"N/A"}</div>
+          <div style="margin-top:6px;">💰 ₹${data.total||0}</div>
+          <div style="font-size:12px;opacity:0.7;">📅 ${data.date||""}</div>
+        </div>`;
     });
-
   } catch (error) {
-    console.error("Error loading quotes:", error);
     container.innerHTML = "❌ Failed to load quotes";
   }
 }
@@ -1267,7 +1106,7 @@ async function loadReferralData() {
   if (!currentUser || !window._firebase) return;
   const snap = await window._firebase.db.collection("users").doc(currentUser.uid).get().catch(() => null);
   if (!snap?.exists) return;
-  const d = snap.data();
+  const d    = snap.data();
   const code = d.referralCode || currentUser.uid.slice(0, 8).toUpperCase();
   document.getElementById("referralCodeText").textContent = code;
   document.getElementById("refCount").textContent     = d.referralCount   || 0;
@@ -1301,10 +1140,10 @@ async function applyPromoCode() {
         }
         msgEl.textContent = "Invalid promo code."; msgEl.className = "promo-msg promo-error"; return;
       }
-      const promo = snap.data();
+      const promo    = snap.data();
       if (!promo.active) { msgEl.textContent = "This promo has expired."; msgEl.className = "promo-msg promo-error"; return; }
       const discount = promo.type === "percent" ? Math.round(lastCalculatedTotal * promo.value / 100) : promo.value;
-      promoDiscount = Math.min(discount, lastCalculatedTotal * 0.5);
+      promoDiscount  = Math.min(discount, lastCalculatedTotal * 0.5);
       msgEl.textContent = `🎉 Code applied! ₹${promoDiscount} off.`;
       msgEl.className = "promo-msg promo-success";
       updatePriceDisplay();
@@ -1342,9 +1181,9 @@ function updatePriceDisplay() {
 function syncPayOnlineButton(total, advanceAmt, fullAmt) {
   const btn = document.getElementById("btnPayOnline");
   if (!btn) return;
-  if (selectedPayment === "advance") btn.innerHTML = `💳 Pay Advance ₹${advanceAmt.toLocaleString("en-IN")} Online`;
-  else if (selectedPayment === "full") btn.innerHTML = `💳 Pay Full ₹${fullAmt.toLocaleString("en-IN")} (Save 7%)`;
-  else btn.innerHTML = `💳 Pay Online`;
+  if (selectedPayment === "advance")      btn.innerHTML = `💳 Pay Advance ₹${advanceAmt.toLocaleString("en-IN")} Online`;
+  else if (selectedPayment === "full")    btn.innerHTML = `💳 Pay Full ₹${fullAmt.toLocaleString("en-IN")} (Save 7%)`;
+  else                                    btn.innerHTML = `💳 Pay Online`;
 }
 
 function selectPayment(type) {
@@ -1380,14 +1219,14 @@ function previewPhotos(input) {
    ============================================ */
 async function saveQuoteToFirestore(total) {
   if (!currentUser || !window._firebase) return;
-  const { db } = window._firebase;
+  const { db }    = window._firebase;
   const houseEl   = document.getElementById("house");
   const vehicleEl = document.getElementById("vehicle");
   try {
     await db.collection("quotes").add({
-      uid: currentUser.uid,
-      pickup: document.getElementById("pickup")?.value  || "",
-      drop:   document.getElementById("drop")?.value    || "",
+      uid:     currentUser.uid,
+      pickup:  document.getElementById("pickup")?.value  || "",
+      drop:    document.getElementById("drop")?.value    || "",
       house:   houseEl?.options[houseEl?.selectedIndex]?.text    || "",
       vehicle: vehicleEl?.options[vehicleEl?.selectedIndex]?.text || "",
       total, date: new Date().toLocaleDateString("en-IN"),
@@ -1488,7 +1327,41 @@ function adjustBounds() {
 }
 
 /* ============================================
-   PRICE CALCULATION
+   INTERCITY PRICING TABLE
+   ============================================ */
+let isIntercityMove = false;
+const INTERCITY_PRICING = {
+  "1750": {"400":9000,"600":10800,"1000":17100,"2000":24000},
+  "3950": {"400":9000,"600":10800,"1000":17100,"2000":24000},
+  "5750": {"400":11000,"600":13200,"1000":20900,"2000":28000},
+  "7450": {"400":13000,"600":15600,"1000":24700,"2000":33000},
+  "8350": {"400":15500,"600":18600,"1000":29450,"2000":38000},
+  "10800":{"400":18000,"600":21600,"1000":34000,"2000":45000},
+  "5400": {"400":10000,"600":12000,"1000":19000,"2000":26000},
+  "8800": {"400":15000,"600":18000,"1000":28000,"2000":38000},
+  "13700":{"400":22000,"600":26000,"1000":40000,"2000":55000},
+  "21550":{"400":35000,"600":42000,"1000":65000,"2000":90000}
+};
+
+function getIntercityBase(houseVal, km) {
+  const tiers = INTERCITY_PRICING[String(houseVal)];
+  if (!tiers) return 15000;
+  return km <= 400 ? tiers["400"] : km <= 600 ? tiers["600"] : km <= 1000 ? tiers["1000"] : tiers["2000"];
+}
+
+function detectAndShowIntercityBadge(km) {
+  const badge = document.getElementById("intercityBadge");
+  isIntercityMove = km > 100;
+  if (badge) {
+    badge.style.display = isIntercityMove ? "flex" : "none";
+    if (isIntercityMove) badge.querySelector(".ic-km").textContent = Math.round(km) + " km";
+  }
+  const vg = document.getElementById("vehicleCardGroup");
+  if (vg) vg.style.display = isIntercityMove ? "none" : "block";
+}
+
+/* ============================================
+   PRICE CALCULATION  ← MAIN FIX HERE
    ============================================ */
 function calculateQuote(auto = false) {
   const pickup  = document.getElementById("pickup");
@@ -1496,80 +1369,119 @@ function calculateQuote(auto = false) {
   const house   = document.getElementById("house");
   const vehicle = document.getElementById("vehicle");
   const result  = document.getElementById("result");
-  if (!pickup?.value || !drop?.value) { if (!auto) showToast("📍 Please enter pickup & drop locations."); return; }
-  const houseBase   = Number(house?.value   || 0);
-  const vehicleRate = Number(vehicle?.value || 0);
+
+  if (!pickup?.value || !drop?.value) {
+    if (!auto) showToast("📍 Please enter pickup & drop locations.");
+    return;
+  }
+
+  // Count chargeable items
   const chargedItems = ["sofaCheck","tvCheck","tvUnitCheck","coffeeCheck","acCheck","bedCheck","wardrobeCheck","dressingCheck","sideTableCheck"];
   let itemCount = 0;
   chargedItems.forEach(id => { if (document.getElementById(id)?.checked) itemCount++; });
   const cartonQty    = parseInt(document.getElementById("cartonQty")?.value || 0);
   const furnitureCost = (itemCount * 150) + (cartonQty * 50);
-const hasItems = itemCount > 0 || cartonQty > 0;
-   // ✅ HANDLE SINGLE ITEM WITHOUT DISTANCE
-if (!houseBase && !vehicleRate && hasItems) {
-  let total = 499 + furnitureCost;
+  const hasItems      = itemCount > 0 || cartonQty > 0;
+  const houseBase     = Number(house?.value   || 0);
+  const vehicleRate   = Number(vehicle?.value || 0);
 
-  lastCalculatedTotal = total;
-  updatePriceDisplay();
-
-  if (result) {
-    result.innerHTML = `
-      🪑 Single Item Move<br>
-      Base: ₹499 + Items: ₹${furnitureCost}<br>
-      <strong>Total: ₹${total}</strong>
-    `;
+  // ── SINGLE ITEM without house/vehicle selected ──
+  if (!houseBase && !vehicleRate && hasItems) {
+    const total = 499 + furnitureCost;
+    lastCalculatedTotal = total;
+    updatePriceDisplay();
+    if (result) result.innerHTML = `🪑 Single Item Move<br>Base: ₹499 + Items: ₹${furnitureCost}<br><strong>Total: ₹${total}</strong>`;
+    return;
   }
 
-  return; // ⛔ STOP here (no need for distance)
-
-}
+  // ── NEEDS DISTANCE — call Distance Matrix, do pricing inside callback ──
+  function applyPrice(km) {
+    // Now km is properly scoped inside this callback
+    detectAndShowIntercityBadge(km);
 
     const pickupFloor = Number(document.getElementById("pickupFloor")?.value || 0);
     const dropFloor   = Number(document.getElementById("dropFloor")?.value   || 0);
     const liftAvail   = document.getElementById("liftAvailable")?.checked;
-    const floorCost   = liftAvail ? Math.round((pickupFloor + dropFloor) * 0.5) : (pickupFloor + dropFloor);
-    detectAndShowIntercityBadge(km);
+    const floorCost   = liftAvail
+      ? Math.round((pickupFloor + dropFloor) * 0.5)
+      : (pickupFloor + dropFloor);
 
     let total, breakdownHtml;
+
     if (km > 100) {
-      const baseRate = getIntercityBase(house?.value || "3950", km);
-      total = Math.round(baseRate + furnitureCost + floorCost);
-      const distLabel = km <= 400 ? "up to 400 km" : km <= 600 ? "up to 600 km" : km <= 1000 ? "up to 1000 km" : "1000+ km";
-      breakdownHtml = `🚛 Intercity · ~${Math.round(km)} km (${distLabel})<br>Base: ₹${baseRate.toLocaleString("en-IN")}${itemCount ? ` · Items: ₹${(itemCount*150).toLocaleString("en-IN")}` : ""}${cartonQty ? ` · Cartons: ₹${(cartonQty*50).toLocaleString("en-IN")}` : ""}${floorCost ? ` · Floor: ₹${floorCost.toLocaleString("en-IN")}` : ""}<br><strong>Total Estimate: ₹${total.toLocaleString("en-IN")}</strong>`;
+      // ── INTERCITY ──
+      const baseRate  = getIntercityBase(house?.value || "3950", km);
+      total           = Math.round(baseRate + furnitureCost + floorCost);
+      const distLabel = km <= 400 ? "up to 400 km"
+                      : km <= 600 ? "up to 600 km"
+                      : km <= 1000 ? "up to 1000 km"
+                      : "1000+ km";
+      breakdownHtml =
+        `🚛 Intercity · ~${Math.round(km)} km (${distLabel})<br>` +
+        `Base: ₹${baseRate.toLocaleString("en-IN")}` +
+        (itemCount  ? ` · Items: ₹${(itemCount * 150).toLocaleString("en-IN")}`   : "") +
+        (cartonQty  ? ` · Cartons: ₹${(cartonQty * 50).toLocaleString("en-IN")}` : "") +
+        (floorCost  ? ` · Floor: ₹${floorCost.toLocaleString("en-IN")}`           : "") +
+        `<br><strong>Total Estimate: ₹${total.toLocaleString("en-IN")}</strong>`;
     } else {
+      // ── LOCAL ──
       const vv = Number(vehicle?.value || 0);
       let baseFare = 1999, perKmRate = 25;
-      if (vv === 88) { baseFare = 7500; perKmRate = 40; }
+      if      (vv === 88) { baseFare = 7500; perKmRate = 40; }
       else if (vv === 69) { baseFare = 6000; perKmRate = 35; }
       else if (vv === 54) { baseFare = 4500; perKmRate = 35; }
-      const distanceFare = km <= 25 ? baseFare : baseFare + ((km - 25) * perKmRate);
+
+      const distanceFare = km <= 25
+        ? baseFare
+        : baseFare + ((km - 25) * perKmRate);
+
       total = Math.round(distanceFare + furnitureCost + floorCost);
-      breakdownHtml = `📍 Local · ~${km.toFixed(1)} km<br>Base fare: ₹${baseFare.toLocaleString("en-IN")}${km > 25 ? ` · Extra km: ₹${Math.round((km-25)*perKmRate).toLocaleString("en-IN")}` : ""}${itemCount ? ` · Items: ₹${(itemCount*150).toLocaleString("en-IN")}` : ""}${cartonQty ? ` · Cartons: ₹${(cartonQty*50).toLocaleString("en-IN")}` : ""}${floorCost ? ` · Floor: ₹${floorCost.toLocaleString("en-IN")}` : ""}<br><strong>Total Estimate: ₹${total.toLocaleString("en-IN")}</strong>`;
+      breakdownHtml =
+        `📍 Local · ~${km.toFixed(1)} km<br>` +
+        `Base fare: ₹${baseFare.toLocaleString("en-IN")}` +
+        (km > 25    ? ` · Extra km: ₹${Math.round((km - 25) * perKmRate).toLocaleString("en-IN")}` : "") +
+        (itemCount  ? ` · Items: ₹${(itemCount * 150).toLocaleString("en-IN")}`                    : "") +
+        (cartonQty  ? ` · Cartons: ₹${(cartonQty * 50).toLocaleString("en-IN")}`                   : "") +
+        (floorCost  ? ` · Floor: ₹${floorCost.toLocaleString("en-IN")}`                            : "") +
+        `<br><strong>Total Estimate: ₹${total.toLocaleString("en-IN")}</strong>`;
     }
+
     if (result) result.innerHTML = breakdownHtml;
     lastCalculatedTotal = total;
     updatePriceDisplay();
     if (currentUser) saveQuoteToFirestore(total);
   }
 
+  // ── Distance Matrix call ──
   try {
     new google.maps.DistanceMatrixService().getDistanceMatrix({
-      origins: [pickup.value], destinations: [drop.value], travelMode: "DRIVING"
+      origins:      [pickup.value],
+      destinations: [drop.value],
+      travelMode:   "DRIVING"
     }, (res, status) => {
       const el = res?.rows?.[0]?.elements?.[0];
       if (status === "OK" && el?.status === "OK" && el?.distance?.value) {
         applyPrice(el.distance.value / 1000);
       } else {
+        // Fallback: straight-line × 1.3
         if (pickupPlace?.geometry && dropPlace?.geometry) {
-          const R = 6371, p1 = pickupPlace.geometry.location, p2 = dropPlace.geometry.location;
-          const lat1 = p1.lat()*Math.PI/180, lat2 = p2.lat()*Math.PI/180;
-          const dLat = lat2-lat1, dLng = (p2.lng()-p1.lng())*Math.PI/180;
-          const a = Math.sin(dLat/2)**2 + Math.cos(lat1)*Math.cos(lat2)*Math.sin(dLng/2)**2;
+          const R    = 6371;
+          const p1   = pickupPlace.geometry.location;
+          const p2   = dropPlace.geometry.location;
+          const lat1 = p1.lat() * Math.PI / 180;
+          const lat2 = p2.lat() * Math.PI / 180;
+          const dLat = lat2 - lat1;
+          const dLng = (p2.lng() - p1.lng()) * Math.PI / 180;
+          const a    = Math.sin(dLat/2)**2 + Math.cos(lat1)*Math.cos(lat2)*Math.sin(dLng/2)**2;
           applyPrice(Math.max(R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)) * 1.3, 5));
-        } else applyPrice(15);
+        } else {
+          applyPrice(15);
+        }
       }
     });
-  } catch(e) { applyPrice(15); }
+  } catch(e) {
+    applyPrice(15);
+  }
 }
 
 /* ============================================
@@ -1589,26 +1501,21 @@ function saveLead() {
 
 async function bookOnWhatsApp() {
   if (!currentUser) { showToast("👋 Please login or create an account to book."); openAuthModal("login"); return; }
-
-  if (!document.getElementById("tncAccepted")?.checked) {
-    showToast("⚠️ Please accept the Terms & Conditions to continue.");
-    return;
-  }
-
+  if (!document.getElementById("tncAccepted")?.checked) { showToast("⚠️ Please accept the Terms & Conditions to continue."); return; }
   const name  = document.getElementById("custName")?.value?.trim();
   const phone = document.getElementById("custPhone")?.value?.trim();
   if (!name)                       return showToast("⚠️ Please enter your name.");
   if (!phone || phone.length < 10) return showToast("⚠️ Please enter a valid phone number.");
   if (lastCalculatedTotal === 0)   return showToast("⚠️ Price not calculated yet.");
   saveLead();
-  const pickup   = document.getElementById("pickup")?.value  || "";
-  const drop     = document.getElementById("drop")?.value    || "";
-  const date     = document.getElementById("shiftDate")?.value || "";
-  const houseEl  = document.getElementById("house");
-  const vehicleEl = document.getElementById("vehicle");
-  const houseText   = houseEl?.options[houseEl?.selectedIndex]?.text    || "";
-  const vehicleText = vehicleEl?.options[vehicleEl?.selectedIndex]?.text || "";
-  const bookingRef  = "WA-" + Date.now().toString(36).toUpperCase();
+  const pickup     = document.getElementById("pickup")?.value  || "";
+  const drop       = document.getElementById("drop")?.value    || "";
+  const date       = document.getElementById("shiftDate")?.value || "";
+  const houseEl    = document.getElementById("house");
+  const vehicleEl  = document.getElementById("vehicle");
+  const houseText  = houseEl?.options[houseEl?.selectedIndex]?.text    || "";
+  const vehicleText= vehicleEl?.options[vehicleEl?.selectedIndex]?.text || "";
+  const bookingRef = "WA-" + Date.now().toString(36).toUpperCase();
   const discountedTotal = Math.max(lastCalculatedTotal - promoDiscount, 0);
   if (window._firebase) {
     try {
@@ -1617,8 +1524,8 @@ async function bookOnWhatsApp() {
         bookingRef, customerUid: currentUser.uid, customerName: name, phone, pickup, drop, date,
         moveType: selectedMoveType, house: houseText, vehicle: vehicleText,
         furniture: getFurnitureSummary(),
-        pickupFloor: document.getElementById("pickupFloor")?.options[document.getElementById("pickupFloor")?.selectedIndex]?.text||"",
-        dropFloor:   document.getElementById("dropFloor")?.options[document.getElementById("dropFloor")?.selectedIndex]?.text||"",
+        pickupFloor:   document.getElementById("pickupFloor")?.options[document.getElementById("pickupFloor")?.selectedIndex]?.text||"",
+        dropFloor:     document.getElementById("dropFloor")?.options[document.getElementById("dropFloor")?.selectedIndex]?.text||"",
         liftAvailable: !!document.getElementById("liftAvailable")?.checked,
         packingService: false, total: discountedTotal, originalTotal: lastCalculatedTotal,
         paid: 0, status: "confirmed", source: "whatsapp", promoDiscount,
@@ -1643,21 +1550,23 @@ function startPayment() {
   if (!document.getElementById("tncAccepted")?.checked) { showToast("⚠️ Please accept the Terms & Conditions."); return; }
   const name  = document.getElementById("custName")?.value?.trim();
   const phone = document.getElementById("custPhone")?.value?.trim();
-  if (!name)  return showToast("⚠️ Please enter your name.");
+  if (!name)                       return showToast("⚠️ Please enter your name.");
   if (!phone || phone.length < 10) return showToast("⚠️ Please enter a valid phone number.");
   if (lastCalculatedTotal === 0)   return showToast("⚠️ Price not calculated yet.");
-  if (!RAZORPAY_KEY) { showToast("⚠️ Payment not configured."); return; }
+  if (!RAZORPAY_KEY)               { showToast("⚠️ Payment not configured."); return; }
   const discounted = Math.max(lastCalculatedTotal - promoDiscount, 0);
   if (selectedPayment === "at_drop") { bookWithoutPayment(); return; }
-  const payAmount = selectedPayment === "full" ? Math.round(discounted * 0.93) : Math.round(discounted * 0.10);
+  const payAmount = selectedPayment === "full"
+    ? Math.round(discounted * 0.93)
+    : Math.round(discounted * 0.10);
   paymentReceiptId = "PKZ-" + Date.now();
   const rzp = new Razorpay({
     key: RAZORPAY_KEY, amount: payAmount * 100, currency: "INR",
     name: "PackZen Packers & Movers",
     description: selectedPayment === "full" ? "Full Payment (7% off)" : `Advance 10%`,
     receipt: paymentReceiptId, prefill: { name, contact: phone }, theme: { color: "#ea580c" },
-    handler: (response) => onPaymentSuccess(response, name, phone, payAmount, discounted),
-    modal: { ondismiss: () => {} }
+    handler:    (response) => onPaymentSuccess(response, name, phone, payAmount, discounted),
+    modal:      { ondismiss: () => {} }
   });
   rzp.open();
   rzp.on("payment.failed", r => showToast("❌ Payment failed: " + r.error.description));
@@ -1672,17 +1581,19 @@ function onPaymentSuccess(response, name, phone, paid, total) {
   const bookingRef = "PKZ-" + Date.now().toString(36).toUpperCase();
   showConfirmationCard({
     bookingRef, name, phone,
-    pickup: pickup?.value||"—", drop: drop?.value||"—", date: shiftDate?.value||"TBD",
-    house: houseEl?.options[houseEl?.selectedIndex]?.text||"—",
+    pickup:  pickup?.value||"—", drop: drop?.value||"—", date: shiftDate?.value||"TBD",
+    house:   houseEl?.options[houseEl?.selectedIndex]?.text||"—",
     vehicle: vehicleEl?.options[vehicleEl?.selectedIndex]?.text||"—",
-    total, paymentLabel: selectedPayment === "full" ? `Paid Full — ₹${paid.toLocaleString("en-IN")}` : `Advance ₹${paid.toLocaleString("en-IN")} paid`,
+    total, paymentLabel: selectedPayment === "full"
+      ? `Paid Full — ₹${paid.toLocaleString("en-IN")}`
+      : `Advance ₹${paid.toLocaleString("en-IN")} paid`,
     paymentNote: `Payment ID: ${response.razorpay_payment_id}`, source: "payment", showInvoice: true
   });
   if (window._firebase) {
     window._firebase.db.collection("bookings").add({
       bookingRef, customerUid: currentUser.uid, customerName: name, phone,
       pickup: pickup?.value||"", drop: drop?.value||"", moveType: selectedMoveType,
-      house: houseEl?.options[houseEl?.selectedIndex]?.text||"",
+      house:   houseEl?.options[houseEl?.selectedIndex]?.text||"",
       vehicle: vehicleEl?.options[vehicleEl?.selectedIndex]?.text||"",
       furniture: getFurnitureSummary(),
       pickupFloor: document.getElementById("pickupFloor")?.options[document.getElementById("pickupFloor")?.selectedIndex]?.text||"",
@@ -1707,9 +1618,9 @@ function onPaymentSuccess(response, name, phone, paid, total) {
 
 function downloadInvoice() {
   if (typeof window.jspdf === "undefined") { showToast("⚠️ PDF library loading..."); return; }
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF();
-  const bookingId = document.getElementById("bookingIdDisplay")?.textContent || "—";
+  const { jsPDF }   = window.jspdf;
+  const doc         = new jsPDF();
+  const bookingId   = document.getElementById("bookingIdDisplay")?.textContent || "—";
   const lines = [
     "Customer : " + (document.getElementById("ccName")?.textContent||"—"),
     "Phone    : " + (document.getElementById("ccPhone")?.textContent||"—"),
@@ -1737,9 +1648,7 @@ function sendWhatsAppAfterPayment() {
   if (pendingWhatsAppMsg) {
     window.open(`https://wa.me/919945095453?text=${encodeURIComponent(pendingWhatsAppMsg)}`, "_blank");
     if (pendingAdminMsg && pendingAdminMsg !== pendingWhatsAppMsg) {
-      setTimeout(() => {
-        window.open(`https://wa.me/919945095453?text=${encodeURIComponent(pendingAdminMsg)}`, "_blank");
-      }, 800);
+      setTimeout(() => { window.open(`https://wa.me/919945095453?text=${encodeURIComponent(pendingAdminMsg)}`, "_blank"); }, 800);
     }
     pendingWhatsAppMsg = null;
     pendingAdminMsg    = null;
@@ -2001,9 +1910,9 @@ function openChatModal() {
   if (currentBookingId && window._firebase) {
     window._firebase.db.collection("bookings").doc(currentBookingId).get().then(doc => {
       if (!doc.exists) return;
-      const b = doc.data();
+      const b  = doc.data();
+      const el = id => document.getElementById(id);
       if (b.driverName) {
-        const el = id => document.getElementById(id);
         if (el("chatDrvName"))   el("chatDrvName").textContent   = b.driverName;
         if (el("chatDrvStatus")) el("chatDrvStatus").textContent = b.driverPhone || "Your Driver";
         if (el("chatDrvAvatar")) el("chatDrvAvatar").textContent = b.driverName.charAt(0).toUpperCase();
@@ -2110,7 +2019,7 @@ function updateChecklistProgress() {
   if (score) score.textContent = `${done} / ${total}`;
 }
 
-function openChecklist() { document.getElementById("userDropdown")?.classList.remove("open"); buildChecklist(); document.getElementById("checklistModal").style.display = "flex"; }
+function openChecklist()  { document.getElementById("userDropdown")?.classList.remove("open"); buildChecklist(); document.getElementById("checklistModal").style.display = "flex"; }
 function closeChecklist() { document.getElementById("checklistModal").style.display = "none"; }
 
 /* ============================================
@@ -2146,7 +2055,7 @@ async function submitReview() {
 async function loadReviewsPublic() {
   waitForFirebase(async () => {
     try {
-      const snap = await window._firebase.db.collection("reviews").where("status","==","approved").orderBy("createdAt","desc").limit(6).get();
+      const snap    = await window._firebase.db.collection("reviews").where("status","==","approved").orderBy("createdAt","desc").limit(6).get();
       if (snap.empty) return;
       const grid    = document.getElementById("reviewsGrid");
       const countEl = document.getElementById("reviewCountLabel");
@@ -2164,31 +2073,38 @@ async function loadReviewsPublic() {
 /* ============================================
    MULTI-STEP FORM
    ============================================ */
-let currentStep = 0;
+let currentStep  = 0;
 function getSteps() { return document.querySelectorAll(".form-step"); }
 const STEP_LABELS = ["What type of move?","Where are you moving?","When & what type of move?","What are you moving?","Almost done — confirm & book"];
 let selectedMoveType = "home";
 
-const MOVE_TYPE_CONFIG = {
+const MOVE_TYPE_CONFIG = window.MOVE_TYPE_CONFIG = {
   home: { sizeLabel:"House Type", icon:"🏠", sizes:[
-    {icon:"🏠",label:"1 RK", sub:"Studio", value:"1750"},{icon:"🏡",label:"1 BHK",sub:"Small",  value:"3950"},
-    {icon:"🏘️",label:"2 BHK",sub:"Medium",value:"5750"},{icon:"🏰",label:"3 BHK",sub:"Large",  value:"7450"},
-    {icon:"🏯",label:"4 BHK",sub:"X-Large",value:"8350"},{icon:"🌇",label:"Villa",sub:"Premium",value:"10800"}
+    {icon:"🏠",label:"1 RK", sub:"Studio",  value:"1750"},
+    {icon:"🏡",label:"1 BHK",sub:"Small",   value:"3950"},
+    {icon:"🏘️",label:"2 BHK",sub:"Medium",  value:"5750"},
+    {icon:"🏰",label:"3 BHK",sub:"Large",   value:"7450"},
+    {icon:"🏯",label:"4 BHK",sub:"X-Large", value:"8350"},
+    {icon:"🌇",label:"Villa", sub:"Premium", value:"10800"}
   ]},
   office: { sizeLabel:"Office Size", icon:"🏢", sizes:[
-    {icon:"💼",label:"Cabin",  sub:"1–5 desks",  value:"5400"},{icon:"🏢",label:"Small", sub:"5–15 desks", value:"8800"},
-    {icon:"🏬",label:"Medium", sub:"15–30 desks",value:"13700"},{icon:"🏭",label:"Large", sub:"30+ desks",  value:"21550"}
+    {icon:"💼",label:"Cabin", sub:"1–5 desks",  value:"5400"},
+    {icon:"🏢",label:"Small", sub:"5–15 desks", value:"8800"},
+    {icon:"🏬",label:"Medium",sub:"15–30 desks",value:"13700"},
+    {icon:"🏭",label:"Large", sub:"30+ desks",  value:"21550"}
   ]},
   single: { sizeLabel:"Item Type", icon:"📦", sizes:[
-    {icon:"🛋️",label:"Furniture",sub:"Sofa, bed…",  value:"0"  },{icon:"🧊",label:"Appliance",sub:"Fridge, AC…",value:"0"},
-    {icon:"🏍️",label:"Bike/Cycle",sub:"Two-wheeler",value:"500"},{icon:"📦",label:"Boxes",     sub:"Cartons",   value:"0"}
+    {icon:"🛋️",label:"Furniture", sub:"Sofa, bed…",  value:"0"},
+    {icon:"🧊",label:"Appliance", sub:"Fridge, AC…", value:"0"},
+    {icon:"🏍️",label:"Bike/Cycle",sub:"Two-wheeler",  value:"500"},
+    {icon:"📦",label:"Boxes",     sub:"Cartons",      value:"0"}
   ]}
 };
 
 function updateStepDots(n) {
   document.querySelectorAll(".step-dot").forEach((dot, i) => {
     dot.classList.remove("active","done");
-    if (i < n)  dot.classList.add("done");
+    if (i < n)   dot.classList.add("done");
     if (i === n) dot.classList.add("active");
   });
   document.querySelectorAll(".step-line").forEach((line, i) => line.classList.toggle("done", i < n));
@@ -2221,7 +2137,7 @@ function autoFillCustomerDetails() {
   window._firebase.db.collection("users").doc(currentUser.uid).get()
     .then(doc => {
       if (!doc.exists) return;
-      const d = doc.data();
+      const d     = doc.data();
       const nameEl  = document.getElementById("custName");
       const phoneEl = document.getElementById("custPhone");
       if (nameEl  && !nameEl.value.trim())  nameEl.value  = d.name  || currentUser.displayName || "";
@@ -2238,7 +2154,7 @@ function nextStep() {
   if (currentStep === 2) {
     if (!document.getElementById("shiftDate")?.value) { showToast("📅 Please select a moving date"); return; }
     if (!document.getElementById("shiftTime")?.value) { showToast("🕐 Please select a time slot"); return; }
-    if (!document.getElementById("house")?.value) { showToast("🏠 Please select your house type"); return; }
+    if (!document.getElementById("house")?.value)     { showToast("🏠 Please select your house type"); return; }
     if (!isIntercityMove && !document.getElementById("vehicle")?.value) { showToast("🚚 Please select a vehicle type"); return; }
   }
   if (currentStep < getSteps().length - 1) { currentStep++; showStep(currentStep); }
@@ -2281,16 +2197,16 @@ function renderSizeCards(type) {
 
 const FURNITURE_CATEGORIES = {
   home: [
-    {id:"cat-living", icon:"🛋️",label:"Living Room",items:[{id:"sofaCheck",emoji:"🛋️",name:"Sofa"},{id:"tvCheck",emoji:"📺",name:"TV"},{id:"tvUnitCheck",emoji:"🗄️",name:"TV Unit"},{id:"coffeeCheck",emoji:"☕",name:"Coffee Table"},{id:"acCheck",emoji:"❄️",name:"AC Unit"}]},
-    {id:"cat-bedroom",icon:"🛏️",label:"Bedroom",    items:[{id:"bedCheck",emoji:"🛏️",name:"Bed"},{id:"wardrobeCheck",emoji:"🚪",name:"Wardrobe"},{id:"dressingCheck",emoji:"🪞",name:"Dressing Table"},{id:"sideTableCheck",emoji:"🪑",name:"Side Table"}]},
-    {id:"cat-kitchen",icon:"🍳",label:"Kitchen",     items:[{id:"fridgeCheck",emoji:"🧊",name:"Fridge"},{id:"wmCheck",emoji:"🫧",name:"Washing Machine"},{id:"microwaveCheck",emoji:"📦",name:"Microwave"},{id:"chimneyCheck",emoji:"🔧",name:"Chimney"},{id:"diningCheck",emoji:"🪑",name:"Dining Table+Chairs"}]},
-    {id:"cat-other",  icon:"📦",label:"Other Items", items:[{id:"bikeCheck",emoji:"🏍️",name:"Bike/Scooter"},{id:"cycleCheck",emoji:"🚲",name:"Cycle"},{id:"plantCheck",emoji:"🪴",name:"Large Plants"},{id:"gymCheck",emoji:"🏋️",name:"Gym Equipment"}]}
+    {id:"cat-living",  icon:"🛋️", label:"Living Room", items:[{id:"sofaCheck",emoji:"🛋️",name:"Sofa"},{id:"tvCheck",emoji:"📺",name:"TV"},{id:"tvUnitCheck",emoji:"🗄️",name:"TV Unit"},{id:"coffeeCheck",emoji:"☕",name:"Coffee Table"},{id:"acCheck",emoji:"❄️",name:"AC Unit"}]},
+    {id:"cat-bedroom", icon:"🛏️", label:"Bedroom",     items:[{id:"bedCheck",emoji:"🛏️",name:"Bed"},{id:"wardrobeCheck",emoji:"🚪",name:"Wardrobe"},{id:"dressingCheck",emoji:"🪞",name:"Dressing Table"},{id:"sideTableCheck",emoji:"🪑",name:"Side Table"}]},
+    {id:"cat-kitchen", icon:"🍳", label:"Kitchen",      items:[{id:"fridgeCheck",emoji:"🧊",name:"Fridge"},{id:"wmCheck",emoji:"🫧",name:"Washing Machine"},{id:"microwaveCheck",emoji:"📦",name:"Microwave"},{id:"chimneyCheck",emoji:"🔧",name:"Chimney"},{id:"diningCheck",emoji:"🪑",name:"Dining Table+Chairs"}]},
+    {id:"cat-other",   icon:"📦", label:"Other Items",  items:[{id:"bikeCheck",emoji:"🏍️",name:"Bike/Scooter"},{id:"cycleCheck",emoji:"🚲",name:"Cycle"},{id:"plantCheck",emoji:"🪴",name:"Large Plants"},{id:"gymCheck",emoji:"🏋️",name:"Gym Equipment"}]}
   ],
   office: [
-    {id:"cat-workstation",icon:"🖥️",label:"Workstation",items:[{id:"deskCheck",emoji:"🖥️",name:"Office Desk"},{id:"chairCheck",emoji:"🪑",name:"Chair"},{id:"serverCheck",emoji:"💾",name:"Server/PC"},{id:"printerCheck",emoji:"🖨️",name:"Printer"}]},
-    {id:"cat-cabin",icon:"🏢",label:"Cabin / Meeting",items:[{id:"confCheck",emoji:"📋",name:"Conference Table"},{id:"cabinetCheck",emoji:"🗄️",name:"Filing Cabinet"},{id:"whiteboardCheck",emoji:"📝",name:"Whiteboard"}]},
-    {id:"cat-appliances",icon:"❄️",label:"Appliances",items:[{id:"fridgeCheck",emoji:"🧊",name:"Fridge"},{id:"acCheck",emoji:"❄️",name:"AC Unit"},{id:"wmCheck",emoji:"🫧",name:"Washing Machine"}]},
-    {id:"cat-other",icon:"📦",label:"Other Items",items:[{id:"plantCheck",emoji:"🪴",name:"Large Plants"},{id:"gymCheck",emoji:"🏋️",name:"Gym Equipment"}]}
+    {id:"cat-workstation",icon:"🖥️",label:"Workstation",    items:[{id:"deskCheck",emoji:"🖥️",name:"Office Desk"},{id:"chairCheck",emoji:"🪑",name:"Chair"},{id:"serverCheck",emoji:"💾",name:"Server/PC"},{id:"printerCheck",emoji:"🖨️",name:"Printer"}]},
+    {id:"cat-cabin",      icon:"🏢",label:"Cabin / Meeting",items:[{id:"confCheck",emoji:"📋",name:"Conference Table"},{id:"cabinetCheck",emoji:"🗄️",name:"Filing Cabinet"},{id:"whiteboardCheck",emoji:"📝",name:"Whiteboard"}]},
+    {id:"cat-appliances", icon:"❄️",label:"Appliances",      items:[{id:"fridgeCheck",emoji:"🧊",name:"Fridge"},{id:"acCheck",emoji:"❄️",name:"AC Unit"},{id:"wmCheck",emoji:"🫧",name:"Washing Machine"}]},
+    {id:"cat-other",      icon:"📦",label:"Other Items",     items:[{id:"plantCheck",emoji:"🪴",name:"Large Plants"},{id:"gymCheck",emoji:"🏋️",name:"Gym Equipment"}]}
   ]
 };
 
@@ -2391,7 +2307,7 @@ function getFurnitureSummary() {
     ["chairCheck","Chair"],["cabinetCheck","Filing Cabinet"],["serverCheck","Server/PC"],
     ["printerCheck","Printer"],["confCheck","Conf. Table"],["whiteboardCheck","Whiteboard"]
   ];
-  const items    = checks.filter(([id]) => document.getElementById(id)?.checked).map(([,name]) => name);
+  const items     = checks.filter(([id]) => document.getElementById(id)?.checked).map(([,name]) => name);
   const cartonQty = parseInt(document.getElementById("cartonQty")?.value || 0);
   if (cartonQty > 0) items.push(`Carton Boxes x${cartonQty}`);
   return items.join(", ") || "";
@@ -2407,7 +2323,7 @@ async function createDriver() {
   const password = document.getElementById("newDriverPassword").value.trim();
   const msg      = document.getElementById("adminMsg");
   const setMsg   = (text, ok) => { msg.style.color = ok ? "#16a34a" : "#dc2626"; msg.textContent = text; };
-  if (!name)             return setMsg("⚠️ Please enter driver name.", false);
+  if (!name) return setMsg("⚠️ Please enter driver name.", false);
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return setMsg("⚠️ Invalid email.", false);
   if (password.length < 6) return setMsg("⚠️ Password must be at least 6 characters.", false);
   const adminSnap = await window._firebase.db.collection("users").doc(currentUser.uid).get();
@@ -2434,12 +2350,7 @@ async function createDriver() {
    ============================================ */
 function bookWithoutPayment() {
   if (!currentUser) { showToast("👋 Please login to book."); openAuthModal("login"); return; }
-
-  if (!document.getElementById("tncAccepted")?.checked) {
-    showToast("⚠️ Please accept the Terms & Conditions to continue.");
-    return;
-  }
-
+  if (!document.getElementById("tncAccepted")?.checked) { showToast("⚠️ Please accept the Terms & Conditions to continue."); return; }
   const nameEl  = document.getElementById("custName");
   const phoneEl = document.getElementById("custPhone");
   const name    = nameEl?.value?.trim();
@@ -2447,10 +2358,10 @@ function bookWithoutPayment() {
   if (!name)  { nameEl.style.borderColor = "#e53e3e"; nameEl.focus(); return; }
   if (!phone || phone.length < 10) { phoneEl.style.borderColor = "#e53e3e"; phoneEl.focus(); return; }
   if (lastCalculatedTotal === 0) { showToast("⚠️ Price not calculated yet."); return; }
-  if (!window._firebase) { showToast("⚠️ Service not ready. Try again."); return; }
-  const pickup = document.getElementById("pickup")?.value || "";
-  const drop   = document.getElementById("drop")?.value   || "";
-  const date   = document.getElementById("shiftDate")?.value || "";
+  if (!window._firebase)         { showToast("⚠️ Service not ready. Try again."); return; }
+  const pickup    = document.getElementById("pickup")?.value  || "";
+  const drop      = document.getElementById("drop")?.value    || "";
+  const date      = document.getElementById("shiftDate")?.value || "";
   const bookingRef = "PKZ-" + Date.now().toString(36).toUpperCase().slice(-6);
   const btn = document.querySelector(".btn-pay");
   if (btn) { btn.disabled = true; btn.textContent = "⏳ Saving..."; }
@@ -2495,7 +2406,11 @@ function copyBookingId() {
   const id = document.getElementById("bookingIdDisplay")?.textContent;
   if (!id || id === "—") return;
   navigator.clipboard.writeText(id).then(() => showToast("✅ Booking ID copied!"))
-    .catch(() => { const el = document.createElement("textarea"); el.value = id; document.body.appendChild(el); el.select(); document.execCommand("copy"); document.body.removeChild(el); showToast("✅ Booking ID copied!"); });
+    .catch(() => {
+      const el = document.createElement("textarea"); el.value = id;
+      document.body.appendChild(el); el.select(); document.execCommand("copy");
+      document.body.removeChild(el); showToast("✅ Booking ID copied!");
+    });
 }
 
 /* ============================================
@@ -2568,11 +2483,11 @@ function loadProfileData() {
   window._firebase.db.collection("users").doc(currentUser.uid).get().then(doc => {
     if (!doc.exists) return;
     const d = doc.data();
-    if (document.getElementById("profileName"))      document.getElementById("profileName").value  = d.name  || "";
-    if (document.getElementById("profileEmail"))     document.getElementById("profileEmail").value = d.email || currentUser.email || "";
-    if (document.getElementById("profilePhone"))     document.getElementById("profilePhone").value = d.phone || "";
-    if (document.getElementById("prefEmail"))        document.getElementById("prefEmail").checked  = d.prefEmail !== false;
-    if (document.getElementById("prefSMS"))          document.getElementById("prefSMS").checked    = d.prefSMS   !== false;
+    if (document.getElementById("profileName"))  document.getElementById("profileName").value  = d.name  || "";
+    if (document.getElementById("profileEmail")) document.getElementById("profileEmail").value = d.email || currentUser.email || "";
+    if (document.getElementById("profilePhone")) document.getElementById("profilePhone").value = d.phone || "";
+    if (document.getElementById("prefEmail"))    document.getElementById("prefEmail").checked  = d.prefEmail !== false;
+    if (document.getElementById("prefSMS"))      document.getElementById("prefSMS").checked    = d.prefSMS   !== false;
   }).catch(() => {});
 }
 
@@ -2605,36 +2520,6 @@ function openProfile() {
 }
 
 /* ============================================
-   INTERCITY
-   ============================================ */
-let isIntercityMove = false;
-const INTERCITY_PRICING = {
-  "1750": {"400":9000,"600":10800,"1000":17100,"2000":24000},
-  "3950": {"400":9000,"600":10800,"1000":17100,"2000":24000},
-  "5750": {"400":11000,"600":13200,"1000":20900,"2000":28000},
-  "7450": {"400":13000,"600":15600,"1000":24700,"2000":33000},
-  "8350": {"400":15500,"600":18600,"1000":29450,"2000":38000},
-  "10800":{"400":18000,"600":21600,"1000":34000,"2000":45000},
-  "5400": {"400":10000,"600":12000,"1000":19000,"2000":26000},
-  "8800": {"400":15000,"600":18000,"1000":28000,"2000":38000},
-  "13700":{"400":22000,"600":26000,"1000":40000,"2000":55000},
-  "21550":{"400":35000,"600":42000,"1000":65000,"2000":90000}
-};
-function getIntercityBase(houseVal, km) {
-  const tiers = INTERCITY_PRICING[String(houseVal)];
-  if (!tiers) return 15000;
-  return km <= 400 ? tiers["400"] : km <= 600 ? tiers["600"] : km <= 1000 ? tiers["1000"] : tiers["2000"];
-}
-let km = 0;
-function detectAndShowIntercityBadge(km) {
-  const badge = document.getElementById("intercityBadge");
-  isIntercityMove = km > 100;
-  if (badge) { badge.style.display = isIntercityMove ? "flex" : "none"; if (isIntercityMove) badge.querySelector(".ic-km").textContent = Math.round(km) + " km"; }
-  const vg = document.getElementById("vehicleCardGroup");
-  if (vg) vg.style.display = isIntercityMove ? "none" : "block";
-}
-
-/* ============================================
    CANCEL / RESCHEDULE / RATE / DAMAGE
    ============================================ */
 function openCancelModal(bookingDocId, bookingRef, status) {
@@ -2656,16 +2541,11 @@ async function confirmCancellation() {
   try {
     await window._firebase.db.collection("bookings").doc(docId).update({ status:"cancelled", cancelReason:reason, cancelledAt:firebase.firestore.FieldValue.serverTimestamp(), cancelledBy:"customer" });
     await window._firebase.db.collection("cancelRequests").add({ bookingDocId:docId, reason, customerUid:currentUser.uid, createdAt:firebase.firestore.FieldValue.serverTimestamp(), resolved:false }).catch(() => {});
-
     const cancelledDoc = await window._firebase.db.collection("bookings").doc(docId).get();
     if (cancelledDoc.exists) {
       const cb = cancelledDoc.data();
-      queueSMS(cb.phone || "", "cancelled", {
-        name:       cb.customerName || "",
-        bookingRef: cb.bookingRef   || docId
-      });
+      queueSMS(cb.phone || "", "cancelled", { name: cb.customerName || "", bookingRef: cb.bookingRef || docId });
     }
-
     closeCancelModal(); showToast("✅ Booking cancelled. Refund (if any) in 5–7 business days."); loadUserBookings();
     if (currentBookingId === docId) { dismissTrackBanner(); localStorage.removeItem("packzen_active_booking"); }
   } catch(e) { showToast("❌ Error: " + e.message); }
@@ -2676,7 +2556,11 @@ function openRescheduleModal(bookingDocId, bookingRef, currentDate) {
   document.getElementById("rescheduleDocId").value = bookingDocId;
   document.getElementById("rescheduleBookingRef").textContent = bookingRef || bookingDocId;
   const dateInput = document.getElementById("rescheduleDate");
-  if (dateInput) { dateInput.value = currentDate || ""; const tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate()+1); dateInput.min = tomorrow.toISOString().split("T")[0]; }
+  if (dateInput) {
+    dateInput.value = currentDate || "";
+    const tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate()+1);
+    dateInput.min = tomorrow.toISOString().split("T")[0];
+  }
   const timeInput = document.getElementById("rescheduleTime");
   if (timeInput) timeInput.value = "";
   document.getElementById("rescheduleModal").style.display = "flex";
@@ -2695,17 +2579,11 @@ async function confirmReschedule() {
   if (btn) { btn.textContent = "Saving..."; btn.disabled = true; }
   try {
     await window._firebase.db.collection("bookings").doc(docId).update({ date:newDate, time:newTime||"", rescheduledAt:firebase.firestore.FieldValue.serverTimestamp(), rescheduledBy:"customer", status:"confirmed" });
-
     const bookingDoc = await window._firebase.db.collection("bookings").doc(docId).get();
     if (bookingDoc.exists) {
       const b = bookingDoc.data();
-      queueSMS(b.phone || "", "reschedule_confirmed", {
-        name:       b.customerName || "",
-        bookingRef: b.bookingRef   || docId,
-        date:       newDate
-      });
+      queueSMS(b.phone || "", "reschedule_confirmed", { name: b.customerName || "", bookingRef: b.bookingRef || docId, date: newDate });
     }
-
     closeRescheduleModal(); showToast("✅ Booking rescheduled!"); loadUserBookings();
   } catch(e) { showToast("❌ Error: " + e.message); }
   finally { if (btn) { btn.textContent = "Confirm Reschedule"; btn.disabled = false; } }
@@ -2737,8 +2615,8 @@ async function submitDriverRating() {
     if (driverUid) {
       await window._firebase.db.collection("driverRatings").add({ driverUid, bookingDocId:ratingBookingDocId, rating:selectedDriverRating, feedback, customerUid:currentUser.uid, createdAt:firebase.firestore.FieldValue.serverTimestamp() });
       const ratingsSnap = await window._firebase.db.collection("driverRatings").where("driverUid","==",driverUid).get();
-      const ratings = ratingsSnap.docs.map(d => d.data().rating);
-      const avg = ratings.reduce((a,b) => a+b,0) / ratings.length;
+      const ratings     = ratingsSnap.docs.map(d => d.data().rating);
+      const avg         = ratings.reduce((a,b) => a+b,0) / ratings.length;
       await window._firebase.db.collection("drivers").doc(driverUid).update({ avgRating:Math.round(avg*10)/10, totalRatings:ratings.length }).catch(()=>{});
     }
     closeRateDriverModal(); showToast("⭐ Thanks for rating your driver!"); loadUserBookings();
@@ -2757,7 +2635,13 @@ async function requestPushPermission() {
 
 function subscribeToBookingNotifications(bookingDocId) {
   if (!bookingDocId || !window._firebase) return;
-  const msgs = { assigned:{title:"🚛 Driver Assigned!",body:"Your driver is on the way."}, packing:{title:"📦 Packing Started",body:"Our team is packing your items."}, transit:{title:"🚚 On The Move!",body:"Your goods are in transit."}, delivered:{title:"🎉 Delivered!",body:"Your move is complete."}, cancelled:{title:"❌ Booking Cancelled",body:"Your booking has been cancelled."} };
+  const msgs = {
+    assigned:  {title:"🚛 Driver Assigned!", body:"Your driver is on the way."},
+    packing:   {title:"📦 Packing Started",  body:"Our team is packing your items."},
+    transit:   {title:"🚚 On The Move!",     body:"Your goods are in transit."},
+    delivered: {title:"🎉 Delivered!",       body:"Your move is complete."},
+    cancelled: {title:"❌ Booking Cancelled",body:"Your booking has been cancelled."}
+  };
   let lastStatus = "";
   window._firebase.db.collection("bookings").doc(bookingDocId).onSnapshot(doc => {
     if (!doc.exists) return;
@@ -2782,11 +2666,13 @@ const SMS_TEMPLATES = {
 
 async function queueSMS(phone, templateKey, data) {
   if (!phone || !window._firebase) return;
-  const mobile = "91" + String(phone).replace(/\D/g,"").slice(-10);
+  const mobile   = "91" + String(phone).replace(/\D/g,"").slice(-10);
   if (mobile.length !== 12) return;
   const template = SMS_TEMPLATES[templateKey];
   if (!template) return;
-  try { await window._firebase.db.collection("smsQueue").add({ mobile, message:template(data), template:templateKey, status:"pending", createdAt:firebase.firestore.FieldValue.serverTimestamp(), retries:0 }); } catch(e) {}
+  try {
+    await window._firebase.db.collection("smsQueue").add({ mobile, message:template(data), template:templateKey, status:"pending", createdAt:firebase.firestore.FieldValue.serverTimestamp(), retries:0 });
+  } catch(e) {}
 }
 
 function setupStatusSMS(bookingDocId, customerPhone, customerName, bookingRef) {
@@ -2819,7 +2705,13 @@ function previewDamagePhotos(input) {
   preview.innerHTML = ""; damagePhotos = [];
   Array.from(input.files).slice(0,5).forEach(file => {
     const reader = new FileReader();
-    reader.onload = e => { damagePhotos.push(e.target.result); const img = document.createElement("img"); img.src = e.target.result; img.style.cssText = "width:70px;height:70px;object-fit:cover;border-radius:8px;border:2px solid var(--border-light)"; preview.appendChild(img); };
+    reader.onload = e => {
+      damagePhotos.push(e.target.result);
+      const img = document.createElement("img");
+      img.src = e.target.result;
+      img.style.cssText = "width:70px;height:70px;object-fit:cover;border-radius:8px;border:2px solid var(--border-light)";
+      preview.appendChild(img);
+    };
     reader.readAsDataURL(file);
   });
 }
@@ -2838,21 +2730,25 @@ async function submitDamageClaim() {
     const b = (await window._firebase.db.collection("bookings").doc(damageBookingDocId).get()).data();
     queueSMS(b?.phone||"", "damage_claim", { name:b?.customerName||"Customer", bookingRef:b?.bookingRef||damageBookingDocId, claimId:claimRef.id.slice(0,8).toUpperCase() });
     closeDamageModal(); showToast("✅ Claim submitted!"); loadUserBookings();
-  } catch(e) { const msgEl = document.getElementById("damageMsg"); if (msgEl) { msgEl.textContent = "Error: " + e.message; msgEl.style.color = "#dc2626"; } }
+  } catch(e) {
+    const msgEl = document.getElementById("damageMsg");
+    if (msgEl) { msgEl.textContent = "Error: " + e.message; msgEl.style.color = "#dc2626"; }
+  }
   finally { if (btn) { btn.textContent = "Submit Claim"; btn.disabled = false; } }
 }
 
 function toggleFaq(btn) {
-  const item = btn.closest(".faq-item");
+  const item   = btn.closest(".faq-item");
   const isOpen = item.classList.contains("open");
   document.querySelectorAll(".faq-item.open").forEach(i => i.classList.remove("open"));
   if (!isOpen) item.classList.add("open");
 }
+
 // ─── OTP Timer for Password Reset ───────────
 function _startOtpTimer() {
   clearInterval(otpTimerInterval);
-  let seconds = 60;
-  const timerEl  = document.getElementById("resetOtpTimer");
+  let seconds     = 60;
+  const timerEl   = document.getElementById("resetOtpTimer");
   const resendBtn = document.getElementById("btnResendResetOtp");
   if (resendBtn) resendBtn.disabled = true;
   if (timerEl)   timerEl.textContent = "Resend in 60s";
@@ -2887,22 +2783,14 @@ function signOutUser() {
 
 // ─── Finalise Reset ──────────────────────────
 async function _finaliseReset(auth, btn) {
-  // Clean up all reset state
   window._resetVerifiedEmail              = null;
   window._resetPhoneUser                  = null;
   window._resetConfirmationVerificationId = null;
   window._resetOtpCode                    = null;
   resetFlowPhone                          = "";
   confirmationResult                      = null;
-
-  if (btn) {
-    btn.disabled    = false;
-    btn.textContent = "Set New Password →";
-  }
-
-  // Sign out after short delay so password saves first
+  if (btn) { btn.disabled = false; btn.textContent = "Set New Password →"; }
   setTimeout(() => { auth.signOut().catch(() => {}); }, 800);
-
   showToast("✅ Password updated! Please login with your new password.");
   closeAuthModal();
   setTimeout(() => openAuthModal("login"), 500);
