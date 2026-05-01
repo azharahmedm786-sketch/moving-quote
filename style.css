@@ -18,16 +18,11 @@
   --navy-mid:         #0f2554;
 
   /* ── Orange Fire CTA ── */
-  --gold:             #c2410c;
-  --gold-light:       #ea580c;
-  --gold-bright:      #f97316;
-  --gold-gradient:    linear-gradient(135deg, #b91c0c 0%, #ea580c 55%, #f97316 100%);
-  --gold-glow:        0 8px 32px rgba(234,88,12,0.40);
-
-  /* ── CTA ── */
-  --cta:              #ea580c;
-  --cta-dark:         #c2410c;
-  --cta-gradient:     linear-gradient(135deg, #c2410c, #ea580c);
+ --accent: #16A34A;
+--accent-hover: #15803D;
+--accent-light: #DCFCE7;
+--accent-gradient: linear-gradient(135deg, #16A34A, #22C55E);
+   
 
   /* ── Success ── */
   --success:          #059669;
@@ -196,11 +191,11 @@ span.ripple, .ripple {
   position: fixed; top: 0; left: 0; right: 0;
   background: var(--navy-deep);
   z-index: 1000;
-  border-bottom: 3px solid var(--gold-bright);
+   border-bottom: 2px solid rgba(22,163,74,0.3);
   width: 100%;
   box-shadow: 0 4px 32px rgba(12,27,58,0.55);
 }
-body.dark-mode .navbar { background: #06101f; }
+body.dark-mode.navbar { background: #06101f; }
 
 .nav-inner {
   max-width: 1200px;
@@ -403,15 +398,13 @@ body.dark-mode .navbar { background: #06101f; }
   gap: 1rem; margin-bottom: 2.5rem; align-items: center;
 }
 .btn-primary {
-  background: var(--gold-gradient); color: white;
-  padding: 0.9rem 2.2rem; border-radius: var(--radius-pill);
-  text-decoration: none; font-weight: 800; font-size: 0.95rem;
-  display: inline-flex; align-items: center; justify-content: center;
-  gap: 0.4rem; transition: transform 0.3s, box-shadow 0.3s;
-  border: none; cursor: pointer; box-shadow: var(--gold-glow);
-  white-space: nowrap; width: auto; flex: 0 0 auto; line-height: 1.4;
-  text-transform: uppercase; letter-spacing: 0.5px;
-  overflow: hidden; position: relative; max-width: fit-content;
+  background: var(--accent-gradient);
+  box-shadow: 0 8px 24px rgba(22,163,74,0.35);
+  border-radius: 12px;
+  text-transform: none; /* remove all caps */
+  letter-spacing: 0;
+}
+overflow: hidden; position: relative; max-width: fit-content;
 }
 .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 16px 40px rgba(234,88,12,0.50); }
 .btn-ghost {
