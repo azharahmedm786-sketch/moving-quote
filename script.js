@@ -67,22 +67,32 @@ async function saveBooking(data) {
 }
 
 // ================= NOTIFY OWNER =================
-
 function notifyOwner(bookingRef, name, phone, pickup, drop, date, total, payType, source) {
+
+  // ✅ Send email
   sendEmailNotification(bookingRef, name, phone, pickup, drop, date, total);
+
+  // ✅ Prepare WhatsApp message (DO NOT open)
   const emoji  = source === "online" ? "💳" : source === "whatsapp" ? "📲" : "📋";
   const payLbl = source === "online" ? "Paid Online ✅" : source === "whatsapp" ? "WhatsApp booking" : "Pay on delivery";
+
   const msg =
-    `${emoji} *New Booking Alert — PackZen* 🚚\n` +
-    `━━━━━━━━━━━━━━━━━━━━\n` +
-    `📌 *ID:* ${bookingRef}\n👤 *Customer:* ${name}\n📞 *Phone:* +91 ${phone}\n` +
-    `📍 *Pickup:* ${pickup}\n🏁 *Drop:* ${drop}\n📅 *Date:* ${date || "To be confirmed"}\n` +
-    `💰 *Amount:* ₹${Number(total).toLocaleString("en-IN")}\n💳 *Payment:* ${payLbl}\n` +
-    `━━━━━━━━━━━━━━━━━━━━\nReply CONFIRM or call customer now.`;
-  setTimeout(() => {
+    `${emoji} New Booking Alert — PackZen 🚚\n` +
+    `ID: ${bookingRef}\n` +
+    `Customer: ${name}\n` +
+    `Phone: +91 ${phone}\n` +
+    `Pickup: ${pickup}\n` +
+    `Drop: ${drop}\n` +
+    `Date: ${date || "To be confirmed"}\n` +
+    `Amount: ₹${Number(total).toLocaleString("en-IN")}\n` +
+    `Payment: ${payLbl}`;
+
+  // ❌ No WhatsApp opening
+  console.log("📲 WhatsApp message (not opened):", msg);
+
+  // ✅ Only show success
   alert("✅ Booking confirmed! We will contact you shortly.");
 }
-
 const RAZORPAY_KEY = (window.ENV && window.ENV.RAZORPAY_KEY) || "";
 
 /* ============================================
