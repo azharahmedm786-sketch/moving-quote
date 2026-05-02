@@ -80,8 +80,7 @@ function notifyOwner(bookingRef, name, phone, pickup, drop, date, total, payType
     `💰 *Amount:* ₹${Number(total).toLocaleString("en-IN")}\n💳 *Payment:* ${payLbl}\n` +
     `━━━━━━━━━━━━━━━━━━━━\nReply CONFIRM or call customer now.`;
   setTimeout(() => {
-    window.open(`https://wa.me/${OWNER_WHATSAPP}?text=${encodeURIComponent(msg)}`, "_blank", "noopener,noreferrer");
-  }, 1500);
+  alert("✅ Booking confirmed! We will contact you shortly.");
 }
 
 const RAZORPAY_KEY = (window.ENV && window.ENV.RAZORPAY_KEY) || "";
