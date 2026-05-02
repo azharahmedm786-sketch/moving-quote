@@ -20,8 +20,6 @@ let trackingMap          = null;
 let trackingDriverMarker = null;
 let currentBookingId     = null;
 let uploadedPhotos       = [];
-let pendingWhatsAppMsg   = null;
-let pendingAdminMsg      = null;
 
 // ─── Reset flow state ────────────────────────
 let resetFlowPhone     = "";
@@ -201,11 +199,10 @@ function buildBsHouseOptions() {
   const title = document.querySelector("#bsHouse .bs-title");
   if (title) title.textContent = "🏠 " + config.sizeLabel;
   const selected = document.getElementById("house")?.value;
-  body.innerHTML = '<div class="bs-house-grid">' +
+body.innerHTML = '<div class="bs-house-grid">' +
     config.sizes.map(s => `
-      <div class="bs-house-card ${s.value === selected ? "selected" : ""}"
-onclick="pickHouseType(event,'${s.value}','${s.icon} ${s.label}','${s.label}')"
-<div class="bs-house-icon">${s.icon}</div>
+      <div class="bs-house-card ${s.value === selected ? "selected" : ""}" onclick="pickHouseType(event,'${s.value}','${s.icon} ${s.label}','${s.label}')">
+        <div class="bs-house-icon">${s.icon}</div>
         <div class="bs-house-label">${s.label}</div>
         <div class="bs-house-sub">${s.sub || ""}</div>
       </div>`).join("") + "</div>";
@@ -1431,14 +1428,6 @@ if (!houseBase && !vehicleRate && hasItems) {
   return;
 }
 
-  // ── SINGLE ITEM without house/vehicle selected ──
-  if (!houseBase && !vehicleRate && hasItems) {
-    const total = 499 + furnitureCost;
-    lastCalculatedTotal = total;
-    updatePriceDisplay();
-    if (result) result.innerHTML = `🪑 Single Item Move<br>Base: ₹499 + Items: ₹${furnitureCost}<br><strong>Total: ₹${total}</strong>`;
-    return;
-  }
 
   // ── NEEDS DISTANCE — call Distance Matrix, do pricing inside callback ──
   function applyPrice(km) {
@@ -1582,8 +1571,6 @@ async function bookOnWhatsApp() {
       queueSMS(phone, "booking_confirmed", { name, bookingRef, date, pickup, total: discountedTotal });
       notifyOwner(bookingRef, name, phone, pickup, drop, date, discountedTotal, "pay_later", "whatsapp");
       showConfirmationCard({ bookingRef, name, phone, pickup, drop, date, house: houseText||"—", vehicle: vehicleText||"—", total: discountedTotal, paymentLabel: "Cash on moving day", paymentNote: "Our team will confirm your slot shortly", source: "whatsapp", showInvoice: false });
-      pendingWhatsAppMsg = `✅ *New Booking — PackZen*\n━━━━━━━━━━━━━━━━━━━━\n🔖 *Booking ID:* ${bookingRef}\n👤 *Name:* ${name}\n📞 *Phone:* ${phone}\n📍 *Pickup:* ${pickup}\n🏁 *Drop:* ${drop}\n📅 *Date:* ${date||"TBD"}\n🏠 *House:* ${houseText||"—"}\n🚚 *Vehicle:* ${vehicleText||"—"}\n💰 *Estimate:* ₹${discountedTotal.toLocaleString("en-IN")}\n━━━━━━━━━━━━━━━━━━━━\nPayment: Cash on moving day`;
-      pendingAdminMsg = pendingWhatsAppMsg;
     } catch(e) { showToast("❌ Booking save failed: " + e.message); }
   }
 }
@@ -1690,12 +1677,6 @@ function downloadInvoice() {
   doc.save("PackZen-Invoice-" + bookingId + ".pdf");
 }
 
-
-  const name  = document.getElementById("custName")?.value?.trim() || "—";
-  const phone = document.getElementById("custPhone")?.value?.trim() || "";
-  const id    = document.getElementById("bookingIdDisplay")?.textContent || "—";
-  const msg   = `✅ *Booking Confirmed — PackZen* 🚚\n\n📌 *ID:* ${id}\n👤 *Name:* ${name}\n💰 *Total:* ₹${lastCalculatedTotal.toLocaleString("en-IN")}\n\n— PackZen | 📞 9945095453`;
-}
 
 /* ============================================
    CONFIRMATION CARD
@@ -2443,7 +2424,6 @@ function bookWithoutPayment() {
       total: discountedTotal, paymentLabel: "Cash on moving day",
       paymentNote: "Pay full amount to driver on moving day", source: "direct", showInvoice: false
     });
-    pendingWhatsAppMsg = `✅ *Booking Confirmed — PackZen* 🚚\n\n📌 *Booking ID:* ${bookingRef}\n👤 *Name:* ${name}\n📍 *Pickup:* ${pickup}\n🏁 *Drop:* ${drop}\n📅 *Date:* ${date||"TBD"}\n💰 *Estimate:* ₹${discountedTotal.toLocaleString("en-IN")}\n💳 *Payment:* Pay on moving day\n\nOur team will call you shortly.\n— PackZen | 📞 9945095453`;
     showToast("✅ Booking saved! ID: " + bookingRef);
   }).catch(e => {
     if (btn) { btn.disabled = false; btn.textContent = "📋 Confirm Booking · Pay on Delivery"; }
@@ -2843,4 +2823,9 @@ async function _finaliseReset(auth, btn) {
   showToast("✅ Password updated! Please login with your new password.");
   closeAuthModal();
   setTimeout(() => openAuthModal("login"), 500);
+}
+// ─── Confirmation button (no WhatsApp opened) ────
+function sendWhatsAppAfterPayment() {
+  showToast("✅ Booking confirmed! Our team will contact you shortly.");
+  closeModal();
 }
