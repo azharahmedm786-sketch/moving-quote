@@ -211,7 +211,7 @@ function buildBsHouseOptions() {
       </div>`).join("") + "</div>";
 }
 
-function pickHouseType(value, label, shortLabel) {
+function pickHouseType(event, value, label, shortLabel) {
   const sel = document.getElementById("house");
   if (sel) sel.value = value;
   document.querySelectorAll(".bs-house-card").forEach(c => c.classList.remove("selected"));
@@ -1400,25 +1400,6 @@ function calculateQuote(auto = false) {
   const result  = document.getElementById("result");
 
 if (!pickup?.value || !drop?.value) {
-
-  // ✅ Allow single item without location
-  if (hasItems && !houseBase && !vehicleRate) {
-    const total = 499 + furnitureCost;
-
-    lastCalculatedTotal = total;
-    updatePriceDisplay();
-
-    if (result) {
-      result.innerHTML = `
-        🪑 Single Item Move<br>
-        Base: ₹499 + Items: ₹${furnitureCost}<br>
-        <strong>Total: ₹${total}</strong>
-      `;
-    }
-
-    return;
-  }
-
   if (!auto) showToast("📍 Please enter pickup & drop locations.");
   return;
 }
@@ -1432,6 +1413,23 @@ if (!pickup?.value || !drop?.value) {
   const hasItems      = itemCount > 0 || cartonQty > 0;
   const houseBase     = Number(house?.value   || 0);
   const vehicleRate   = Number(vehicle?.value || 0);
+   // ✅ SINGLE ITEM LOGIC (correct place)
+if (!houseBase && !vehicleRate && hasItems) {
+  const total = 499 + furnitureCost;
+
+  lastCalculatedTotal = total;
+  updatePriceDisplay();
+
+  if (result) {
+    result.innerHTML = `
+      🪑 Single Item Move<br>
+      Base: ₹499 + Items: ₹${furnitureCost}<br>
+      <strong>Total: ₹${total}</strong>
+    `;
+  }
+
+  return;
+}
 
   // ── SINGLE ITEM without house/vehicle selected ──
   if (!houseBase && !vehicleRate && hasItems) {
