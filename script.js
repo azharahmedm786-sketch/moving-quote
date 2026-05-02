@@ -46,8 +46,28 @@ function sendEmailNotification(bookingRef, name, phone, pickup, drop, date, tota
   .then(() => { console.log("✅ Email sent"); })
   .catch((err) => { console.error("❌ Email failed:", err); });
 }
+// ================= SAVE BOOKING =================
+async function saveBooking(data) {
+  const db = window._firebase.db;
+
+  try {
+    const docRef = await db.collection("bookings").add({
+      ...data,
+      status: "pending",
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+
+    console.log("✅ Booking saved:", docRef.id);
+    return docRef.id;
+
+  } catch (err) {
+    console.error("❌ Error saving booking:", err);
+    alert("Booking failed. Try again.");
+  }
+}
 
 // ================= NOTIFY OWNER =================
+
 function notifyOwner(bookingRef, name, phone, pickup, drop, date, total, payType, source) {
   sendEmailNotification(bookingRef, name, phone, pickup, drop, date, total);
   const emoji  = source === "online" ? "💳" : source === "whatsapp" ? "📲" : "📋";
