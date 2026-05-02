@@ -1697,7 +1697,6 @@ function downloadInvoice() {
   const phone = document.getElementById("custPhone")?.value?.trim() || "";
   const id    = document.getElementById("bookingIdDisplay")?.textContent || "—";
   const msg   = `✅ *Booking Confirmed — PackZen* 🚚\n\n📌 *ID:* ${id}\n👤 *Name:* ${name}\n💰 *Total:* ₹${lastCalculatedTotal.toLocaleString("en-IN")}\n\n— PackZen | 📞 9945095453`;
-  window.open(`https://wa.me/91${phone}?text=${encodeURIComponent(msg)}`, "_blank");
 }
 
 /* ============================================
