@@ -204,8 +204,8 @@ function buildBsHouseOptions() {
   body.innerHTML = '<div class="bs-house-grid">' +
     config.sizes.map(s => `
       <div class="bs-house-card ${s.value === selected ? "selected" : ""}"
-           onclick="pickHouseType('${s.value}','${s.icon} ${s.label}','${s.label}')">
-        <div class="bs-house-icon">${s.icon}</div>
+onclick="pickHouseType(event,'${s.value}','${s.icon} ${s.label}','${s.label}')"
+<div class="bs-house-icon">${s.icon}</div>
         <div class="bs-house-label">${s.label}</div>
         <div class="bs-house-sub">${s.sub || ""}</div>
       </div>`).join("") + "</div>";
@@ -2203,17 +2203,30 @@ function shakeField(el) {
   el.classList.add("error");
   setTimeout(() => el.classList.remove("error"), 600);
 }
-
 function selectMoveType(el, type) {
-  selectedMoveType = type;
-  document.getElementById("moveType").value = type;
-  document.querySelectorAll(".move-type-card, .bs-move-card").forEach(c => c.classList.remove("selected"));
-  el.classList.add("selected");
-  renderSizeCards(type);
-  const houseEl = document.getElementById("house");
-  if (houseEl) houseEl.value = "";
-}
+  window.selectedMoveType = type;
 
+  // Highlight selected card
+  document.querySelectorAll(".move-type-card").forEach(card => {
+    card.classList.remove("selected");
+  });
+
+  if (el) el.classList.add("selected");
+
+  // Save value
+  const input = document.getElementById("moveType");
+  if (input) input.value = type;
+
+  // Build house options safely
+  if (typeof buildBsHouseOptions === "function") {
+    buildBsHouseOptions();
+  }
+
+  // Recalculate safely
+  if (typeof calculateQuote === "function") {
+    calculateQuote(true);
+  }
+}
 function renderSizeCards(type) {
   const config = MOVE_TYPE_CONFIG[type] || MOVE_TYPE_CONFIG.home;
   const label  = document.getElementById("sizeLabelText");
