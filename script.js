@@ -1692,16 +1692,7 @@ function downloadInvoice() {
   doc.save("PackZen-Invoice-" + bookingId + ".pdf");
 }
 
-function sendWhatsAppAfterPayment() {
-  if (pendingWhatsAppMsg) {
-    window.open(`https://wa.me/919945095453?text=${encodeURIComponent(pendingWhatsAppMsg)}`, "_blank");
-    if (pendingAdminMsg && pendingAdminMsg !== pendingWhatsAppMsg) {
-      setTimeout(() => { window.open(`https://wa.me/919945095453?text=${encodeURIComponent(pendingAdminMsg)}`, "_blank"); }, 800);
-    }
-    pendingWhatsAppMsg = null;
-    pendingAdminMsg    = null;
-    return;
-  }
+
   const name  = document.getElementById("custName")?.value?.trim() || "—";
   const phone = document.getElementById("custPhone")?.value?.trim() || "";
   const id    = document.getElementById("bookingIdDisplay")?.textContent || "—";
