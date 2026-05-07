@@ -1,3 +1,4 @@
+cat << 'ENDOFSCRIPT' > /home/claude/script.js
 /* ============================================
    PackZen — script.js  (Full Feature Set — FIXED)
    ============================================ */
@@ -779,10 +780,10 @@ async function processReferral(refCode, newUserUid) {
     if (!snap.empty) {
       await snap.docs[0].ref.update({
         referralCount:   firebase.firestore.FieldValue.increment(1),
-        referralCredits: firebase.firestore.FieldValue.increment(500)
+        referralCredits: firebase.firestore.FieldValue.increment(100)
       });
       await window._firebase.db.collection("users").doc(newUserUid)
-        .update({ referralDiscount: 500, referredBy: refCode });
+        .update({ referralDiscount: 100, referredBy: refCode });
     }
   } catch (e) {}
 }
@@ -1159,8 +1160,8 @@ async function applyPromoCode() {
       if (!snap.exists) {
         const refSnap = await db.collection("users").where("referralCode","==",code).get();
         if (!refSnap.empty && currentUser && refSnap.docs[0].id !== currentUser.uid) {
-          promoDiscount = 500;
-          msgEl.textContent = "🎉 Referral code applied! ₹500 discount.";
+          promoDiscount = 100;
+          msgEl.textContent = "🎉 Referral code applied! ₹100 discount.";
           msgEl.className = "promo-msg promo-success";
           updatePriceDisplay(); return;
         }
@@ -1387,7 +1388,7 @@ function detectAndShowIntercityBadge(km) {
 }
 
 /* ============================================
-   PRICE CALCULATION  ← MAIN FIX HERE
+   PRICE CALCULATION
    ============================================ */
 function calculateQuote(auto = false) {
   const pickup  = document.getElementById("pickup");
@@ -1396,55 +1397,58 @@ function calculateQuote(auto = false) {
   const vehicle = document.getElementById("vehicle");
   const result  = document.getElementById("result");
 
-if (!pickup?.value || !drop?.value) {
-  if (!auto) showToast("📍 Please enter pickup & drop locations.");
-  return;
-}
+  if (!pickup?.value || !drop?.value) {
+    if (!auto) showToast("📍 Please enter pickup & drop locations.");
+    return;
+  }
 
   // Count chargeable items
   const chargedItems = ["sofaCheck","tvCheck","tvUnitCheck","coffeeCheck","acCheck","bedCheck","wardrobeCheck","dressingCheck","sideTableCheck"];
   let itemCount = 0;
   chargedItems.forEach(id => { if (document.getElementById(id)?.checked) itemCount++; });
   const cartonQty    = parseInt(document.getElementById("cartonQty")?.value || 0);
-  const furnitureCost = (itemCount * 150) + (cartonQty * 50);
+  // ── UPDATED: ₹159 per furniture item (was ₹150) ──
+  const furnitureCost = (itemCount * 159) + (cartonQty * 50);
   const hasItems      = itemCount > 0 || cartonQty > 0;
   const houseBase     = Number(house?.value   || 0);
   const vehicleRate   = Number(vehicle?.value || 0);
-   // ✅ SINGLE ITEM LOGIC (correct place)
-if (!houseBase && !vehicleRate && hasItems) {
-  const total = 499 + furnitureCost;
 
-  lastCalculatedTotal = total;
-  updatePriceDisplay();
-
-  if (result) {
-    result.innerHTML = `
-      🪑 Single Item Move<br>
-      Base: ₹499 + Items: ₹${furnitureCost}<br>
-      <strong>Total: ₹${total}</strong>
-    `;
+  // ── UPDATED: Single item logic now requires vehicle + ₹1,999 base (was ₹499, no vehicle required) ──
+  if (!houseBase && hasItems) {
+    if (!vehicleRate) {
+      showToast("🚚 Please select a vehicle for your single-item move.");
+      return;
+    }
+    const total = 1999 + furnitureCost;
+    lastCalculatedTotal = total;
+    updatePriceDisplay();
+    if (result) {
+      result.innerHTML = `
+        🪑 Single Item Move<br>
+        Base: ₹1,999 + Items: ₹${furnitureCost}<br>
+        <strong>Total: ₹${total}</strong>
+      `;
+    }
+    return;
   }
-
-  return;
-}
-
 
   // ── NEEDS DISTANCE — call Distance Matrix, do pricing inside callback ──
   function applyPrice(km) {
-    // Now km is properly scoped inside this callback
     detectAndShowIntercityBadge(km);
 
     const pickupFloor = Number(document.getElementById("pickupFloor")?.value || 0);
     const dropFloor   = Number(document.getElementById("dropFloor")?.value   || 0);
     const liftAvail   = document.getElementById("liftAvailable")?.checked;
-    const floorCost   = liftAvail
-      ? Math.round((pickupFloor + dropFloor) * 0.5)
-      : (pickupFloor + dropFloor);
+
+    // ── UPDATED: ₹200/floor full, ₹100/floor with lift (was ₹100/₹50) ──
+    const floorCost = liftAvail
+      ? Math.round((pickupFloor + dropFloor) * 100)
+      : (pickupFloor + dropFloor) * 200;
 
     let total, breakdownHtml;
 
     if (km > 100) {
-      // ── INTERCITY ──
+      // ── INTERCITY (unchanged) ──
       const baseRate  = getIntercityBase(house?.value || "3950", km);
       total           = Math.round(baseRate + furnitureCost + floorCost);
       const distLabel = km <= 400 ? "up to 400 km"
@@ -1454,28 +1458,30 @@ if (!houseBase && !vehicleRate && hasItems) {
       breakdownHtml =
         `🚛 Intercity · ~${Math.round(km)} km (${distLabel})<br>` +
         `Base: ₹${baseRate.toLocaleString("en-IN")}` +
-        (itemCount  ? ` · Items: ₹${(itemCount * 150).toLocaleString("en-IN")}`   : "") +
+        (itemCount  ? ` · Items: ₹${(itemCount * 159).toLocaleString("en-IN")}`   : "") +
         (cartonQty  ? ` · Cartons: ₹${(cartonQty * 50).toLocaleString("en-IN")}` : "") +
         (floorCost  ? ` · Floor: ₹${floorCost.toLocaleString("en-IN")}`           : "") +
         `<br><strong>Total Estimate: ₹${total.toLocaleString("en-IN")}</strong>`;
     } else {
       // ── LOCAL ──
       const vv = Number(vehicle?.value || 0);
-      let baseFare = 1999, perKmRate = 25;
-      if      (vv === 88) { baseFare = 7500; perKmRate = 40; }
-      else if (vv === 69) { baseFare = 6000; perKmRate = 35; }
-      else if (vv === 54) { baseFare = 4500; perKmRate = 35; }
 
-      const distanceFare = km <= 25
+      // ── UPDATED: new per-km rates, free threshold is 10 km (was 25 km) ──
+      let baseFare = 1999, perKmRate = 27;
+      if      (vv === 88) { baseFare = 7500; perKmRate = 48; }
+      else if (vv === 69) { baseFare = 6000; perKmRate = 40; }
+      else if (vv === 54) { baseFare = 4500; perKmRate = 38; }
+
+      const distanceFare = km <= 10
         ? baseFare
-        : baseFare + ((km - 25) * perKmRate);
+        : baseFare + ((km - 10) * perKmRate);
 
       total = Math.round(distanceFare + furnitureCost + floorCost);
       breakdownHtml =
         `📍 Local · ~${km.toFixed(1)} km<br>` +
         `Base fare: ₹${baseFare.toLocaleString("en-IN")}` +
-        (km > 25    ? ` · Extra km: ₹${Math.round((km - 25) * perKmRate).toLocaleString("en-IN")}` : "") +
-        (itemCount  ? ` · Items: ₹${(itemCount * 150).toLocaleString("en-IN")}`                    : "") +
+        (km > 10    ? ` · Extra km: ₹${Math.round((km - 10) * perKmRate).toLocaleString("en-IN")}` : "") +
+        (itemCount  ? ` · Items: ₹${(itemCount * 159).toLocaleString("en-IN")}`                    : "") +
         (cartonQty  ? ` · Cartons: ₹${(cartonQty * 50).toLocaleString("en-IN")}`                   : "") +
         (floorCost  ? ` · Floor: ₹${floorCost.toLocaleString("en-IN")}`                            : "") +
         `<br><strong>Total Estimate: ₹${total.toLocaleString("en-IN")}</strong>`;
@@ -1676,7 +1682,6 @@ function downloadInvoice() {
   lines.forEach(line => { doc.text(line, 14, y); y += 9; });
   doc.save("PackZen-Invoice-" + bookingId + ".pdf");
 }
-
 
 /* ============================================
    CONFIRMATION CARD
@@ -2184,30 +2189,23 @@ function shakeField(el) {
   el.classList.add("error");
   setTimeout(() => el.classList.remove("error"), 600);
 }
+
 function selectMoveType(el, type) {
   window.selectedMoveType = type;
-
-  // Highlight selected card
   document.querySelectorAll(".move-type-card").forEach(card => {
     card.classList.remove("selected");
   });
-
   if (el) el.classList.add("selected");
-
-  // Save value
   const input = document.getElementById("moveType");
   if (input) input.value = type;
-
-  // Build house options safely
   if (typeof buildBsHouseOptions === "function") {
     buildBsHouseOptions();
   }
-
-  // Recalculate safely
   if (typeof calculateQuote === "function") {
     calculateQuote(true);
   }
 }
+
 function renderSizeCards(type) {
   const config = MOVE_TYPE_CONFIG[type] || MOVE_TYPE_CONFIG.home;
   const label  = document.getElementById("sizeLabelText");
@@ -2253,7 +2251,7 @@ function renderFurnitureGrid(type) {
         <span class="fc-emoji">${item.emoji}</span>
         <span class="fc-name">${item.name}</span>
         <span class="fc-price" style="${FREE_CATS.includes(catId)?"color:#94a3b8":""}">
-          ${FREE_CATS.includes(catId)?"FREE":"+₹150"}
+          ${FREE_CATS.includes(catId)?"FREE":"+₹159"}
         </span>
       </div>
     </label>`;
@@ -2824,8 +2822,11 @@ async function _finaliseReset(auth, btn) {
   closeAuthModal();
   setTimeout(() => openAuthModal("login"), 500);
 }
+
 // ─── Confirmation button (no WhatsApp opened) ────
 function sendWhatsAppAfterPayment() {
   showToast("✅ Booking confirmed! Our team will contact you shortly.");
   closeModal();
 }
+ENDOFSCRIPT
+echo "Done. Lines: $(wc -l < /home/claude/script.js)"
