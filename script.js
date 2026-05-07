@@ -1,4 +1,3 @@
-cat << 'ENDOFSCRIPT' > /home/claude/script.js
 /* ============================================
    PackZen — script.js  (Full Feature Set — FIXED)
    ============================================ */
@@ -2834,6 +2833,3 @@ function sendWhatsAppAfterPayment() {
   showToast("✅ Booking confirmed! Our team will contact you shortly.");
   closeModal();
 }
-ENDOFSCRIPT
-echo "Done. Lines: $(wc -l < /home/claude/script.js)"
-console.log("SCRIPT LOADED SUCCESSFULLY");
