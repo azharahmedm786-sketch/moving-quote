@@ -2151,7 +2151,11 @@ function showStep(n) {
       window.scrollTo({ top: window.scrollY + formCard.getBoundingClientRect().top - navH - 12, behavior: "smooth" });
     }
   }, 50);
-  if (n === 2) { const vc = document.getElementById("vehicle"); if (!vc?.value) document.querySelector(".vehicle-card")?.click(); }
+if (n === 2) {
+    renderSizeCards(selectedMoveType || "home");
+    const vc = document.getElementById("vehicle");
+    if (!vc?.value) document.querySelector(".vehicle-card")?.click();
+  }
   if (n === 3) renderFurnitureGrid(selectedMoveType || "home");
   if (n === getSteps().length - 1) { calculateQuote(true); autoFillCustomerDetails(); }
 }
@@ -2200,6 +2204,7 @@ function selectMoveType(el, type) {
   if (el) el.classList.add("selected");
   const input = document.getElementById("moveType");
   if (input) input.value = type;
+  renderSizeCards(type);
   if (typeof buildBsHouseOptions === "function") {
     buildBsHouseOptions();
   }
@@ -2304,14 +2309,13 @@ function changeCartonQty(delta) {
   input.value = Math.max(0, Math.min(50, (parseInt(input.value) || 0) + delta));
   calculateQuote(true);
 }
-
 function selectCard(el, type, value) {
   const select = document.getElementById(type);
   if (select) select.value = value;
   const parent = el.closest(type === "house" ? ".select-cards" : ".vehicle-cards");
   if (parent) parent.querySelectorAll(type === "house" ? ".select-card" : ".vehicle-card").forEach(c => c.classList.remove("selected"));
   el.classList.add("selected");
-  if (currentStep === getSteps().length - 1) calculateQuote(true);
+  calculateQuote(true);
 }
 
 function changeQty(id, delta) {
