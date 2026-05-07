@@ -801,9 +801,11 @@ async function loginUser() {
   const email = document.getElementById("loginEmail").value.trim();
   const pass  = document.getElementById("loginPassword").value;
 
-  if (!email || !pass) return showError("loginError", "⚠️ Enter email and password");
+if (!email || !pass) {
+  return showError("loginError", "⚠️ Enter email and password");
+}
 
-  const btn = document.getElementById("btnLogin");
+const btn = document.getElementById("btnLogin");
   if (btn) { btn.disabled = true; btn.textContent = "Signing in..."; }
 
   waitForFirebase(async () => {
@@ -2830,3 +2832,4 @@ function sendWhatsAppAfterPayment() {
 }
 ENDOFSCRIPT
 echo "Done. Lines: $(wc -l < /home/claude/script.js)"
+console.log("SCRIPT LOADED SUCCESSFULLY");
