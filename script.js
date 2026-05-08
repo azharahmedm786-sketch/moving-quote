@@ -102,6 +102,38 @@ function notifyOwner(bookingRef, name, phone, pickup, drop, date, total, payType
 const RAZORPAY_KEY = (window.ENV && window.ENV.RAZORPAY_KEY) || "";
 
 /* ============================================
+   FURNITURE QUANTITY SYSTEM
+   ============================================ */
+const FURNITURE_PRICES = {
+  sofaCheck:250, tvCheck:150, tvUnitCheck:250, coffeeCheck:100, acCheck:500,
+  bedCheck:350, wardrobeCheck:600, dressingCheck:250, sideTableCheck:100,
+  fridgeCheck:350, wmCheck:250, microwaveCheck:100, chimneyCheck:250, diningCheck:300,
+  deskCheck:0, chairCheck:0, serverCheck:0, printerCheck:0,
+  confCheck:0, cabinetCheck:0, whiteboardCheck:0,
+  bikeCheck:0, cycleCheck:0, plantCheck:0, gymCheck:0
+};
+
+function changeFurnitureQty(id, delta) {
+  const input = document.getElementById(id);
+  if (!input) return;
+  const newVal = Math.max(0, Math.min(20, (parseInt(input.value) || 0) + delta));
+  input.value = newVal;
+  const card = document.getElementById("card-" + id);
+  if (card) card.classList.toggle("active", newVal > 0);
+  calculateQuote(true);
+}
+
+function syncFurnitureQty(id) {
+  const input = document.getElementById(id);
+  if (!input) return;
+  const val = Math.max(0, Math.min(20, parseInt(input.value) || 0));
+  input.value = val;
+  const card = document.getElementById("card-" + id);
+  if (card) card.classList.toggle("active", val > 0);
+  calculateQuote(true);
+}
+
+/* ============================================
    UTILITY
    ============================================ */
 function debounce(fn, ms) {
@@ -466,7 +498,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initPaymentOptions();
   buildDateStrip();
 
-  if (!document.getElementById("pz-fc-styles")) {
+ if (!document.getElementById("pz-fc-styles")) {
     const s = document.createElement("style");
     s.id = "pz-fc-styles";
     s.textContent = `
@@ -477,28 +509,24 @@ document.addEventListener("DOMContentLoaded", () => {
       .fc-cat-icon{font-size:1.1rem;}
       .fc-cat-label{flex:1;font-weight:600;font-size:.9rem;color:var(--text,#fff);}
       .fc-cat-arrow{font-size:.8rem;color:var(--text-muted,#aaa);transition:transform .2s;}
-      .fc-category-items{display:none;flex-wrap:wrap;gap:8px;padding:12px;background:rgba(255,255,255,0.02);}
-      .furniture-card{display:flex;flex-direction:column;align-items:center;width:80px;cursor:pointer;position:relative;}
-      .furniture-card input[type=checkbox]{position:absolute;opacity:0;width:0;height:0;}
-      .fc-body{display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 6px;border-radius:10px;width:100%;text-align:center;border:2px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.03);transition:all .2s;position:relative;}
-      .furniture-card input:checked~.fc-body{border-color:#3b82f6;background:rgba(59,130,246,0.15);}
-      .fc-check{position:absolute;top:4px;right:4px;width:16px;height:16px;background:#3b82f6;border-radius:50%;font-size:9px;color:#fff;display:flex;align-items:center;justify-content:center;opacity:0;transform:scale(0);transition:all .15s;}
-      .furniture-card input:checked~.fc-body .fc-check{opacity:1;transform:scale(1);}
-      .fc-emoji{font-size:1.5rem;line-height:1;}
-      .fc-name{font-size:.72rem;font-weight:500;color:var(--text,#fff);line-height:1.2;}
-      .fc-price{font-size:.68rem;color:#22c55e;font-weight:600;display:none;}
+      .fc-category-items{display:none;flex-wrap:wrap;gap:10px;padding:12px;background:rgba(255,255,255,0.02);}
+      .fc-qty-card{display:flex;flex-direction:column;align-items:center;gap:5px;padding:10px 8px;border-radius:10px;border:2px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.03);transition:all .2s;width:88px;text-align:center;}
+      .fc-qty-card.active{border-color:#3b82f6;background:rgba(59,130,246,0.13);}
+      .fc-emoji{font-size:1.4rem;line-height:1;}
+      .fc-name{font-size:.68rem;font-weight:500;color:var(--text,#fff);line-height:1.2;min-height:2em;display:flex;align-items:center;justify-content:center;}
+      .fc-price-tag{font-size:.64rem;color:#22c55e;font-weight:600;}
+      .fc-qty-row{display:flex;align-items:center;gap:4px;margin-top:2px;}
+      .fc-qty-btn{width:26px;height:26px;border-radius:6px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.07);color:var(--text,#fff);font-size:1rem;font-weight:700;cursor:pointer;transition:background .15s,border-color .15s;display:flex;align-items:center;justify-content:center;padding:0;line-height:1;-webkit-tap-highlight-color:transparent;}
+      .fc-qty-btn:hover,.fc-qty-btn:active{background:#3b82f6;border-color:#3b82f6;}
+      .fc-qty-input{width:26px;text-align:center;background:transparent;border:none;color:var(--text,#fff);font-size:.85rem;font-weight:700;-moz-appearance:textfield;pointer-events:none;}
+      .fc-qty-input::-webkit-outer-spin-button,.fc-qty-input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
       .carton-box-row{display:flex;align-items:center;flex-wrap:wrap;gap:10px;padding:4px 0;width:100%;}
       .carton-label{font-size:.85rem;color:var(--text,#fff);flex:1;min-width:160px;}
       .carton-qty-wrap{display:flex;align-items:center;gap:6px;}
-      .carton-price-note{font-size:.8rem;color:#22c55e;font-weight:600;}`;
+      .carton-price-note{font-size:.8rem;color:#22c55e;font-weight:600;}
+      @media(max-width:380px){.fc-qty-card{width:78px;padding:8px 5px;}}`;
     document.head.appendChild(s);
   }
-
-  document.addEventListener("change", (e) => {
-    if (e.target.type === "checkbox" && e.target.closest(".furniture-card")) {
-      e.target.closest(".furniture-card").classList.toggle("checked", e.target.checked);
-    }
-  });
 
   if (!document.getElementById("recaptcha-container-signup")) {
     const d = document.createElement("div");
@@ -1431,35 +1459,17 @@ function calculateQuote(auto = false) {
   }
 
   // Count chargeable items
-const itemPrices = {
-  sofaCheck: 250,
-  tvCheck: 150,
-  tvUnitCheck: 250,
-  coffeeCheck: 100,
-  acCheck: 500,
-  bedCheck: 350,
-  wardrobeCheck: 600,
-  dressingCheck: 250,
-   fridgeCheck: 350,
-wmCheck: 250,
-microwaveCheck: 100,
-chimneyCheck: 250,
-diningCheck: 300,
-  sideTableCheck: 100
-   
-};
-
-let itemCost = 0;
-let itemCount = 0;
-
-Object.keys(itemPrices).forEach(id => {
-  const checkbox = document.getElementById(id);
-
-  if (checkbox && checkbox.checked === true) {
-    itemCost += itemPrices[id];
-    itemCount++;
-  }
-});
+// Count chargeable items — quantity-based
+  let itemCost = 0;
+  let itemCount = 0;
+  Object.keys(FURNITURE_PRICES).forEach(id => {
+    const input = document.getElementById(id);
+    const qty   = parseInt(input?.value || 0);
+    if (qty > 0) {
+      itemCost  += FURNITURE_PRICES[id] * qty;
+      itemCount += qty;
+    }
+  });
 
 const cartonQty = parseInt(document.getElementById("cartonQty")?.value || 0);
 const cartonCost = cartonQty * 50;
@@ -2370,18 +2380,22 @@ function renderFurnitureGrid(type) {
   if (!grid) return;
   const categories = FURNITURE_CATEGORIES[type] || FURNITURE_CATEGORIES.home;
   const FREE_CATS  = ["cat-kitchen","cat-other","cat-appliances"];
-  const itemCard = (item, catId) => `
-    <label class="furniture-card">
-      <input type="checkbox" id="${item.id}" onchange="calculateQuote(true)" aria-label="${item.name}">
-      <div class="fc-body">
-        <div class="fc-check">✓</div>
-        <span class="fc-emoji">${item.emoji}</span>
-        <span class="fc-name">${item.name}</span>
-        <span class="fc-price" style="${FREE_CATS.includes(catId)?"color:#94a3b8":""}">
-          ${FREE_CATS.includes(catId)?"FREE":"+₹159"}
-        </span>
+const itemCard = (item, catId) => {
+    const isFree     = FREE_CATS.includes(catId);
+    const price      = FURNITURE_PRICES[item.id] || 0;
+    const priceLabel = isFree ? "FREE" : (price > 0 ? `+₹${price}` : "FREE");
+    return `
+    <div class="fc-qty-card" id="card-${item.id}">
+      <span class="fc-emoji">${item.emoji}</span>
+      <span class="fc-name">${item.name}</span>
+      <span class="fc-price-tag" style="${isFree || !price ? 'color:#94a3b8' : ''}">${priceLabel}</span>
+      <div class="fc-qty-row">
+        <button class="fc-qty-btn" onclick="changeFurnitureQty('${item.id}',-1)" aria-label="Remove ${item.name}">−</button>
+        <input type="number" id="${item.id}" value="0" min="0" max="20" class="fc-qty-input" onchange="syncFurnitureQty('${item.id}')" aria-label="${item.name} quantity" readonly>
+        <button class="fc-qty-btn" onclick="changeFurnitureQty('${item.id}',1)" aria-label="Add ${item.name}">+</button>
       </div>
-    </label>`;
+    </div>`;
+  };
   const categoryBlock = cat => `
     <div class="fc-category">
       <div class="fc-category-header" onclick="toggleFurnitureCategory('${cat.id}')">
@@ -2451,19 +2465,23 @@ function changeQty(id, delta) {
 function capitalize(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : ""; }
 
 function getFurnitureSummary() {
-  const checks = [
-    ["sofaCheck","Sofa"],["bedCheck","Bed"],["tvCheck","TV"],["tvUnitCheck","TV Unit"],
-    ["coffeeCheck","Coffee Table"],["acCheck","AC Unit"],["wardrobeCheck","Wardrobe"],
-    ["dressingCheck","Dressing Table"],["sideTableCheck","Side Table"],["fridgeCheck","Fridge"],
-    ["wmCheck","Washing Machine"],["microwaveCheck","Microwave"],["chimneyCheck","Chimney"],
-    ["diningCheck","Dining Table"],["bikeCheck","Bike/Scooter"],["cycleCheck","Cycle"],
-    ["plantCheck","Large Plants"],["gymCheck","Gym Equipment"],["deskCheck","Office Desk"],
-    ["chairCheck","Chair"],["cabinetCheck","Filing Cabinet"],["serverCheck","Server/PC"],
-    ["printerCheck","Printer"],["confCheck","Conf. Table"],["whiteboardCheck","Whiteboard"]
-  ];
-  const items     = checks.filter(([id]) => document.getElementById(id)?.checked).map(([,name]) => name);
+  const labels = {
+    sofaCheck:"Sofa", bedCheck:"Bed", tvCheck:"TV", tvUnitCheck:"TV Unit",
+    coffeeCheck:"Coffee Table", acCheck:"AC Unit", wardrobeCheck:"Wardrobe",
+    dressingCheck:"Dressing Table", sideTableCheck:"Side Table", fridgeCheck:"Fridge",
+    wmCheck:"Washing Machine", microwaveCheck:"Microwave", chimneyCheck:"Chimney",
+    diningCheck:"Dining Table", bikeCheck:"Bike/Scooter", cycleCheck:"Cycle",
+    plantCheck:"Large Plants", gymCheck:"Gym Equipment", deskCheck:"Office Desk",
+    chairCheck:"Chair", cabinetCheck:"Filing Cabinet", serverCheck:"Server/PC",
+    printerCheck:"Printer", confCheck:"Conf. Table", whiteboardCheck:"Whiteboard"
+  };
+  const items = [];
+  Object.entries(labels).forEach(([id, name]) => {
+    const qty = parseInt(document.getElementById(id)?.value || 0);
+    if (qty > 0) items.push(qty > 1 ? `${name} ×${qty}` : name);
+  });
   const cartonQty = parseInt(document.getElementById("cartonQty")?.value || 0);
-  if (cartonQty > 0) items.push(`Carton Boxes x${cartonQty}`);
+  if (cartonQty > 0) items.push(`Carton Boxes ×${cartonQty}`);
   return items.join(", ") || "";
 }
 
