@@ -1449,21 +1449,21 @@ diningCheck: 300,
    
 };
 
-let furnitureCost = 0;
+let itemCost = 0;
 let itemCount = 0;
 
 Object.keys(itemPrices).forEach(id => {
   const checkbox = document.getElementById(id);
 
   if (checkbox && checkbox.checked === true) {
-    furnitureCost += itemPrices[id];
+    itemCost += itemPrices[id];
     itemCount++;
   }
 });
 
 const cartonQty = parseInt(document.getElementById("cartonQty")?.value || 0);
-
-furnitureCost += cartonQty * 40;
+const cartonCost = cartonQty * 40;
+const furnitureCost = itemCost + cartonCost;
 
 const hasItems = itemCount > 0 || cartonQty > 0;
   const houseBase     = Number(house?.value   || 0);
@@ -1533,12 +1533,12 @@ const floorCost = liftAvail
                       : km <= 600 ? "up to 600 km"
                       : km <= 1000 ? "up to 1000 km"
                       : "1000+ km";
-      breakdownHtml =
+       breakdownHtml =
         `🚛 Intercity · ~${Math.round(km)} km (${distLabel})<br>` +
         `Base: ₹${baseRate.toLocaleString("en-IN")}` +
-        (furnitureCost ? ` · Items: ₹${furnitureCost.toLocaleString("en-IN")}` : "") +
-        (cartonQty  ? ` · Cartons: ₹${(cartonQty * 50).toLocaleString("en-IN")}` : "") +
-        (floorCost  ? ` · Floor: ₹${floorCost.toLocaleString("en-IN")}`           : "") +
+        (itemCost  ? ` · Items: ₹${itemCost.toLocaleString("en-IN")}`   : "") +
+        (cartonQty ? ` · Cartons: ₹${cartonCost.toLocaleString("en-IN")}` : "") +
+        (floorCost ? ` · Floor: ₹${floorCost.toLocaleString("en-IN")}`   : "") +
         `<br><strong>Total Estimate: ₹${total.toLocaleString("en-IN")}</strong>`;
     } else {
       // ── LOCAL ──
@@ -1555,12 +1555,12 @@ const floorCost = liftAvail
         : baseFare + ((km - 10) * perKmRate);
 
       total = Math.round(distanceFare + furnitureCost + floorCost);
-      breakdownHtml =
+    breakdownHtml =
         `📍 Local · ~${km.toFixed(1)} km<br>` +
         `Base fare: ₹${baseFare.toLocaleString("en-IN")}` +
         (km > 10    ? ` · Extra km: ₹${Math.round((km - 10) * perKmRate).toLocaleString("en-IN")}` : "") +
-      (furnitureCost ? ` · Items: ₹${furnitureCost.toLocaleString("en-IN")}` : "") +
-        (cartonQty  ? ` · Cartons: ₹${(cartonQty * 50).toLocaleString("en-IN")}`                   : "") +
+        (itemCost   ? ` · Items: ₹${itemCost.toLocaleString("en-IN")}`                              : "") +
+        (cartonQty  ? ` · Cartons: ₹${cartonCost.toLocaleString("en-IN")}`                         : "") +
         (floorCost  ? ` · Floor: ₹${floorCost.toLocaleString("en-IN")}`                            : "") +
         `<br><strong>Total Estimate: ₹${total.toLocaleString("en-IN")}</strong>`;
     }
