@@ -1462,7 +1462,7 @@ Object.keys(itemPrices).forEach(id => {
 });
 
 const cartonQty = parseInt(document.getElementById("cartonQty")?.value || 0);
-const cartonCost = cartonQty * 40;
+const cartonCost = cartonQty * 50;
 const furnitureCost = itemCost + cartonCost;
 
 const hasItems = itemCount > 0 || cartonQty > 0;
