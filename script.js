@@ -1440,7 +1440,13 @@ const itemPrices = {
   bedCheck: 350,
   wardrobeCheck: 600,
   dressingCheck: 250,
+   fridgeCheck: 350,
+washingCheck: 250,
+microwaveCheck: 100,
+chimneyCheck: 250,
+diningCheck: 300,
   sideTableCheck: 100
+   
 };
 
 let furnitureCost = 0;
