@@ -1483,8 +1483,11 @@ const total = 1999 + furnitureCost;
     if (result) {
       result.innerHTML = `
         🪑 Single Item Move<br>
-      Base: ₹1,999 + Vehicle: ₹${vehicleRate} + Items: ₹${furnitureCost}<br>
-        <strong>Total: ₹${total}</strong>
+Base: ₹1,999
+${furnitureCost ? ` • Items: ₹${furnitureCost}` : ""}
+${cartonQty ? ` • Cartons: ₹${cartonQty * 50}` : ""}
+${floorCost ? ` • Floor: ₹${floorCost}` : ""}<br>
+<strong>Total: ₹${total}</strong>
       `;
     }
     return;
