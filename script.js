@@ -58,10 +58,18 @@ async function saveBooking(data) {
     console.log("✅ Booking saved:", docRef.id);
     return docRef.id;
 
-  } catch (err) {
-    console.error("❌ Error saving booking:", err);
-    alert("Booking failed. Try again.");
   }
+     catch (err) {
+  console.error("❌ Error saving booking:", err);
+
+  // Backup booking locally
+  localStorage.setItem("pendingBooking", JSON.stringify({
+    ...data,
+    savedAt: new Date().toISOString()
+  }));
+
+  alert("⚠️ Booking temporarily saved. Please check your internet and try again.");
+}
 }
 
 // ================= NOTIFY OWNER =================
@@ -352,6 +360,7 @@ document.addEventListener("DOMContentLoaded", () => {
     setTimeout(() => { el.scrollIntoView({ behavior: "smooth", block: "center" }); }, 320);
   });
 
+   
   const makeVisible = () => document.querySelectorAll(".reveal, .reveal-stagger").forEach(el => el.classList.add("visible"));
   makeVisible(); setTimeout(makeVisible, 100); setTimeout(makeVisible, 500);
 
@@ -504,7 +513,20 @@ document.addEventListener("DOMContentLoaded", () => {
     document.body.appendChild(d);
   }
 });
+// Recover failed booking
+window.addEventListener("load", () => {
 
+  const pendingBooking = localStorage.getItem("pendingBooking");
+
+  if (pendingBooking) {
+    console.log("⚠️ Found unsaved booking backup");
+
+    showToast("Recovered unsaved booking data.");
+
+    localStorage.removeItem("pendingBooking");
+  }
+
+});
 /* ============================================
    PAYMENT OPTIONS
    ============================================ */
@@ -1192,7 +1214,7 @@ function updatePriceDisplay() {
   const optAtDrop = document.getElementById("optAtDropAmt");
   if (!priceEl) return;
   const discounted = Math.max(lastCalculatedTotal - promoDiscount, 0);
-  const fullAmt    = Math.round(discounted * 0.93);
+const fullAmt = Math.max(discounted - 200, 0);
   const advanceAmt = Math.round(discounted * 0.10);
   priceEl.textContent = "₹" + discounted.toLocaleString("en-IN");
   if (advanceEl) advanceEl.textContent = "₹" + advanceAmt.toLocaleString("en-IN");
@@ -1210,7 +1232,8 @@ function syncPayOnlineButton(total, advanceAmt, fullAmt) {
   const btn = document.getElementById("btnPayOnline");
   if (!btn) return;
   if (selectedPayment === "advance")      btn.innerHTML = `💳 Pay Advance ₹${advanceAmt.toLocaleString("en-IN")} Online`;
-  else if (selectedPayment === "full")    btn.innerHTML = `💳 Pay Full ₹${fullAmt.toLocaleString("en-IN")} (Save 7%)`;
+ else if (selectedPayment === "full")
+  btn.innerHTML = `💳 Pay Full ₹${fullAmt.toLocaleString("en-IN")} (Save ₹200)`;
   else                                    btn.innerHTML = `💳 Pay Online`;
 }
 
@@ -1219,7 +1242,11 @@ function selectPayment(type) {
   ["optAdvance","optFull","optAtDrop"].forEach(id => document.getElementById(id)?.classList.remove("selected"));
   document.getElementById({ advance:"optAdvance", full:"optFull", at_drop:"optAtDrop" }[type])?.classList.add("selected");
   const discounted = Math.max(lastCalculatedTotal - promoDiscount, 0);
-  syncPayOnlineButton(discounted, Math.round(discounted * 0.10), Math.round(discounted * 0.93));
+syncPayOnlineButton(
+  discounted,
+  Math.round(discounted * 0.10),
+  Math.max(discounted - 200, 0)
+);
 }
 
 function startRazorpayPayment() { startPayment(); }
@@ -1404,13 +1431,35 @@ function calculateQuote(auto = false) {
   }
 
   // Count chargeable items
-  const chargedItems = ["sofaCheck","tvCheck","tvUnitCheck","coffeeCheck","acCheck","bedCheck","wardrobeCheck","dressingCheck","sideTableCheck"];
-  let itemCount = 0;
-  chargedItems.forEach(id => { if (document.getElementById(id)?.checked) itemCount++; });
-  const cartonQty    = parseInt(document.getElementById("cartonQty")?.value || 0);
-  // ── UPDATED: ₹159 per furniture item (was ₹150) ──
-  const furnitureCost = (itemCount * 159) + (cartonQty * 50);
-  const hasItems      = itemCount > 0 || cartonQty > 0;
+const itemPrices = {
+  sofaCheck: 250,
+  tvCheck: 150,
+  tvUnitCheck: 250,
+  coffeeCheck: 100,
+  acCheck: 500,
+  bedCheck: 350,
+  wardrobeCheck: 600,
+  dressingCheck: 250,
+  sideTableCheck: 100
+};
+
+let furnitureCost = 0;
+let itemCount = 0;
+
+Object.keys(itemPrices).forEach(id => {
+  const checkbox = document.getElementById(id);
+
+  if (checkbox?.checked) {
+    furnitureCost += itemPrices[id];
+    itemCount++;
+  }
+});
+
+const cartonQty = parseInt(document.getElementById("cartonQty")?.value || 0);
+
+furnitureCost += cartonQty * 40;
+
+const hasItems = itemCount > 0 || cartonQty > 0;
   const houseBase     = Number(house?.value   || 0);
   const vehicleRate   = Number(vehicle?.value || 0);
 
@@ -1420,13 +1469,13 @@ function calculateQuote(auto = false) {
       showToast("🚚 Please select a vehicle for your single-item move.");
       return;
     }
-    const total = 1999 + furnitureCost;
+const total = 1999 + vehicleRate + furnitureCost;
     lastCalculatedTotal = total;
     updatePriceDisplay();
     if (result) {
       result.innerHTML = `
         🪑 Single Item Move<br>
-        Base: ₹1,999 + Items: ₹${furnitureCost}<br>
+      Base: ₹1,999 + Vehicle: ₹${vehicleRate} + Items: ₹${furnitureCost}<br>
         <strong>Total: ₹${total}</strong>
       `;
     }
@@ -1435,8 +1484,28 @@ function calculateQuote(auto = false) {
 
   // ── NEEDS DISTANCE — call Distance Matrix, do pricing inside callback ──
   function applyPrice(km) {
-    detectAndShowIntercityBadge(km);
+    if (km == null || isNaN(km)) {
+  showToast("Unable to calculate distance.");
+  return;
+}
+  detectAndShowIntercityBadge(km);
 
+// Reset vehicle for intercity moves
+if (isIntercityMove) {
+  const vehicleField = document.getElementById("vehicle");
+
+  if (vehicleField && vehicleField.value) {
+    vehicleField.dataset.previous = vehicleField.value;
+    vehicleField.value = "";
+  }
+}
+else {
+  const vehicleField = document.getElementById("vehicle");
+
+  if (vehicleField && vehicleField.dataset.previous) {
+    vehicleField.value = vehicleField.dataset.previous;
+  }
+}
     const pickupFloor = Number(document.getElementById("pickupFloor")?.value || 0);
     const dropFloor   = Number(document.getElementById("dropFloor")?.value   || 0);
     const liftAvail   = document.getElementById("liftAvailable")?.checked;
@@ -1489,6 +1558,7 @@ function calculateQuote(auto = false) {
     }
 
     if (result) result.innerHTML = breakdownHtml;
+     total = Math.max(total, 1999);
     lastCalculatedTotal = total;
     updatePriceDisplay();
     if (currentUser) saveQuoteToFirestore(total);
@@ -1597,10 +1667,53 @@ function startPayment() {
   const discounted = Math.max(lastCalculatedTotal - promoDiscount, 0);
   if (selectedPayment === "at_drop") { bookWithoutPayment(); return; }
   const payAmount = selectedPayment === "full"
-    ? Math.round(discounted * 0.93)
+     ? Math.max(discounted - 200, 0)
     : Math.round(discounted * 0.10);
   paymentReceiptId = "PKZ-" + Date.now();
-  const rzp = new Razorpay({
+ // Payment safety check
+// Payment safety check
+if (!lastCalculatedTotal || isNaN(lastCalculatedTotal)) {
+  showToast("Invalid booking amount.");
+  return;
+}
+
+if (lastCalculatedTotal < 1999) {
+  showToast("Amount too low.");
+  return;
+}
+
+const pickupField = document.getElementById("pickup")?.value;
+const dropField = document.getElementById("drop")?.value;
+const customerName = document.getElementById("custName")?.value;
+const customerPhone = document.getElementById("custPhone")?.value;
+const shiftDate = document.getElementById("shiftDate")?.value;
+const houseType = document.getElementById("house")?.value;
+
+if (!pickupField || !dropField) {
+  showToast("Please enter pickup and drop location.");
+  return;
+}
+
+if (!customerName) {
+  showToast("Please enter your name.");
+  return;
+}
+
+if (!/^[0-9]{10}$/.test(customerPhone)) {
+  showToast("Please enter valid mobile number.");
+  return;
+}
+
+if (!shiftDate) {
+  showToast("Please select shifting date.");
+  return;
+}
+
+if (!houseType) {
+  showToast("Please select house type.");
+  return;
+}
+   const rzp = new Razorpay({
     key: RAZORPAY_KEY, amount: payAmount * 100, currency: "INR",
     name: "PackZen Packers & Movers",
     description: selectedPayment === "full" ? "Full Payment (7% off)" : `Advance 10%`,
