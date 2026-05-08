@@ -1441,7 +1441,7 @@ const itemPrices = {
   wardrobeCheck: 600,
   dressingCheck: 250,
    fridgeCheck: 350,
-washingCheck: 250,
+wmCheck: 250,
 microwaveCheck: 100,
 chimneyCheck: 250,
 diningCheck: 300,
