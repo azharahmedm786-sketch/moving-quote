@@ -1467,7 +1467,7 @@ const cartonQty = parseInt(document.getElementById("cartonQty")?.value || 0);
 
 furnitureCost += cartonQty * 40;
 
-const hasItems = itemCount > 0 || cartonQty > 0;
+const hasItems = itemCount > 0;
   const houseBase     = Number(house?.value   || 0);
   const vehicleRate   = Number(vehicle?.value || 0);
 
