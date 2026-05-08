@@ -1527,7 +1527,7 @@ const floorCost = liftAvail
       breakdownHtml =
         `🚛 Intercity · ~${Math.round(km)} km (${distLabel})<br>` +
         `Base: ₹${baseRate.toLocaleString("en-IN")}` +
-        (itemCount  ? ` · Items: ₹${(itemCount * 159).toLocaleString("en-IN")}`   : "") +
+        (furnitureCost ? ` · Items: ₹${furnitureCost.toLocaleString("en-IN")}` : "") +
         (cartonQty  ? ` · Cartons: ₹${(cartonQty * 50).toLocaleString("en-IN")}` : "") +
         (floorCost  ? ` · Floor: ₹${floorCost.toLocaleString("en-IN")}`           : "") +
         `<br><strong>Total Estimate: ₹${total.toLocaleString("en-IN")}</strong>`;
@@ -1550,7 +1550,7 @@ const floorCost = liftAvail
         `📍 Local · ~${km.toFixed(1)} km<br>` +
         `Base fare: ₹${baseFare.toLocaleString("en-IN")}` +
         (km > 10    ? ` · Extra km: ₹${Math.round((km - 10) * perKmRate).toLocaleString("en-IN")}` : "") +
-        (itemCount  ? ` · Items: ₹${(itemCount * 159).toLocaleString("en-IN")}`                    : "") +
+      (furnitureCost ? ` · Items: ₹${furnitureCost.toLocaleString("en-IN")}` : "") +
         (cartonQty  ? ` · Cartons: ₹${(cartonQty * 50).toLocaleString("en-IN")}`                   : "") +
         (floorCost  ? ` · Floor: ₹${floorCost.toLocaleString("en-IN")}`                            : "") +
         `<br><strong>Total Estimate: ₹${total.toLocaleString("en-IN")}</strong>`;
