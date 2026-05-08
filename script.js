@@ -1511,10 +1511,9 @@ else {
     const liftAvail   = document.getElementById("liftAvailable")?.checked;
 
     // ── UPDATED: ₹200/floor full, ₹100/floor with lift (was ₹100/₹50) ──
-    const floorCost = liftAvail
-      ? Math.round((pickupFloor + dropFloor) * 100)
-      : (pickupFloor + dropFloor) * 200;
-
+const floorCost = liftAvail
+  ? Math.round((pickupFloor + dropFloor) / 2)
+  : (pickupFloor + dropFloor);
     let total, breakdownHtml;
 
     if (km > 100) {
