@@ -1455,10 +1455,12 @@ let itemCount = 0;
 Object.keys(itemPrices).forEach(id => {
   const checkbox = document.getElementById(id);
 
-  if (checkbox?.checked) {
-    furnitureCost += itemPrices[id];
-    itemCount++;
-  }
+if (checkbox?.checked) {
+  console.log("SELECTED:", id, itemPrices[id]);
+
+  furnitureCost += itemPrices[id];
+  itemCount++;
+}
 });
 
 const cartonQty = parseInt(document.getElementById("cartonQty")?.value || 0);
