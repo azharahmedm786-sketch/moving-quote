@@ -1791,36 +1791,139 @@ if (!houseType) {
   showToast("Please select house type.");
   return;
 }
-   const rzp = new Razorpay({
-    key: RAZORPAY_KEY, amount: payAmount * 100, currency: "INR",
-    name: "PackZen Packers & Movers",
-    description: selectedPayment === "full" ? "Full Payment (7% off)" : `Advance 10%`,
-    receipt: paymentReceiptId, prefill: { name, contact: phone }, theme: { color: "#ea580c" },
-   handler: async (response) => {
+   // CREATE ORDER FROM SECURE FIREBASE FUNCTION
+const orderResponse = await fetch(
+  "https://us-central1-packzen-e7539.cloudfunctions.net/createRazorpayOrder",
+  {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      amount: payAmount,
+      customerName: name,
+      phone: phone,
+      moveType: selectedMoveType,
+      pickup: pickupLocation,
+      drop: dropLocation,
+      date: shiftDate
+    })
+  }
+);
 
-    await onPaymentSuccess(response, name, phone, payAmount, discounted);
+const orderData = await orderResponse.json();
 
-    isProcessingPayment = false;
+if (!orderData.success) {
+  showToast("Failed to create payment order");
+  return;
+}
 
-    if (payBtn) {
-        payBtn.disabled = false;
-        payBtn.innerText = "Pay Now";
+const rzp = new Razorpay({
+  key: RAZORPAY_KEY,
+
+  amount: orderData.amount,
+
+  currency: orderData.currency,
+
+  order_id: orderData.orderId,
+
+  name: "PackZen Packers & Movers",
+
+  description:
+    selectedPayment === "full"
+      ? "Full Payment"
+      : "Advance Payment",
+
+  prefill: {
+    name,
+    contact: phone
+  },
+
+  theme: {
+    color: "#ea580c"
+  },
+
+  handler: async function (response) {
+
+    try {
+
+      // VERIFY PAYMENT SECURELY
+      const verifyResponse = await fetch(
+        "https://us-central1-packzen-e7539.cloudfunctions.net/verifyRazorpayPayment",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+
+          body: JSON.stringify({
+
+            razorpay_order_id: response.razorpay_order_id,
+
+            razorpay_payment_id: response.razorpay_payment_id,
+
+            razorpay_signature: response.razorpay_signature,
+
+            bookingData: {
+
+              customerName: name,
+
+              phone: phone,
+
+              moveType: selectedMoveType,
+
+              pickup: pickupLocation,
+
+              drop: dropLocation,
+
+              date: shiftDate,
+
+              total: payAmount,
+
+              paymentType: selectedPayment,
+
+              paymentStatus: "paid"
+            }
+          })
+        }
+      );
+
+      const verifyData = await verifyResponse.json();
+
+      if (!verifyData.success) {
+
+        showToast("Payment verification failed");
+
+        return;
+      }
+
+      showToast("Booking successful!");
+
+      window.location.href =
+        "/success.html?booking=" + verifyData.bookingRef;
+
+    } catch (err) {
+
+      console.error(err);
+
+      showToast("Payment verification failed");
     }
-},
+  },
 
-modal: {
+  modal: {
     ondismiss: () => {
 
-        isProcessingPayment = false;
+      isProcessingPayment = false;
 
-        if (payBtn) {
-            payBtn.disabled = false;
-            payBtn.innerText = "Pay Now";
-        }
+      if (payBtn) {
+        payBtn.disabled = false;
+        payBtn.innerText = "Pay Now";
+      }
     }
-}
-  });
-  rzp.open();
+  }
+});
+
+rzp.open();
   rzp.on("payment.failed", r => {
 
     isProcessingPayment = false;
