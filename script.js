@@ -6,7 +6,7 @@
 let pickupPlace, dropPlace;
 let map, directionsService, directionsRenderer;
 let pickupMarker, dropMarker;
-let lastCalculatedTotal  = 0;
+let lastCalculatedTotal  = 0; 
 let paymentReceiptId     = "";
 let confirmationResult   = null;
 let pendingSignupData    = null;
