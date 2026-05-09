@@ -1734,9 +1734,19 @@ function startPayment() {
   if (!RAZORPAY_KEY)               { showToast("⚠️ Payment not configured."); return; }
   const discounted = Math.max(lastCalculatedTotal - promoDiscount, 0);
   if (selectedPayment === "at_drop") { bookWithoutPayment(); return; }
-  const payAmount = selectedPayment === "full"
-     ? Math.max(discounted - 200, 0)
-    : Math.round(discounted * 0.10);
+ let payAmount = 0;
+
+if (selectedPayment === "full") {
+
+    payAmount = Math.max(discounted - 200, 500);
+
+} else {
+
+    payAmount = Math.max(
+        Math.round(discounted * 0.10),
+        199
+    );
+}
   paymentReceiptId = "PKZ-" + Date.now();
  // Payment safety check
 // Payment safety check
