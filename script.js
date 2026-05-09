@@ -1325,6 +1325,13 @@ async function saveQuoteToFirestore(total) {
 function initAutocomplete() {
   const pickupInput = document.getElementById("pickup");
   const dropInput   = document.getElementById("drop");
+   pickupInput.addEventListener("input", () => {
+    pickupPlace = null;
+});
+
+dropInput.addEventListener("input", () => {
+    dropPlace = null;
+});
   const pickupAuto  = new google.maps.places.Autocomplete(pickupInput);
   const dropAuto    = new google.maps.places.Autocomplete(dropInput);
 pickupAuto.addListener("place_changed", () => {
