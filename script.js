@@ -2379,11 +2379,29 @@ function autoFillCustomerDetails() {
 
 function nextStep() {
   if (currentStep === 0 && !document.getElementById("moveType")?.value) { showToast("👆 Please select your move type"); return; }
-  if (currentStep === 1) {
-    if (!document.getElementById("pickup")?.value.trim()) { showToast("📍 Please enter a pickup location"); return; }
-    if (!document.getElementById("drop")?.value.trim())   { showToast("🏁 Please enter a drop location"); return; }
-  }
-  if (currentStep === 2) {
+ if (currentStep === 1) {
+
+    if (!document.getElementById("pickup")?.value.trim()) {
+        showToast("📍 Please enter a pickup location");
+        return;
+    }
+
+    if (!pickupPlace || !pickupPlace.geometry) {
+        showToast("⚠️ Please select pickup address from dropdown");
+        return;
+    }
+
+    if (!document.getElementById("drop")?.value.trim()) {
+        showToast("🏁 Please enter a drop location");
+        return;
+    }
+
+    if (!dropPlace || !dropPlace.geometry) {
+        showToast("⚠️ Please select drop address from dropdown");
+        return;
+    }
+}
+   if (currentStep === 2) {
     if (!document.getElementById("shiftDate")?.value) { showToast("📅 Please select a moving date"); return; }
     if (!document.getElementById("shiftTime")?.value) { showToast("🕐 Please select a time slot"); return; }
     if (!document.getElementById("house")?.value)     { showToast("🏠 Please select your house type"); return; }
