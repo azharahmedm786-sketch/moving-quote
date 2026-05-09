@@ -13,6 +13,7 @@ let pendingSignupData    = null;
 let currentUser          = null;
 let promoDiscount        = 0;
 let selectedPayment      = "at_drop";
+let isProcessingPayment = false;
 let currentRating        = 0;
 let trackingListener     = null;
 let chatListener         = null;
@@ -1674,6 +1675,16 @@ async function bookOnWhatsApp() {
    RAZORPAY
    ============================================ */
 function startPayment() {
+       if (isProcessingPayment) return;
+
+    isProcessingPayment = true;
+
+    const payBtn = document.getElementById("btnPayOnline");
+
+    if (payBtn) {
+        payBtn.disabled = true;
+        payBtn.innerText = "Processing...";
+    }
   if (!currentUser) { showToast("👋 Please login to book."); openAuthModal("login"); return; }
   if (!document.getElementById("tncAccepted")?.checked) { showToast("⚠️ Please accept the Terms & Conditions."); return; }
   const name  = document.getElementById("custName")?.value?.trim();
@@ -1736,11 +1747,42 @@ if (!houseType) {
     name: "PackZen Packers & Movers",
     description: selectedPayment === "full" ? "Full Payment (7% off)" : `Advance 10%`,
     receipt: paymentReceiptId, prefill: { name, contact: phone }, theme: { color: "#ea580c" },
-    handler:    (response) => onPaymentSuccess(response, name, phone, payAmount, discounted),
-    modal:      { ondismiss: () => {} }
+   handler: async (response) => {
+
+    await onPaymentSuccess(response, name, phone, payAmount, discounted);
+
+    isProcessingPayment = false;
+
+    if (payBtn) {
+        payBtn.disabled = false;
+        payBtn.innerText = "Pay Now";
+    }
+},
+
+modal: {
+    ondismiss: () => {
+
+        isProcessingPayment = false;
+
+        if (payBtn) {
+            payBtn.disabled = false;
+            payBtn.innerText = "Pay Now";
+        }
+    }
+}
   });
   rzp.open();
-  rzp.on("payment.failed", r => showToast("❌ Payment failed: " + r.error.description));
+  rzp.on("payment.failed", r => {
+
+    isProcessingPayment = false;
+
+    if (payBtn) {
+        payBtn.disabled = false;
+        payBtn.innerText = "Pay Now";
+    }
+
+    showToast("❌ Payment failed: " + r.error.description);
+});
 }
 
 function onPaymentSuccess(response, name, phone, paid, total) {
