@@ -1327,9 +1327,41 @@ function initAutocomplete() {
   const dropInput   = document.getElementById("drop");
   const pickupAuto  = new google.maps.places.Autocomplete(pickupInput);
   const dropAuto    = new google.maps.places.Autocomplete(dropInput);
-  pickupAuto.addListener("place_changed", () => { pickupPlace = pickupAuto.getPlace(); showLocation("pickup"); calculateQuote(true); });
-  dropAuto.addListener("place_changed",   () => { dropPlace   = dropAuto.getPlace();   showLocation("drop");   calculateQuote(true); });
+pickupAuto.addListener("place_changed", () => {
 
+    const place = pickupAuto.getPlace();
+
+    if (!place.geometry) {
+        showToast("⚠️ Please select pickup address from dropdown");
+        pickupInput.value = "";
+        pickupPlace = null;
+        return;
+    }
+
+    pickupPlace = place;
+
+    showLocation("pickup");
+
+    calculateQuote(true);
+});
+
+dropAuto.addListener("place_changed", () => {
+
+    const place = dropAuto.getPlace();
+
+    if (!place.geometry) {
+        showToast("⚠️ Please select drop address from dropdown");
+        dropInput.value = "";
+        dropPlace = null;
+        return;
+    }
+
+    dropPlace = place;
+
+    showLocation("drop");
+
+    calculateQuote(true);
+});
   const toggle = document.getElementById("useCurrentLocation");
   if (toggle) {
     toggle.addEventListener("change", () => {
