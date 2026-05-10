@@ -1354,26 +1354,30 @@ async function saveQuoteToFirestore(total) {
    GOOGLE MAPS
    ============================================ */
 function initAutocomplete() {
-  const pickupInput = document.getElementById("pickup");
-  const dropInput   = document.getElementById("drop");
-   pickupInput.addEventListener("input", () => {
-    pickupPlace = null;
-});
 
-dropInput.addEventListener("input", () => {
+  const pickupInput = document.getElementById("pickup");
+  const dropInput = document.getElementById("drop");
+
+  const pickupAuto = new google.maps.places.Autocomplete(pickupInput);
+  const dropAuto = new google.maps.places.Autocomplete(dropInput);
+
+  pickupInput.addEventListener("input", () => {
+    pickupPlace = null;
+  });
+
+  dropInput.addEventListener("input", () => {
     dropPlace = null;
-});
-  const pickupAuto  = new google.maps.places.Autocomplete(pickupInput);
-  const dropAuto    = new google.maps.places.Autocomplete(dropInput);
-pickupAuto.addListener("place_changed", () => {
+  });
+
+  pickupAuto.addListener("place_changed", () => {
 
     const place = pickupAuto.getPlace();
 
     if (!place.geometry) {
-        showToast("⚠️ Please select pickup address from dropdown");
-        pickupInput.value = "";
-        pickupPlace = null;
-        return;
+      showToast("⚠️ Please select pickup address from dropdown");
+      pickupInput.value = "";
+      pickupPlace = null;
+      return;
     }
 
     pickupPlace = place;
@@ -1381,17 +1385,17 @@ pickupAuto.addListener("place_changed", () => {
     showLocation("pickup");
 
     calculateQuote(true);
-});
+  });
 
-dropAuto.addListener("place_changed", () => {
+  dropAuto.addListener("place_changed", () => {
 
     const place = dropAuto.getPlace();
 
     if (!place.geometry) {
-        showToast("⚠️ Please select drop address from dropdown");
-        dropInput.value = "";
-        dropPlace = null;
-        return;
+      showToast("⚠️ Please select drop address from dropdown");
+      dropInput.value = "";
+      dropPlace = null;
+      return;
     }
 
     dropPlace = place;
@@ -1399,29 +1403,8 @@ dropAuto.addListener("place_changed", () => {
     showLocation("drop");
 
     calculateQuote(true);
-});
-  const toggle = document.getElementById("useCurrentLocation");
-  if (toggle) {
-    toggle.addEventListener("change", () => {
-      if (!toggle.checked) return;
-      if (!navigator.geolocation) { showToast("⚠️ Location not supported."); toggle.checked = false; return; }
-      pickupInput.value = "📍 Getting your location...";
-      navigator.geolocation.getCurrentPosition(
-        pos => {
-          const latLng = new google.maps.LatLng(pos.coords.latitude, pos.coords.longitude);
-          new google.maps.Geocoder().geocode({ location: latLng }, (res, status) => {
-            if (status === "OK" && res[0]) {
-              pickupInput.value = res[0].formatted_address;
-              pickupPlace = { geometry: { location: latLng } };
-              showLocation("pickup"); calculateQuote(true);
-            } else { pickupInput.value = ""; toggle.checked = false; showToast("⚠️ Could not get address."); }
-          });
-        },
-        err => { pickupInput.value = ""; toggle.checked = false; showToast("❌ " + err.message); },
-        { enableHighAccuracy: true, timeout: 10000 }
-      );
-    });
-  }
+  });
+
   attachAutoCalculation();
 }
 
