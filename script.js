@@ -2539,6 +2539,7 @@ function selectMoveType(el, type) {
   const input = document.getElementById("moveType");
   if (input) input.value = type;
   renderSizeCards(type);
+  renderFurnitureGrid(type);
   if (typeof buildBsHouseOptions === "function") {
     buildBsHouseOptions();
   }
@@ -2546,7 +2547,6 @@ function selectMoveType(el, type) {
     calculateQuote(true);
   }
 }
-
 function renderSizeCards(type) {
   const config = MOVE_TYPE_CONFIG[type] || MOVE_TYPE_CONFIG.home;
   const label  = document.getElementById("sizeLabelText");
