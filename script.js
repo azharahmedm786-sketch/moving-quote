@@ -1309,7 +1309,7 @@ syncPayOnlineButton(
 );
 }
 
-function startRazorpayPayment() { startPayment(); }
+async function startRazorpayPayment() { startPayment(); }
 
 /* ============================================
    PHOTO UPLOAD
