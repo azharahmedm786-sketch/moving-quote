@@ -1474,10 +1474,29 @@ Select items you're moving. Furniture charges are calculated individually based 
 </div>
 
 <!-- SCRIPTS -->
-<script src="https://packzen-config.azharahmedm786.workers.dev"></script>
+<!-- 1. Firebase SDK (must be first) -->
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+
+<!-- 2. Config files -->
+<script src="env-config.js"></script>
 <script src="firebase-config.js"></script>
- 
-  <script>
+<script src="https://packzen-config.azharahmedm786.workers.dev"></script>
+
+<!-- 3. EmailJS -->
+<script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+<script>emailjs.init("y2TDPrqIRH-YMJ29_");</script>
+
+<!-- 4. Razorpay & PDF -->
+<script src="https://checkout.razorpay.com/v1/checkout.js" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
+
+<!-- 5. Your main script (after Firebase) -->
+<script src="script.js?v=4"></script>
+
+<!-- 6. Admin check -->
+<script>
 (function() {
   const ADMIN_EMAILS = [
     "admin@packzen.com",
@@ -1490,77 +1509,47 @@ Select items you're moving. Furniture charges are calculated individually based 
     n = n || 0;
     if (window._firebase) { cb(); return; }
     if (n > 30) return;
-    setTimeout(function() { waitFB(cb, n + 1); }, 200);
-  }
-  function applyAdminLink(show) {
-    var link = document.getElementById("adminNavLink");
-    if (link) link.style.display = show ? "" : "none";
+    setTimeout(() => waitFB(cb, n + 1), 200);
   }
   waitFB(function() {
     window._firebase.auth.onAuthStateChanged(function(user) {
-      if (!user) { applyAdminLink(false); return; }
-      var userEmail = (user.email || "").toLowerCase();
-      if (ADMIN_EMAILS.includes(userEmail)) { applyAdminLink(true); return; }
+      if (!user) { document.getElementById("adminNavLink").style.display = "none"; return; }
+      if (ADMIN_EMAILS.includes((user.email || "").toLowerCase())) {
+        document.getElementById("adminNavLink").style.display = "";
+        return;
+      }
       window._firebase.db.collection("users").doc(user.uid).get()
-        .then(function(doc) {
-          var role = doc.exists ? (doc.data() || {}).role : null;
-          applyAdminLink(role === "admin");
+        .then(doc => {
+          document.getElementById("adminNavLink").style.display =
+            (doc.exists && doc.data()?.role === "admin") ? "" : "none";
         })
-        .catch(function() { applyAdminLink(false); });
+        .catch(() => { document.getElementById("adminNavLink").style.display = "none"; });
     });
   });
 })();
 </script>
-<script src="https://checkout.razorpay.com/v1/checkout.js" defer></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
-<script src="script.js"></script>
+
+<!-- 7. Google Maps loader -->
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
-    var statValues = ['100', '2026', '100', '0'];
-    var statNumbers = document.querySelectorAll('.stat-number');
-    statNumbers.forEach(function(el, i) {
-      if (statValues[i] !== undefined) el.textContent = statValues[i];
-    });
+function loadGoogleMaps() {
+  if (!window.ENV || !window.ENV.GOOGLE_MAPS_KEY) return;
+  var s = document.createElement('script');
+  s.src = 'https://maps.googleapis.com/maps/api/js?key=' + window.ENV.GOOGLE_MAPS_KEY + '&libraries=places&callback=initAutocomplete';
+  s.async = true;
+  s.defer = true;
+  document.head.appendChild(s);
+}
+window.addEventListener('load', loadGoogleMaps);
+</script>
+
+<!-- 8. Service Worker -->
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch(() => {});
   });
-
-  function loadGoogleMaps() {
-    if (!window.ENV || !window.ENV.GOOGLE_MAPS_KEY) return;
-    var s = document.createElement('script');
-    s.src = 'https://maps.googleapis.com/maps/api/js?key=' + window.ENV.GOOGLE_MAPS_KEY + '&libraries=places&callback=initAutocomplete';
-    s.async = true; s.defer = true;
-    document.head.appendChild(s);
-  }
-  window.addEventListener('load', loadGoogleMaps);
-</script>
-  <script>
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', function () {
-      navigator.serviceWorker.register('/sw.js')
-        .then(r => console.log('SW registered:', r.scope))
-        .catch(e => console.log('SW failed:', e));
-   });
-  }
-</script>
-<script src="env-config.js"></script>
-<script src="firebase-config.js"></script>
-
-<!-- ✅ ADD EMAILJS HERE -->
-<script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
-<script>
-  (function(){
-    emailjs.init("y2TDPrqIRH-YMJ29_");
-  })();
+}
 </script>
 
-<!-- 🔥 FIREBASE SDK -->
-<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
-
-<!-- 🔥 YOUR FIREBASE CONFIG -->
-<script src="firebase-config.js"></script>
-
-<!-- 🔥 YOUR MAIN SCRIPT -->
-<script src="script.js?v=3"></script>
 </body>
 </html>
