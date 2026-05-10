@@ -149,30 +149,6 @@ function debounce(fn, ms) {
    MOVE TYPE SELECTOR
    ============================================ */
 
-let selectedMoveType = "home";
-
-function selectMoveType(type) {
-
-  selectedMoveType = type;
-
-  // Remove active class from all cards
-  document.querySelectorAll(".move-type-card").forEach(card => {
-    card.classList.remove("active");
-  });
-
-  // Add active class to clicked card
-  const activeCard = document.querySelector(`[data-move="${type}"]`);
-
-  if (activeCard) {
-    activeCard.classList.add("active");
-  }
-
-  // Re-render size cards
-  renderSizeCards(type);
-
-  // Recalculate quote
-  calculateQuote(true);
-}
 /* ============================================
    BOTTOM SHEET SYSTEM
    ============================================ */
