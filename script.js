@@ -2435,10 +2435,12 @@ async function loadReviewsPublic() {
 /* ============================================
    MULTI-STEP FORM
    ============================================ */
+/* ============================================
+   MULTI-STEP FORM
+   ============================================ */
 let currentStep  = 0;
 function getSteps() { return document.querySelectorAll(".form-step"); }
 const STEP_LABELS = ["What type of move?","Where are you moving?","When & what type of move?","What are you moving?","Almost done — confirm & book"];
-let selectedMoveType = "home";
 
 const MOVE_TYPE_CONFIG = window.MOVE_TYPE_CONFIG = {
   home: { sizeLabel:"House Type", icon:"🏠", sizes:[
