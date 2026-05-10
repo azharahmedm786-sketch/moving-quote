@@ -1309,7 +1309,7 @@ syncPayOnlineButton(
 );
 }
 
-async function startRazorpayPayment() { startPayment(); }
+ function startRazorpayPayment() { startPayment(); }
 
 /* ============================================
    PHOTO UPLOAD
@@ -1744,7 +1744,7 @@ async function bookOnWhatsApp() {
 /* ============================================
    RAZORPAY
    ============================================ */
-function startPayment() {
+async function startPayment() {
        if (isProcessingPayment) return;
 
     isProcessingPayment = true;
