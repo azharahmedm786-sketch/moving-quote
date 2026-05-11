@@ -2164,19 +2164,23 @@ input:focus-visible, select:focus-visible {
   max-width: 100vw;
   overflow-x: hidden;
 }
-/* Chatbot button — sits at bottom right */
-.chatbot-btn {        /* ← replace with your actual class */
-  bottom: max(1.5rem, env(safe-area-inset-bottom, 1.5rem)) !important;
-  right: max(1.5rem, env(safe-area-inset-right, 1.5rem)) !important;
+
+/* ── Fix: chatbot + WhatsApp stacking ── */
+#pzs-fab {
+  bottom: 28px !important;
+  right: 28px !important;
 }
 
-/* WhatsApp floats above chatbot */
 .float-wa {
-  bottom: max(5rem, calc(env(safe-area-inset-bottom, 1.5rem) + 3.5rem)) !important;
+  bottom: 96px !important;
 }
 
 @media (max-width: 480px) {
+  #pzs-fab {
+    bottom: 18px !important;
+    right: 18px !important;
+  }
   .float-wa {
-    bottom: calc(max(1rem, env(safe-area-inset-bottom, 1rem)) + 3.2rem) !important;
+    bottom: 86px !important;
   }
 }
