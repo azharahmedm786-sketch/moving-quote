@@ -1667,7 +1667,7 @@ body.dark-mode .faq-item.open .faq-q { background: rgba(249,115,22,0.10) !import
   box-shadow: 0 6px 24px rgba(234,88,12,0.45) !important;
 }
 .float-wa {
-  bottom: max(1.5rem, env(safe-area-inset-bottom, 1.5rem));
+  bottom: max(5rem, calc(env(safe-area-inset-bottom, 1.5rem) + 3.5rem));
   right:  max(1.5rem, env(safe-area-inset-right,  1.5rem));
   background: linear-gradient(135deg, #25D366, #1da851);
   box-shadow: 0 6px 24px rgba(37,211,102,0.40) !important;
@@ -2163,4 +2163,20 @@ input:focus-visible, select:focus-visible {
 .final-cta-section, .trust-signals-section, .stats-bar {
   max-width: 100vw;
   overflow-x: hidden;
+}
+/* Chatbot button — sits at bottom right */
+.chatbot-btn {        /* ← replace with your actual class */
+  bottom: max(1.5rem, env(safe-area-inset-bottom, 1.5rem)) !important;
+  right: max(1.5rem, env(safe-area-inset-right, 1.5rem)) !important;
+}
+
+/* WhatsApp floats above chatbot */
+.float-wa {
+  bottom: max(5rem, calc(env(safe-area-inset-bottom, 1.5rem) + 3.5rem)) !important;
+}
+
+@media (max-width: 480px) {
+  .float-wa {
+    bottom: calc(max(1rem, env(safe-area-inset-bottom, 1rem)) + 3.2rem) !important;
+  }
 }
