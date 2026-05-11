@@ -15,6 +15,8 @@ const STATIC_ASSETS = [
   '/style.css',
   '/script.js',
   '/manifest.json',
+   '/driver.html',
+  '/driver-manifest.json',
   '/assets/logo/packzen-logo.png',
   'https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap',
 ];
