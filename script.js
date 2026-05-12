@@ -1668,6 +1668,20 @@ async function bookOnWhatsApp() {
   if (!phone || phone.length < 10) return showToast("⚠️ Please enter a valid phone number.");
   if (lastCalculatedTotal === 0)   return showToast("⚠️ Price not calculated yet.");
   saveLead();
+   fetch("https://n8n-production-e685.up.railway.app/webhook/7e8cb436-3263-4063-9ed8-74ebcebf8214", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify({
+    name,
+    phone,
+    pickup,
+    drop
+  })
+})
+.then(res => console.log("n8n sent"))
+.catch(err => console.error("n8n error", err));
   const pickup     = document.getElementById("pickup")?.value  || "";
   const drop       = document.getElementById("drop")?.value    || "";
   const date       = document.getElementById("shiftDate")?.value || "";
