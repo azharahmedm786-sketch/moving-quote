@@ -1648,7 +1648,7 @@ const floorCost = liftAvail
    WHATSAPP BOOKING
    ============================================ */
 function saveLead() {
-  fetch("https://script.google.com/macros/s/AKfycbwne_QGsKg2vomV1ELPCNkJQ--vMUx4qbkKxfHPvMT9zjkduNZ3t7AC5XC-lNnskEzwVg/exec", {
+  fetch("https://n8n-production-e685.up.railway.app/webhook-test/7e8cb436-3263-4063-9ed8-74ebcebf8214", {
     method: "POST",
     body: JSON.stringify({
       name:   document.getElementById("custName")?.value||"",
