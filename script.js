@@ -1317,7 +1317,9 @@ return;
 container.innerHTML = "";
 snapshot.forEach(doc => {
 const data = doc.data();
-container.innerHTML += <div style="padding:12px;margin-bottom:12px;border:1px solid #333;border-radius:10px;background:#0f172a;"> <div style="font-weight:600;">${data.pickup||"N/A"} → ${data.drop||"N/A"}</div> <div style="margin-top:6px;">💰 ₹${data.total||0}</div> <div style="font-size:12px;opacity:0.7;">📅 ${data.date||""}</div> </div>;
+container.innerHTML += `
+<div style="padding:12px;margin-bottom:12px;border:1px solid #333;border-radius:10px;background:#0f172a;">
+`;
 });
 } catch (error) {
 container.innerHTML = "❌ Failed to load quotes";
@@ -2867,70 +2869,7 @@ if (typeof calculateQuote === "function") {
 calculateQuote(true);
 }
 }
-function renderSizeCards(type) {
 
-  const config = MOVE_TYPE_CONFIG[type] || MOVE_TYPE_CONFIG.home;
-
-  const label = document.getElementById("sizeLabelText");
-  const cards = document.getElementById("houseCards");
-  const select = document.getElementById("house");
-
-  if (label) {
-    label.textContent = config.sizeLabel;
-  }
-
-  if (!cards || !select) return;
-
-  // RESET
-  cards.innerHTML = "";
-  select.innerHTML = '<option value="">Select</option>';
-
-  // BUILD CARDS
-  config.sizes.forEach(s => {
-
-    // DROPDOWN OPTION
-    const option = document.createElement("option");
-    option.value = s.value;
-    option.textContent = s.label;
-    select.appendChild(option);
-
-    // CARD
-    const card = document.createElement("div");
-
-    card.className = "select-card";
-    card.style.cursor = "pointer";
-
-    card.innerHTML = `
-      <div class="sc-icon">${s.icon}</div>
-      <div class="sc-label">${s.label}</div>
-      <div class="sc-sub">${s.sub}</div>
-    `;
-
-    // CLICK
-    card.onclick = () => {
-
-      document.querySelectorAll("#houseCards .select-card")
-        .forEach(c => c.classList.remove("selected"));
-
-      card.classList.add("selected");
-
-      select.value = s.value;
-
-      if (typeof calculateQuote === "function") {
-        calculateQuote(true);
-      }
-
-    };
-
-    cards.appendChild(card);
-
-  });
-
-  // RENDER FURNITURE
-  if (typeof renderFurnitureGrid === "function") {
-    renderFurnitureGrid(type);
-  }
-}
 
 function renderFurnitureGrid(type) {
 const grid = document.querySelector(".furniture-grid");
