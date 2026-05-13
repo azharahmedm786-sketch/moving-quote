@@ -2881,25 +2881,24 @@ function renderSizeCards(type) {
 
   if (!cards || !select) return;
 
-  // CLEAR OLD CONTENT
+  // RESET
   cards.innerHTML = "";
   select.innerHTML = '<option value="">Select</option>';
 
+  // BUILD CARDS
   config.sizes.forEach(s => {
 
-    // CREATE SELECT OPTION
+    // DROPDOWN OPTION
     const option = document.createElement("option");
     option.value = s.value;
     option.textContent = s.label;
     select.appendChild(option);
 
-    // CREATE CARD
+    // CARD
     const card = document.createElement("div");
 
     card.className = "select-card";
-
-    card.setAttribute("role", "button");
-    card.setAttribute("tabindex", "0");
+    card.style.cursor = "pointer";
 
     card.innerHTML = `
       <div class="sc-icon">${s.icon}</div>
@@ -2907,8 +2906,8 @@ function renderSizeCards(type) {
       <div class="sc-sub">${s.sub}</div>
     `;
 
-    // CLICK EVENT
-    card.addEventListener("click", () => {
+    // CLICK
+    card.onclick = () => {
 
       document.querySelectorAll("#houseCards .select-card")
         .forEach(c => c.classList.remove("selected"));
@@ -2917,30 +2916,21 @@ function renderSizeCards(type) {
 
       select.value = s.value;
 
-      calculateQuote(true);
-    });
+      if (typeof calculateQuote === "function") {
+        calculateQuote(true);
+      }
+
+    };
 
     cards.appendChild(card);
 
   });
-}
-renderFurnitureGrid(type);
-}
 
-const FURNITURE_CATEGORIES = {
-home: [
-{id:"cat-living", icon:"🛋️", label:"Living Room", items:[{id:"sofaCheck",emoji:"🛋️",name:"Sofa"},{id:"tvCheck",emoji:"📺",name:"TV"},{id:"tvUnitCheck",emoji:"🗄️",name:"TV Unit"},{id:"coffeeCheck",emoji:"☕",name:"Coffee Table"},{id:"acCheck",emoji:"❄️",name:"AC Unit"}]},
-{id:"cat-bedroom", icon:"🛏️", label:"Bedroom", items:[{id:"bedCheck",emoji:"🛏️",name:"Bed"},{id:"wardrobeCheck",emoji:"🚪",name:"Wardrobe"},{id:"dressingCheck",emoji:"🪞",name:"Dressing Table"},{id:"sideTableCheck",emoji:"🪑",name:"Side Table"}]},
-{id:"cat-kitchen", icon:"🍳", label:"Kitchen", items:[{id:"fridgeCheck",emoji:"🧊",name:"Fridge"},{id:"wmCheck",emoji:"🫧",name:"Washing Machine"},{id:"microwaveCheck",emoji:"📦",name:"Microwave"},{id:"chimneyCheck",emoji:"🔧",name:"Chimney"},{id:"diningCheck",emoji:"🪑",name:"Dining Table+Chairs"}]},
-{id:"cat-other", icon:"📦", label:"Other Items", items:[{id:"bikeCheck",emoji:"🏍️",name:"Bike/Scooter"},{id:"cycleCheck",emoji:"🚲",name:"Cycle"},{id:"plantCheck",emoji:"🪴",name:"Large Plants"},{id:"gymCheck",emoji:"🏋️",name:"Gym Equipment"}]}
-],
-office: [
-{id:"cat-workstation",icon:"🖥️",label:"Workstation", items:[{id:"deskCheck",emoji:"🖥️",name:"Office Desk"},{id:"chairCheck",emoji:"🪑",name:"Chair"},{id:"serverCheck",emoji:"💾",name:"Server/PC"},{id:"printerCheck",emoji:"🖨️",name:"Printer"}]},
-{id:"cat-cabin", icon:"🏢",label:"Cabin / Meeting",items:[{id:"confCheck",emoji:"📋",name:"Conference Table"},{id:"cabinetCheck",emoji:"🗄️",name:"Filing Cabinet"},{id:"whiteboardCheck",emoji:"📝",name:"Whiteboard"}]},
-{id:"cat-appliances", icon:"❄️",label:"Appliances", items:[{id:"fridgeCheck",emoji:"🧊",name:"Fridge"},{id:"acCheck",emoji:"❄️",name:"AC Unit"},{id:"wmCheck",emoji:"🫧",name:"Washing Machine"}]},
-{id:"cat-other", icon:"📦",label:"Other Items", items:[{id:"plantCheck",emoji:"🪴",name:"Large Plants"},{id:"gymCheck",emoji:"🏋️",name:"Gym Equipment"}]}
-]
-};
+  // RENDER FURNITURE
+  if (typeof renderFurnitureGrid === "function") {
+    renderFurnitureGrid(type);
+  }
+}
 
 function renderFurnitureGrid(type) {
 const grid = document.querySelector(".furniture-grid");
