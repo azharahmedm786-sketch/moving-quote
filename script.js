@@ -400,7 +400,28 @@ const title = document.querySelector("#bsHouse .bs-title");
 if (title) title.textContent = "🏠 " + config.sizeLabel;
 const selected = document.getElementById("house")?.value;
 body.innerHTML = '' +
-config.sizes.map(s => <div class="bs-house-card ${s.value === selected ? "selected" : ""}" onclick="pickHouseType(event,'${s.value}','${s.icon} ${s.label}','${s.label}')"> <div class="bs-house-icon">${s.icon}</div> <div class="bs-house-label">${s.label}</div> <div class="bs-house-sub">${s.sub || ""}</div> </div>).join("") + "";
+config.sizes.map(s => `<div class="bs-house-card ${s.value === selected ? "selected" : ""}" data-house-value="${s.value}" data-house-label="${s.icon} ${s.label}" data-house-short="${s.label}" role="button" tabindex="0"> <div class="bs-house-icon">${s.icon}</div> <div class="bs-house-label">${s.label}</div> <div class="bs-house-sub">${s.sub || ""}</div> </div>`).join("") + "";
+
+// Add event listeners to all house cards
+body.querySelectorAll('.bs-house-card').forEach(card => {
+  card.addEventListener('click', function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    const value = this.getAttribute('data-house-value');
+    const label = this.getAttribute('data-house-label');
+    const short = this.getAttribute('data-house-short');
+    pickHouseType(e, value, label, short);
+  });
+  card.addEventListener('touchend', function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    const value = this.getAttribute('data-house-value');
+    const label = this.getAttribute('data-house-label');
+    const short = this.getAttribute('data-house-short');
+    pickHouseType(e, value, label, short);
+  });
+  card.style.cursor = 'pointer';
+});
 }
 
 function pickHouseType(event, value, label, shortLabel) {
@@ -2613,10 +2634,28 @@ Object.entries(CHECKLIST_DATA).forEach(([cat, items]) => {
 html += <div class="cl-category">${cat}</div>;
 items.forEach((item, i) => {
 const key = cat + i, done = saved[key];
-html += <div class="cl-item ${done?"done":""}" onclick="toggleChecklist('${key}',this)"><div class="cl-check">${done?"✓":""}</div><div class="cl-text">${item}</div></div>;
+html += `<div class="cl-item ${done?'done':''}" data-check-key="${key}" role="button" tabindex="0"><div class="cl-check">${done?'✓':''}</div><div class="cl-text">${item}</div></div>`;
 });
 });
 container.innerHTML = html;
+
+// Add event delegation for checklist items
+container.querySelectorAll('.cl-item[data-check-key]').forEach(item => {
+  item.addEventListener('click', function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    const key = this.getAttribute('data-check-key');
+    toggleChecklist(key, this);
+  });
+  item.addEventListener('touchend', function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    const key = this.getAttribute('data-check-key');
+    toggleChecklist(key, this);
+  });
+  item.style.cursor = 'pointer';
+});
+
 updateChecklistProgress();
 }
 
@@ -2839,10 +2878,42 @@ const label = document.getElementById("sizeLabelText");
 const cards = document.getElementById("houseCards");
 const select = document.getElementById("house");
 if (label) label.textContent = config.sizeLabel;
-if (cards) cards.innerHTML = config.sizes.map(s => <div class="select-card" onclick="selectCard(this,'house','${s.value}')"> <div class="sc-icon">${s.icon}</div><div class="sc-label">${s.label}</div><div class="sc-sub">${s.sub}</div> </div>).join("");
+if (cards) {
+  cards.innerHTML = config.sizes.map(s => `<div class="select-card" data-house-value="${s.value}" data-house-label="${s.label}" role="button" tabindex="0" aria-label="Select ${s.label}"> <div class="sc-icon">${s.icon}</div><div class="sc-label">${s.label}</div><div class="sc-sub">${s.sub}</div> </div>`).join("");
+
+  // Add click/touch event listeners to all cards
+  cards.querySelectorAll('.select-card').forEach(card => {
+    card.addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      const value = this.getAttribute('data-house-value');
+      selectCard(this, 'house', value);
+    });
+
+    // Touch support for mobile
+    card.addEventListener('touchend', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      const value = this.getAttribute('data-house-value');
+      selectCard(this, 'house', value);
+    });
+
+    // Make it visually clickable
+    card.style.cursor = 'pointer';
+
+    // Keyboard support
+    card.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        const value = this.getAttribute('data-house-value');
+        selectCard(this, 'house', value);
+      }
+    });
+  });
+}
 if (select) {
-select.innerHTML = 'Select size' +
-config.sizes.map(s => <option value="${s.value}">${s.label}</option>).join("");
+select.innerHTML = '<option value="">Select size</option>' +
+config.sizes.map(s => `<option value="${s.value}">${s.label}</option>`).join("");
 }
 renderFurnitureGrid(type);
 }
@@ -2870,12 +2941,69 @@ const FREE_CATS = ["cat-kitchen","cat-other","cat-appliances"];
 const itemCard = (item, catId) => {
 const isFree = FREE_CATS.includes(catId);
 const price = FURNITURE_PRICES[item.id] || 0;
-const priceLabel = isFree ? "FREE" : (price > 0 ? +₹${price} : "FREE");
-return <div class="fc-qty-card" id="card-${item.id}"> <span class="fc-emoji">${item.emoji}</span> <span class="fc-name">${item.name}</span> <span class="fc-price-tag" style="${isFree || !price ? 'color:#94a3b8' : ''}">${priceLabel}</span> <div class="fc-qty-row"> <button class="fc-qty-btn" onclick="changeFurnitureQty('${item.id}',-1)" aria-label="Remove ${item.name}">−</button> <input type="number" id="${item.id}" value="0" min="0" max="20" class="fc-qty-input" onchange="syncFurnitureQty('${item.id}')" aria-label="${item.name} quantity" readonly> <button class="fc-qty-btn" onclick="changeFurnitureQty('${item.id}',1)" aria-label="Add ${item.name}">+</button> </div> </div>;
+const priceLabel = isFree ? "FREE" : (price > 0 ? `+₹${price}` : "FREE");
+return `<div class="fc-qty-card" id="card-${item.id}" data-item-id="${item.id}"> <span class="fc-emoji">${item.emoji}</span> <span class="fc-name">${item.name}</span> <span class="fc-price-tag" style="${isFree || !price ? 'color:#94a3b8' : ''}">${priceLabel}</span> <div class="fc-qty-row"> <button class="fc-qty-btn" data-action="minus" data-item="${item.id}" aria-label="Remove ${item.name}">−</button> <input type="number" id="${item.id}" value="0" min="0" max="20" class="fc-qty-input" onchange="syncFurnitureQty('${item.id}')" aria-label="${item.name} quantity" readonly> <button class="fc-qty-btn" data-action="plus" data-item="${item.id}" aria-label="Add ${item.name}">+</button> </div> </div>`;
 };
-const categoryBlock = cat => <div class="fc-category"> <div class="fc-category-header" onclick="toggleFurnitureCategory('${cat.id}')"> <span class="fc-cat-icon">${cat.icon}</span> <span class="fc-cat-label">${cat.label}</span> <span class="fc-cat-arrow" id="arrow-${cat.id}">▾</span> </div> <div class="fc-category-items" id="${cat.id}" style="display:flex"> ${cat.items.map(item => itemCard(item, cat.id)).join("")} </div> </div>;
-const cartonSection = <div class="fc-category"> <div class="fc-category-header" onclick="toggleFurnitureCategory('cat-carton')"> <span class="fc-cat-icon">📦</span><span class="fc-cat-label">Carton Boxes</span> <span class="fc-cat-arrow" id="arrow-cat-carton">▾</span> </div> <div class="fc-category-items" id="cat-carton" style="display:flex"> <div class="carton-box-row"> <span class="carton-label">📦 How many carton boxes?</span> <div class="carton-qty-wrap"> <button class="qty-btn" onclick="changeCartonQty(-1)">−</button> <input type="number" id="cartonQty" value="0" min="0" max="50" class="fc-qty" onchange="calculateQuote(true)"> <button class="qty-btn" onclick="changeCartonQty(1)">+</button> </div> <span class="carton-price-note">₹50 per box</span> </div> </div> </div>;
+const categoryBlock = cat => `<div class="fc-category" data-cat-id="${cat.id}"> <div class="fc-category-header" data-toggle-cat="${cat.id}"> <span class="fc-cat-icon">${cat.icon}</span> <span class="fc-cat-label">${cat.label}</span> <span class="fc-cat-arrow" id="arrow-${cat.id}">▾</span> </div> <div class="fc-category-items" id="${cat.id}" style="display:flex"> ${cat.items.map(item => itemCard(item, cat.id)).join("")} </div> </div>`;
+const cartonSection = `<div class="fc-category" data-cat-id="cat-carton"> <div class="fc-category-header" data-toggle-cat="cat-carton"> <span class="fc-cat-icon">📦</span><span class="fc-cat-label">Carton Boxes</span> <span class="fc-cat-arrow" id="arrow-cat-carton">▾</span> </div> <div class="fc-category-items" id="cat-carton" style="display:flex"> <div class="carton-box-row"> <span class="carton-label">📦 How many carton boxes?</span> <div class="carton-qty-wrap"> <button class="qty-btn" data-carton-action="minus">−</button> <input type="number" id="cartonQty" value="0" min="0" max="50" class="fc-qty" onchange="calculateQuote(true)"> <button class="qty-btn" data-carton-action="plus">+</button> </div> <span class="carton-price-note">₹50 per box</span> </div> </div> </div>`;
 grid.innerHTML = categories.map(categoryBlock).join("") + cartonSection;
+
+// Add event delegation for furniture interactions
+grid.querySelectorAll('.fc-qty-btn[data-action]').forEach(btn => {
+  btn.addEventListener('click', function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    const itemId = this.getAttribute('data-item');
+    const action = this.getAttribute('data-action');
+    const delta = action === 'plus' ? 1 : -1;
+    changeFurnitureQty(itemId, delta);
+  });
+  btn.addEventListener('touchend', function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    const itemId = this.getAttribute('data-item');
+    const action = this.getAttribute('data-action');
+    const delta = action === 'plus' ? 1 : -1;
+    changeFurnitureQty(itemId, delta);
+  });
+  btn.style.cursor = 'pointer';
+});
+
+// Category toggle delegation
+grid.querySelectorAll('[data-toggle-cat]').forEach(header => {
+  header.addEventListener('click', function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    const catId = this.getAttribute('data-toggle-cat');
+    toggleFurnitureCategory(catId);
+  });
+  header.addEventListener('touchend', function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    const catId = this.getAttribute('data-toggle-cat');
+    toggleFurnitureCategory(catId);
+  });
+  header.style.cursor = 'pointer';
+});
+
+// Carton buttons
+grid.querySelectorAll('[data-carton-action]').forEach(btn => {
+  btn.addEventListener('click', function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    const action = this.getAttribute('data-carton-action');
+    const delta = action === 'plus' ? 1 : -1;
+    changeCartonQty(delta);
+  });
+  btn.addEventListener('touchend', function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    const action = this.getAttribute('data-carton-action');
+    const delta = action === 'plus' ? 1 : -1;
+    changeCartonQty(delta);
+  });
+  btn.style.cursor = 'pointer';
+});
 }
 
 function toggleFurnitureCategory(id) {
@@ -3084,13 +3212,40 @@ const canReschedule = !["transit","delivered","cancelled"].includes(b.status);
 const canRate = b.status === "delivered" && !b.driverRating;
 const canClaim = b.status === "delivered" && !b.damageClaimed;
 return <div class="bk-card"> <div class="bk-card-top"><div class="bk-route">${escapeHTML((b.pickup||"?").split(",")[0])} → ${escapeHTML((b.drop||"?").split(",")[0])}</div><div class="bk-status" style="color:${color}">${icon} ${escapeHTML(capitalize(b.status||"confirmed"))}</div></div> <div class="bk-meta"><span>₹${(b.total||0).toLocaleString("en-IN")}</span><span>${escapeHTML(b.date)||"Date TBD"}</span><span style="font-size:.72rem;color:#5a6a8a">${escapeHTML(b.bookingRef)||""}</span></div> ${canCancel||canReschedule||canRate||canClaim?
-${canReschedule?<button class="bk-btn reschedule" onclick="openRescheduleModal('${id}','${b.bookingRef||id}','${b.date||""}')">📅 Reschedule</button>:""}
-${canCancel?<button class="bk-btn cancel" onclick="openCancelModal('${id}','${b.bookingRef||id}','${b.status||""}')">✕ Cancel</button>:""}
-${canRate?<button class="bk-btn rate" onclick="openRateDriverModal('${id}','${b.bookingRef||id}','${b.driverName||""}')">⭐ Rate Driver</button>:""}
-${canClaim?<button class="bk-btn claim" onclick="openDamageModal('${id}','${b.bookingRef||id}')">🔧 Report Damage</button>:""}
+${canReschedule?`<button class="bk-btn reschedule" data-action="reschedule" data-id="${id}" data-ref="${b.bookingRef||id}" data-date="${b.date||""}">📅 Reschedule</button>`:""}
+${canCancel?`<button class="bk-btn cancel" data-action="cancel" data-id="${id}" data-ref="${b.bookingRef||id}" data-status="${b.status||""}">✕ Cancel</button>`:""}
+${canRate?`<button class="bk-btn rate" data-action="rate" data-id="${id}" data-ref="${b.bookingRef||id}" data-driver="${b.driverName||""}">⭐ Rate Driver</button>`:""}
+${canClaim?`<button class="bk-btn claim" data-action="claim" data-id="${id}" data-ref="${b.bookingRef||id}">🔧 Report Damage</button>`:""}
 :""} </div>;
 }).join("");
 }).catch(() => {});
+
+// Attach event listeners to booking action buttons
+attachBookingButtonListeners();
+}
+
+function attachBookingButtonListeners() {
+  const list = document.getElementById("bookingsList");
+  if (!list) return;
+
+  list.querySelectorAll('.bk-btn[data-action]').forEach(btn => {
+    btn.addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      const action = this.getAttribute('data-action');
+      const id = this.getAttribute('data-id');
+      const ref = this.getAttribute('data-ref');
+      const status = this.getAttribute('data-status');
+      const date = this.getAttribute('data-date');
+      const driver = this.getAttribute('data-driver');
+
+      if (action === 'reschedule') openRescheduleModal(id, ref, date);
+      else if (action === 'cancel') openCancelModal(id, ref, status);
+      else if (action === 'rate') openRateDriverModal(id, ref, driver);
+      else if (action === 'claim') openDamageModal(id, ref);
+    });
+    btn.style.cursor = 'pointer';
+  });
 }
 
 function loadProfileData() {
