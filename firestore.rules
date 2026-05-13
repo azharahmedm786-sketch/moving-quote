@@ -1,0 +1,288 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // HELPER FUNCTIONS
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
+    // Is the request from a logged-in user?
+    function isAuth() {
+      return request.auth != null;
+    }
+
+    // Is the logged-in user the owner of this doc?
+    function isOwner(uid) {
+      return isAuth() && request.auth.uid == uid;
+    }
+
+    // Read the user's role from /users/{uid}
+    function userRole() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
+    }
+
+    function isAdmin() {
+      return isAuth() && userRole() == 'admin';
+    }
+
+    function isDriver() {
+      return isAuth() && userRole() == 'driver';
+    }
+
+    function isCustomer() {
+      return isAuth() && userRole() == 'customer';
+    }
+
+    // Is the driver assigned to this booking?
+    function isAssignedDriver(booking) {
+      return isAuth() && booking.driverUid == request.auth.uid;
+    }
+
+    // Only allow specific fields to be changed (no extra fields snuck in)
+    function onlyFields(fields) {
+      return request.resource.data.diff(resource.data).affectedKeys().hasOnly(fields);
+    }
+
+
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // USERS  /users/{uid}
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    match /users/{uid} {
+
+      // Read: own doc, OR admin, OR driver reading their own doc
+      allow read: if isOwner(uid) || isAdmin();
+
+      // Create: only during signup (user creates their own doc)
+      allow create: if isOwner(uid)
+        && request.resource.data.role in ['customer', 'driver']
+        && request.resource.data.keys().hasAll(['name', 'role', 'createdAt']);
+
+      // Update own profile: customer can update name, email, phone, prefs, fcmToken
+      // Driver can update isOnline, lat, lng, locationUpdatedAt, currentBooking
+      allow update: if isOwner(uid) && (
+          onlyFields(['name', 'email', 'phone', 'prefEmail', 'prefSMS', 'fcmToken', 'fcmUpdatedAt',
+                      'referralDiscount', 'referralCredits', 'referralCount', 'referredBy',
+                      'isOnline', 'lat', 'lng', 'locationUpdatedAt', 'currentBooking',
+                      'avgRating', 'totalRatings'])
+        );
+
+      // Admin can update anything (assign roles, create drivers, update ratings)
+      allow update: if isAdmin();
+
+      // Nobody deletes users (only Firebase Console)
+      allow delete: if false;
+    }
+
+
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // BOOKINGS  /bookings/{bookingId}
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    match /bookings/{bookingId} {
+
+      // Customer reads their own bookings
+      allow read: if isAuth() && (
+        resource.data.customerUid == request.auth.uid
+        || isAdmin()
+        || isAssignedDriver(resource.data)
+      );
+
+      // Customer creates a booking (must be logged in, must set their own UID)
+      allow create: if isAuth()
+        && request.resource.data.customerUid == request.auth.uid
+        && request.resource.data.keys().hasAll(['customerUid', 'pickup', 'drop', 'status', 'createdAt'])
+        && request.resource.data.status == 'confirmed';
+
+      // Customer updates: cancel, reschedule, rating only
+      allow update: if isAuth()
+        && resource.data.customerUid == request.auth.uid
+        && (
+          // Cancellation
+          onlyFields(['status', 'cancelReason', 'cancelledAt', 'cancelledBy'])
+          ||
+          // Rescheduling
+          onlyFields(['date', 'time', 'rescheduledAt', 'rescheduledBy'])
+          ||
+          // Rating the driver
+          onlyFields(['driverRating', 'driverFeedback', 'ratedAt'])
+        );
+
+      // Driver updates: status, location, delivery photos only
+      allow update: if isDriver()
+        && isAssignedDriver(resource.data)
+        && (
+          onlyFields(['status'])
+          ||
+          onlyFields(['driverLat', 'driverLng', 'locationUpdatedAt'])
+          ||
+          onlyFields(['deliveryPhotos', 'deliveryNote'])
+        );
+
+      // Admin: full read/write
+      allow update, delete: if isAdmin();
+    }
+
+
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // CHATS  /chats/{bookingId}/messages/{msgId}
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    match /chats/{bookingId} {
+      allow read: if isAuth() && (
+        isAdmin()
+        || get(/databases/$(database)/documents/bookings/$(bookingId)).data.customerUid == request.auth.uid
+        || get(/databases/$(database)/documents/bookings/$(bookingId)).data.driverUid   == request.auth.uid
+      );
+      allow write: if false; // Chat doc itself is not written directly
+
+      match /messages/{msgId} {
+        // Only the customer or assigned driver of THIS booking can read/write messages
+        allow read, write: if isAuth() && (
+          isAdmin()
+          || get(/databases/$(database)/documents/bookings/$(bookingId)).data.customerUid == request.auth.uid
+          || get(/databases/$(database)/documents/bookings/$(bookingId)).data.driverUid   == request.auth.uid
+        );
+      }
+    }
+
+
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // QUOTES  /quotes/{quoteId}
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    match /quotes/{quoteId} {
+      // Customer reads/creates their own saved quotes
+      allow read, create: if isAuth() && request.auth.uid == resource.data.uid;
+      allow create: if isAuth() && request.resource.data.uid == request.auth.uid;
+      allow read, write: if isAdmin();
+    }
+
+
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // REVIEWS  /reviews/{reviewId}
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    match /reviews/{reviewId} {
+      // Anyone can read approved reviews (for public display)
+      allow read: if resource.data.status == 'approved' || isAdmin();
+
+      // Logged-in customers can submit reviews
+      allow create: if isAuth()
+        && request.resource.data.keys().hasAll(['name', 'text', 'rating', 'createdAt'])
+        && request.resource.data.rating >= 1
+        && request.resource.data.rating <= 5
+        && request.resource.data.status == 'pending';
+
+      // Only admin can approve/reject
+      allow update, delete: if isAdmin();
+    }
+
+
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // DRIVER RATINGS  /driverRatings/{ratingId}
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    match /driverRatings/{ratingId} {
+      // Customer creates rating for their completed booking
+      allow create: if isAuth()
+        && request.resource.data.customerUid == request.auth.uid
+        && request.resource.data.rating >= 1
+        && request.resource.data.rating <= 5;
+
+      // Admin and the rated driver can read
+      allow read: if isAdmin()
+        || (isDriver() && resource.data.driverUid == request.auth.uid);
+
+      // No updates or deletes
+      allow update, delete: if isAdmin();
+    }
+
+
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // PROMOS  /promos/{code}
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    match /promos/{code} {
+      // Anyone logged in can read a promo to validate it
+      allow read: if isAuth();
+
+      // Only admin can create/update/delete promos
+      allow write: if isAdmin();
+    }
+
+
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // CANCEL REQUESTS  /cancelRequests/{requestId}
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    match /cancelRequests/{requestId} {
+      // Customer creates their own cancel request
+      allow create: if isAuth()
+        && request.resource.data.customerUid == request.auth.uid;
+
+      // Admin reads and resolves
+      allow read, update: if isAdmin();
+
+      // Customer can read their own requests
+      allow read: if isAuth()
+        && resource.data.customerUid == request.auth.uid;
+
+      allow delete: if false;
+    }
+
+
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // BROADCASTS  /broadcasts/{broadcastId}
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    match /broadcasts/{broadcastId} {
+      // Only admin can create broadcasts
+      allow write: if isAdmin();
+
+      // Logged-in users can read broadcasts
+      allow read: if isAuth();
+    }
+
+
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // DRIVERS  /drivers/{driverUid}
+    //  (separate collection used for avg rating aggregation)
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    match /drivers/{driverUid} {
+      allow read: if isAuth();
+      allow write: if isAdmin()
+        || (isDriver() && request.auth.uid == driverUid
+            && onlyFields(['avgRating', 'totalRatings']));
+    }
+
+
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // DAMAGE CLAIMS  /damageClaims/{claimId}
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    match /damageClaims/{claimId} {
+      // Customer creates a claim for their own delivered booking
+      allow create: if isAuth()
+        && request.resource.data.customerUid == request.auth.uid;
+
+      // Customer reads their own claims
+      allow read: if isAuth()
+        && resource.data.customerUid == request.auth.uid;
+
+      // Admin reads all and resolves
+      allow read, update: if isAdmin();
+
+      allow delete: if false;
+    }
+
+
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // LEADS  /leads/{leadId}  (from saveLead)
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    match /leads/{leadId} {
+      allow create: if true; // Anyone can submit a lead (before login)
+      allow read, update, delete: if isAdmin();
+    }
+
+
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // DENY EVERYTHING ELSE
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+  }
+}

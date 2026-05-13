@@ -1,0 +1,11 @@
+# Sitemap location
+# PackZen Packers & Movers — robots.txt
+
+User-agent: *
+Allow: /
+
+Disallow: /admin.html
+Disallow: /env-config.js
+Disallow: /firebase-config.js
+
+Sitemap: https://packzenblr.in/sitemap.xml

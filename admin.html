@@ -1,0 +1,1114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <title>PackZen Admin</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+
+  <!-- ✅ FIX 1: Block Google from indexing the admin page -->
+  <meta name="robots" content="noindex, nofollow, noarchive"/>
+
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root{--primary:#0057ff;--accent:#00c96e;--dark:#050d1a;--text:#1a2744;--text-muted:#5a6a8a;--surface:#fff;--surface2:#f4f7ff;--border:#dde4f5;--shadow-sm:0 2px 12px rgba(0,60,180,.08);--shadow-md:0 8px 32px rgba(0,60,180,.12)}
+    body.dark{--text:#e2e8f4;--text-muted:#8a9bbf;--surface:#0d1f3c;--surface2:#091529;--border:#1e3a5f;--dark:#020810}
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'DM Sans',sans-serif;background:var(--surface2);color:var(--text);min-height:100vh;transition:background .3s,color .3s}
+    h1,h2,h3{font-family:'Syne',sans-serif}
+    .admin-login{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--dark)}
+    .login-card{background:var(--surface);border-radius:24px;padding:40px 36px;max-width:400px;width:100%;box-shadow:0 30px 80px rgba(0,0,0,.3)}
+    .login-logo{font-family:'Syne',sans-serif;font-size:1.5rem;font-weight:800;color:var(--primary);margin-bottom:6px}
+    .login-sub{color:var(--text-muted);font-size:.9rem;margin-bottom:28px}
+    .field-label{display:block;font-size:.85rem;font-weight:600;color:var(--text-muted);margin-bottom:8px;margin-top:16px}
+    .field-input{width:100%;padding:12px 16px;border:1.5px solid var(--border);border-radius:12px;font-family:'DM Sans',sans-serif;font-size:.95rem;color:var(--text);background:var(--surface);outline:none;transition:border-color .2s}
+    .field-input:focus{border-color:var(--primary)}
+    .btn-auth{width:100%;padding:14px;background:var(--primary);color:#fff;border:none;border-radius:50px;font-family:'DM Sans',sans-serif;font-size:1rem;font-weight:700;cursor:pointer;margin-top:20px;box-shadow:0 6px 20px rgba(0,87,255,.3);transition:transform .2s}
+    .btn-auth:hover{transform:translateY(-2px)}
+    .btn-auth:disabled{opacity:.6;cursor:not-allowed;transform:none}
+    .auth-err{font-size:.85rem;color:#e53e3e;margin-top:10px;min-height:18px}
+    .lockout-banner{background:rgba(220,38,38,.1);border:1px solid rgba(220,38,38,.3);border-radius:10px;padding:10px 14px;font-size:.84rem;color:#dc2626;margin-top:12px;display:none}
+
+    /* ✅ FIX 2: Shell is NOT in the DOM at load — injected only after auth passes */
+    .admin-shell{display:none}
+    .admin-shell.active{display:flex;min-height:100vh}
+    .sidebar{width:240px;background:var(--dark);display:flex;flex-direction:column;padding:24px 0;flex-shrink:0;position:fixed;top:0;left:0;bottom:0;z-index:100;overflow-y:auto}
+    .sidebar-logo{padding:0 24px 20px;border-bottom:1px solid rgba(255,255,255,.08);margin-bottom:14px}
+    .sidebar-logo span{font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:800;color:#fff}
+    .sidebar-logo b{color:var(--accent)}
+    .sb-role{font-size:.7rem;color:rgba(255,255,255,.4);font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:0 24px;margin:10px 0 5px}
+    .nav-item{display:flex;align-items:center;gap:12px;padding:11px 24px;color:rgba(255,255,255,.6);font-size:.88rem;font-weight:500;cursor:pointer;transition:background .2s,color .2s;border-left:3px solid transparent}
+    .nav-item:hover{background:rgba(255,255,255,.06);color:#fff}
+    .nav-item.active{background:rgba(0,87,255,.15);color:#fff;border-left-color:var(--primary)}
+    .nav-item .ni{font-size:1rem;width:20px;text-align:center}
+    .sidebar-bottom{margin-top:auto;padding:16px 24px;border-top:1px solid rgba(255,255,255,.08)}
+    .btn-signout{width:100%;padding:10px;background:rgba(255,255,255,.08);border:none;border-radius:10px;color:rgba(255,255,255,.7);font-family:'DM Sans',sans-serif;font-size:.85rem;cursor:pointer;transition:background .2s}
+    .btn-signout:hover{background:rgba(255,80,80,.2);color:#fff}
+    .admin-main{margin-left:240px;flex:1;padding:28px;min-height:100vh;background:var(--surface2);transition:background .3s}
+    .topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px}
+    .topbar h1{font-size:1.5rem;font-weight:800;color:var(--text)}
+    .topbar-right{display:flex;align-items:center;gap:10px}
+    .theme-btn{background:var(--surface);border:1.5px solid var(--border);color:var(--text);width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;transition:transform .3s}
+    .theme-btn:hover{transform:rotate(20deg)}
+    .admin-badge{background:rgba(0,87,255,.1);color:var(--primary);font-size:.75rem;font-weight:700;padding:4px 12px;border-radius:20px;border:1px solid rgba(0,87,255,.2)}
+    /* ✅ FIX 3: Session timer display */
+    .session-timer{font-size:.75rem;color:var(--text-muted);padding:4px 10px;border:1px solid var(--border);border-radius:20px;}
+    .session-timer.warn{color:#d97706;border-color:#d97706}
+    .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-bottom:22px}
+    .stat-card{background:var(--surface);border-radius:16px;padding:18px 20px;border:1px solid var(--border);box-shadow:var(--shadow-sm)}
+    .sc-lbl{font-size:.78rem;color:var(--text-muted);font-weight:600;margin-bottom:5px}
+    .sc-val{font-family:'Syne',sans-serif;font-size:1.9rem;font-weight:800;color:var(--primary)}
+    .sc-sub{font-size:.73rem;color:var(--text-muted);margin-top:3px}
+    .section{display:none}
+    .section.active{display:block}
+    .chart-row{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:20px}
+    .chart-card{background:var(--surface);border-radius:18px;border:1px solid var(--border);padding:20px 22px;box-shadow:var(--shadow-sm)}
+    .chart-card h3{font-size:.95rem;font-weight:700;color:var(--text);margin-bottom:16px}
+    .table-card{background:var(--surface);border-radius:18px;border:1px solid var(--border);box-shadow:var(--shadow-sm);overflow:hidden;margin-bottom:20px}
+    .table-hdr{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:8px}
+    .table-title{font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;color:var(--text)}
+    .table-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+    .search-input{padding:7px 14px;border:1.5px solid var(--border);border-radius:30px;font-family:'DM Sans',sans-serif;font-size:.83rem;background:var(--surface2);color:var(--text);outline:none;width:170px}
+    table{width:100%;border-collapse:collapse}
+    th{background:var(--surface2);padding:10px 14px;text-align:left;font-size:.76rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em}
+    td{padding:12px 14px;border-bottom:1px solid var(--border);font-size:.84rem;color:var(--text);vertical-align:middle}
+    tr:last-child td{border-bottom:none}
+    tr:hover td{background:rgba(0,87,255,.02)}
+    .empty-row td{text-align:center;color:var(--text-muted);padding:36px;font-size:.88rem}
+    .badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:.72rem;font-weight:700}
+    .badge-pending{background:rgba(251,191,36,.15);color:#d97706}
+    .badge-confirmed{background:rgba(0,87,255,.12);color:var(--primary)}
+    .badge-assigned{background:rgba(124,58,237,.12);color:#7c3aed}
+    .badge-packing{background:rgba(14,165,233,.12);color:#0ea5e9}
+    .badge-transit{background:rgba(249,115,22,.12);color:#f97316}
+    .badge-delivered{background:rgba(0,201,110,.12);color:var(--accent)}
+    .btn-sm{padding:5px 12px;border-radius:18px;border:none;font-family:'DM Sans',sans-serif;font-size:.76rem;font-weight:600;cursor:pointer;transition:all .2s}
+    .btn-assign{background:rgba(0,87,255,.1);color:var(--primary)}
+    .btn-assign:hover{background:var(--primary);color:#fff}
+    .btn-export{background:rgba(0,201,110,.1);color:var(--accent);border:1.5px solid rgba(0,201,110,.3);padding:7px 14px;border-radius:30px;font-family:'DM Sans',sans-serif;font-size:.8rem;font-weight:700;cursor:pointer;transition:background .2s}
+    .btn-export:hover{background:var(--accent);color:#fff}
+    .btn-primary-sm{background:var(--primary);color:#fff;padding:7px 16px;border:none;border-radius:30px;font-family:'DM Sans',sans-serif;font-size:.82rem;font-weight:700;cursor:pointer;transition:background .2s}
+    .btn-primary-sm:hover{background:#0040cc}
+    select.status-sel{padding:4px 10px;border:1.5px solid var(--border);border-radius:18px;font-family:'DM Sans',sans-serif;font-size:.76rem;font-weight:600;background:var(--surface2);color:var(--text);cursor:pointer;outline:none}
+    .driver-card{background:var(--surface);border-radius:16px;border:1px solid var(--border);padding:18px 22px;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;box-shadow:var(--shadow-sm);margin-bottom:14px}
+    .driver-info{display:flex;align-items:center;gap:14px}
+    .driver-avatar{width:46px;height:46px;border-radius:50%;background:linear-gradient(135deg,var(--primary),#7c3aed);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.2rem;font-weight:800;font-family:'Syne',sans-serif;flex-shrink:0}
+    .driver-name{font-weight:700;color:var(--text);font-size:.95rem}
+    .driver-meta{font-size:.8rem;color:var(--text-muted);margin-top:2px}
+    .online-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:5px}
+    .online-dot.on{background:var(--accent);box-shadow:0 0 5px rgba(0,201,110,.6)}
+    .online-dot.off{background:var(--text-muted)}
+    .assign-overlay{position:fixed;inset:0;background:rgba(5,13,26,.75);backdrop-filter:blur(8px);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px}
+    .assign-box{background:var(--surface);border-radius:20px;padding:32px;max-width:420px;width:100%;box-shadow:0 30px 80px rgba(0,0,0,.3)}
+    .assign-title{font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:800;color:var(--text);margin-bottom:16px}
+    .assign-info{background:var(--surface2);border-radius:12px;padding:14px;border:1px solid var(--border);font-size:.86rem;color:var(--text);line-height:1.8;margin-bottom:16px}
+    .btn-row{display:flex;gap:10px;margin-top:18px}
+    .btn-cancel{flex:1;padding:11px;background:var(--surface2);color:var(--text-muted);border:1.5px solid var(--border);border-radius:50px;font-family:'DM Sans',sans-serif;font-size:.9rem;font-weight:600;cursor:pointer}
+    .btn-confirm{flex:2;padding:11px;background:var(--primary);color:#fff;border:none;border-radius:50px;font-family:'DM Sans',sans-serif;font-size:.9rem;font-weight:700;cursor:pointer;box-shadow:0 5px 16px rgba(0,87,255,.3)}
+    .promo-form{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+    .promo-form input,.promo-form select{padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:.88rem;background:var(--surface2);color:var(--text);outline:none}
+    .promo-form input:focus,.promo-form select:focus{border-color:var(--primary)}
+    .bulk-textarea{width:100%;padding:12px;border:1.5px solid var(--border);border-radius:12px;font-family:'DM Sans',sans-serif;font-size:.9rem;color:var(--text);background:var(--surface2);outline:none;resize:vertical;min-height:80px;margin-bottom:10px}
+    .bulk-textarea:focus{border-color:var(--primary)}
+    .toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--dark);color:#fff;padding:12px 24px;border-radius:50px;font-size:.9rem;font-weight:600;z-index:99999;opacity:0;transition:opacity .3s,transform .3s;pointer-events:none;white-space:nowrap}
+    .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+    .driver-form-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:14px}
+    .driver-form-grid input,.driver-form-grid select{padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:.88rem;background:var(--surface2);color:var(--text);outline:none;width:100%}
+    .driver-form-grid input:focus,.driver-form-grid select:focus{border-color:var(--primary)}
+    .driver-form-actions{display:flex;align-items:flex-end}
+    #adminDriverMsg{min-height:18px;font-size:.83rem;margin-top:6px;font-weight:600}
+    @media(max-width:768px){
+      .admin-shell.active{flex-direction:column}
+      .sidebar{position:static;width:100%;flex-direction:row;padding:10px;height:auto;flex-wrap:nowrap;overflow-x:auto}
+      .admin-main{margin-left:0}
+      .sidebar-logo,.sb-role,.sidebar-bottom{display:none}
+      .nav-item{padding:8px 12px;font-size:.78rem;border-left:none;border-bottom:3px solid transparent}
+      .nav-item.active{border-left:none;border-bottom-color:var(--primary)}
+      .chart-row{grid-template-columns:1fr}
+      .driver-form-grid{grid-template-columns:1fr}
+    }
+  </style>
+</head>
+<body>
+
+<!-- LOGIN SCREEN -->
+<div class="admin-login" id="adminLogin">
+  <div class="login-card">
+    <div class="login-logo">📦 PackZen <span style="color:var(--text-muted);font-size:.9rem;font-weight:500;">Admin</span></div>
+    <p class="login-sub">Restricted — admin access only</p>
+
+    <!-- ✅ FIX: autocomplete off prevents browser from suggesting admin credentials to non-admins -->
+    <label class="field-label">Email</label>
+    <input id="adminEmail" type="email" class="field-input" placeholder="admin@packzen.com" autocomplete="off">
+    <label class="field-label">Password</label>
+    <input id="adminPass" type="password" class="field-input" placeholder="Password" autocomplete="off">
+
+    <div id="adminErr" class="auth-err"></div>
+    <div class="lockout-banner" id="lockoutBanner">🔒 Too many failed attempts. Please wait <span id="lockoutTimer">30</span>s before trying again.</div>
+
+    <button class="btn-auth" id="loginBtn" onclick="adminLogin()">Login to Dashboard →</button>
+  </div>
+</div>
+
+<!-- ✅ FIX 2: Admin shell is EMPTY until auth passes — injected by buildShell() -->
+<div class="admin-shell" id="adminShell"></div>
+
+<div class="toast" id="adminToast"></div>
+
+<script src="env-config.js"></script>
+<script src="firebase-config.js"></script>
+
+<script>
+/* ================================================================
+   ✅ SECURITY CONSTANTS
+   ================================================================ */
+const ADMIN_EMAILS = [
+  "admin@packzen.com",
+  "support@packzenblr.in",
+  "azharahmedm786@gmail.com",
+  "moveeasyblr@gmail.com"
+];
+
+/* ✅ FIX 3: Brute-force rate limiter
+   Max 3 failed attempts → 30s lockout, stored in sessionStorage
+   so it resets on tab close but persists within the session. */
+const RATE_KEY   = "pz_admin_attempts";
+const LOCK_KEY   = "pz_admin_lockout";
+const MAX_TRIES  = 3;
+const LOCKOUT_MS = 30 * 1000; // 30 seconds
+
+function getRateData() {
+  try { return JSON.parse(sessionStorage.getItem(RATE_KEY)) || { count: 0 }; } catch(e) { return { count: 0 }; }
+}
+function setRateData(d) { try { sessionStorage.setItem(RATE_KEY, JSON.stringify(d)); } catch(e) {} }
+function getLockout()   { try { return parseInt(sessionStorage.getItem(LOCK_KEY) || "0"); } catch(e) { return 0; } }
+function setLockout(ts) { try { sessionStorage.setItem(LOCK_KEY, String(ts)); } catch(e) {} }
+
+function isLockedOut() {
+  const until = getLockout();
+  return until > Date.now();
+}
+
+function recordFailedAttempt() {
+  const d = getRateData();
+  d.count = (d.count || 0) + 1;
+  setRateData(d);
+  if (d.count >= MAX_TRIES) {
+    setLockout(Date.now() + LOCKOUT_MS);
+    setRateData({ count: 0 });
+    startLockoutTimer();
+  }
+}
+
+function clearAttempts() {
+  try { sessionStorage.removeItem(RATE_KEY); sessionStorage.removeItem(LOCK_KEY); } catch(e) {}
+}
+
+let lockoutInterval = null;
+function startLockoutTimer() {
+  const banner = document.getElementById("lockoutBanner");
+  const span   = document.getElementById("lockoutTimer");
+  const btn    = document.getElementById("loginBtn");
+  if (banner) banner.style.display = "block";
+  if (btn) btn.disabled = true;
+  if (lockoutInterval) clearInterval(lockoutInterval);
+  lockoutInterval = setInterval(() => {
+    const remaining = Math.ceil((getLockout() - Date.now()) / 1000);
+    if (remaining <= 0) {
+      clearInterval(lockoutInterval);
+      if (banner) banner.style.display = "none";
+      if (btn) btn.disabled = false;
+      return;
+    }
+    if (span) span.textContent = remaining;
+  }, 500);
+}
+
+// Resume lockout if page was refreshed during lockout window
+if (isLockedOut()) startLockoutTimer();
+
+/* ✅ FIX 4: Session timeout — 2 hours
+   Stored in sessionStorage so it resets on tab close. */
+const SESSION_KEY      = "pz_admin_session_start";
+const SESSION_LIMIT_MS = 2 * 60 * 60 * 1000; // 2 hours
+const WARN_BEFORE_MS   = 10 * 60 * 1000;      // warn 10 min before
+
+let sessionInterval = null;
+
+function startSessionTimer() {
+  try { sessionStorage.setItem(SESSION_KEY, String(Date.now())); } catch(e) {}
+  sessionInterval = setInterval(() => {
+    const start = parseInt(sessionStorage.getItem(SESSION_KEY) || "0");
+    if (!start) return;
+    const elapsed   = Date.now() - start;
+    const remaining = SESSION_LIMIT_MS - elapsed;
+    const timerEl   = document.getElementById("sessionTimerDisplay");
+    if (!timerEl) return;
+    if (remaining <= 0) {
+      clearInterval(sessionInterval);
+      toast("⏱️ Session expired. Signing out for security.");
+      setTimeout(() => adminSignOut(), 1500);
+      return;
+    }
+    const mins = Math.floor(remaining / 60000);
+    timerEl.textContent = "Session: " + mins + "m";
+    timerEl.className   = "session-timer" + (remaining < WARN_BEFORE_MS ? " warn" : "");
+  }, 30000);
+}
+
+/* ================================================================
+   FIREBASE HELPER
+   ================================================================ */
+function waitFB(cb, n=0) {
+  if (window._firebase) { cb(); return; }
+  if (n > 30) {
+    const err = document.getElementById("adminErr");
+    if (err) err.textContent = "Firebase failed to load. Check your connection and refresh.";
+    const btn = document.getElementById("loginBtn");
+    if (btn) { btn.disabled = false; btn.textContent = "Login to Dashboard →"; }
+    return;
+  }
+  setTimeout(() => waitFB(cb, n+1), 200);
+}
+
+/* ================================================================
+   AUTO-LOGIN GUARD (checks if already signed in as admin on load)
+   ================================================================ */
+document.addEventListener("DOMContentLoaded", () => {
+  waitFB(() => {
+    const { auth, db } = window._firebase;
+    auth.onAuthStateChanged(async (user) => {
+      if (!user) return; // Not logged in — show login form, nothing else
+      const userEmail = (user.email || "").toLowerCase();
+      try {
+        const snap = await db.collection("users").doc(user.uid).get();
+        const data = snap.data() || {};
+        if (data.role === "admin" || ADMIN_EMAILS.includes(userEmail)) {
+          adminUser = user;
+          showShell(data.name || user.displayName || "Admin");
+        }
+        // If not admin role — do nothing (don't redirect, just show login)
+      } catch(e) {
+        if (ADMIN_EMAILS.includes(userEmail)) {
+          adminUser = user;
+          showShell(user.displayName || "Admin");
+        }
+      }
+    });
+  });
+});
+
+/* ================================================================
+   LOGIN — WITH RATE LIMITING
+   ================================================================ */
+function adminLogin() {
+  // ✅ Block if locked out
+  if (isLockedOut()) { startLockoutTimer(); return; }
+
+  const email = document.getElementById("adminEmail").value.trim().toLowerCase();
+  const pass  = document.getElementById("adminPass").value;
+  const err   = document.getElementById("adminErr");
+  const btn   = document.getElementById("loginBtn");
+  err.textContent = ""; err.style.color = "#ef4444";
+
+  if (!email || !pass) { err.textContent = "Please enter email and password."; return; }
+
+  btn.disabled = true; btn.textContent = "Signing in...";
+
+  waitFB(() => {
+    const { auth, db } = window._firebase;
+    auth.signInWithEmailAndPassword(email, pass)
+      .then(cred => {
+        adminUser = cred.user;
+        const userEmail = cred.user.email?.toLowerCase() || "";
+        db.collection("users").doc(cred.user.uid).get()
+          .then(async doc => {
+            const role = doc.exists ? doc.data()?.role : null;
+            const name = doc.exists ? (doc.data()?.name || "Admin") : "Admin";
+            if (role === "admin" || ADMIN_EMAILS.includes(userEmail)) {
+              // Auto-fix missing role in Firestore
+              if (ADMIN_EMAILS.includes(userEmail) && role !== "admin") {
+                try {
+                  if (doc.exists) {
+                    await db.collection("users").doc(cred.user.uid).update({ role: "admin" });
+                  } else {
+                    await db.collection("users").doc(cred.user.uid).set({
+                      name: cred.user.displayName || "Admin", email: userEmail,
+                      role: "admin", createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                  }
+                } catch(e) { console.warn("Could not set admin role:", e.message); }
+              }
+              clearAttempts(); // ✅ Reset attempts on successful login
+              showShell(name);
+            } else {
+              auth.signOut(); adminUser = null;
+              recordFailedAttempt(); // ✅ Count as failed — wrong role
+              err.textContent = "Access denied. Your account does not have admin permissions.";
+            }
+          })
+          .catch(() => {
+            if (ADMIN_EMAILS.includes(userEmail)) {
+              clearAttempts();
+              showShell(cred.user.displayName || "Admin");
+            } else {
+              auth.signOut(); adminUser = null;
+              recordFailedAttempt();
+              err.textContent = "Could not verify admin role. Please contact support.";
+            }
+          });
+      })
+      .catch(e => {
+        recordFailedAttempt(); // ✅ Count failed attempt
+        const d = getRateData();
+        const remaining = MAX_TRIES - d.count;
+        if      (e.code === "auth/wrong-password" || e.code === "auth/invalid-credential")
+          err.textContent = `Wrong password. ${remaining > 0 ? remaining + " attempt(s) remaining." : ""}`;
+        else if (e.code === "auth/user-not-found")
+          err.textContent = "No account found with this email.";
+        else if (e.code === "auth/invalid-email")
+          err.textContent = "Invalid email address.";
+        else if (e.code === "auth/too-many-requests")
+          err.textContent = "Too many attempts. Please wait a few minutes.";
+        else
+          err.textContent = e.message;
+      })
+      .finally(() => { btn.disabled = false; btn.textContent = "Login to Dashboard →"; });
+  });
+}
+
+/* ================================================================
+   SIGN OUT
+   ================================================================ */
+function adminSignOut() {
+  if (sessionInterval) clearInterval(sessionInterval);
+  try { sessionStorage.removeItem(SESSION_KEY); } catch(e) {}
+  waitFB(() => window._firebase.auth.signOut().then(() => {
+    // ✅ FIX: Clear the shell HTML on sign out — no admin UI left in DOM
+    const shell = document.getElementById("adminShell");
+    if (shell) { shell.classList.remove("active"); shell.innerHTML = ""; }
+    document.getElementById("adminLogin").style.display = "flex";
+    adminUser = null; allBookings=[]; allDrivers=[]; allCustomers=[]; allReviews=[]; allPromos=[];
+  }));
+}
+
+/* ================================================================
+   ✅ FIX 2 — BUILD SHELL: Admin HTML injected ONLY after auth passes
+   The browser never receives admin UI HTML for unauthenticated visits.
+   ================================================================ */
+function buildShell(adminName) {
+  const shell = document.getElementById("adminShell");
+  shell.innerHTML = `
+  <aside class="sidebar">
+    <div class="sidebar-logo"><span>📦 Pack<b>Zen</b></span><br><small style="color:rgba(255,255,255,.35);font-size:.72rem;">Admin Panel</small></div>
+    <div class="sb-role">Main</div>
+    <div class="nav-item active" onclick="showSection('overview',this)"><span class="ni">📊</span> Overview</div>
+    <div class="nav-item" onclick="showSection('bookings',this)"><span class="ni">📦</span> Bookings</div>
+    <div class="nav-item" onclick="showSection('drivers',this)"><span class="ni">🚚</span> Drivers</div>
+    <div class="sb-role">Manage</div>
+    <div class="nav-item" onclick="showSection('customers',this)"><span class="ni">👥</span> Customers</div>
+    <div class="nav-item" onclick="showSection('reviews',this)"><span class="ni">⭐</span> Reviews</div>
+    <div class="nav-item" onclick="showSection('cancels',this)"><span class="ni">✕</span> Cancellations</div>
+    <div class="nav-item" onclick="showSection('claims',this)"><span class="ni">🔧</span> Damage Claims</div>
+    <div class="nav-item" onclick="showSection('promos',this)"><span class="ni">🏷️</span> Promo Codes</div>
+    <div class="nav-item" onclick="showSection('broadcast',this)"><span class="ni">📢</span> Broadcast</div>
+    <div class="sidebar-bottom">
+      <button class="btn-signout" onclick="adminSignOut()">🚪 Sign Out</button>
+    </div>
+  </aside>
+  <main class="admin-main">
+    <div class="topbar">
+      <h1 id="sectionTitle">Overview</h1>
+      <div class="topbar-right">
+        <span class="session-timer" id="sessionTimerDisplay">Session: 120m</span>
+        <button class="theme-btn" onclick="toggleAdminTheme()">🌙</button>
+        <div class="admin-badge">🔐 Admin</div>
+        <span style="font-size:.83rem;color:var(--text-muted);font-weight:500;" id="adminNameDisplay">${adminName}</span>
+      </div>
+    </div>
+    <!-- OVERVIEW -->
+    <div class="section active" id="sectionOverview">
+      <div class="stats-grid">
+        <div class="stat-card"><div class="sc-lbl">Total Bookings</div><div class="sc-val" id="statTotal">0</div><div class="sc-sub">All time</div></div>
+        <div class="stat-card"><div class="sc-lbl">Pending</div><div class="sc-val" id="statPending" style="color:#d97706">0</div><div class="sc-sub">Awaiting assignment</div></div>
+        <div class="stat-card"><div class="sc-lbl">In Progress</div><div class="sc-val" id="statProgress" style="color:#7c3aed">0</div><div class="sc-sub">Active moves</div></div>
+        <div class="stat-card"><div class="sc-lbl">Delivered</div><div class="sc-val" id="statDelivered" style="color:var(--accent)">0</div><div class="sc-sub">Completed</div></div>
+        <div class="stat-card"><div class="sc-lbl">Total Revenue</div><div class="sc-val" id="statRevenue" style="font-size:1.4rem">₹0</div><div class="sc-sub">From all bookings</div></div>
+        <div class="stat-card"><div class="sc-lbl">Avg. Rating</div><div class="sc-val" id="statRating" style="color:#f59e0b">—</div><div class="sc-sub">Customer reviews</div></div>
+      </div>
+      <div class="chart-row">
+        <div class="chart-card"><h3>📈 Monthly Bookings</h3><canvas id="bookingsChart" height="160"></canvas></div>
+        <div class="chart-card"><h3>💰 Monthly Revenue (₹)</h3><canvas id="revenueChart" height="160"></canvas></div>
+      </div>
+      <div class="table-card">
+        <div class="table-hdr"><div class="table-title">Recent Bookings</div></div>
+        <table><thead><tr><th>ID</th><th>Customer</th><th>Route</th><th>Date</th><th>Status</th><th>Action</th></tr></thead>
+        <tbody id="overviewTable"><tr class="empty-row"><td colspan="6">Loading...</td></tr></tbody></table>
+      </div>
+    </div>
+    <!-- BOOKINGS -->
+    <div class="section" id="sectionBookings">
+      <div class="table-card">
+        <div class="table-hdr">
+          <div class="table-title">All Bookings</div>
+          <div class="table-actions">
+            <input class="search-input" placeholder="Search..." oninput="filterBookings(this.value)">
+            <button class="btn-export" onclick="exportCSV()">⬇ Export CSV</button>
+          </div>
+        </div>
+        <table><thead><tr><th>ID</th><th>Customer</th><th>Phone</th><th>Route</th><th>Date</th><th>Amount</th><th>Status</th><th>Driver</th><th>Actions</th></tr></thead>
+        <tbody id="bookingsTable"><tr class="empty-row"><td colspan="9">Loading...</td></tr></tbody></table>
+      </div>
+    </div>
+    <!-- DRIVERS -->
+    <div class="section" id="sectionDrivers">
+      <div class="table-card" style="margin-bottom:20px;">
+        <div class="table-hdr"><div class="table-title">🚚 Create New Driver Account</div></div>
+        <div style="padding:20px;">
+          <div class="driver-form-grid">
+            <div>
+              <label class="field-label" style="margin-top:0">Full Name <span style="color:#dc2626">*</span></label>
+              <input id="newDriverName" placeholder="Driver full name" autocomplete="off">
+            </div>
+            <div>
+              <label class="field-label" style="margin-top:0">Email Address <span style="color:#dc2626">*</span></label>
+              <input id="newDriverEmail" type="email" placeholder="driver@email.com" autocomplete="off">
+            </div>
+            <div>
+              <label class="field-label" style="margin-top:0">Phone Number</label>
+              <input id="newDriverPhone" type="tel" placeholder="10-digit mobile" maxlength="10">
+            </div>
+            <div>
+              <label class="field-label" style="margin-top:0">Vehicle Type</label>
+              <select id="newDriverVehicle">
+                <option value="">Select vehicle</option>
+                <option value="Tata Ace">🛻 Tata Ace (Small)</option>
+                <option value="14 ft Truck">🚚 14 ft Truck (Medium)</option>
+                <option value="17 ft Truck">🚛 17 ft Truck (Large)</option>
+                <option value="22 ft Truck">🚜 22 ft Truck (XL)</option>
+              </select>
+            </div>
+            <div>
+              <label class="field-label" style="margin-top:0">Temporary Password <span style="color:#dc2626">*</span></label>
+              <input id="newDriverPassword" type="password" placeholder="Min 6 characters" autocomplete="new-password">
+            </div>
+            <div class="driver-form-actions">
+              <button class="btn-primary-sm" onclick="adminCreateDriver()" style="width:100%;padding:12px;font-size:.9rem;">✅ Create Driver Account</button>
+            </div>
+          </div>
+          <div id="adminDriverMsg"></div>
+        </div>
+      </div>
+      <div id="driversList"><div style="text-align:center;color:var(--text-muted);padding:40px;">Loading drivers...</div></div>
+    </div>
+    <!-- CUSTOMERS -->
+    <div class="section" id="sectionCustomers">
+      <div class="table-card">
+        <div class="table-hdr"><div class="table-title">Registered Customers</div></div>
+        <table><thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Bookings</th><th>Referrals</th><th>Joined</th></tr></thead>
+        <tbody id="customersTable"><tr class="empty-row"><td colspan="6">Loading...</td></tr></tbody></table>
+      </div>
+    </div>
+    <!-- REVIEWS -->
+    <div class="section" id="sectionReviews">
+      <div class="table-card">
+        <div class="table-hdr"><div class="table-title">Customer Reviews</div></div>
+        <table><thead><tr><th>Name</th><th>Rating</th><th>Review</th><th>Date</th><th>Status</th><th>Action</th></tr></thead>
+        <tbody id="reviewsTable"><tr class="empty-row"><td colspan="6">Loading...</td></tr></tbody></table>
+      </div>
+    </div>
+    <!-- PROMOS -->
+    <div class="section" id="sectionPromos">
+      <div class="table-card" style="margin-bottom:20px;">
+        <div class="table-hdr"><div class="table-title">Create Promo Code</div></div>
+        <div style="padding:20px;">
+          <div class="promo-form">
+            <div><label class="field-label" style="margin-top:0">Code</label><input id="promoCode" placeholder="e.g. SAVE200" style="text-transform:uppercase"></div>
+            <div><label class="field-label" style="margin-top:0">Type</label><select id="promoType"><option value="flat">Flat (₹)</option><option value="percent">Percent (%)</option></select></div>
+            <div><label class="field-label" style="margin-top:0">Value</label><input id="promoValue" type="number" placeholder="e.g. 200"></div>
+            <div><label class="field-label" style="margin-top:0">Max Uses</label><input id="promoMax" type="number" placeholder="e.g. 100"></div>
+          </div>
+          <button class="btn-primary-sm" onclick="createPromo()">+ Create Promo Code</button>
+        </div>
+      </div>
+      <div class="table-card">
+        <div class="table-hdr"><div class="table-title">Active Promo Codes</div></div>
+        <table><thead><tr><th>Code</th><th>Type</th><th>Value</th><th>Used</th><th>Max</th><th>Status</th><th>Action</th></tr></thead>
+        <tbody id="promosTable"><tr class="empty-row"><td colspan="7">No promos yet.</td></tr></tbody></table>
+      </div>
+    </div>
+    <!-- CANCELLATIONS -->
+    <div class="section" id="sectionCancels">
+      <div class="table-card">
+        <div class="table-hdr">
+          <div class="table-title">✕ Cancellation Requests</div>
+          <button class="btn-export" onclick="loadCancelRequests()">🔄 Refresh</button>
+        </div>
+        <table><thead><tr><th>Booking Ref</th><th>Customer</th><th>Reason</th><th>Requested</th><th>Status</th><th>Action</th></tr></thead>
+        <tbody id="cancelsTable"><tr class="empty-row"><td colspan="6">Loading...</td></tr></tbody></table>
+      </div>
+    </div>
+    <!-- DAMAGE CLAIMS -->
+    <div class="section" id="sectionClaims">
+      <div class="table-card">
+        <div class="table-hdr">
+          <div class="table-title">🔧 Damage Claims</div>
+          <button class="btn-export" onclick="loadDamageClaims()">🔄 Refresh</button>
+        </div>
+        <table>
+          <thead><tr><th>Claim ID</th><th>Booking</th><th>Type</th><th>Description</th><th>Photos</th><th>Date</th><th>Status</th><th>Action</th></tr></thead>
+          <tbody id="claimsTable"><tr class="empty-row"><td colspan="8">Loading...</td></tr></tbody>
+        </table>
+      </div>
+      <div id="claimDetailPanel" style="display:none;margin-top:1.5rem;">
+        <div class="table-card">
+          <div class="table-hdr">
+            <div class="table-title">📋 Claim Detail</div>
+            <button onclick="document.getElementById('claimDetailPanel').style.display='none'" style="background:none;border:none;font-size:1.2rem;cursor:pointer;color:var(--text-muted)">✕</button>
+          </div>
+          <div style="padding:1rem">
+            <div id="claimDetailContent"></div>
+            <div style="margin-top:1rem">
+              <label style="font-size:.82rem;font-weight:600;color:var(--text-muted);display:block;margin-bottom:.4rem">Admin Response</label>
+              <textarea id="claimResponseText" rows="3" style="width:100%;padding:.6rem;border:1.5px solid var(--border);border-radius:10px;background:var(--surface2);color:var(--text);font-size:.85rem;box-sizing:border-box" placeholder="Describe your resolution..."></textarea>
+            </div>
+            <div style="display:flex;gap:.7rem;margin-top:.8rem;flex-wrap:wrap">
+              <button onclick="resolveDamageClaim('approved')" style="padding:.55rem 1.1rem;background:#16a34a;color:white;border:none;border-radius:10px;cursor:pointer;font-weight:700;font-size:.82rem">✅ Approve Claim</button>
+              <button onclick="resolveDamageClaim('rejected')" style="padding:.55rem 1.1rem;background:#dc2626;color:white;border:none;border-radius:10px;cursor:pointer;font-weight:700;font-size:.82rem">❌ Reject Claim</button>
+              <button onclick="resolveDamageClaim('investigating')" style="padding:.55rem 1.1rem;background:#d97706;color:white;border:none;border-radius:10px;cursor:pointer;font-weight:700;font-size:.82rem">🔍 Mark Investigating</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- BROADCAST -->
+    <div class="section" id="sectionBroadcast">
+      <div class="table-card">
+        <div class="table-hdr"><div class="table-title">📢 Broadcast Message to Customers</div></div>
+        <div style="padding:20px;">
+          <label class="field-label" style="margin-top:0">Message</label>
+          <textarea class="bulk-textarea" id="broadcastMsg" placeholder="Type your message to all customers..."></textarea>
+          <label class="field-label">Send Via</label>
+          <div style="display:flex;gap:10px;margin-bottom:14px;">
+            <label style="display:flex;align-items:center;gap:6px;font-size:.88rem;cursor:pointer;"><input type="checkbox" id="sendWA" checked> WhatsApp</label>
+            <label style="display:flex;align-items:center;gap:6px;font-size:.88rem;cursor:pointer;"><input type="checkbox" id="sendEmail"> Email (Firestore log)</label>
+          </div>
+          <button class="btn-primary-sm" onclick="sendBroadcast()">📤 Send Broadcast</button>
+          <div id="broadcastResult" style="margin-top:12px;font-size:.85rem;color:var(--accent);"></div>
+        </div>
+      </div>
+      <div class="table-card">
+        <div class="table-hdr"><div class="table-title">Broadcast History</div></div>
+        <table><thead><tr><th>Message</th><th>Recipients</th><th>Date</th><th>Via</th></tr></thead>
+        <tbody id="broadcastTable"><tr class="empty-row"><td colspan="4">No broadcasts sent yet.</td></tr></tbody></table>
+      </div>
+    </div>
+  </main>
+  <!-- ASSIGN MODAL -->
+  <div class="assign-overlay" id="assignModal" style="display:none;">
+    <div class="assign-box">
+      <div class="assign-title">🚚 Assign Driver to Booking</div>
+      <div class="assign-info" id="assignInfo">Loading...</div>
+      <label class="field-label">Select Driver</label>
+      <select class="field-input" id="assignSelect"><option value="">-- Select a driver --</option></select>
+      <div class="btn-row">
+        <button class="btn-cancel" onclick="closeAssignModal()">Cancel</button>
+        <button class="btn-confirm" onclick="confirmAssign()">Assign ✓</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+/* ================================================================
+   SHOW SHELL — only called after successful admin auth
+   ================================================================ */
+let adminUser = null, allBookings = [], allDrivers = [], allCustomers = [], allReviews = [], allPromos = [];
+let assigningId = null, bookingsChart = null, revenueChart = null;
+
+function showShell(name) {
+  document.getElementById("adminLogin").style.display = "none";
+  buildShell(name); // ✅ Inject admin HTML now — not before
+  const shell = document.getElementById("adminShell");
+  shell.classList.add("active");
+  // Apply saved theme
+  if (localStorage.getItem("packzen-theme") === "dark") {
+    document.body.classList.add("dark");
+    setTimeout(() => { const b = document.querySelector(".theme-btn"); if(b) b.textContent="☀️"; }, 100);
+  }
+  startSessionTimer(); // ✅ Start 2-hour session countdown
+  loadAll();
+}
+
+function requireAdmin(cb) {
+  if (!adminUser) { toast("⚠️ Not logged in as admin."); return; }
+  cb();
+}
+
+/* ── THEME ── */
+function toggleAdminTheme() {
+  document.body.classList.toggle("dark");
+  document.querySelector(".theme-btn").textContent = document.body.classList.contains("dark") ? "☀️" : "🌙";
+  localStorage.setItem("packzen-theme", document.body.classList.contains("dark") ? "dark" : "light");
+}
+
+/* ── TOAST ── */
+function toast(msg, dur=3000) {
+  const t = document.getElementById("adminToast");
+  t.textContent = msg; t.classList.add("show");
+  setTimeout(() => t.classList.remove("show"), dur);
+}
+
+/* ── LOAD ALL ── */
+function loadAll() {
+  waitFB(() => { loadBookings(); loadDrivers(); loadCustomers(); loadReviews(); loadPromos(); loadBroadcastHistory(); });
+}
+
+function loadBookings() {
+  window._firebase.db.collection("bookings").orderBy("createdAt","desc").onSnapshot(snap => {
+    allBookings = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    updateStats(); renderOverview(); renderBookingsTable(allBookings); renderCharts();
+  });
+}
+function loadDrivers() {
+  window._firebase.db.collection("users").where("role","==","driver").onSnapshot(snap => {
+    allDrivers = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    renderDrivers(); populateAssignSelect();
+  });
+}
+function loadCustomers() {
+  window._firebase.db.collection("users").where("role","==","customer").onSnapshot(snap => {
+    allCustomers = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    renderCustomers();
+  });
+}
+function loadReviews() {
+  window._firebase.db.collection("reviews").orderBy("createdAt","desc").onSnapshot(snap => {
+    allReviews = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    renderReviews();
+  });
+}
+function loadPromos() {
+  window._firebase.db.collection("promos").onSnapshot(snap => {
+    allPromos = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    renderPromos();
+  });
+}
+function loadBroadcastHistory() {
+  window._firebase.db.collection("broadcasts").orderBy("createdAt","desc").limit(10).onSnapshot(snap => {
+    const tbody = document.getElementById("broadcastTable");
+    if (!tbody) return;
+    if (snap.empty) { tbody.innerHTML = '<tr class="empty-row"><td colspan="4">No broadcasts yet.</td></tr>'; return; }
+    tbody.innerHTML = snap.docs.map(d => {
+      const b = d.data();
+      const date = b.createdAt?.toDate ? b.createdAt.toDate().toLocaleDateString("en-IN") : "—";
+      const preview = (b.message||"").slice(0,60) + ((b.message||"").length > 60 ? "..." : "");
+      return `<tr><td>${preview}</td><td>${b.recipients||0}</td><td>${date}</td><td>${b.via||"—"}</td></tr>`;
+    }).join("");
+  });
+}
+
+/* ── STATS ── */
+function updateStats() {
+  const el = id => document.getElementById(id);
+  if (!el("statTotal")) return;
+  el("statTotal").textContent     = allBookings.length;
+  el("statPending").textContent   = allBookings.filter(b => !b.driverUid && b.status !== "delivered").length;
+  el("statProgress").textContent  = allBookings.filter(b => ["assigned","packing","transit"].includes(b.status)).length;
+  el("statDelivered").textContent = allBookings.filter(b => b.status === "delivered").length;
+  const rev = allBookings.reduce((s, b) => s + (b.total || 0), 0);
+  el("statRevenue").textContent = "₹" + (rev >= 100000 ? (rev/100000).toFixed(1)+"L" : rev.toLocaleString("en-IN"));
+  const ratings = allReviews.filter(r => r.rating).map(r => r.rating);
+  el("statRating").textContent = ratings.length ? (ratings.reduce((a,b)=>a+b,0)/ratings.length).toFixed(1)+"★" : "—";
+}
+
+/* ── CHARTS ── */
+function renderCharts() {
+  const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  const bookingsByMonth = new Array(12).fill(0), revenueByMonth = new Array(12).fill(0);
+  allBookings.forEach(b => {
+    const d = b.createdAt?.toDate ? b.createdAt.toDate() : null;
+    if (!d) return;
+    bookingsByMonth[d.getMonth()]++;
+    revenueByMonth[d.getMonth()] += b.total || 0;
+  });
+  const isDark = document.body.classList.contains("dark");
+  const gridColor  = isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.06)";
+  const labelColor = isDark ? "#8a9bbf" : "#5a6a8a";
+  const cfg = (label, data, color) => ({
+    type:"bar", data:{ labels:months, datasets:[{ label, data, backgroundColor:color+"88", borderColor:color, borderWidth:2, borderRadius:6 }] },
+    options:{ responsive:true, plugins:{ legend:{ display:false } }, scales:{ x:{ grid:{ color:gridColor }, ticks:{ color:labelColor, font:{ size:10 } } }, y:{ grid:{ color:gridColor }, ticks:{ color:labelColor, font:{ size:10 } } } } }
+  });
+  const ctx1 = document.getElementById("bookingsChart");
+  const ctx2 = document.getElementById("revenueChart");
+  if (!ctx1 || !ctx2) return;
+  if (bookingsChart) bookingsChart.destroy();
+  if (revenueChart)  revenueChart.destroy();
+  bookingsChart = new Chart(ctx1, cfg("Bookings", bookingsByMonth, "#0057ff"));
+  revenueChart  = new Chart(ctx2, cfg("Revenue",  revenueByMonth,  "#00c96e"));
+}
+
+/* ── OVERVIEW TABLE ── */
+function renderOverview() {
+  const tbody = document.getElementById("overviewTable");
+  if (!tbody) return;
+  const recent = allBookings.slice(0, 8);
+  if (!recent.length) { tbody.innerHTML = '<tr class="empty-row"><td colspan="6">No bookings yet</td></tr>'; return; }
+  tbody.innerHTML = recent.map(b => `
+    <tr>
+      <td><code style="font-size:.75rem;color:var(--primary)">#${b.id.slice(-6).toUpperCase()}</code></td>
+      <td>${b.customerName||"—"}</td>
+      <td style="max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${(b.pickup||"").split(",")[0]} → ${(b.drop||"").split(",")[0]}</td>
+      <td>${b.date||"—"}</td>
+      <td><span class="badge badge-${b.status||"pending"}">${cap(b.status||"pending")}</span></td>
+      <td><button class="btn-sm btn-assign" onclick="openAssignModal('${b.id}')">Assign</button></td>
+    </tr>`).join("");
+}
+
+/* ── BOOKINGS TABLE ── */
+function renderBookingsTable(list) {
+  const tbody = document.getElementById("bookingsTable");
+  if (!tbody) return;
+  if (!list.length) { tbody.innerHTML = '<tr class="empty-row"><td colspan="9">No bookings found</td></tr>'; return; }
+  tbody.innerHTML = list.map(b => `
+    <tr>
+      <td>
+        <code style="font-size:.75rem;color:var(--primary)">${b.bookingRef||("#"+b.id.slice(-6).toUpperCase())}</code>
+        ${b.source==="whatsapp"?'<span class="badge" style="background:rgba(37,211,102,.12);color:#25D366;margin-left:4px">💬 WA</span>':b.paymentType==="pay_later"?'<span class="badge" style="background:rgba(251,191,36,.12);color:#d97706;margin-left:4px">📋 Later</span>':''}
+      </td>
+      <td>${b.customerName||"—"}</td>
+      <td>${b.phone||"—"}</td>
+      <td style="max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${(b.pickup||"").split(",")[0]} → ${(b.drop||"").split(",")[0]}</td>
+      <td>${b.date||"—"}</td>
+      <td>₹${(b.total||0).toLocaleString("en-IN")} <small style="color:var(--text-muted)">${b.paymentType==="pay_later"?"(Pay Later)":b.source==="whatsapp"?"(WA)":b.paid?"(₹"+b.paid+" paid)":""}</small></td>
+      <td>
+        <select class="status-sel" onchange="updateStatus('${b.id}',this.value)">
+          ${["pending","confirmed","assigned","packing","transit","delivered"].map(s=>`<option value="${s}"${b.status===s?" selected":""}>${cap(s)}</option>`).join("")}
+        </select>
+      </td>
+      <td>${b.driverName||'<span style="color:var(--text-muted);font-size:.78rem">Unassigned</span>'}</td>
+      <td style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
+        <button class="btn-sm btn-assign" onclick="openAssignModal('${b.id}')">🚚 Assign</button>
+        <button class="btn-sm" style="background:rgba(220,38,38,.1);color:#dc2626;" onclick="deleteBooking('${b.id}','${b.bookingRef||b.id.slice(-6).toUpperCase()}')">🗑 Delete</button>
+      </td>
+    </tr>`).join("");
+}
+
+function filterBookings(q) {
+  const f = allBookings.filter(b =>
+    (b.customerName||"").toLowerCase().includes(q.toLowerCase()) ||
+    (b.id||"").toLowerCase().includes(q.toLowerCase()) ||
+    (b.phone||"").includes(q)
+  );
+  renderBookingsTable(f);
+}
+function updateStatus(id, status) {
+  requireAdmin(() => {
+    window._firebase.db.collection("bookings").doc(id).update({ status })
+      .then(() => toast("✅ Status → " + cap(status)))
+      .catch(e => toast("❌ " + e.message));
+  });
+}
+function deleteBooking(id, ref) {
+  requireAdmin(() => {
+    if (!confirm(`⚠️ Permanently delete booking #${ref}?\n\nThis cannot be undone.`)) return;
+    window._firebase.db.collection("bookings").doc(id).delete()
+      .then(() => toast("🗑️ Booking #" + ref + " deleted"))
+      .catch(e => toast("❌ " + e.message));
+  });
+}
+function exportCSV() {
+  const headers = ["ID","Customer","Phone","Pickup","Drop","Date","Total","Status","Driver"];
+  const rows = allBookings.map(b => [
+    b.id.slice(-6).toUpperCase(), b.customerName||"", b.phone||"",
+    (b.pickup||"").replace(/,/g," "), (b.drop||"").replace(/,/g," "),
+    b.date||"", b.total||0, b.status||"", b.driverName||""
+  ]);
+  const csv = [headers, ...rows].map(r => r.join(",")).join("\n");
+  const a = document.createElement("a");
+  a.href = "data:text/csv;charset=utf-8," + encodeURIComponent(csv);
+  a.download = "PackZen-Bookings-" + new Date().toLocaleDateString("en-IN").replace(/\//g,"-") + ".csv";
+  a.click();
+  toast("📁 CSV downloaded!");
+}
+
+/* ── DRIVERS ── */
+function renderDrivers() {
+  const el = document.getElementById("driversList");
+  if (!el) return;
+  if (!allDrivers.length) { el.innerHTML = '<div style="text-align:center;color:var(--text-muted);padding:40px;">No drivers yet. Create one using the form above.</div>'; return; }
+  el.innerHTML = allDrivers.map(d => `
+    <div class="driver-card">
+      <div class="driver-info">
+        <div class="driver-avatar">${(d.name||"D").charAt(0)}</div>
+        <div>
+          <div class="driver-name">${d.name||"Driver"}</div>
+          <div class="driver-meta"><span class="online-dot ${d.isOnline?"on":"off"}"></span>${d.isOnline?"Online":"Offline"} &nbsp;·&nbsp; ${d.email}${d.vehicle?` &nbsp;·&nbsp; ${d.vehicle}`:""}</div>
+          <div class="driver-meta" style="margin-top:3px">📞 ${d.phone||"—"} &nbsp;·&nbsp; Active job: <strong>${d.currentBooking?"#"+d.currentBooking.slice(-6).toUpperCase():"None"}</strong>${d.rating?` &nbsp;·&nbsp; ⭐ ${d.rating}`:""}</div>
+        </div>
+      </div>
+      <span class="badge ${d.isOnline?"badge-delivered":"badge-pending"}">${d.isOnline?"🟢 Active":"⚫ Offline"}</span>
+    </div>`).join("");
+}
+
+/* ── CUSTOMERS ── */
+function renderCustomers() {
+  const tbody = document.getElementById("customersTable");
+  if (!tbody) return;
+  if (!allCustomers.length) { tbody.innerHTML = '<tr class="empty-row"><td colspan="6">No customers yet</td></tr>'; return; }
+  tbody.innerHTML = allCustomers.map(c => `
+    <tr>
+      <td>${c.name||"—"}</td><td>${c.email||"—"}</td><td>${c.phone||"—"}</td>
+      <td>${allBookings.filter(b=>b.customerUid===c.id).length}</td>
+      <td>${c.referralCount||0} (₹${c.referralCredits||0})</td>
+      <td>${c.createdAt?.toDate?c.createdAt.toDate().toLocaleDateString("en-IN"):"—"}</td>
+    </tr>`).join("");
+}
+
+/* ── REVIEWS ── */
+function renderReviews() {
+  const tbody = document.getElementById("reviewsTable");
+  if (!tbody) return;
+  if (!allReviews.length) { tbody.innerHTML = '<tr class="empty-row"><td colspan="6">No reviews yet</td></tr>'; return; }
+  tbody.innerHTML = allReviews.map(r => `
+    <tr>
+      <td>${r.name||"—"}</td>
+      <td style="color:#f59e0b">${"★".repeat(r.rating||0)}</td>
+      <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${r.text||""}</td>
+      <td>${r.date||"—"}</td>
+      <td><span class="badge ${r.status==="approved"?"badge-delivered":"badge-pending"}">${cap(r.status||"pending")}</span></td>
+      <td>
+        ${r.status!=="approved"?`<button class="btn-sm btn-assign" onclick="approveReview('${r.id}')">Approve</button>`:""}
+        <button class="btn-sm" style="background:rgba(229,62,62,.1);color:#e53e3e;margin-left:4px" onclick="deleteReview('${r.id}')">Delete</button>
+      </td>
+    </tr>`).join("");
+  updateStats();
+}
+function approveReview(id) { requireAdmin(() => window._firebase.db.collection("reviews").doc(id).update({ status:"approved" }).then(()=>toast("✅ Review approved!")).catch(e=>toast("❌ "+e.message))); }
+function deleteReview(id) { requireAdmin(() => { if(!confirm("Delete this review?")) return; window._firebase.db.collection("reviews").doc(id).delete().then(()=>toast("🗑️ Review deleted")).catch(e=>toast("❌ "+e.message)); }); }
+
+/* ── PROMOS ── */
+function createPromo() {
+  requireAdmin(() => {
+    const code=document.getElementById("promoCode").value.trim().toUpperCase();
+    const type=document.getElementById("promoType").value;
+    const value=Number(document.getElementById("promoValue").value);
+    const max=Number(document.getElementById("promoMax").value)||999;
+    if (!code||!value) { toast("⚠️ Fill in code & value"); return; }
+    window._firebase.db.collection("promos").doc(code).set({ code, type, value, max, used:0, active:true, createdAt:firebase.firestore.FieldValue.serverTimestamp() })
+      .then(()=>{ toast("✅ Promo created: "+code); document.getElementById("promoCode").value=""; document.getElementById("promoValue").value=""; })
+      .catch(e=>toast("❌ "+e.message));
+  });
+}
+function togglePromo(id, active) { requireAdmin(()=>window._firebase.db.collection("promos").doc(id).update({active}).then(()=>toast(active?"✅ Promo activated":"⏸ Promo paused"))); }
+function deletePromo(id) { requireAdmin(()=>{ if(!confirm("Delete promo?"))return; window._firebase.db.collection("promos").doc(id).delete().then(()=>toast("🗑️ Promo deleted")); }); }
+function renderPromos() {
+  const tbody = document.getElementById("promosTable");
+  if (!tbody) return;
+  if (!allPromos.length) { tbody.innerHTML = '<tr class="empty-row"><td colspan="7">No promo codes yet</td></tr>'; return; }
+  tbody.innerHTML = allPromos.map(p => `
+    <tr>
+      <td><strong style="font-family:'Syne',sans-serif;color:var(--primary)">${p.code}</strong></td>
+      <td>${cap(p.type)}</td><td>${p.type==="percent"?p.value+"%":"₹"+p.value}</td>
+      <td>${p.used||0}</td><td>${p.max||"∞"}</td>
+      <td><span class="badge ${p.active?"badge-delivered":"badge-pending"}">${p.active?"Active":"Inactive"}</span></td>
+      <td>
+        <button class="btn-sm btn-assign" onclick="togglePromo('${p.id}',${!p.active})">${p.active?"Pause":"Activate"}</button>
+        <button class="btn-sm" style="background:rgba(229,62,62,.1);color:#e53e3e;margin-left:4px" onclick="deletePromo('${p.id}')">Delete</button>
+      </td>
+    </tr>`).join("");
+}
+
+/* ── BROADCAST ── */
+async function sendBroadcast() {
+  requireAdmin(async () => {
+    const msg=document.getElementById("broadcastMsg").value.trim();
+    const viaWA=document.getElementById("sendWA").checked;
+    const viaEmail=document.getElementById("sendEmail").checked;
+    if (!msg) { toast("⚠️ Type a message first"); return; }
+    const result=document.getElementById("broadcastResult");
+    result.textContent="⏳ Sending...";
+    if (viaWA) window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`,"_blank");
+    await window._firebase.db.collection("broadcasts").add({ message:msg, via:[viaWA?"WhatsApp":"",viaEmail?"Email":""].filter(Boolean).join(", "), recipients:allCustomers.length, createdAt:firebase.firestore.FieldValue.serverTimestamp() });
+    result.textContent=`✅ Broadcast sent to ${allCustomers.length} customers!`;
+    document.getElementById("broadcastMsg").value="";
+    toast("📢 Broadcast sent!");
+  });
+}
+
+/* ── ASSIGN MODAL ── */
+function openAssignModal(id) {
+  assigningId = id;
+  const b = allBookings.find(x => x.id === id);
+  if (!b) return;
+  document.getElementById("assignInfo").innerHTML =
+    `<strong>Booking:</strong> #${id.slice(-6).toUpperCase()}<br>` +
+    `<strong>Customer:</strong> ${b.customerName||"—"}<br>` +
+    `<strong>Route:</strong> ${(b.pickup||"").split(",")[0]} → ${(b.drop||"").split(",")[0]}<br>` +
+    `<strong>Date:</strong> ${b.date||"—"}`;
+  document.getElementById("assignModal").style.display = "flex";
+}
+function closeAssignModal() { document.getElementById("assignModal").style.display = "none"; assigningId = null; }
+function populateAssignSelect() {
+  const sel = document.getElementById("assignSelect");
+  if (!sel) return;
+  sel.innerHTML = '<option value="">-- Select a driver --</option>' + allDrivers.map(d=>`<option value="${d.id}">${d.name||d.email}</option>`).join("");
+}
+function confirmAssign() {
+  requireAdmin(() => {
+    const driverUid = document.getElementById("assignSelect").value;
+    if (!driverUid) { toast("⚠️ Select a driver"); return; }
+    const driver = allDrivers.find(d => d.id === driverUid);
+    const db = window._firebase.db;
+    db.collection("bookings").doc(assigningId).update({ driverUid, driverName:driver?.name||"Driver", driverPhone:driver?.phone||"", status:"assigned" })
+      .then(()=>db.collection("users").doc(driverUid).update({ currentBooking:assigningId }))
+      .then(()=>{ toast("✅ Driver assigned!"); closeAssignModal(); })
+      .catch(e=>toast("❌ "+e.message));
+  });
+}
+
+/* ── NAV ── */
+function showSection(name, el) {
+  document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
+  document.querySelectorAll(".nav-item").forEach(n=>n.classList.remove("active"));
+  const sec = document.getElementById("section"+cap(name));
+  if (sec) sec.classList.add("active");
+  if (el) el.classList.add("active");
+  const titles = { overview:"Overview", bookings:"Bookings", drivers:"Drivers", customers:"Customers", reviews:"Reviews", cancels:"Cancellations", claims:"Damage Claims", promos:"Promo Codes", broadcast:"Broadcast" };
+  const titleEl = document.getElementById("sectionTitle");
+  if (titleEl) titleEl.textContent = titles[name] || cap(name);
+  if (name==="overview") renderCharts();
+  if (name==="cancels")  loadCancelRequests();
+  if (name==="claims")   loadDamageClaims();
+}
+
+/* ── DAMAGE CLAIMS ── */
+let currentClaimDocId = "";
+async function loadDamageClaims() {
+  const tbody = document.getElementById("claimsTable");
+  if (!tbody || !window._firebase) return;
+  tbody.innerHTML = "<tr><td colspan='8' style='text-align:center;padding:1rem'>Loading...</td></tr>";
+  try {
+    const snap = await window._firebase.db.collection("damageClaims").orderBy("createdAt","desc").limit(60).get();
+    if (snap.empty) { tbody.innerHTML = "<tr class='empty-row'><td colspan='8'>No damage claims yet.</td></tr>"; return; }
+    const statusColor = { pending:"#d97706", investigating:"#2563eb", approved:"#16a34a", rejected:"#dc2626" };
+    tbody.innerHTML = snap.docs.map(d => {
+      const c = d.data();
+      const date   = c.createdAt?.toDate?.().toLocaleDateString("en-IN") || "—";
+      const photos = c.photos?.length ? `<span style="color:#2563eb;cursor:pointer;font-weight:600" onclick="openClaimDetail('${d.id}')">${c.photos.length} photo(s)</span>` : "None";
+      const col = statusColor[c.status] || "#64748b";
+      return `<tr>
+        <td style="font-family:monospace;font-size:.75rem">${d.id.slice(0,8).toUpperCase()}</td>
+        <td>${c.bookingDocId?.slice(0,8)||"—"}</td>
+        <td>${c.damageType||"—"}</td>
+        <td style="max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${c.description||"—"}</td>
+        <td>${photos}</td><td>${date}</td>
+        <td><span style="color:${col};font-weight:700;font-size:.78rem">${(c.status||"pending").toUpperCase()}</span></td>
+        <td><button onclick="openClaimDetail('${d.id}')" style="padding:.3rem .7rem;background:#7c3aed;color:white;border:none;border-radius:8px;cursor:pointer;font-size:.75rem">Review</button></td>
+      </tr>`;
+    }).join("");
+  } catch(e) { tbody.innerHTML = `<tr><td colspan='8' style='color:red'>Error: ${e.message}</td></tr>`; }
+}
+async function openClaimDetail(docId) {
+  currentClaimDocId = docId;
+  const doc = await window._firebase.db.collection("damageClaims").doc(docId).get();
+  if (!doc.exists) return;
+  const c = doc.data();
+  const panel = document.getElementById("claimDetailPanel");
+  const content = document.getElementById("claimDetailContent");
+  const photoHtml = c.photos?.length ? c.photos.map(p=>`<img src="${p}" style="width:80px;height:80px;object-fit:cover;border-radius:8px;border:2px solid var(--border)">`).join("") : "<span style='color:var(--text-muted);font-size:.82rem'>No photos attached</span>";
+  content.innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem 1.2rem;margin-bottom:1rem;font-size:.85rem">
+      <div><span style="color:var(--text-muted)">Claim ID:</span> <strong>${docId.slice(0,8).toUpperCase()}</strong></div>
+      <div><span style="color:var(--text-muted)">Booking:</span> <strong>${c.bookingDocId?.slice(0,8)||"—"}</strong></div>
+      <div><span style="color:var(--text-muted)">Type:</span> <strong>${c.damageType||"—"}</strong></div>
+      <div><span style="color:var(--text-muted)">Status:</span> <strong style="color:#7c3aed">${(c.status||"pending").toUpperCase()}</strong></div>
+    </div>
+    <div style="font-size:.85rem;color:var(--text-muted);margin-bottom:.9rem;background:var(--surface2);padding:.7rem;border-radius:10px"><strong>Description:</strong><br>${c.description||"—"}</div>
+    ${c.adminResponse?`<div style="font-size:.82rem;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:.6rem;margin-bottom:.8rem;color:#166534"><strong>Previous response:</strong> ${c.adminResponse}</div>`:""}
+    <div style="display:flex;gap:6px;flex-wrap:wrap">${photoHtml}</div>`;
+  panel.style.display = "block";
+  panel.scrollIntoView({ behavior:"smooth", block:"start" });
+}
+async function resolveDamageClaim(newStatus) {
+  if (!currentClaimDocId || !window._firebase) return;
+  const response = document.getElementById("claimResponseText").value.trim();
+  if (!response) { alert("Please enter an admin response before resolving."); return; }
+  try {
+    await window._firebase.db.collection("damageClaims").doc(currentClaimDocId).update({ status:newStatus, adminResponse:response, resolvedAt:firebase.firestore.FieldValue.serverTimestamp(), resolvedBy:firebase.auth().currentUser?.uid||"admin" });
+    toast("✅ Claim marked as " + newStatus);
+    document.getElementById("claimDetailPanel").style.display = "none";
+    loadDamageClaims();
+  } catch(e) { alert("Error: " + e.message); }
+}
+
+/* ── CANCELLATIONS ── */
+async function loadCancelRequests() {
+  const tbody = document.getElementById("cancelsTable");
+  if (!tbody || !window._firebase) return;
+  tbody.innerHTML = "<tr><td colspan='6' style='text-align:center;padding:1rem'>Loading...</td></tr>";
+  try {
+    const snap = await window._firebase.db.collection("cancelRequests").orderBy("createdAt","desc").limit(50).get();
+    if (snap.empty) { tbody.innerHTML = "<tr class='empty-row'><td colspan='6'>No cancellation requests yet.</td></tr>"; return; }
+    tbody.innerHTML = snap.docs.map(d => {
+      const c = d.data();
+      const date = c.createdAt?.toDate?.().toLocaleDateString("en-IN") || "—";
+      return `<tr>
+        <td>${c.bookingDocId||"—"}</td><td>${c.customerUid?.slice(0,8)||"—"}</td>
+        <td>${c.reason||"—"}</td><td>${date}</td>
+        <td><span style="color:${c.resolved?'#16a34a':'#dc2626'}">${c.resolved?"✅ Resolved":"⏳ Pending"}</span></td>
+        <td><button onclick="resolveCancelRequest('${d.id}')" style="padding:.3rem .7rem;background:#2563eb;color:white;border:none;border-radius:8px;cursor:pointer;font-size:.75rem">Mark Resolved</button></td>
+      </tr>`;
+    }).join("");
+  } catch(e) { tbody.innerHTML = `<tr><td colspan='6' style='color:red'>Error: ${e.message}</td></tr>`; }
+}
+async function resolveCancelRequest(docId) {
+  if (!window._firebase) return;
+  await window._firebase.db.collection("cancelRequests").doc(docId).update({ resolved:true });
+  toast("✅ Marked as resolved");
+  loadCancelRequests();
+}
+
+/* ── CREATE DRIVER ── */
+async function adminCreateDriver() {
+  const name     = (document.getElementById("newDriverName")||{}).value||"";
+  const email    = (document.getElementById("newDriverEmail")||{}).value||"";
+  const phone    = (document.getElementById("newDriverPhone")||{}).value||"";
+  const vehicle  = (document.getElementById("newDriverVehicle")||{}).value||"";
+  const password = (document.getElementById("newDriverPassword")||{}).value||"";
+  const msgEl    = document.getElementById("adminDriverMsg");
+  const setMsg   = (text, ok) => { if(msgEl){ msgEl.textContent=text; msgEl.style.color=ok?"#16a34a":"#e53e3e"; } };
+  if (!name.trim()) return setMsg("⚠️ Please enter the driver's full name.", false);
+  if (!email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) return setMsg("⚠️ Please enter a valid email address.", false);
+  if (phone.trim() && phone.trim().length!==10) return setMsg("⚠️ Phone must be 10 digits (or leave it blank).", false);
+  if (password.length < 6) return setMsg("⚠️ Password must be at least 6 characters.", false);
+  setMsg("⏳ Creating driver account...", true);
+  const btn = document.querySelector('[onclick="adminCreateDriver()"]');
+  if (btn) { btn.disabled=true; btn.textContent="Creating..."; }
+  try {
+    const { db } = window._firebase;
+    const secondaryApp  = firebase.initializeApp(firebase.app().options, "adminDriver_"+Date.now());
+    const secondaryAuth = secondaryApp.auth();
+    const cred      = await secondaryAuth.createUserWithEmailAndPassword(email.trim(), password);
+    const driverUid = cred.user.uid;
+    await secondaryAuth.signOut();
+    await secondaryApp.delete();
+    await db.collection("users").doc(driverUid).set({ name:name.trim(), email:email.trim(), phone:phone.trim()?"+91"+phone.trim():"", vehicle:vehicle||"", role:"driver", isOnline:false, rating:0, totalMoves:0, createdBy:adminUser?adminUser.uid:"admin", createdAt:firebase.firestore.FieldValue.serverTimestamp() });
+    setMsg('✅ Driver "'+name.trim()+'" created! They can now log in at driver.html', true);
+    toast("✅ Driver account created for "+name.trim());
+    ["newDriverName","newDriverEmail","newDriverPhone","newDriverVehicle","newDriverPassword"].forEach(id=>{const el=document.getElementById(id);if(el)el.value="";});
+    loadDrivers();
+  } catch(err) {
+    if      (err.code==="auth/email-already-in-use") setMsg("⚠️ A driver with this email already exists.", false);
+    else if (err.code==="auth/invalid-email")        setMsg("⚠️ Invalid email address format.", false);
+    else if (err.code==="auth/weak-password")        setMsg("⚠️ Password is too weak. Use at least 6 characters.", false);
+    else setMsg("⚠️ "+(err.message||"Failed to create driver."), false);
+  } finally {
+    if (btn) { btn.disabled=false; btn.textContent="✅ Create Driver Account"; }
+  }
+}
+
+/* ── UTILS ── */
+function cap(s) { return s ? s.charAt(0).toUpperCase()+s.slice(1) : ""; }
+</script>
+</body>
+</html>

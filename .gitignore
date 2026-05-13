@@ -1,0 +1,13 @@
+# Environment files - NEVER COMMIT THESE!
+env-config.js
+.env
+*.local
+
+# Firebase
+.firebase/
+*.log
+firebase-debug.log
+
+# OS files
+.DS_Store
+Thumbs.db
