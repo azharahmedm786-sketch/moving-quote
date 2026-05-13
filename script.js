@@ -199,8 +199,12 @@ drop: drop,
 date: date,
 amount: total
 })
-.then(() => { // Email sent successfully })
-.catch((err) => { /* console.error("Email failed:", err); */ });
+.then(() => {
+  console.log("Email sent successfully");
+})
+.catch((err) => {
+  console.error("Email failed:", err);
+});
 }
 // ================= SAVE BOOKING =================
 async function saveBooking(data) {
