@@ -1321,6 +1321,7 @@ container.innerHTML +=`
 <div style="padding:12px;margin-bottom:12px;border:1px solid #333;border-radius:10px;background:#0f172a;">
 </div>
 `;
+});
 } catch (error) {
 container.innerHTML = "❌ Failed to load quotes";
 }
