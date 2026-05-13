@@ -2868,47 +2868,61 @@ calculateQuote(true);
 }
 }
 function renderSizeCards(type) {
-const config = MOVE_TYPE_CONFIG[type] || MOVE_TYPE_CONFIG.home;
-const label = document.getElementById("sizeLabelText");
-const cards = document.getElementById("houseCards");
-const select = document.getElementById("house");
-if (label) label.textContent = config.sizeLabel;
-if (cards) {
-  cards.innerHTML = config.sizes.map(s => `<div class="select-card" data-house-value="${s.value}" data-house-label="${s.label}" role="button" tabindex="0" aria-label="Select ${s.label}"> <div class="sc-icon">${s.icon}</div><div class="sc-label">${s.label}</div><div class="sc-sub">${s.sub}</div> </div>`).join("");
 
-  // Add click/touch event listeners to all cards
-  cards.querySelectorAll('.select-card').forEach(card => {
-    card.addEventListener('click', function(e) {
-      e.preventDefault();
-      e.stopPropagation();
-      const value = this.getAttribute('data-house-value');
-      selectCard(this, 'house', value);
+  const config = MOVE_TYPE_CONFIG[type] || MOVE_TYPE_CONFIG.home;
+
+  const label = document.getElementById("sizeLabelText");
+  const cards = document.getElementById("houseCards");
+  const select = document.getElementById("house");
+
+  if (label) {
+    label.textContent = config.sizeLabel;
+  }
+
+  if (!cards || !select) return;
+
+  // CLEAR OLD CONTENT
+  cards.innerHTML = "";
+  select.innerHTML = '<option value="">Select</option>';
+
+  config.sizes.forEach(s => {
+
+    // CREATE SELECT OPTION
+    const option = document.createElement("option");
+    option.value = s.value;
+    option.textContent = s.label;
+    select.appendChild(option);
+
+    // CREATE CARD
+    const card = document.createElement("div");
+
+    card.className = "select-card";
+
+    card.setAttribute("role", "button");
+    card.setAttribute("tabindex", "0");
+
+    card.innerHTML = `
+      <div class="sc-icon">${s.icon}</div>
+      <div class="sc-label">${s.label}</div>
+      <div class="sc-sub">${s.sub}</div>
+    `;
+
+    // CLICK EVENT
+    card.addEventListener("click", () => {
+
+      document.querySelectorAll("#houseCards .select-card")
+        .forEach(c => c.classList.remove("selected"));
+
+      card.classList.add("selected");
+
+      select.value = s.value;
+
+      calculateQuote(true);
     });
 
-    // Touch support for mobile
-    card.addEventListener('touchend', function(e) {
-      e.preventDefault();
-      e.stopPropagation();
-      const value = this.getAttribute('data-house-value');
-      selectCard(this, 'house', value);
-    });
+    cards.appendChild(card);
 
-    // Make it visually clickable
-    card.style.cursor = 'pointer';
-
-    // Keyboard support
-    card.addEventListener('keydown', function(e) {
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        const value = this.getAttribute('data-house-value');
-        selectCard(this, 'house', value);
-      }
-    });
   });
-}
-if (select) {
-select.innerHTML = '<option value="">Select size</option>' +
-config.sizes.map(s => `<option value="${s.value}">${s.label}</option>`).join("");
 }
 renderFurnitureGrid(type);
 }
