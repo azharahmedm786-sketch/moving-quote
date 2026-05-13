@@ -531,7 +531,10 @@ PAGE LOAD
 ============================================ */
 document.addEventListener("DOMContentLoaded", () => {
   // Setup current location button after a short delay to ensure DOM is ready
-  setTimeout(setupCurrentLocationListener, 500);
+  setTimeout(() => {
+      setupCurrentLocationListener();
+      initGeolocationFeature();
+    }, 1000);
 if (localStorage.getItem("packzen-theme") === "dark") {
 document.body.classList.add("dark-mode");
 const btn = document.getElementById("themeToggle");
@@ -1516,11 +1519,17 @@ document.querySelector(".furniture-grid")?.addEventListener("change", () => calc
 }
 
 
+
 /* ============================================
-GEOLOCATION / CURRENT LOCATION
+GEOLOCATION / CURRENT LOCATION - ROBUST VERSION
 ============================================ */
-let currentLocationWatchId = null;
 let isLocating = false;
+let geoLocationRetryCount = 0;
+const MAX_GEO_RETRIES = 2;
+
+function isGoogleMapsReady() {
+  return typeof google !== 'undefined' && google.maps && google.maps.Geocoder;
+}
 
 function getCurrentLocation() {
   return new Promise((resolve, reject) => {
@@ -1531,8 +1540,8 @@ function getCurrentLocation() {
 
     const options = {
       enableHighAccuracy: true,
-      timeout: 10000,
-      maximumAge: 300000
+      timeout: 15000,
+      maximumAge: 60000
     };
 
     navigator.geolocation.getCurrentPosition(
@@ -1547,7 +1556,7 @@ function getCurrentLocation() {
         let message = "Unable to retrieve your location";
         switch(error.code) {
           case error.PERMISSION_DENIED:
-            message = "Location access denied. Please enable location permissions in your browser settings.";
+            message = "Location access denied. Please enable location permissions in your browser settings or enter address manually.";
             break;
           case error.POSITION_UNAVAILABLE:
             message = "Location information unavailable. Please enter address manually.";
@@ -1565,13 +1574,43 @@ function getCurrentLocation() {
 
 async function handleCurrentLocationToggle() {
   const toggle = document.getElementById("useCurrentLocation");
-  if (!toggle || !toggle.checked || isLocating) return;
+  if (!toggle) {
+    console.error("useCurrentLocation toggle not found");
+    return;
+  }
+
+  // If toggle is unchecked, do nothing (user turned it off)
+  if (!toggle.checked) {
+    console.log("Location toggle unchecked");
+    return;
+  }
+
+  // Prevent multiple simultaneous requests
+  if (isLocating) {
+    showToast("⏳ Already locating... please wait");
+    return;
+  }
+
+  // Check if Google Maps is ready
+  if (!isGoogleMapsReady()) {
+    showToast("⚠️ Maps not ready yet. Please try again in a few seconds.");
+    toggle.checked = false;
+    return;
+  }
 
   isLocating = true;
+  geoLocationRetryCount = 0;
+
+  // Show loading state on the toggle label
+  const toggleLabel = toggle.closest('.toggle-row')?.querySelector('.toggle-text');
+  const originalText = toggleLabel?.textContent || "📱 Use my current location";
+  if (toggleLabel) toggleLabel.textContent = "📍 Locating...";
+
   showToast("📍 Getting your current location...");
 
   try {
     const coords = await getCurrentLocation();
+    console.log("Location obtained:", coords);
 
     // Reverse geocode to get address
     const geocoder = new google.maps.Geocoder();
@@ -1579,13 +1618,15 @@ async function handleCurrentLocationToggle() {
 
     const result = await new Promise((resolve, reject) => {
       geocoder.geocode({ location: latlng }, (results, status) => {
-        if (status === "OK" && results[0]) {
+        if (status === "OK" && results && results[0]) {
           resolve(results[0]);
         } else {
-          reject(new Error("Could not find address for this location"));
+          reject(new Error("Could not find address for this location. Please enter manually."));
         }
       });
     });
+
+    console.log("Geocoding result:", result);
 
     // Fill the pickup field
     const pickupInput = document.getElementById("pickup");
@@ -1594,76 +1635,61 @@ async function handleCurrentLocationToggle() {
       pickupPlace = result;
       showLocation("pickup");
       calculateQuote(true);
-    }
 
-    showToast(`✅ Location set: ${result.formatted_address.split(",")[0]}`);
+      // Show success
+      const shortAddress = result.formatted_address.split(",")[0];
+      showToast(`✅ Location set: ${shortAddress}`);
+
+      // Update label back
+      if (toggleLabel) toggleLabel.textContent = originalText;
+    } else {
+      throw new Error("Pickup field not found");
+    }
 
   } catch (err) {
     console.error("Geolocation error:", err);
     showToast("⚠️ " + err.message);
-    // Uncheck the toggle on error
-    if (toggle) toggle.checked = false;
+
+    // Reset toggle on error
+    toggle.checked = false;
+    if (toggleLabel) toggleLabel.textContent = originalText;
+
+    // Retry logic for timeout errors
+    if (err.message.includes("timed out") && geoLocationRetryCount < MAX_GEO_RETRIES) {
+      geoLocationRetryCount++;
+      showToast(`🔄 Retrying... (${geoLocationRetryCount}/${MAX_GEO_RETRIES})`);
+      setTimeout(() => {
+        if (toggle.checked) handleCurrentLocationToggle();
+      }, 2000);
+    }
   } finally {
     isLocating = false;
   }
 }
 
 function setupCurrentLocationListener() {
+  console.log("Setting up current location listener...");
+
   const toggle = document.getElementById("useCurrentLocation");
-  if (!toggle) return;
+  if (!toggle) {
+    console.error("useCurrentLocation checkbox not found in DOM");
+    return;
+  }
 
+  // Remove any existing listeners to prevent duplicates
+  toggle.removeEventListener("change", handleCurrentLocationToggle);
+
+  // Add the change listener
   toggle.addEventListener("change", handleCurrentLocationToggle);
+
+  console.log("Current location listener attached successfully");
 }
 
-
-function showLocation(type) {
-const mapDiv = document.getElementById("map");
-const place = type === "pickup" ? pickupPlace : dropPlace;
-if (!place?.geometry) return;
-const loc = place.geometry.location;
-if (!map) {
-mapDiv.style.display = "block"; mapDiv.style.height = "200px"; mapDiv.style.maxHeight = "200px";
-map = new google.maps.Map(mapDiv, { center: loc, zoom: 14 });
-directionsService = new google.maps.DirectionsService();
-directionsRenderer = new google.maps.DirectionsRenderer({ map, suppressMarkers: true });
+// Also set up when DOM is ready AND when Google Maps is loaded
+function initGeolocationFeature() {
+  console.log("Initializing geolocation feature...");
+  setupCurrentLocationListener();
 }
-map.setCenter(loc);
-if (type === "pickup") {
-if (pickupMarker) pickupMarker.setMap(null);
-pickupMarker = new google.maps.Marker({ map, position: loc, draggable: true, label: "P" });
-pickupMarker.addListener("dragend", () => updateAddress("pickup", pickupMarker.getPosition()));
-} else {
-if (dropMarker) dropMarker.setMap(null);
-dropMarker = new google.maps.Marker({ map, position: loc, draggable: true, label: "D" });
-dropMarker.addListener("dragend", () => updateAddress("drop", dropMarker.getPosition()));
-}
-adjustBounds();
-}
-
-function updateAddress(type, latlng) {
-new google.maps.Geocoder().geocode({ location: latlng }, (res, status) => {
-if (status === "OK" && res[0]) {
-document.getElementById(type).value = res[0].formatted_address;
-if (type === "pickup") pickupPlace = { geometry: { location: latlng } };
-else dropPlace = { geometry: { location: latlng } };
-adjustBounds(); calculateQuote(true);
-}
-});
-}
-
-function adjustBounds() {
-if (!map) return;
-const bounds = new google.maps.LatLngBounds();
-if (pickupPlace?.geometry) bounds.extend(pickupPlace.geometry.location);
-if (dropPlace?.geometry) bounds.extend(dropPlace.geometry.location);
-if (!bounds.isEmpty()) map.fitBounds(bounds);
-if (pickupPlace && dropPlace) {
-directionsService.route({
-origin: pickupPlace.geometry.location, destination: dropPlace.geometry.location, travelMode: "DRIVING"
-}, (res, status) => { if (status === "OK") directionsRenderer.setDirections(res); });
-}
-}
-
 /* ============================================
 INTERCITY PRICING TABLE
 ============================================ */
