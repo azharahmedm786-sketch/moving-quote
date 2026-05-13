@@ -4,6 +4,10 @@ SECURITY HARDENED VERSION - May 2026
 ============================================ */
 
 /*
+PACKZEN PRICING VERSION: 2.0 (May 2026)
+Strategy: Smart Value - Professional service at competitive startup prices
+Target Margin: 35-40% | Position: 10-20% below market average
+
 IMPORTANT SECURITY NOTES:
 1. This file includes input sanitization, XSS protection, and rate limiting
 2. Firebase Security Rules MUST be configured as follows:
@@ -526,6 +530,8 @@ if (labelInput) labelInput.value = range;
 PAGE LOAD
 ============================================ */
 document.addEventListener("DOMContentLoaded", () => {
+  // Setup current location button after a short delay to ensure DOM is ready
+  setTimeout(setupCurrentLocationListener, 500);
 if (localStorage.getItem("packzen-theme") === "dark") {
 document.body.classList.add("dark-mode");
 const btn = document.getElementById("themeToggle");
@@ -648,6 +654,7 @@ if (!document.getElementById("pz-fc-styles")) {
 const s = document.createElement("style");
 s.id = "pz-fc-styles";
 s.textContent = .furniture-grid{display:flex;flex-direction:column;gap:8px;} .fc-category{border:1px solid rgba(255,255,255,0.08);border-radius:12px;overflow:hidden;} .fc-category-header{display:flex;align-items:center;gap:10px;padding:12px 16px;background:rgba(255,255,255,0.04);cursor:pointer;transition:background .2s;user-select:none;} .fc-category-header:hover{background:rgba(255,255,255,0.08);} .fc-cat-icon{font-size:1.1rem;} .fc-cat-label{flex:1;font-weight:600;font-size:.9rem;color:var(--text,#fff);} .fc-cat-arrow{font-size:.8rem;color:var(--text-muted,#aaa);transition:transform .2s;} .fc-category-items{display:none;flex-wrap:wrap;gap:10px;padding:12px;background:rgba(255,255,255,0.02);} .fc-qty-card{display:flex;flex-direction:column;align-items:center;gap:5px;padding:10px 8px;border-radius:10px;border:2px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.03);transition:all .2s;width:88px;text-align:center;} .fc-qty-card.active{border-color:#3b82f6;background:rgba(59,130,246,0.13);} .fc-emoji{font-size:1.4rem;line-height:1;} .fc-name{font-size:.68rem;font-weight:500;color:var(--text,#fff);line-height:1.2;min-height:2em;display:flex;align-items:center;justify-content:center;} .fc-price-tag{font-size:.64rem;color:#22c55e;font-weight:600;} .fc-qty-row{display:flex;align-items:center;gap:4px;margin-top:2px;} .fc-qty-btn{width:26px;height:26px;border-radius:6px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.07);color:var(--text,#fff);font-size:1rem;font-weight:700;cursor:pointer;transition:background .15s,border-color .15s;display:flex;align-items:center;justify-content:center;padding:0;line-height:1;-webkit-tap-highlight-color:transparent;} .fc-qty-btn:hover,.fc-qty-btn:active{background:#3b82f6;border-color:#3b82f6;} .fc-qty-input{width:26px;text-align:center;background:transparent;border:none;color:var(--text,#fff);font-size:.85rem;font-weight:700;-moz-appearance:textfield;pointer-events:none;} .fc-qty-input::-webkit-outer-spin-button,.fc-qty-input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;} .carton-box-row{display:flex;align-items:center;flex-wrap:wrap;gap:10px;padding:4px 0;width:100%;} .carton-label{font-size:.85rem;color:var(--text,#fff);flex:1;min-width:160px;} .carton-qty-wrap{display:flex;align-items:center;gap:6px;} .carton-price-note{font-size:.8rem;color:#22c55e;font-weight:600;} @media(max-width:380px){.fc-qty-card{width:78px;padding:8px 5px;}};
+
 document.head.appendChild(s);
 }
 
@@ -1508,6 +1515,107 @@ document.getElementById(id)?.addEventListener("change", () => calculateQuote(tru
 document.querySelector(".furniture-grid")?.addEventListener("change", () => calculateQuote(true));
 }
 
+
+/* ============================================
+GEOLOCATION / CURRENT LOCATION
+============================================ */
+let currentLocationWatchId = null;
+let isLocating = false;
+
+function getCurrentLocation() {
+  return new Promise((resolve, reject) => {
+    if (!navigator.geolocation) {
+      reject(new Error("Geolocation is not supported by your browser"));
+      return;
+    }
+
+    const options = {
+      enableHighAccuracy: true,
+      timeout: 10000,
+      maximumAge: 300000
+    };
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        resolve({
+          lat: position.coords.latitude,
+          lng: position.coords.longitude,
+          accuracy: position.coords.accuracy
+        });
+      },
+      (error) => {
+        let message = "Unable to retrieve your location";
+        switch(error.code) {
+          case error.PERMISSION_DENIED:
+            message = "Location access denied. Please enable location permissions in your browser settings.";
+            break;
+          case error.POSITION_UNAVAILABLE:
+            message = "Location information unavailable. Please enter address manually.";
+            break;
+          case error.TIMEOUT:
+            message = "Location request timed out. Please try again or enter address manually.";
+            break;
+        }
+        reject(new Error(message));
+      },
+      options
+    );
+  });
+}
+
+async function handleCurrentLocationToggle() {
+  const toggle = document.getElementById("useCurrentLocation");
+  if (!toggle || !toggle.checked || isLocating) return;
+
+  isLocating = true;
+  showToast("📍 Getting your current location...");
+
+  try {
+    const coords = await getCurrentLocation();
+
+    // Reverse geocode to get address
+    const geocoder = new google.maps.Geocoder();
+    const latlng = { lat: coords.lat, lng: coords.lng };
+
+    const result = await new Promise((resolve, reject) => {
+      geocoder.geocode({ location: latlng }, (results, status) => {
+        if (status === "OK" && results[0]) {
+          resolve(results[0]);
+        } else {
+          reject(new Error("Could not find address for this location"));
+        }
+      });
+    });
+
+    // Fill the pickup field
+    const pickupInput = document.getElementById("pickup");
+    if (pickupInput) {
+      pickupInput.value = result.formatted_address;
+      pickupPlace = result;
+      showLocation("pickup");
+      calculateQuote(true);
+    }
+
+    showToast(`✅ Location set: ${result.formatted_address.split(",")[0]}`);
+
+  } catch (err) {
+    console.error("Geolocation error:", err);
+    showToast("⚠️ " + err.message);
+    // Uncheck the toggle on error
+    if (toggle) toggle.checked = false;
+  } finally {
+    isLocating = false;
+  }
+}
+
+function setupCurrentLocationListener() {
+  const toggle = document.getElementById("useCurrentLocation");
+  if (!toggle) return;
+
+  toggle.addEventListener("change", handleCurrentLocationToggle);
+}
+
+
 function showLocation(type) {
 const mapDiv = document.getElementById("map");
 const place = type === "pickup" ? pickupPlace : dropPlace;
@@ -1561,21 +1669,21 @@ INTERCITY PRICING TABLE
 ============================================ */
 let isIntercityMove = false;
 const INTERCITY_PRICING = {
-"1750": {"400":9000,"600":10800,"1000":17100,"2000":24000},
-"3950": {"400":9000,"600":10800,"1000":17100,"2000":24000},
-"5750": {"400":11000,"600":13200,"1000":20900,"2000":28000},
-"7450": {"400":13000,"600":15600,"1000":24700,"2000":33000},
-"8350": {"400":15500,"600":18600,"1000":29450,"2000":38000},
-"10800":{"400":18000,"600":21600,"1000":34000,"2000":45000},
-"5400": {"400":10000,"600":12000,"1000":19000,"2000":26000},
-"8800": {"400":15000,"600":18000,"1000":28000,"2000":38000},
-"13700":{"400":22000,"600":26000,"1000":40000,"2000":55000},
-"21550":{"400":35000,"600":42000,"1000":65000,"2000":90000}
+"2500": {"400":8000,"600":9500,"1000":14000,"2000":20000},
+"4500": {"400":8500,"600":10500,"1000":15500,"2000":22000},
+"6500": {"400":10500,"600":12500,"1000":18500,"2000":26000},
+"8500": {"400":12500,"600":15000,"1000":22000,"2000":30000},
+"10500":{"400":14500,"600":17500,"1000":26000,"2000":35000},
+"13500":{"400":17000,"600":20500,"1000":30000,"2000":42000},
+"6500": {"400":10500,"600":12500,"1000":18500,"2000":26000},
+"10500":{"400":14500,"600":17500,"1000":26000,"2000":35000},
+"16500":{"400":22000,"600":26000,"1000":38000,"2000":52000},
+"25500":{"400":35000,"600":42000,"1000":60000,"2000":85000}
 };
 
 function getIntercityBase(houseVal, km) {
 const tiers = INTERCITY_PRICING[String(houseVal)];
-if (!tiers) return 15000;
+if (!tiers) return 12000;
 return km <= 400 ? tiers["400"] : km <= 600 ? tiers["600"] : km <= 1000 ? tiers["1000"] : tiers["2000"];
 }
 
@@ -1626,17 +1734,27 @@ const hasItems = itemCount > 0 || cartonQty > 0;
 const houseBase = Number(house?.value || 0);
 const vehicleRate = Number(vehicle?.value || 0);
 
-// ── UPDATED: Single item logic now requires vehicle + ₹1,999 base (was ₹499, no vehicle required) ──
+// ── STARTUP PRICING: Single item ₹1,499 base + items, vehicle optional for small items ──
 if (!houseBase && hasItems) {
-if (!vehicleRate) {
-showToast("🚚 Please select a vehicle for your single-item move.");
-return;
+if (itemCount <= 3 && !vehicleRate) {
+  // Small item move without vehicle (bike/scooter/courier style)
+  const total = 1499 + furnitureCost + floorCost;
+  lastCalculatedTotal = total;
+  updatePriceDisplay();
+  if (result) {
+    result.innerHTML = `🪑 Single Item Move<br>Base: ₹1,499${furnitureCost ? ` • Items: ₹${furnitureCost}` : ""}${cartonQty ? ` • Cartons: ₹${cartonQty * 50}` : ""}${floorCost ? ` • Floor: ₹${floorCost}` : ""}<br><strong>Total: ₹${total}</strong>`;
+  }
+  return;
 }
-const total = 1999 + furnitureCost;
+if (!vehicleRate) {
+  showToast("🚚 Please select a vehicle for larger moves.");
+  return;
+}
+const total = 1499 + furnitureCost + floorCost;
 lastCalculatedTotal = total;
 updatePriceDisplay();
 if (result) {
-result.innerHTML = 🪑 Single Item Move<br> Base: ₹1,999 ${furnitureCost ? • Items: ₹${furnitureCost}: ""} ${cartonQty ? • Cartons: ₹${cartonQty * 50}: ""} ${floorCost ? • Floor: ₹${floorCost}: ""}<br> <strong>Total: ₹${total}</strong> ;
+  result.innerHTML = `🪑 Single Item Move<br>Base: ₹1,499${furnitureCost ? ` • Items: ₹${furnitureCost}` : ""}${cartonQty ? ` • Cartons: ₹${cartonQty * 50}` : ""}${floorCost ? ` • Floor: ₹${floorCost}` : ""}<br><strong>Total: ₹${total}</strong>`;
 }
 return;
 }
@@ -1669,10 +1787,10 @@ const pickupFloor = Number(document.getElementById("pickupFloor")?.value || 0);
 const dropFloor = Number(document.getElementById("dropFloor")?.value || 0);
 const liftAvail = document.getElementById("liftAvailable")?.checked;
 
-// ── UPDATED: ₹200/floor full, ₹100/floor with lift (was ₹100/₹50) ──
+// ── STARTUP PRICING: ₹300/floor no lift, ₹150/floor with lift ──
 const floorCost = liftAvail
-? Math.round((pickupFloor + dropFloor) / 2)
-: (pickupFloor + dropFloor);
+? Math.round((pickupFloor + dropFloor) * 150)
+: (pickupFloor + dropFloor) * 300;
 let total, breakdownHtml;
 
 if (km > 100) {
@@ -1694,21 +1812,21 @@ if (km > 100) {
   // ── LOCAL ──
   const vv = Number(vehicle?.value || 0);
 
-  // ── UPDATED: new per-km rates, free threshold is 10 km (was 25 km) ──
-  let baseFare = 1999, perKmRate = 27;
-  if      (vv === 88) { baseFare = 7500; perKmRate = 48; }
-  else if (vv === 69) { baseFare = 6000; perKmRate = 40; }
-  else if (vv === 54) { baseFare = 4500; perKmRate = 38; }
+  // ── STARTUP PRICING: Sustainable margins, competitive rates ──
+  let baseFare = 2500, perKmRate = 32;
+  if      (vv === 88) { baseFare = 5500; perKmRate = 55; }
+  else if (vv === 69) { baseFare = 4500; perKmRate = 48; }
+  else if (vv === 54) { baseFare = 3500; perKmRate = 42; }
 
-  const distanceFare = km <= 10
+  const distanceFare = km <= 5
     ? baseFare
-    : baseFare + ((km - 10) * perKmRate);
+    : baseFare + ((km - 5) * perKmRate);
 
   total = Math.round(distanceFare + furnitureCost + floorCost);
 breakdownHtml =
     `📍 Local · ~${km.toFixed(1)} km<br>` +
     `Base fare: ₹${baseFare.toLocaleString("en-IN")}` +
-    (km > 10    ? ` · Extra km: ₹${Math.round((km - 10) * perKmRate).toLocaleString("en-IN")}` : "") +
+    (km > 5     ? ` · Extra km (${(km-5).toFixed(1)}km × ₹${perKmRate}): ₹${Math.round((km - 5) * perKmRate).toLocaleString("en-IN")}` : "") +
     (itemCost   ? ` · Items: ₹${itemCost.toLocaleString("en-IN")}`                              : "") +
     (cartonQty  ? ` · Cartons: ₹${cartonCost.toLocaleString("en-IN")}`                         : "") +
     (floorCost  ? ` · Floor: ₹${floorCost.toLocaleString("en-IN")}`                            : "") +
@@ -1716,7 +1834,7 @@ breakdownHtml =
 }
 
 if (result) result.innerHTML = breakdownHtml;
- total = Math.max(total, 1999);
+ total = Math.max(total, 1499);
 lastCalculatedTotal = total;
 updatePriceDisplay();
 if (currentUser) saveQuoteToFirestore(total);
@@ -2562,18 +2680,18 @@ const STEP_LABELS = ["What type of move?","Where are you moving?","When & what t
 
 const MOVE_TYPE_CONFIG = window.MOVE_TYPE_CONFIG = {
 home: { sizeLabel:"House Type", icon:"🏠", sizes:[
-{icon:"🏠",label:"1 RK", sub:"Studio", value:"1750"},
-{icon:"🏡",label:"1 BHK",sub:"Small", value:"3950"},
-{icon:"🏘️",label:"2 BHK",sub:"Medium", value:"5750"},
-{icon:"🏰",label:"3 BHK",sub:"Large", value:"7450"},
-{icon:"🏯",label:"4 BHK",sub:"X-Large", value:"8350"},
-{icon:"🌇",label:"Villa", sub:"Premium", value:"10800"}
+{icon:"🏠",label:"1 RK", sub:"Studio", value:"2500"},
+{icon:"🏡",label:"1 BHK",sub:"Small", value:"4500"},
+{icon:"🏘️",label:"2 BHK",sub:"Medium", value:"6500"},
+{icon:"🏰",label:"3 BHK",sub:"Large", value:"8500"},
+{icon:"🏯",label:"4 BHK",sub:"X-Large", value:"10500"},
+{icon:"🌇",label:"Villa", sub:"Premium", value:"13500"}
 ]},
 office: { sizeLabel:"Office Size", icon:"🏢", sizes:[
-{icon:"💼",label:"Cabin", sub:"1–5 desks", value:"5400"},
-{icon:"🏢",label:"Small", sub:"5–15 desks", value:"8800"},
-{icon:"🏬",label:"Medium",sub:"15–30 desks",value:"13700"},
-{icon:"🏭",label:"Large", sub:"30+ desks", value:"21550"}
+{icon:"💼",label:"Cabin", sub:"1–5 desks", value:"6500"},
+{icon:"🏢",label:"Small", sub:"5–15 desks", value:"10500"},
+{icon:"🏬",label:"Medium",sub:"15–30 desks",value:"16500"},
+{icon:"🏭",label:"Large", sub:"30+ desks", value:"25500"}
 ]},
 single: { sizeLabel:"Item Type", icon:"📦", sizes:[
 {icon:"🛋️",label:"Furniture", sub:"Sofa, bed…", value:"0"},
