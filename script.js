@@ -234,32 +234,23 @@ alert("⚠️ Booking temporarily saved. Please check your internet and try agai
 }
 
 // ================= NOTIFY OWNER =================
-function notifyOwner(bookingRef, name, phone, pickup, drop, date, total, payType, source) {
+const msg = `
+${emoji} New Booking Alert — PackZen 🚚
 
-// ✅ Send email
-sendEmailNotification(bookingRef, name, phone, pickup, drop, date, total);
-
-// ✅ Prepare WhatsApp message (DO NOT open)
-const emoji = source === "online" ? "💳" : source === "whatsapp" ? "📲" : "📋";
-const payLbl = source === "online" ? "Paid Online ✅" : source === "whatsapp" ? "WhatsApp booking" : "Pay on delivery";
-
-const msg =
-${emoji} New Booking Alert — PackZen 🚚\n +
-ID: ${bookingRef}\n +
-Customer: ${name}\n +
-Phone: +91 ${phone}\n +
-Pickup: ${pickup}\n +
-Drop: ${drop}\n +
-Date: ${date || "To be confirmed"}\n +
-Amount: ₹${Number(total).toLocaleString("en-IN")}\n +
-Payment: ${payLbl};
-
+ID: ${bookingRef}
+Name: ${name}
+Phone: +91 ${phone}
+Pickup: ${pickup}
+Drop: ${drop}
+Date: ${date || "To be confirmed"}
+Amount: ₹${Number(total).toLocaleString("en-IN")}
+Payment: ${payLbl}
+`;
 // ❌ No WhatsApp opening
 console.log("📲 WhatsApp message (not opened):", msg);
 
 // ✅ Only show success
 alert("✅ Booking confirmed! We will contact you shortly.");
-}
 const RAZORPAY_KEY = (window.ENV && window.ENV.RAZORPAY_KEY) || "";
 
 /* ============================================
@@ -352,7 +343,7 @@ const ds = d.toISOString().split("T")[0];
 const card = document.createElement("div");
 card.className = "bs-date-card" + (i === 0 ? " today-card" : "") + (ds === selected ? " selected" : "");
 card.dataset.date = ds;
-card.innerHTML = <div class="bs-dc-day">${DAYS[d.getDay()]}</div> <div class="bs-dc-num">${d.getDate()}</div> <div class="bs-dc-month">${MONTHS[d.getMonth()]}</div> ${i === 0 ? '<div class="bs-dc-tag">Today</div>' : i === 1 ? '<div class="bs-dc-tag">Tomorrow</div>' : ''};
+card.innerHTML = `<div class="bs-dc-day">${DAYS[d.getDay()]}</div> <div class="bs-dc-num">${d.getDate()}</div> <div class="bs-dc-month">${MONTHS[d.getMonth()]}</div> ${i === 0 ? '<div class="bs-dc-tag">Today</div>' : i === 1 ? '<div class="bs-dc-tag">Tomorrow</div>' : ''}`;
 card.addEventListener("click", () => {
 strip.querySelectorAll(".bs-date-card").forEach(c => c.classList.remove("selected"));
 card.classList.add("selected");
@@ -494,7 +485,7 @@ d.setDate(today.getDate() + i);
 const card = document.createElement("div");
 card.className = "date-card" + (i === 0 ? " today-card" : "");
 card.dataset.date = d.toISOString().split("T")[0];
-card.innerHTML = <div class="dc-day">${days[d.getDay()]}</div> <div class="dc-num">${d.getDate()}</div> <div class="dc-month">${months[d.getMonth()]}</div> ${i === 0 ? '<div class="dc-tag">Today</div>' : i === 1 ? '<div class="dc-tag">Tomorrow</div>' : ""};
+card.innerHTML = `<div class="dc-day">${days[d.getDay()]}</div> <div class="dc-num">${d.getDate()}</div> <div class="dc-month">${months[d.getMonth()]}</div> ${i === 0 ? '<div class="dc-tag">Today</div>' : i === 1 ? '<div class="dc-tag">Tomorrow</div>' : ""}`;
 card.addEventListener("click", () => selectDateCard(card, d));
 strip.appendChild(card);
 }
@@ -509,7 +500,7 @@ const label = document.getElementById("dateSelectedLabel");
 const days = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
 const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 if (label) {
-label.textContent = ✅ ${days[dateObj.getDay()]}, ${dateObj.getDate()} ${months[dateObj.getMonth()]};
+label.textContent = `✅ ${days[dateObj.getDay()]}, ${dateObj.getDate()} ${months[dateObj.getMonth()]}`;
 label.className = "date-selected-label has-date";
 }
 calculateQuote(true);
@@ -530,13 +521,13 @@ const d = new Date(val + "T00:00:00");
 const today = new Date(); today.setHours(0,0,0,0);
 if (d < today) { showToast("⚠️ Please select today or a future date."); return; }
 document.querySelectorAll(".date-card").forEach(c => c.classList.remove("selected"));
-const match = document.querySelector(.date-card[data-date="${val}"]);
+const match = document.querySelector(`.date-card[data-date="${val}"]`);
 if (match) match.classList.add("selected");
 const label = document.getElementById("dateSelectedLabel");
 const days = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
 const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 if (label) {
-label.textContent = ✅ ${days[d.getDay()]}, ${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()};
+label.textContent = `✅ ${days[d.getDay()]}, ${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
 label.className = "date-selected-label has-date";
 }
 calculateQuote(true);
@@ -681,7 +672,7 @@ buildDateStrip();
 if (!document.getElementById("pz-fc-styles")) {
 const s = document.createElement("style");
 s.id = "pz-fc-styles";
-s.textContent = .furniture-grid{display:flex;flex-direction:column;gap:8px;} .fc-category{border:1px solid rgba(255,255,255,0.08);border-radius:12px;overflow:hidden;} .fc-category-header{display:flex;align-items:center;gap:10px;padding:12px 16px;background:rgba(255,255,255,0.04);cursor:pointer;transition:background .2s;user-select:none;} .fc-category-header:hover{background:rgba(255,255,255,0.08);} .fc-cat-icon{font-size:1.1rem;} .fc-cat-label{flex:1;font-weight:600;font-size:.9rem;color:var(--text,#fff);} .fc-cat-arrow{font-size:.8rem;color:var(--text-muted,#aaa);transition:transform .2s;} .fc-category-items{display:none;flex-wrap:wrap;gap:10px;padding:12px;background:rgba(255,255,255,0.02);} .fc-qty-card{display:flex;flex-direction:column;align-items:center;gap:5px;padding:10px 8px;border-radius:10px;border:2px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.03);transition:all .2s;width:88px;text-align:center;} .fc-qty-card.active{border-color:#3b82f6;background:rgba(59,130,246,0.13);} .fc-emoji{font-size:1.4rem;line-height:1;} .fc-name{font-size:.68rem;font-weight:500;color:var(--text,#fff);line-height:1.2;min-height:2em;display:flex;align-items:center;justify-content:center;} .fc-price-tag{font-size:.64rem;color:#22c55e;font-weight:600;} .fc-qty-row{display:flex;align-items:center;gap:4px;margin-top:2px;} .fc-qty-btn{width:26px;height:26px;border-radius:6px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.07);color:var(--text,#fff);font-size:1rem;font-weight:700;cursor:pointer;transition:background .15s,border-color .15s;display:flex;align-items:center;justify-content:center;padding:0;line-height:1;-webkit-tap-highlight-color:transparent;} .fc-qty-btn:hover,.fc-qty-btn:active{background:#3b82f6;border-color:#3b82f6;} .fc-qty-input{width:26px;text-align:center;background:transparent;border:none;color:var(--text,#fff);font-size:.85rem;font-weight:700;-moz-appearance:textfield;pointer-events:none;} .fc-qty-input::-webkit-outer-spin-button,.fc-qty-input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;} .carton-box-row{display:flex;align-items:center;flex-wrap:wrap;gap:10px;padding:4px 0;width:100%;} .carton-label{font-size:.85rem;color:var(--text,#fff);flex:1;min-width:160px;} .carton-qty-wrap{display:flex;align-items:center;gap:6px;} .carton-price-note{font-size:.8rem;color:#22c55e;font-weight:600;} @media(max-width:380px){.fc-qty-card{width:78px;padding:8px 5px;}};
+s.textContent = `.furniture-grid{display:flex;flex-direction:column;gap:8px;} .fc-category{border:1px solid rgba(255,255,255,0.08);border-radius:12px;overflow:hidden;} .fc-category-header{display:flex;align-items:center;gap:10px;padding:12px 16px;background:rgba(255,255,255,0.04);cursor:pointer;transition:background .2s;user-select:none;} .fc-category-header:hover{background:rgba(255,255,255,0.08);} .fc-cat-icon{font-size:1.1rem;} .fc-cat-label{flex:1;font-weight:600;font-size:.9rem;color:var(--text,#fff);} .fc-cat-arrow{font-size:.8rem;color:var(--text-muted,#aaa);transition:transform .2s;} .fc-category-items{display:none;flex-wrap:wrap;gap:10px;padding:12px;background:rgba(255,255,255,0.02);} .fc-qty-card{display:flex;flex-direction:column;align-items:center;gap:5px;padding:10px 8px;border-radius:10px;border:2px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.03);transition:all .2s;width:88px;text-align:center;} .fc-qty-card.active{border-color:#3b82f6;background:rgba(59,130,246,0.13);} .fc-emoji{font-size:1.4rem;line-height:1;} .fc-name{font-size:.68rem;font-weight:500;color:var(--text,#fff);line-height:1.2;min-height:2em;display:flex;align-items:center;justify-content:center;} .fc-price-tag{font-size:.64rem;color:#22c55e;font-weight:600;} .fc-qty-row{display:flex;align-items:center;gap:4px;margin-top:2px;} .fc-qty-btn{width:26px;height:26px;border-radius:6px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.07);color:var(--text,#fff);font-size:1rem;font-weight:700;cursor:pointer;transition:background .15s,border-color .15s;display:flex;align-items:center;justify-content:center;padding:0;line-height:1;-webkit-tap-highlight-color:transparent;} .fc-qty-btn:hover,.fc-qty-btn:active{background:#3b82f6;border-color:#3b82f6;} .fc-qty-input{width:26px;text-align:center;background:transparent;border:none;color:var(--text,#fff);font-size:.85rem;font-weight:700;-moz-appearance:textfield;pointer-events:none;} .fc-qty-input::-webkit-outer-spin-button,.fc-qty-input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;} .carton-box-row{display:flex;align-items:center;flex-wrap:wrap;gap:10px;padding:4px 0;width:100%;} .carton-label{font-size:.85rem;color:var(--text,#fff);flex:1;min-width:160px;} .carton-qty-wrap{display:flex;align-items:center;gap:6px;} .carton-price-note{font-size:.8rem;color:#22c55e;font-weight:600;} @media(max-width:380px){.fc-qty-card{width:78px;padding:8px 5px;}}`;
 
 document.head.appendChild(s);
 }
@@ -689,13 +680,13 @@ document.head.appendChild(s);
 if (!document.getElementById("recaptcha-container-signup")) {
 const d = document.createElement("div");
 d.id = "recaptcha-container-signup";
-d.style.cssText = "position;width:0;height:0;overflow;opacity:0;pointer-events;";
+d.style.cssText = "position:absolute;width:0;height:0;overflow:hidden;opacity:0;pointer-events:none;";
 document.body.appendChild(d);
 }
 if (!document.getElementById("recaptcha-container-reset")) {
 const d = document.createElement("div");
 d.id = "recaptcha-container-reset";
-d.style.cssText = "position;width:0;height:0;overflow;opacity:0;pointer-events;";
+d.style.cssText = "position:absolute;width:0;height:0;overflow:hidden;opacity:0;pointer-events:none;";
 document.body.appendChild(d);
 }
 });
@@ -1067,7 +1058,7 @@ const result = await auth.signInWithPopup(provider);
 await _handleGoogleUser(result.user, db);
 closeAuthModal();
 const name = (result.user.displayName || result.user.email?.split("@")[0] || "User").split(" ")[0];
-showToast(👋 Welcome, ${name}!);
+showToast(`👋 Welcome, ${name}!`);
 } catch (err) {
 if (err.code === "auth/popup-blocked") {
 showError("loginError", "⚠️ Popup blocked — please allow popups for this site and try again.");
@@ -1382,7 +1373,7 @@ const promo = snap.data();
 if (!promo.active) { msgEl.textContent = "This promo has expired."; msgEl.className = "promo-msg promo-error"; return; }
 const discount = promo.type === "percent" ? Math.round(lastCalculatedTotal * promo.value / 100) : promo.value;
 promoDiscount = Math.min(discount, lastCalculatedTotal * 0.5);
-msgEl.textContent = 🎉 Code applied! ₹${promoDiscount} off.;
+msgEl.textContent = `🎉 Code applied! ₹${promoDiscount} off.`;
 msgEl.className = "promo-msg promo-success";
 updatePriceDisplay();
 } catch(e) { msgEl.textContent = "Error checking code."; msgEl.className = "promo-msg promo-error"; }
@@ -1419,10 +1410,10 @@ syncPayOnlineButton(discounted, advanceAmt, fullAmt);
 function syncPayOnlineButton(total, advanceAmt, fullAmt) {
 const btn = document.getElementById("btnPayOnline");
 if (!btn) return;
-if (selectedPayment === "advance") btn.innerHTML = 💳 Pay Advance ₹${advanceAmt.toLocaleString("en-IN")} Online;
+if (selectedPayment === "advance") btn.innerHTML = `💳 Pay Advance ₹${advanceAmt.toLocaleString("en-IN")} Online`;
 else if (selectedPayment === "full")
-btn.innerHTML = 💳 Pay Full ₹${fullAmt.toLocaleString("en-IN")} (Save ₹200);
-else btn.innerHTML = 💳 Pay Online;
+btn.innerHTML = `💳 Pay Full ₹${fullAmt.toLocaleString("en-IN")} (Save ₹200)`;
+else btn.innerHTML = `💳 Pay Online`;
 }
 
 function selectPayment(type) {
@@ -2247,9 +2238,9 @@ pickup: pickup?.value||"—", drop: drop?.value||"—", date: shiftDate?.value||
 house: houseEl?.options[houseEl?.selectedIndex]?.text||"—",
 vehicle: vehicleEl?.options[vehicleEl?.selectedIndex]?.text||"—",
 total, paymentLabel: selectedPayment === "full"
-? Paid Full — ₹${paid.toLocaleString("en-IN")}
-: Advance ₹${paid.toLocaleString("en-IN")} paid,
-paymentNote: Payment ID: ${response.razorpay_payment_id}, source: "payment", showInvoice: true
+? `Paid Full — ₹${paid.toLocaleString("en-IN")}`
+: `Advance ₹${paid.toLocaleString("en-IN")} paid`,
+paymentNote: `Payment ID: ${response.razorpay_payment_id}`, source: "payment", showInvoice: true
 });
 if (window._firebase) {
 window._firebase.db.collection("bookings").add({
@@ -2597,8 +2588,8 @@ snap.forEach(d => {
 const msg = d.data();
 const isMine = msg.senderUid === currentUser?.uid;
 const time = msg.time?.toDate ? msg.time.toDate().toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"}) : "";
-const senderLabel = (!isMine && msg.senderName) ? <span class="chat-sender">${msg.senderName}</span> : "";
-container.innerHTML += <div class="chat-bubble ${isMine?"mine":"theirs"}">${senderLabel}<div>${escapeHTML(msg.text)}</div><div class="chat-time">${time}</div></div>;
+const senderLabel = (!isMine && msg.senderName) ? `<span class="chat-sender">${msg.senderName}</span>` : "";
+container.innerHTML += `<div class="chat-bubble ${isMine?"mine":"theirs"}">${senderLabel}<div>${escapeHTML(msg.text)}</div><div class="chat-time">${time}</div></div>`;
 });
 container.scrollTop = container.scrollHeight;
 });
@@ -2679,7 +2670,7 @@ const done = Object.values(saved).filter(Boolean).length;
 const bar = document.getElementById("clProgressBar");
 const score = document.getElementById("clScore");
 if (bar) bar.style.width = (total ? Math.round(done / total * 100) : 0) + "%";
-if (score) score.textContent = ${done} / ${total};
+if (score) score.textContent = `${done} / ${total}`;
 }
 
 function openChecklist() { document.getElementById("userDropdown")?.classList.remove("open"); buildChecklist(); document.getElementById("checklistModal").style.display = "flex"; }
@@ -2726,7 +2717,7 @@ const snap = await window._firebase.db.collection("reviews").where("status","=="
 if (snap.empty) return;
 const grid = document.getElementById("reviewsGrid");
 const countEl = document.getElementById("reviewCountLabel");
-if (countEl) countEl.textContent = Based on ${snap.size}+ reviews;
+if (countEl) countEl.textContent = `Based on ${snap.size}+ reviews`;
 let html = "";
 snap.forEach(d => {
 const r = d.data();
@@ -3060,10 +3051,10 @@ printerCheck:"Printer", confCheck:"Conf. Table", whiteboardCheck:"Whiteboard"
 const items = [];
 Object.entries(labels).forEach(([id, name]) => {
 const qty = parseInt(document.getElementById(id)?.value || 0);
-if (qty > 0) items.push(qty > 1 ? ${name} ×${qty} : name);
+if (qty > 0) items.push(qty > 1 ? `${name} ×${qty}` : name);
 });
 const cartonQty = parseInt(document.getElementById("cartonQty")?.value || 0);
-if (cartonQty > 0) items.push(Carton Boxes ×${cartonQty});
+if (cartonQty > 0) items.push(`Carton Boxes ×${cartonQty}`);
 return items.join(", ") || "";
 }
 
@@ -3092,7 +3083,7 @@ await window._firebase.db.collection("users").doc(cred.user.uid).set({
 name, email, role: "driver", isOnline: false, phone: "", vehicle: "", rating: 0, totalMoves: 0,
 createdBy: currentUser.uid, createdAt: firebase.firestore.FieldValue.serverTimestamp()
 });
-setMsg(✅ Driver "${name}" created!, true);
+setMsg(`✅ Driver "${name}" created!`, true);
 ["newDriverName","newDriverEmail","newDriverPassword"].forEach(id => { document.getElementById(id).value = ""; });
 } catch(error) {
 setMsg("⚠️ " + (error.code === "auth/email-already-in-use" ? "Email already exists." : error.message), false);
@@ -3215,12 +3206,12 @@ const canCancel = !["packing","transit","delivered","cancelled"].includes(b.stat
 const canReschedule = !["transit","delivered","cancelled"].includes(b.status);
 const canRate = b.status === "delivered" && !b.driverRating;
 const canClaim = b.status === "delivered" && !b.damageClaimed;
-return <div class="bk-card"> <div class="bk-card-top"><div class="bk-route">${escapeHTML((b.pickup||"?").split(",")[0])} → ${escapeHTML((b.drop||"?").split(",")[0])}</div><div class="bk-status" style="color:${color}">${icon} ${escapeHTML(capitalize(b.status||"confirmed"))}</div></div> <div class="bk-meta"><span>₹${(b.total||0).toLocaleString("en-IN")}</span><span>${escapeHTML(b.date)||"Date TBD"}</span><span style="font-size:.72rem;color:#5a6a8a">${escapeHTML(b.bookingRef)||""}</span></div> ${canCancel||canReschedule||canRate||canClaim?
+return `<div class="bk-card"> <div class="bk-card-top"><div class="bk-route">${escapeHTML((b.pickup||"?").split(",")[0])} → ${escapeHTML((b.drop||"?").split(",")[0])}</div><div class="bk-status" style="color:${color}">${icon} ${escapeHTML(capitalize(b.status||"confirmed"))}</div></div> <div class="bk-meta"><span>₹${(b.total||0).toLocaleString("en-IN")}</span><span>${escapeHTML(b.date)||"Date TBD"}</span><span style="font-size:.72rem;color:#5a6a8a">${escapeHTML(b.bookingRef)||""}</span></div> ${canCancel||canReschedule||canRate||canClaim?`
 ${canReschedule?`<button class="bk-btn reschedule" data-action="reschedule" data-id="${id}" data-ref="${b.bookingRef||id}" data-date="${b.date||""}">📅 Reschedule</button>`:""}
 ${canCancel?`<button class="bk-btn cancel" data-action="cancel" data-id="${id}" data-ref="${b.bookingRef||id}" data-status="${b.status||""}">✕ Cancel</button>`:""}
 ${canRate?`<button class="bk-btn rate" data-action="rate" data-id="${id}" data-ref="${b.bookingRef||id}" data-driver="${b.driverName||""}">⭐ Rate Driver</button>`:""}
 ${canClaim?`<button class="bk-btn claim" data-action="claim" data-id="${id}" data-ref="${b.bookingRef||id}">🔧 Report Damage</button>`:""}
-:""} </div>;
+`:""} </div>`;
 }).join("");
 }).catch(() => {});
 
@@ -3314,7 +3305,7 @@ const btn = document.getElementById("btnConfirmCancel");
 if (btn) { btn.textContent = "Cancelling..."; btn.disabled = true; }
 try {
 await window._firebase.db.collection("bookings").doc(docId).update({ status:"cancelled", cancelReason, cancelledAt: firebase.firestore.FieldValue.serverTimestamp(), cancelledBy:"customer" });
-await window._firebase.db.collection("cancelRequests").add({ bookingDocId, reason, customerUid.uid, createdAt: firebase.firestore.FieldValue.serverTimestamp(), resolved }).catch(() => {});
+await window._firebase.db.collection("cancelRequests").add({ bookingDocId, reason, customerUid: currentUser.uid, createdAt: firebase.firestore.FieldValue.serverTimestamp(), resolved }).catch(() => {});
 const cancelledDoc = await window._firebase.db.collection("bookings").doc(docId).get();
 if (cancelledDoc.exists) {
 const cb = cancelledDoc.data();
@@ -3352,7 +3343,7 @@ if (!currentUser || !window._firebase) return;
 const btn = document.getElementById("btnConfirmReschedule");
 if (btn) { btn.textContent = "Saving..."; btn.disabled = true; }
 try {
-await window._firebase.db.collection("bookings").doc(docId).update({ date, time||"", rescheduledAt: firebase.firestore.FieldValue.serverTimestamp(), rescheduledBy:"customer", status:"confirmed" });
+await window._firebase.db.collection("bookings").doc(docId).update({ date: newDate, time: newTime||"", rescheduledAt: firebase.firestore.FieldValue.serverTimestamp(), rescheduledBy:"customer", status:"confirmed" });
 const bookingDoc = await window._firebase.db.collection("bookings").doc(docId).get();
 if (bookingDoc.exists) {
 const b = bookingDoc.data();
@@ -3387,11 +3378,11 @@ await window._firebase.db.collection("bookings").doc(ratingBookingDocId).update(
 const bookingDoc = await window._firebase.db.collection("bookings").doc(ratingBookingDocId).get();
 const driverUid = bookingDoc.data()?.driverUid;
 if (driverUid) {
-await window._firebase.db.collection("driverRatings").add({ driverUid, bookingDocId, rating, feedback, customerUid.uid, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+await window._firebase.db.collection("driverRatings").add({ driverUid, bookingDocId, rating, feedback, customerUid: currentUser.uid, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
 const ratingsSnap = await window._firebase.db.collection("driverRatings").where("driverUid","==",driverUid).get();
 const ratings = ratingsSnap.docs.map(d => d.data().rating);
 const avg = ratings.reduce((a,b) => a+b,0) / ratings.length;
-await window._firebase.db.collection("drivers").doc(driverUid).update({ avgRating.round(avg*10)/10, totalRatings.length }).catch(()=>{});
+await window._firebase.db.collection("drivers").doc(driverUid).update({ avgRating: Math.round(avg*10)/10, totalRatings: ratings.length }).catch(()=>{});
 }
 closeRateDriverModal(); showToast("⭐ Thanks for rating your driver!"); loadUserBookings();
 } catch(e) { showToast("Error: " + e.message); }
@@ -3421,7 +3412,7 @@ window._firebase.db.collection("bookings").doc(bookingDocId).onSnapshot(doc => {
 if (!doc.exists) return;
 const status = doc.data().status;
 if (status && status !== lastStatus && msgs[status]) {
-if (Notification.permission === "granted") new Notification(msgs[status].title, { body.body, icon:"/favicon.ico" });
+if (Notification.permission === "granted") new Notification(msgs[status].title, { body: msgs[status].body, icon:"/favicon.ico" });
 lastStatus = status;
 }
 });
@@ -3429,13 +3420,13 @@ setupStatusSMS(bookingDocId, "", "", "");
 }
 
 const SMS_TEMPLATES = {
-booking_confirmed: d => Hi ${d.name}, your PackZen booking ${d.bookingRef} is confirmed for ${d.date}! Pickup: ${(d.pickup||"").split(",")[0]}. Est: Rs.${Number(d.total).toLocaleString("en-IN")}. Track: packzenblr.in,
-driver_assigned: d => Hi ${d.name}, your PackZen driver ${d.driverName} (${d.driverPhone}) is assigned for booking ${d.bookingRef}.,
-move_started: d => Hi ${d.name}, your goods are now in transit for booking ${d.bookingRef}. Track: packzenblr.in,
-delivered: d => Hi ${d.name}, your PackZen move ${d.bookingRef} is complete! Rate your driver on packzenblr.in.,
-cancelled: d => Hi ${d.name}, your PackZen booking ${d.bookingRef} has been cancelled. Refund (if any) in 5-7 business days. Queries: 9945095453,
-damage_claim: d => Hi ${d.name}, your damage claim (${d.claimId}) for booking ${d.bookingRef} has been received. We'll respond within 3 business days.,
-reschedule_confirmed: d => Hi ${d.name}, your PackZen booking ${d.bookingRef} has been rescheduled to ${d.date}. Queries: 9945095453,
+booking_confirmed: d => `Hi ${d.name}, your PackZen booking ${d.bookingRef} is confirmed for ${d.date}! Pickup: ${(d.pickup||"").split(",")[0]}. Est: Rs.${Number(d.total).toLocaleString("en-IN")}. Track: packzenblr.in`,
+driver_assigned: d => `Hi ${d.name}, your PackZen driver ${d.driverName} (${d.driverPhone}) is assigned for booking ${d.bookingRef}.`,
+move_started: d => `Hi ${d.name}, your goods are now in transit for booking ${d.bookingRef}. Track: packzenblr.in`,
+delivered: d => `Hi ${d.name}, your PackZen move ${d.bookingRef} is complete! Rate your driver on packzenblr.in.`,
+cancelled: d => `Hi ${d.name}, your PackZen booking ${d.bookingRef} has been cancelled. Refund (if any) in 5-7 business days. Queries: 9945095453`,
+damage_claim: d => `Hi ${d.name}, your damage claim (${d.claimId}) for booking ${d.bookingRef} has been received. We'll respond within 3 business days.`,
+reschedule_confirmed: d => `Hi ${d.name}, your PackZen booking ${d.bookingRef} has been rescheduled to ${d.date}. Queries: 9945095453`,
 };
 
 async function queueSMS(phone, templateKey, data) {
@@ -3445,7 +3436,7 @@ if (mobile.length !== 12) return;
 const template = SMS_TEMPLATES[templateKey];
 if (!template) return;
 try {
-await window._firebase.db.collection("smsQueue").add({ mobile, message(data), template, status:"pending", createdAt: firebase.firestore.FieldValue.serverTimestamp(), retries:0 });
+await window._firebase.db.collection("smsQueue").add({ mobile, message: SMS_TEMPLATES[template]?.(data) || "", template, status:"pending", createdAt: firebase.firestore.FieldValue.serverTimestamp(), retries:0 });
 } catch(e) {}
 }
 
@@ -3458,8 +3449,8 @@ if (!doc.exists) return;
 const b = doc.data(); const status = b.status;
 if (!status || status === lastStatus) return;
 lastStatus = status;
-if (map[status]) queueSMS(b.phone||customerPhone, map[status], { name.customerName||customerName, bookingRef.bookingRef||bookingRef||bookingDocId, driverName.driverName||"", driverPhone.driverPhone||"", date.date||"" });
-if (status === "assigned" && b.driverName) queueSMS(b.phone||customerPhone, "driver_assigned", { name.customerName||customerName, bookingRef.bookingRef||bookingDocId, driverName.driverName, driverPhone.driverPhone||"" });
+if (map[status]) queueSMS(b.phone||customerPhone, map[status], { name: b.customerName||customerName, bookingRef: b.bookingRef||bookingRef||bookingDocId, driverName: b.driverName||"", driverPhone: b.driverPhone||"", date: b.date||"" });
+if (status === "assigned" && b.driverName) queueSMS(b.phone||customerPhone, "driver_assigned", { name: b.customerName||customerName, bookingRef: b.bookingRef||bookingDocId, driverName: b.driverName, driverPhone: b.driverPhone||"" });
 });
 }
 
@@ -3499,10 +3490,10 @@ if (!currentUser || !window._firebase) return;
 const btn = document.getElementById("btnSubmitDamage");
 if (btn) { btn.textContent = "Submitting..."; btn.disabled = true; }
 try {
-const claimRef = await window._firebase.db.collection("damageClaims").add({ bookingDocId, customerUid.uid, damageType, description, photos.slice(0,5), status:"pending", createdAt: firebase.firestore.FieldValue.serverTimestamp() });
-await window._firebase.db.collection("bookings").doc(damageBookingDocId).update({ damageClaimed, damageClaimId.id, damageClaimedAt: firebase.firestore.FieldValue.serverTimestamp() });
+const claimRef = await window._firebase.db.collection("damageClaims").add({ bookingDocId, customerUid: currentUser.uid, damageType, description, photos: damagePhotos.slice(0,5), status:"pending", createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+await window._firebase.db.collection("bookings").doc(damageBookingDocId).update({ damageClaimed: true, damageClaimId: claimRef.id, damageClaimedAt: firebase.firestore.FieldValue.serverTimestamp() });
 const b = (await window._firebase.db.collection("bookings").doc(damageBookingDocId).get()).data();
-queueSMS(b?.phone||"", "damage_claim", { name?.customerName||"Customer", bookingRef?.bookingRef||damageBookingDocId, claimId.id.slice(0,8).toUpperCase() });
+queueSMS(b?.phone||"", "damage_claim", { name: b?.customerName||"Customer", bookingRef: b?.bookingRef||damageBookingDocId, claimId: claimRef.id.slice(0,8).toUpperCase() });
 closeDamageModal(); showToast("✅ Claim submitted!"); loadUserBookings();
 } catch(e) {
 const msgEl = document.getElementById("damageMsg");
@@ -3528,7 +3519,7 @@ if (resendBtn) resendBtn.disabled = true;
 if (timerEl) timerEl.textContent = "Resend in 60s";
 otpTimerInterval = setInterval(() => {
 seconds--;
-if (timerEl) timerEl.textContent = seconds > 0 ? Resend in ${seconds}s : "";
+if (timerEl) timerEl.textContent = seconds > 0 ? `Resend in ${seconds}s` : "";
 if (seconds <= 0) {
 clearInterval(otpTimerInterval);
 if (resendBtn) resendBtn.disabled = false;
