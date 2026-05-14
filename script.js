@@ -299,7 +299,36 @@ timer = setTimeout(() => fn(...args), ms);
 /* ============================================
 MOVE TYPE SELECTOR
 ============================================ */
+let selectedMoveType = "";
 
+function selectMoveType(card, type) {
+  selectedMoveType = type;
+  document.querySelectorAll(".move-type-card").forEach(c => c.classList.remove("selected"));
+  card.classList.add("selected");
+  document.getElementById("moveType").value = type;
+}
+
+function nextStep() {
+  const steps = document.querySelectorAll(".form-step");
+  const current = document.querySelector(".form-step.active");
+  if (!current) return;
+  const idx = Array.from(steps).indexOf(current);
+  if (idx < steps.length - 1) {
+    current.classList.remove("active");
+    steps[idx + 1].classList.add("active");
+    updateStepHeader(idx + 1);
+  }
+}
+
+function updateStepHeader(idx) {
+  const labels = ["What type of move?", "Where are you moving?", "When & how?", "What items?", "Confirm & Book"];
+  document.getElementById("stepCurrent").textContent = idx + 1;
+  document.getElementById("stepLabel").textContent = labels[idx] || "";
+  document.getElementById("progressBar").style.width = ((idx + 1) / 5 * 100) + "%";
+  document.querySelectorAll(".step-dot").forEach((dot, i) => {
+    dot.classList.toggle("active", i <= idx);
+  });
+}
 /* ============================================
 BOTTOM SHEET SYSTEM
 ============================================ */
