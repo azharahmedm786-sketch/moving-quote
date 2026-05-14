@@ -2536,7 +2536,7 @@ trackingMap.setCenter(pos);
 if (trackingDriverMarker) trackingDriverMarker.setPosition(pos);
 else trackingDriverMarker = new google.maps.Marker({ map: trackingMap, position: pos, title: "Your Driver" });
 } else  {
-  mapDiv.innerHTML = `<span>📍 Driver at ${lat.toFixed(4)}, ${lng.toFixed(4)}</span>`;
+mapDiv.innerHTML = `Driver at ${lat.toFixed(4)}, ${lng.toFixed(4)}`;
 }
 
 /* ============================================
