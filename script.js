@@ -2628,7 +2628,7 @@ if (!container) return;
 const saved = JSON.parse(localStorage.getItem("packzen-checklist") || "{}");
 let html = "";
 Object.entries(CHECKLIST_DATA).forEach(([cat, items]) => {
-html += <div class="cl-category">${cat}</div>;
+html += `<div class="cl-category">${cat}</div>`;
 items.forEach((item, i) => {
 const key = cat + i, done = saved[key];
 html += `<div class="cl-item ${done?'done':''}" data-check-key="${key}" role="button" tabindex="0"><div class="cl-check">${done?'✓':''}</div><div class="cl-text">${item}</div></div>`;
@@ -2723,7 +2723,7 @@ if (countEl) countEl.textContent = `Based on ${snap.size}+ reviews`;
 let html = "";
 snap.forEach(d => {
 const r = d.data();
-html += <div class="review-card"><div class="review-stars">${"★".repeat(r.rating)}${"☆".repeat(5-r.rating)}</div><p class="review-text">"${escapeHTML(r.text)}"</p><div class="review-author"><div class="review-avatar">${escapeHTML(r.name).charAt(0).toUpperCase()}</div><div><div class="review-name">${escapeHTML(r.name)}</div><div class="review-meta">${escapeHTML(r.date)||""}</div></div></div></div>;
+html += `<div class="review-card"><div class="review-stars">${"★".repeat(r.rating)}${"☆".repeat(5-r.rating)}</div><p class="review-text">"${escapeHTML(r.text)}"</p><div class="review-author"><div class="review-avatar">${escapeHTML(r.name).charAt(0).toUpperCase()}</div><div><div class="review-name">${escapeHTML(r.name)}</div><div class="review-meta">${escapeHTML(r.date)||""}</div></div></div></div>;
 });
 if (grid) grid.innerHTML = html;
 } catch(e) {}
@@ -3126,7 +3126,7 @@ if (!list) return;
 if (snap.empty) { list.innerHTML = 'No saved quotes yet.'; return; }
 list.innerHTML = snap.docs.map(d => {
 const q = d.data();
-return <div class="quote-item"><div class="qi-route">📍 ${q.pickup||"?"} → 🏁 ${q.drop||"?"}</div><div class="qi-details"><span>${q.house||"—"}</span><span>${q.vehicle||"—"}</span><span class="qi-price">₹${(q.total||0).toLocaleString("en-IN")}</span></div><div class="qi-date">${q.date||""}</div></div>;
+return `<div class="quote-item"><div class="qi-route">📍 ${q.pickup||"?"} → 🏁 ${q.drop||"?"}</div><div class="qi-details"><span>${q.house||"—"}</span><span>${q.vehicle||"—"}</span><span class="qi-price">₹${(q.total||0).toLocaleString("en-IN")}</span></div><div class="qi-date">${q.date||""}</div></div>;
 }).join("");
 }).catch(() => {});
 }
