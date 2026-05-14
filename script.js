@@ -2872,19 +2872,31 @@ el.classList.add("error");
 setTimeout(() => el.classList.remove("error"), 600);
 }
 
-function selectMoveType(el, type) {
+function selectMoveType(type) {
+
 window.selectedMoveType = type;
+
 document.querySelectorAll(".move-type-card").forEach(card => {
 card.classList.remove("selected");
+
+if (card.dataset.type === type) {
+card.classList.add("selected");
+}
 });
-if (el) el.classList.add("selected");
+
 const input = document.getElementById("moveType");
-if (input) input.value = type;
+
+if (input) {
+input.value = type;
+}
+
 renderSizeCards(type);
 renderFurnitureGrid(type);
-if (typeof buildBsHouseOptions === "function") {
-buildBsHouseOptions();
+
+if (typeof buildHouseOptions === "function") {
+buildHouseOptions();
 }
+
 if (typeof calculateQuote === "function") {
 calculateQuote(true);
 }
