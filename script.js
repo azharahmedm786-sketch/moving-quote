@@ -2529,14 +2529,33 @@ if (b.driverLat && b.driverLng) updateTrackingMap(b.driverLat, b.driverLng);
 function updateTrackingMap(lat, lng) {
 const mapDiv = document.getElementById("trackingMapDiv");
 if (typeof google !== "undefined" && google.maps) {
-mapDiv.innerHTML = ""; mapDiv.style.height = "200px";
-if (!trackingMap) trackingMap = new google.maps.Map(mapDiv, { center: { lat, lng }, zoom: 14 });
-const pos = { lat, lng };
-trackingMap.setCenter(pos);
-if (trackingDriverMarker) trackingDriverMarker.setPosition(pos);
-else trackingDriverMarker = new google.maps.Marker({ map: trackingMap, position: pos, title: "Your Driver" });
-} else  {
-mapDiv.innerHTML = `Driver at ${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+    mapDiv.innerHTML = "";
+    mapDiv.style.height = "200px";
+
+    if (!trackingMap) {
+        trackingMap = new google.maps.Map(mapDiv, {
+            center: { lat, lng },
+            zoom: 14
+        });
+    }
+
+    const pos = { lat, lng };
+
+    trackingMap.setCenter(pos);
+
+    if (trackingDriverMarker) {
+        trackingDriverMarker.setPosition(pos);
+    } else {
+        trackingDriverMarker = new google.maps.Marker({
+            map: trackingMap,
+            position: pos,
+            title: "Your Driver"
+        });
+    }
+}
+
+} else {
+    mapDiv.innerHTML = `Driver at ${lat.toFixed(4)}, ${lng.toFixed(4)}`;
 }
 
 /* ============================================
