@@ -724,8 +724,9 @@ body.dark-mode .service-card { background: var(--bg-secondary); }
 @media (max-width: 600px) {
   .hiw-steps { flex-direction: column; align-items: center; gap: 1.25rem; }
   .hiw-step {
-  width: 100%;
-  max-width: 320px;
+width: 92%;
+max-width: 300px;
+padding: 22px 16px;
 }
 }
 @media (max-width: 480px) {
