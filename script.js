@@ -729,10 +729,20 @@ function calculateQuote(auto = false) {
   const vehicleRate = Number(vehicle?.value || 0);
 
   // Floor costs
-  const pickupFloor = Number(document.getElementById("pickupFloor")?.value || 0);
-  const dropFloor = Number(document.getElementById("dropFloor")?.value || 0);
-  const liftAvail = document.getElementById("liftAvailable")?.checked;
-  const floorCost = liftAvail ? Math.round((pickupFloor + dropFloor) * 150) : (pickupFloor + dropFloor) * 300;
+const pickupFloor = parseInt(document.getElementById("pickupFloor")?.value) || 0;
+const dropFloor = parseInt(document.getElementById("dropFloor")?.value) || 0;
+
+const liftAvail = document.getElementById("liftAvailable")?.checked;
+
+const totalFloors = pickupFloor + dropFloor;
+
+let floorCost = 0;
+
+if (liftAvail) {
+  floorCost = totalFloors * 150;
+} else {
+  floorCost = totalFloors * 300;
+}
 
   // Single item move
   if (!houseBase && hasItems) {
