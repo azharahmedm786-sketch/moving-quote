@@ -1454,22 +1454,29 @@ body {
 @media (max-width: 600px) {
   .hiw-steps {
     flex-direction: column;
-    align-items: stretch;
+    align-items: center;
     gap: 1.25rem;
   }
 
   .hiw-step {
-    min-width: unset;
-    max-width: unset;
-    width: 100%;
-    padding: 24px 20px 20px;
+    width: 92%;
+    max-width: 300px;
+    padding: 22px 16px;
+  }
+
+  .hiw-step h3 {
+    font-size: 0.9rem;
+  }
+
+  .hiw-step p {
+    font-size: 0.78rem;
+    line-height: 1.5;
   }
 
   .hiw-connector {
     display: none;
   }
 }
-
 
 /* ============================================================
    20. WHY SECTION
