@@ -648,7 +648,7 @@ body.dark-mode .service-card { background: var(--bg-secondary); }
   display: flex; align-items: center; justify-content: center; flex-wrap: wrap;
 }
 .ts-badge {
-  display: flex; align-items: center; gap: 12px; padding: 0 28px;
+  display: flex; align-items: center; gap: 12px; padding: 0 28px; opacity: 1 !important;
 }
 .ts-icon { font-size: 1.7rem; color: #00e0ff; }
 .ts-val  { font-weight: 800; font-size: 1rem; color: #ffffff; }
@@ -665,6 +665,10 @@ body.dark-mode .service-card { background: var(--bg-secondary); }
   .ts-icon  { font-size: 1.4rem; }
   .ts-val   { font-size: 0.88rem; }
   .ts-lbl   { font-size: 0.68rem; }
+   .ts-val,
+.ts-lbl {
+  opacity: 1 !important;
+}
 }
 
 /* ============================================
