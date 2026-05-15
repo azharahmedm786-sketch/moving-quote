@@ -652,7 +652,7 @@ body.dark-mode .service-card { background: var(--bg-secondary); }
 }
 .ts-icon { font-size: 1.7rem; color: #00e0ff; }
 .ts-val  { font-weight: 800; font-size: 1rem; color: #ffffff; }
-.ts-lbl  { font-size: 0.75rem; color: rgba(255,255,255,0.75); }
+.ts-lbl { font-size: 0.75rem; color: rgba(255,255,255,0.92); }
 .ts-divider { width: 1px; height: 40px; background: rgba(255,255,255,0.2); }
 
 @media (max-width: 600px) {
