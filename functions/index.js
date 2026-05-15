@@ -129,3 +129,60 @@ exports.retrySMS = functions
     });
     return { success: true };
   });
+const Razorpay = require("razorpay");
+const cors = require("cors")({
+  origin: [
+    "https://packzenblr.in",
+    "https://www.packzenblr.in",
+    "http://localhost:5000"
+  ]
+});
+
+const razorpay = new Razorpay({
+  key_id: "rzp_live_Sn8LmBe51Sy0jv",
+  key_secret: "TB40xu7vy1MVSz5zj47ejIGW"
+});
+
+exports.createRazorpayOrder = functions
+  .region("asia-south1")
+  .https.onRequest((req, res) => {
+
+    cors(req, res, async () => {
+
+      try {
+
+        if (req.method !== "POST") {
+          return res.status(405).send("Method Not Allowed");
+        }
+
+        const amount = req.body.amount;
+
+        if (!amount) {
+          return res.status(400).json({
+            error: "Amount is required"
+          });
+        }
+
+        const options = {
+          amount: amount * 100,
+          currency: "INR",
+          receipt: "receipt_" + Date.now()
+        };
+
+        const order = await razorpay.orders.create(options);
+
+        return res.status(200).json(order);
+
+      } catch (error) {
+
+        console.error("Razorpay Error:", error);
+
+        return res.status(500).json({
+          error: error.message
+        });
+
+      }
+
+    });
+
+});
