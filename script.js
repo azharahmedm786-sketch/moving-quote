@@ -457,6 +457,19 @@ function showStep(n) {
   getSteps().forEach(s => s.classList.remove("active"));
   const steps = getSteps();
   if (steps[n]) steps[n].classList.add("active");
+  setTimeout(() => {
+
+  if (map) {
+
+    google.maps.event.trigger(map, "resize");
+
+    if (pickupPlace?.geometry?.location) {
+      map.setCenter(pickupPlace.geometry.location);
+    }
+
+  }
+
+}, 300);
   const pb = document.getElementById("progressBar");
   if (pb) pb.style.width = ((n + 1) / 5) * 100 + "%";
   updateStepDots(n);
