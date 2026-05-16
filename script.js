@@ -622,10 +622,11 @@ map = new google.maps.Map(mapElement, {
 directionsRenderer = new google.maps.DirectionsRenderer({
     map: map,
     suppressMarkers: false,
+    preserveViewport: false,
     polylineOptions: {
       strokeColor: "#1a56db",
-      strokeOpacity: 0.9,
-      strokeWeight: 5
+      strokeOpacity: 1.0,
+      strokeWeight: 6
     }
   });
   initAutocomplete();
