@@ -688,18 +688,17 @@ directionsService.route(request, (result, status) => {
         map.fitBounds(result.routes[0].bounds);
       }
       // Force draw a bold blue line on top
-     // Force draw a bold blue line on top
- // Force draw a bold blue line on top
       if (window._routePolyline) window._routePolyline.setMap(null);
       const routePath = result.routes[0].overview_path;
       console.log("Route path points:", routePath ? routePath.length : "NULL");
       if (routePath && routePath.length > 0) {
-        window._routePolyline = new google.maps.Polyline({
+window._routePolyline = new google.maps.Polyline({
           path: routePath,
           geodesic: true,
           strokeColor: "#FF0000",
           strokeOpacity: 1.0,
-          strokeWeight: 7,
+          strokeWeight: 8,
+          zIndex: 999,
           map: map
         });
         console.log("✅ Blue polyline drawn!");
