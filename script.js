@@ -697,7 +697,7 @@ directionsService.route(request, (result, status) => {
         window._routePolyline = new google.maps.Polyline({
           path: routePath,
           geodesic: true,
-          strokeColor: "#1a56db",
+          strokeColor: "#FF0000",
           strokeOpacity: 1.0,
           strokeWeight: 7,
           map: map
