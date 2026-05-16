@@ -585,6 +585,38 @@ function selectTimeSlot(btn, value, label, range) {
 /* ============================================
 GOOGLE MAPS
 ============================================ */
+window.initMap = function () {
+
+  const mapElement = document.getElementById("map");
+
+  if (!mapElement) {
+    console.error("Map div not found");
+    return;
+  }
+
+  map = new google.maps.Map(mapElement, {
+    center: {
+      lat: 12.9716,
+      lng: 77.5946
+    },
+    zoom: 11,
+    mapTypeControl: false,
+    streetViewControl: false,
+    fullscreenControl: false
+  });
+
+  directionsService = new google.maps.DirectionsService();
+
+  directionsRenderer = new google.maps.DirectionsRenderer({
+    map: map
+  });
+
+  initAutocomplete();
+
+  console.log("✅ Map initialized");
+
+};
+
 function initAutocomplete() {
   const pickupInput = document.getElementById("pickup");
   const dropInput = document.getElementById("drop");
