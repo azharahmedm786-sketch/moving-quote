@@ -700,8 +700,8 @@ directionsService.route(request, (result, status) => {
 
   } else {
 
-    console.error("Directions request failed:", status);
-
+   alert("Directions failed: " + status);
+console.error("Directions request failed:", status);
     directionsRenderer.setDirections({ routes: [] });
 
     if (pickupMarker) pickupMarker.setMap(null);
