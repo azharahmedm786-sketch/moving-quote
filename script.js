@@ -619,17 +619,18 @@ map = new google.maps.Map(mapElement, {
 
   directionsService = new google.maps.DirectionsService();
 directionsRenderer = new google.maps.DirectionsRenderer({
-    map: map,
-    suppressMarkers: false,
-    suppressPolylines: false,
-    preserveViewport: false,
-    polylineOptions: {
-      strokeColor: "#1a56db",
-      strokeOpacity: 1.0,
-      strokeWeight: 8,
-      zIndex: 99
-    }
-  });
+  map: map,
+  suppressMarkers: false,
+  preserveViewport: false,
+  polylineOptions: {
+    strokeColor: "#1a56db",
+    strokeOpacity: 1,
+    strokeWeight: 6
+  },
+  markerOptions: {
+    clickable: false
+  }
+});
   initAutocomplete();
 
   console.log("✅ Map initialized");
@@ -684,34 +685,48 @@ function showLocation(type) {
   };
 
 directionsService.route(request, (result, status) => {
-    if (status === "OK") {
-      directionsRenderer.setDirections(result);
-      const leg = result.routes[0]?.legs[0];
-      if (leg) {
-        console.log("Distance:", leg.distance.text);
-        console.log("Duration:", leg.duration.text);
-        map.fitBounds(result.routes[0].bounds);
-      }
-  
-    } else {
-      console.error("Directions request failed:", status);
-      // Fallback: place markers at both points
-      if (pickupMarker) pickupMarker.setMap(null);
-      if (dropMarker) dropMarker.setMap(null);
-      pickupMarker = new google.maps.Marker({
-        map, position: pickupPlace.geometry.location,
-        title: "Pickup", label: "A"
-      });
-      dropMarker = new google.maps.Marker({
-        map, position: dropPlace.geometry.location,
-        title: "Drop", label: "B"
-      });
-      const bounds = new google.maps.LatLngBounds();
-      bounds.extend(pickupPlace.geometry.location);
-      bounds.extend(dropPlace.geometry.location);
-      map.fitBounds(bounds);
-    }
-  });
+
+  if (status === google.maps.DirectionsStatus.OK) {
+
+    directionsRenderer.setDirections(result);
+
+    const route = result.routes[0];
+    const leg = route.legs[0];
+
+    console.log("Distance:", leg.distance.text);
+    console.log("Duration:", leg.duration.text);
+
+    map.fitBounds(route.bounds);
+
+  } else {
+
+    console.error("Directions request failed:", status);
+
+    directionsRenderer.setDirections({ routes: [] });
+
+    if (pickupMarker) pickupMarker.setMap(null);
+    if (dropMarker) dropMarker.setMap(null);
+
+    pickupMarker = new google.maps.Marker({
+      position: pickupPlace.geometry.location,
+      map: map,
+      label: "A"
+    });
+
+    dropMarker = new google.maps.Marker({
+      position: dropPlace.geometry.location,
+      map: map,
+      label: "B"
+    });
+
+    const bounds = new google.maps.LatLngBounds();
+
+    bounds.extend(pickupPlace.geometry.location);
+    bounds.extend(dropPlace.geometry.location);
+
+    map.fitBounds(bounds);
+  }
+});
 }
 
 /* ============================================
