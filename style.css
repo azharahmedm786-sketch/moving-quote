@@ -2202,4 +2202,7 @@ input:focus-visible, select:focus-visible {
   height: 400px;
   min-height: 400px;
   border-radius: 16px;
+  touch-action: pan-x pan-y;
+  -webkit-user-select: none;
+  user-select: none;
 }
