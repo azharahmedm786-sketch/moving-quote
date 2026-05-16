@@ -1544,7 +1544,7 @@ Select items you're moving. Furniture charges are calculated individually based 
 function loadGoogleMaps() {
   if (!window.ENV || !window.ENV.GOOGLE_MAPS_KEY) return;
   var s = document.createElement('script');
- s.src = 'https://maps.googleapis.com/maps/api/js?key=' + window.ENV.GOOGLE_MAPS_KEY + '&libraries=places&callback=initMap';
+s.src = 'https://maps.googleapis.com/maps/api/js?key=' + window.ENV.GOOGLE_MAPS_KEY + '&libraries=places,geometry&callback=initMap';
   s.async = true;
   s.defer = true;
   document.head.appendChild(s);
