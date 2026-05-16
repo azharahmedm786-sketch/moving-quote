@@ -607,15 +607,14 @@ window.initMap = function () {
     return;
   }
 
-  map = new google.maps.Map(mapElement, {
-    center: {
-      lat: 12.9716,
-      lng: 77.5946
-    },
+map = new google.maps.Map(mapElement, {
+    center: { lat: 12.9716, lng: 77.5946 },
     zoom: 11,
     mapTypeControl: false,
     streetViewControl: false,
-    fullscreenControl: false
+    fullscreenControl: false,
+    gestureHandling: "greedy",
+    zoomControl: true
   });
 
   directionsService = new google.maps.DirectionsService();
