@@ -689,15 +689,23 @@ directionsService.route(request, (result, status) => {
       }
       // Force draw a bold blue line on top
      // Force draw a bold blue line on top
+ // Force draw a bold blue line on top
       if (window._routePolyline) window._routePolyline.setMap(null);
-      window._routePolyline = new google.maps.Polyline({
-        path: result.routes[0].overview_path,
-        geodesic: true,
-        strokeColor: "#1a56db",
-        strokeOpacity: 1.0,
-        strokeWeight: 7,
-        map: map
-      });
+      const routePath = result.routes[0].overview_path;
+      console.log("Route path points:", routePath ? routePath.length : "NULL");
+      if (routePath && routePath.length > 0) {
+        window._routePolyline = new google.maps.Polyline({
+          path: routePath,
+          geodesic: true,
+          strokeColor: "#1a56db",
+          strokeOpacity: 1.0,
+          strokeWeight: 7,
+          map: map
+        });
+        console.log("✅ Blue polyline drawn!");
+      } else {
+        console.error("❌ No route path available");
+      }
     } else {
       console.error("Directions request failed:", status);
       // Fallback: place markers at both points
