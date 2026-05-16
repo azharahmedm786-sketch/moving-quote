@@ -653,8 +653,6 @@ function initAutocomplete() {
     if (!place.geometry) { showToast("⚠️ Please select drop address from dropdown"); dropInput.value = ""; dropPlace = null; return; }
     dropPlace = place; showLocation("drop"); calculateQuote(true);
   });
-
-  attachAutoCalculation();
 }
 
 function showLocation(type) {
