@@ -684,7 +684,7 @@ function showLocation(type) {
     travelMode: google.maps.TravelMode.DRIVING
   };
 
-  directionsService.route(request, (result, status) => {
+directionsService.route(request, (result, status) => {
     if (status === "OK") {
       directionsRenderer.setDirections(result);
       const leg = result.routes[0]?.legs[0];
@@ -693,6 +693,16 @@ function showLocation(type) {
         console.log("Duration:", leg.duration.text);
         map.fitBounds(result.routes[0].bounds);
       }
+      // Force draw a bold blue line on top
+      if (window._routePolyline) window._routePolyline.setMap(null);
+      window._routePolyline = new google.maps.Polyline({
+        path: google.maps.geometry.encoding.decodePath(result.routes[0].overview_polyline),
+        geodesic: true,
+        strokeColor: "#1a56db",
+        strokeOpacity: 1.0,
+        strokeWeight: 6,
+        map: map
+      });
     } else {
       console.error("Directions request failed:", status);
       // Fallback: place markers at both points
