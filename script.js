@@ -644,15 +644,45 @@ function initAutocomplete() {
 }
 
 function showLocation(type) {
-  const mapDiv = document.getElementById("map");
-  if (mapDiv && type === "pickup" && pickupPlace) { mapDiv.style.display = "block"; mapDiv.style.height = "200px"; }
-}
 
-function attachAutoCalculation() {
-  ["house","vehicle","pickupFloor","dropFloor","liftAvailable","cartonQty"].forEach(id =>
-    document.getElementById(id)?.addEventListener("change", () => calculateQuote(true))
-  );
-  document.querySelector(".furniture-grid")?.addEventListener("change", () => calculateQuote(true));
+  if (!pickupPlace || !dropPlace) return;
+
+  if (
+    !pickupPlace.geometry ||
+    !dropPlace.geometry
+  ) return;
+
+  const request = {
+    origin: pickupPlace.geometry.location,
+    destination: dropPlace.geometry.location,
+    travelMode: google.maps.TravelMode.DRIVING
+  };
+
+  directionsService.route(request, (result, status) => {
+
+    if (status === "OK") {
+
+      directionsRenderer.setDirections(result);
+
+      const route = result.routes[0];
+
+      if (route && route.legs[0]) {
+
+        const leg = route.legs[0];
+
+        console.log("Distance:", leg.distance.text);
+        console.log("Duration:", leg.duration.text);
+
+      }
+
+    } else {
+
+      console.error("Directions request failed:", status);
+
+    }
+
+  });
+
 }
 
 /* ============================================
