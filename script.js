@@ -620,10 +620,15 @@ window.initMap = function () {
 
   directionsService = new google.maps.DirectionsService();
 
-  directionsRenderer = new google.maps.DirectionsRenderer({
-    map: map
+directionsRenderer = new google.maps.DirectionsRenderer({
+    map: map,
+    suppressMarkers: false,
+    polylineOptions: {
+      strokeColor: "#1a56db",
+      strokeOpacity: 0.9,
+      strokeWeight: 5
+    }
   });
-
   initAutocomplete();
 
   console.log("✅ Map initialized");
