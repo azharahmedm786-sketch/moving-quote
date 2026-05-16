@@ -694,13 +694,14 @@ directionsService.route(request, (result, status) => {
         map.fitBounds(result.routes[0].bounds);
       }
       // Force draw a bold blue line on top
+     // Force draw a bold blue line on top
       if (window._routePolyline) window._routePolyline.setMap(null);
       window._routePolyline = new google.maps.Polyline({
-        path: google.maps.geometry.encoding.decodePath(result.routes[0].overview_polyline),
+        path: result.routes[0].overview_path,
         geodesic: true,
         strokeColor: "#1a56db",
         strokeOpacity: 1.0,
-        strokeWeight: 6,
+        strokeWeight: 7,
         map: map
       });
     } else {
