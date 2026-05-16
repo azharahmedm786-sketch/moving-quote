@@ -657,13 +657,21 @@ function initAutocomplete() {
 }
 
 function showLocation(type) {
-
   if (!pickupPlace || !dropPlace) return;
+  if (!pickupPlace.geometry || !dropPlace.geometry) return;
 
-  if (
-    !pickupPlace.geometry ||
-    !dropPlace.geometry
-  ) return;
+  // Make the map visible
+  const mapDiv = document.getElementById("map");
+  if (mapDiv) {
+    mapDiv.style.display = "block";
+    mapDiv.style.height = "400px";
+    mapDiv.style.minHeight = "400px";
+  }
+
+  // Trigger resize so Google Maps renders tiles properly
+  if (map) {
+    google.maps.event.trigger(map, "resize");
+  }
 
   const request = {
     origin: pickupPlace.geometry.location,
@@ -672,30 +680,33 @@ function showLocation(type) {
   };
 
   directionsService.route(request, (result, status) => {
-
     if (status === "OK") {
-
       directionsRenderer.setDirections(result);
-
-      const route = result.routes[0];
-
-      if (route && route.legs[0]) {
-
-        const leg = route.legs[0];
-
+      const leg = result.routes[0]?.legs[0];
+      if (leg) {
         console.log("Distance:", leg.distance.text);
         console.log("Duration:", leg.duration.text);
-
+        map.fitBounds(result.routes[0].bounds);
       }
-
     } else {
-
       console.error("Directions request failed:", status);
-
+      // Fallback: place markers at both points
+      if (pickupMarker) pickupMarker.setMap(null);
+      if (dropMarker) dropMarker.setMap(null);
+      pickupMarker = new google.maps.Marker({
+        map, position: pickupPlace.geometry.location,
+        title: "Pickup", label: "A"
+      });
+      dropMarker = new google.maps.Marker({
+        map, position: dropPlace.geometry.location,
+        title: "Drop", label: "B"
+      });
+      const bounds = new google.maps.LatLngBounds();
+      bounds.extend(pickupPlace.geometry.location);
+      bounds.extend(dropPlace.geometry.location);
+      map.fitBounds(bounds);
     }
-
   });
-
 }
 
 /* ============================================
@@ -1249,8 +1260,13 @@ function resetBookingForm() {
   ["custName","custPhone"].forEach(id => { const el = document.getElementById(id); if (el) el.value = ""; });
   document.querySelectorAll(".move-type-card, .select-card, .vehicle-card").forEach(c => c.classList.remove("selected"));
   selectedMoveType = null;
-  const mapDiv = document.getElementById("map");
-  if (mapDiv) { mapDiv.style.display = "none"; mapDiv.style.height = "0"; }
+ const mapDiv = document.getElementById("map");
+if (mapDiv) {
+  mapDiv.style.display = "block";
+  mapDiv.style.height = "400px";
+}
+if (map) google.maps.event.trigger(map, "resize");
+if (directionsRenderer) directionsRenderer.setDirections({ routes: [] });
   promoDiscount = 0; lastCalculatedTotal = 0;
   updatePriceDisplay(); initPaymentOptions();
   setTimeout(() => renderSizeCards("home"), 100);
