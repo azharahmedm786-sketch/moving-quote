@@ -618,12 +618,17 @@ map = new google.maps.Map(mapElement, {
   });
 
   directionsService = new google.maps.DirectionsService();
-
 directionsRenderer = new google.maps.DirectionsRenderer({
     map: map,
     suppressMarkers: false,
-    suppressPolylines: true,
-    preserveViewport: false
+    suppressPolylines: false,
+    preserveViewport: false,
+    polylineOptions: {
+      strokeColor: "#1a56db",
+      strokeOpacity: 1.0,
+      strokeWeight: 8,
+      zIndex: 99
+    }
   });
   initAutocomplete();
 
@@ -687,24 +692,7 @@ directionsService.route(request, (result, status) => {
         console.log("Duration:", leg.duration.text);
         map.fitBounds(result.routes[0].bounds);
       }
-      // Force draw a bold blue line on top
-      if (window._routePolyline) window._routePolyline.setMap(null);
-      const routePath = result.routes[0].overview_path;
-      console.log("Route path points:", routePath ? routePath.length : "NULL");
-      if (routePath && routePath.length > 0) {
-window._routePolyline = new google.maps.Polyline({
-          path: routePath,
-          geodesic: true,
-          strokeColor: "#FF0000",
-          strokeOpacity: 1.0,
-          strokeWeight: 8,
-          zIndex: 999,
-          map: map
-        });
-        console.log("✅ Blue polyline drawn!");
-      } else {
-        console.error("❌ No route path available");
-      }
+  
     } else {
       console.error("Directions request failed:", status);
       // Fallback: place markers at both points
