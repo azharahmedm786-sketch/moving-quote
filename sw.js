@@ -13,12 +13,14 @@ const STATIC_ASSETS = [
   '/index.html',
   '/Offline.html',
   '/style.css',
+  '/mobile-fixes.css',
   '/script.js',
+  '/chatbot.js',
   '/manifest.json',
-   '/driver.html',
+  '/driver.html',
   '/driver-manifest.json',
   '/assets/logo/packzen-logo.png',
-  'https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap',
+  '/assets/logo/packzen-og.png',
 ];
 const OFFLINE_PAGE = '/Offline.html';
 
