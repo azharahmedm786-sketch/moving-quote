@@ -11,3 +11,5 @@ firebase-debug.log
 # OS files
 .DS_Store
 Thumbs.db
+node_modules/ 
+functions/node_modules/ 
