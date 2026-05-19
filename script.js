@@ -1015,7 +1015,7 @@ async function startPayment() {
   if (!shiftDate) { showToast("Please select shifting date."); isProcessingPayment = false; if (payBtn) { payBtn.disabled = false; payBtn.innerText = "Pay Now"; } return; }
 
   try {
-    const orderResponse = await fetch("https://us-central1-packzen-e7539.cloudfunctions.net/createRazorpayOrder", {
+    const orderResponse = await fetch("https://asia-south1-packzen-e7539.cloudfunctions.net/createRazorpayOrder", {
       method: "POST", headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ amount: payAmount, customerName: name, phone: phone, moveType: selectedMoveType, pickup: pickupField, drop: dropField, date: shiftDate })
     });
@@ -1028,7 +1028,7 @@ async function startPayment() {
       prefill: { name, contact: phone }, theme: { color: "#ea580c" },
       handler: async function (response) {
         try {
-          const verifyResponse = await fetch("https://us-central1-packzen-e7539.cloudfunctions.net/verifyRazorpayPayment", {
+          const verifyResponse = await fetch("https://asia-south1-packzen-e7539.cloudfunctions.net/verifyRazorpayPayment", {
             method: "POST", headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
               razorpay_order_id: response.razorpay_order_id, razorpay_payment_id: response.razorpay_payment_id, razorpay_signature: response.razorpay_signature,
