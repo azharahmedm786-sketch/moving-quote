@@ -5,5 +5,5 @@ window.ENV = {
   FIREBASE_AUTH_KEY: "AIzaSyCNZdOeUlwlI9kwkzD05R1xEy8EyuP8VJo",
 
   // Razorpay Public Key
-  RAZORPAY_KEY: "rzp_live_Sn8LmBe51Sy0jv"
+  RAZORPAY_KEY: "rzp_live_SslVE1I4iLezjE"
 };
