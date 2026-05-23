@@ -1037,8 +1037,24 @@ async function startPayment() {
           });
           const verifyData = await verifyResponse.json();
           if (!verifyData.success) { showToast("Payment verification failed"); return; }
-          showToast("Booking successful!");
-          window.location.href = "/success.html?booking=" + verifyData.bookingRef;
+          isProcessingPayment = false;
+if (payBtn) { payBtn.disabled = false; payBtn.innerText = "Pay Now"; }
+showToast("✅ Payment successful!");
+showConfirmationCard({
+  bookingRef: verifyData.bookingRef || paymentReceiptId,
+  name: name,
+  phone: phone,
+  pickup: pickupField,
+  drop: dropField,
+  date: shiftDate,
+  house: document.getElementById("house")?.options[document.getElementById("house")?.selectedIndex]?.text || "",
+  vehicle: document.getElementById("vehicle")?.options[document.getElementById("vehicle")?.selectedIndex]?.text || "",
+  total: payAmount,
+  paymentLabel: selectedPayment === "full" ? "Paid Full Online" : "Advance Paid Online",
+  paymentNote: "Payment ID: " + response.razorpay_payment_id,
+  source: "payment",
+  showInvoice: true
+});
         } catch (err) { console.error(err); showToast("Payment verification failed"); }
       },
       modal: { ondismiss: () => { isProcessingPayment = false; if (payBtn) { payBtn.disabled = false; payBtn.innerText = "Pay Now"; } } }

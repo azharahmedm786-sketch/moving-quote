@@ -130,6 +130,7 @@ exports.retrySMS = functions
     return { success: true };
   });
 const Razorpay = require("razorpay");
+
 const cors = require("cors")({
   origin: [
     "https://packzenblr.in",
@@ -139,50 +140,114 @@ const cors = require("cors")({
 });
 
 const razorpay = new Razorpay({
-  key_id: "rzp_live_Sn8LmBe51Sy0jv",
-  key_secret: "TB40xu7vy1MVSz5zj47ejIGW"
+  key_id: "rzp_live_SslVE1I4iLezjE",
+  key_secret: "FFl1Y1VlrlgY3r07GH24tcwe"
 });
 
 exports.createRazorpayOrder = functions
   .region("asia-south1")
   .https.onRequest((req, res) => {
 
-    cors(req, res, async () => {
+    return cors(req, res, async () => {
 
       try {
 
-        if (req.method !== "POST") {
-          return res.status(405).send("Method Not Allowed");
-        }
-
-        const amount = req.body.amount;
+        const { amount } = req.body;
 
         if (!amount) {
           return res.status(400).json({
-            error: "Amount is required"
+            error: "Amount required"
           });
         }
 
-        const options = {
-          amount: amount * 100,
+        const order = await razorpay.orders.create({
+          amount: Number(amount) * 100,
           currency: "INR",
           receipt: "receipt_" + Date.now()
-        };
-
-        const order = await razorpay.orders.create(options);
-
-        return res.status(200).json(order);
-
-      } catch (error) {
-
-        console.error("Razorpay Error:", error);
-
-        return res.status(500).json({
-          error: error.message
         });
 
+        console.log("Order created:", order.id);
+
+       return res.status(200).json({
+  success: true,
+  orderId: order.id,
+  amount: order.amount,
+  currency: order.currency,
+});
+
+      } catch (err) {
+
+        console.error("Razorpay Full Error:", {
+          message: err.message,
+          description: err.description,
+          error: err.error,
+          stack: err.stack
+        });
+
+        return res.status(500).json({
+          error: err.message
+        });
       }
 
     });
 
 });
+const crypto = require("crypto");
+
+exports.verifyRazorpayPayment = functions
+  .region("asia-south1")
+  .https.onRequest((req, res) => {
+
+    return cors(req, res, async () => {
+
+      try {
+        const {
+          razorpay_order_id,
+          razorpay_payment_id,
+          razorpay_signature,
+          bookingData
+        } = req.body;
+
+        // Verify signature
+        const body = razorpay_order_id + "|" + razorpay_payment_id;
+        const expectedSignature = crypto
+          .createHmac("sha256", "FFl1Y1VlrlgY3r07GH24tcwe")
+          .update(body)
+          .digest("hex");
+
+        if (expectedSignature !== razorpay_signature) {
+          return res.status(400).json({
+            success: false,
+            error: "Invalid signature"
+          });
+        }
+
+        // Save booking to Firestore
+        const bookingRef = "PKZ-" + Date.now().toString(36).toUpperCase();
+        await admin.firestore().collection("bookings").add({
+          ...bookingData,
+          bookingRef,
+          paymentId: razorpay_payment_id,
+          orderId: razorpay_order_id,
+          paymentStatus: "paid",
+          status: "confirmed",
+          createdAt: admin.firestore.FieldValue.serverTimestamp()
+        });
+
+        console.log("✅ Payment verified:", razorpay_payment_id);
+
+        return res.status(200).json({
+          success: true,
+          bookingRef
+        });
+
+      } catch (err) {
+        console.error("Verify error:", err.message);
+        return res.status(500).json({
+          success: false,
+          error: err.message
+        });
+      }
+
+    });
+  });
