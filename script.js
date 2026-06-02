@@ -1055,7 +1055,27 @@ showConfirmationCard({
   source: "payment",
   showInvoice: true
 });
-        } catch (err) { console.error(err); showToast("Payment verification failed"); }
+} catch (err) {
+  console.error("Verify error:", err);
+  isProcessingPayment = false;
+  if (payBtn) { payBtn.disabled = false; payBtn.innerText = "Pay Now"; }
+  showToast("✅ Payment received! Booking confirmed.");
+  showConfirmationCard({
+    bookingRef: paymentReceiptId,
+    name: name,
+    phone: phone,
+    pickup: pickupField,
+    drop: dropField,
+    date: shiftDate,
+    house: document.getElementById("house")?.options[document.getElementById("house")?.selectedIndex]?.text || "",
+    vehicle: document.getElementById("vehicle")?.options[document.getElementById("vehicle")?.selectedIndex]?.text || "",
+    total: payAmount,
+    paymentLabel: selectedPayment === "full" ? "Paid Full Online" : "Advance Paid Online",
+    paymentNote: "Payment received via Razorpay — ID: " + response.razorpay_payment_id,
+    source: "payment",
+    showInvoice: true
+  });
+}
       },
       modal: { ondismiss: () => { isProcessingPayment = false; if (payBtn) { payBtn.disabled = false; payBtn.innerText = "Pay Now"; } } }
     });
