@@ -193,61 +193,62 @@ exports.createRazorpayOrder = functions
 
 });
 const crypto = require("crypto");
-
 exports.verifyRazorpayPayment = functions
   .region("asia-south1")
-  .https.onRequest((req, res) => {
+  .https.onRequest(async (req, res) => {
 
-    return cors(req, res, async () => {
+    res.set("Access-Control-Allow-Origin", "*");
+    res.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+    res.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
 
-      try {
-        const {
-          razorpay_order_id,
-          razorpay_payment_id,
-          razorpay_signature,
-          bookingData
-        } = req.body;
+    if (req.method === "OPTIONS") {
+      return res.status(204).send("");
+    }
 
-        // Verify signature
-        const body = razorpay_order_id + "|" + razorpay_payment_id;
-        const expectedSignature = crypto
-          .createHmac("sha256", "FFl1Y1VlrlgY3r07GH24tcwe")
-          .update(body)
-          .digest("hex");
+    try {
+      const {
+        razorpay_order_id,
+        razorpay_payment_id,
+        razorpay_signature,
+        bookingData
+      } = req.body;
 
-        if (expectedSignature !== razorpay_signature) {
-          return res.status(400).json({
-            success: false,
-            error: "Invalid signature"
-          });
-        }
+      const body = razorpay_order_id + "|" + razorpay_payment_id;
+      const expectedSignature = crypto
+        .createHmac("sha256", "FFl1Y1VlrlgY3r07GH24tcwe")
+        .update(body)
+        .digest("hex");
 
-        // Save booking to Firestore
-        const bookingRef = "PKZ-" + Date.now().toString(36).toUpperCase();
-        await admin.firestore().collection("bookings").add({
-          ...bookingData,
-          bookingRef,
-          paymentId: razorpay_payment_id,
-          orderId: razorpay_order_id,
-          paymentStatus: "paid",
-          status: "confirmed",
-          createdAt: admin.firestore.FieldValue.serverTimestamp()
-        });
-
-        console.log("✅ Payment verified:", razorpay_payment_id);
-
-        return res.status(200).json({
-          success: true,
-          bookingRef
-        });
-
-      } catch (err) {
-        console.error("Verify error:", err.message);
-        return res.status(500).json({
+      if (expectedSignature !== razorpay_signature) {
+        return res.status(400).json({
           success: false,
-          error: err.message
+          error: "Invalid signature"
         });
       }
 
-    });
+      const bookingRef = "PKZ-" + Date.now().toString(36).toUpperCase();
+      await admin.firestore().collection("bookings").add({
+        ...bookingData,
+        bookingRef,
+        paymentId: razorpay_payment_id,
+        orderId: razorpay_order_id,
+        paymentStatus: "paid",
+        status: "confirmed",
+        createdAt: admin.firestore.FieldValue.serverTimestamp()
+      });
+
+      console.log("✅ Payment verified:", razorpay_payment_id);
+
+      return res.status(200).json({
+        success: true,
+        bookingRef
+      });
+
+         } catch (err) {
+      console.error("Verify error:", err.message);
+      return res.status(500).json({
+        success: false,
+        error: err.message
+      });
+    }
   });
