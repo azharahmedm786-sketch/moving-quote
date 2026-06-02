@@ -196,6 +196,7 @@ const crypto = require("crypto");
 exports.verifyRazorpayPayment = functions
   .region("asia-south1")
   .https.onRequest(async (req, res) => {
+    console.log("VERIFY VERSION 2");
 
     res.set("Access-Control-Allow-Origin", "*");
     res.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
