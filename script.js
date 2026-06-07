@@ -1120,7 +1120,8 @@ function onPaymentSuccess(response, name, phone, paid, total) {
 BOOK WITHOUT PAYMENT (FIXED)
 ============================================ */
 function bookWithoutPayment() {
-  if (!currentUser) { showToast("👋 Please login to book."); openAuthModal("login"); return; }
+const activeUser = currentUser || window._firebase?.auth?.currentUser;
+if (!activeUser) { showToast("👋 Please login to book."); openAuthModal("login"); return; }
   if (!document.getElementById("tncAccepted")?.checked) { showToast("⚠️ Please accept the Terms & Conditions to continue."); return; }
 
   const nameEl = document.getElementById("custName");
@@ -1144,7 +1145,7 @@ function bookWithoutPayment() {
   const discountedTotal = Math.max(lastCalculatedTotal - promoDiscount, 0);
 
   window._firebase.db.collection("bookings").add({
-    bookingRef, customerUid: currentUser.uid, customerName: name, phone, pickup: pickupVal, drop: dropVal, date,
+    bookingRef, customerUid: activeUser.uid, customerName: name, phone, pickup: pickupVal, drop: dropVal, date,
     moveType: selectedMoveType, house: houseEl?.options[houseEl?.selectedIndex]?.text || "", vehicle: vehicleEl?.options[vehicleEl?.selectedIndex]?.text || "",
     furniture: getFurnitureSummary(), pickupFloor: document.getElementById("pickupFloor")?.options[document.getElementById("pickupFloor")?.selectedIndex]?.text || "",
     dropFloor: document.getElementById("dropFloor")?.options[document.getElementById("dropFloor")?.selectedIndex]?.text || "",
@@ -1179,7 +1180,8 @@ function saveLead() {
 }
 
 async function bookOnWhatsApp() {
-  if (!currentUser) { showToast("👋 Please login or create an account to book."); openAuthModal("login"); return; }
+  const activeUser = currentUser || window._firebase?.auth?.currentUser;
+  if (!activeUser) { showToast("👋 Please login or create an account to book."); openAuthModal("login"); return; }
   if (!document.getElementById("tncAccepted")?.checked) { showToast("⚠️ Please accept the Terms & Conditions to continue."); return; }
 
   const name = document.getElementById("custName")?.value?.trim();
@@ -1210,7 +1212,7 @@ async function bookOnWhatsApp() {
     try {
       showToast("⏳ Saving booking...");
       const docRef = await window._firebase.db.collection("bookings").add({
-        bookingRef, customerUid: currentUser.uid, customerName: name, phone, pickup, drop, date,
+        bookingRef, customerUid: activeUser.uid, customerName: name, phone, pickup, drop, date,
         moveType: selectedMoveType, house: houseText, vehicle: vehicleText, furniture: getFurnitureSummary(),
         pickupFloor: document.getElementById("pickupFloor")?.options[document.getElementById("pickupFloor")?.selectedIndex]?.text || "",
         dropFloor: document.getElementById("dropFloor")?.options[document.getElementById("dropFloor")?.selectedIndex]?.text || "",
@@ -2844,12 +2846,14 @@ document.addEventListener("DOMContentLoaded", () => {
     priceEl.classList.remove("updated"); void priceEl.offsetWidth; priceEl.classList.add("updated");
   }).observe(priceEl, { childList: true });
 
-  document.querySelectorAll('a[href^="#"]').forEach(a => {
-    a.addEventListener("click", function (e) {
-      const t = document.querySelector(this.getAttribute("href"));
-      if (t) { e.preventDefault(); t.scrollIntoView({ behavior: "smooth" }); }
-    });
+ document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener("click", function (e) {
+    const href = this.getAttribute("href");
+    if (!href || href === "#") return;
+    const t = document.querySelector(href);
+    if (t) { e.preventDefault(); t.scrollIntoView({ behavior: "smooth" }); }
   });
+});
 
   const navbar = document.querySelector(".navbar");
   if (navbar) {
