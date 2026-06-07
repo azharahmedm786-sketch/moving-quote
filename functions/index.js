@@ -140,8 +140,8 @@ const cors = require("cors")({
 });
 
 const razorpay = new Razorpay({
-  key_id: "rzp_live_SslVE1I4iLezjE",
-  key_secret: "FFl1Y1VlrlgY3r07GH24tcwe"
+  key_id: "rzp_live_Sn8LmBe51Sy0jv",
+  key_secret: "TB40xu7vy1MVSz5zj47ejIGW"
 });
 
 exports.createRazorpayOrder = functions
@@ -216,7 +216,7 @@ exports.verifyRazorpayPayment = functions
 
       const body = razorpay_order_id + "|" + razorpay_payment_id;
       const expectedSignature = crypto
-        .createHmac("sha256", "FFl1Y1VlrlgY3r07GH24tcwe")
+        .createHmac("sha256", "TB40xu7vy1MVSz5zj47ejIGW")
         .update(body)
         .digest("hex");
 
@@ -226,8 +226,11 @@ exports.verifyRazorpayPayment = functions
           error: "Invalid signature"
         });
       }
+      console.log("SIGNATURE VERIFIED SUCCESSFULLY");
 
       const bookingRef = "PKZ-" + Date.now().toString(36).toUpperCase();
+      console.log("ABOUT TO CREATE BOOKING");
+console.log("BOOKING DATA:", bookingData);
       await admin.firestore().collection("bookings").add({
         ...bookingData,
         bookingRef,
@@ -237,7 +240,7 @@ exports.verifyRazorpayPayment = functions
         status: "confirmed",
         createdAt: admin.firestore.FieldValue.serverTimestamp()
       });
-
+console.log("BOOKING CREATED SUCCESSFULLY");
       console.log("✅ Payment verified:", razorpay_payment_id);
 
       return res.status(200).json({
