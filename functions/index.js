@@ -140,8 +140,8 @@ const cors = require("cors")({
 });
 
 const razorpay = new Razorpay({
-  key_id: "rzp_live_Sn8LmBe51Sy0jv",
-  key_secret: "TB40xu7vy1MVSz5zj47ejIGW"
+  key_id: functions.config().razorpay.key_id,
+  key_secret: functions.config().razorpay.key_secret
 });
 
 exports.createRazorpayOrder = functions
@@ -216,7 +216,7 @@ exports.verifyRazorpayPayment = functions
 
       const body = razorpay_order_id + "|" + razorpay_payment_id;
       const expectedSignature = crypto
-        .createHmac("sha256", "TB40xu7vy1MVSz5zj47ejIGW")
+       .createHmac("sha256", functions.config().razorpay.key_secret)
         .update(body)
         .digest("hex");
 
