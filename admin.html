@@ -1034,7 +1034,8 @@ async function resolveDamageClaim(newStatus) {
   const response = document.getElementById("claimResponseText").value.trim();
   if (!response) { alert("Please enter an admin response before resolving."); return; }
   try {
-    await window._firebase.db.collection("damageClaims").doc(currentClaimDocId).update({ status:newStatus, adminResponse:response, resolvedAt:firebase.firestore.FieldValue.serverTimestamp(), resolvedBy:firebase.auth().currentUser?.uid||"admin" });
+    await window._firebase.db.collection("damageClaims").doc(currentClaimDocId).update({ status:newStatus, adminResponse:response, resolvedAt:firebase.firestore.FieldValue.serverTimestamp(), resolvedBy: adminUser?.uid || "admin"
+
     toast("✅ Claim marked as " + newStatus);
     document.getElementById("claimDetailPanel").style.display = "none";
     loadDamageClaims();
