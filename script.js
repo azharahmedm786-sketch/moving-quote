@@ -1098,8 +1098,9 @@ function onPaymentSuccess(response, name, phone, paid, total) {
     paymentNote: `Payment ID: ${response.razorpay_payment_id}`, source: "payment", showInvoice: true
   });
   if (window._firebase) {
+    const activeUser = currentUser || window._firebase?.auth?.currentUser;
     window._firebase.db.collection("bookings").add({
-      bookingRef, customerUid: currentUser.uid, customerName: name, phone, pickup: pickup?.value || "", drop: drop?.value || "", moveType: selectedMoveType,
+      bookingRef, customerUid: activeUser?.uid, customerName: name, phone, pickup: pickup?.value || "", drop: drop?.value || "", moveType: selectedMoveType,
       house: houseEl?.options[houseEl?.selectedIndex]?.text || "", vehicle: vehicleEl?.options[vehicleEl?.selectedIndex]?.text || "",
       furniture: getFurnitureSummary(), pickupFloor: document.getElementById("pickupFloor")?.options[document.getElementById("pickupFloor")?.selectedIndex]?.text || "",
       dropFloor: document.getElementById("dropFloor")?.options[document.getElementById("dropFloor")?.selectedIndex]?.text || "",
@@ -1112,7 +1113,10 @@ function onPaymentSuccess(response, name, phone, paid, total) {
       requestPushPermission(); subscribeToBookingNotifications(docRef.id);
       queueSMS(phone, "booking_confirmed", { name, bookingRef, date: shiftDate?.value || "TBD", pickup: pickup?.value || "", total });
       notifyOwner(bookingRef, name, phone, pickup?.value || "—", drop?.value || "—", shiftDate?.value || "TBD", total, selectedPayment, "online");
-    }).catch(() => {});
+    }).catch((err) => {
+      console.error("BOOKING SAVE FAILED:", err);
+      showToast("❌ Booking save failed: " + err.message);
+    });
   }
 }
 
@@ -1120,8 +1124,8 @@ function onPaymentSuccess(response, name, phone, paid, total) {
 BOOK WITHOUT PAYMENT (FIXED)
 ============================================ */
 function bookWithoutPayment() {
-const activeUser = currentUser || window._firebase?.auth?.currentUser;
-if (!activeUser) { showToast("👋 Please login to book."); openAuthModal("login"); return; }
+  const activeUser = currentUser || window._firebase?.auth?.currentUser;
+  if (!activeUser) { showToast("👋 Please login to book."); openAuthModal("login"); return; }
   if (!document.getElementById("tncAccepted")?.checked) { showToast("⚠️ Please accept the Terms & Conditions to continue."); return; }
 
   const nameEl = document.getElementById("custName");
@@ -1134,6 +1138,8 @@ if (!activeUser) { showToast("👋 Please login to book."); openAuthModal("login
   if (!window._firebase) { showToast("⚠️ Service not ready. Try again."); return; }
 
   const date = document.getElementById("shiftDate")?.value || "";
+  if (!date) { showToast("📅 Please select a moving date."); return; }
+
   const pickupVal = document.getElementById("pickup")?.value || "";
   const dropVal = document.getElementById("drop")?.value || "";
   const bookingRef = "PKZ-" + Date.now().toString(36).toUpperCase().slice(-6);
@@ -1145,132 +1151,89 @@ if (!activeUser) { showToast("👋 Please login to book."); openAuthModal("login
   const discountedTotal = Math.max(lastCalculatedTotal - promoDiscount, 0);
 
   window._firebase.db.collection("bookings").add({
-    bookingRef, customerUid: activeUser.uid, customerName: name, phone, pickup: pickupVal, drop: dropVal, date,
-    moveType: selectedMoveType, house: houseEl?.options[houseEl?.selectedIndex]?.text || "", vehicle: vehicleEl?.options[vehicleEl?.selectedIndex]?.text || "",
-    furniture: getFurnitureSummary(), pickupFloor: document.getElementById("pickupFloor")?.options[document.getElementById("pickupFloor")?.selectedIndex]?.text || "",
+    bookingRef,
+    customerUid: activeUser.uid,
+    customerName: name,
+    phone,
+    pickup: pickupVal,
+    drop: dropVal,
+    date,
+    moveType: selectedMoveType,
+    house: houseEl?.options[houseEl?.selectedIndex]?.text || "",
+    vehicle: vehicleEl?.options[vehicleEl?.selectedIndex]?.text || "",
+    furniture: getFurnitureSummary(),
+    pickupFloor: document.getElementById("pickupFloor")?.options[document.getElementById("pickupFloor")?.selectedIndex]?.text || "",
     dropFloor: document.getElementById("dropFloor")?.options[document.getElementById("dropFloor")?.selectedIndex]?.text || "",
-    liftAvailable: !!document.getElementById("liftAvailable")?.checked, packingService: false, total: discountedTotal, originalTotal: lastCalculatedTotal,
-    paid: 0, paymentType: "pay_later", status: "confirmed", source: "direct", promoDiscount, photos: uploadedPhotos.slice(0, 3),
+    liftAvailable: !!document.getElementById("liftAvailable")?.checked,
+    packingService: false,
+    total: discountedTotal,
+    originalTotal: lastCalculatedTotal,
+    paid: 0,
+    paymentType: "pay_later",
+    status: "confirmed",
+    source: "direct",
+    promoDiscount,
+    photos: uploadedPhotos.slice(0, 3),
     createdAt: firebase.firestore.FieldValue.serverTimestamp()
-  }).then(docRef => {
-    currentBookingId = docRef.id; localStorage.setItem("packzen_active_booking", docRef.id);
-    if (btn) { btn.disabled = false; btn.textContent = "📋 Confirm Booking · Pay on Delivery"; }
-    queueSMS(phone, "booking_confirmed", { name, bookingRef, date, pickup: pickupVal, total: discountedTotal });
-    notifyOwner(bookingRef, name, phone, pickupVal, dropVal, date, discountedTotal, "pay_later", "direct");
-    showConfirmationCard({
-      bookingRef, name, phone: "+91 " + phone, pickup: pickupVal, drop: dropVal, date,
-      house: houseEl?.options[houseEl?.selectedIndex]?.text || "—", vehicle: vehicleEl?.options[vehicleEl?.selectedIndex]?.text || "—",
-      total: discountedTotal, paymentLabel: "Cash on moving day", paymentNote: "Pay full amount to driver on moving day", source: "direct", showInvoice: false
+  })
+  .then((docRef) => {
+    currentBookingId = docRef.id;
+    localStorage.setItem("packzen_active_booking", docRef.id);
+
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = "📋 Confirm Booking · Pay on Delivery";
+    }
+
+    queueSMS(phone, "booking_confirmed", {
+      name,
+      bookingRef,
+      date,
+      pickup: pickupVal,
+      total: discountedTotal
     });
+
+    notifyOwner(
+      bookingRef,
+      name,
+      phone,
+      pickupVal,
+      dropVal,
+      date,
+      discountedTotal,
+      "pay_later",
+      "direct"
+    );
+
+    showConfirmationCard({
+      bookingRef,
+      name,
+      phone: "+91 " + phone,
+      pickup: pickupVal,
+      drop: dropVal,
+      date,
+      house: houseEl?.options[houseEl?.selectedIndex]?.text || "—",
+      vehicle: vehicleEl?.options[vehicleEl?.selectedIndex]?.text || "—",
+      total: discountedTotal,
+      paymentLabel: "Cash on moving day",
+      paymentNote: "Pay full amount to driver on moving day",
+      source: "direct",
+      showInvoice: false
+    });
+
     showToast("✅ Booking saved! ID: " + bookingRef);
-  }).catch(e => {
-    if (btn) { btn.disabled = false; btn.textContent = "📋 Confirm Booking · Pay on Delivery"; }
-    showToast("❌ Booking failed: " + e.message);
+  })
+  .catch((err) => {
+    console.error("BOOKING SAVE FAILED:", err);
+
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = "📋 Confirm Booking · Pay on Delivery";
+    }
+
+    showToast("❌ Booking failed: " + err.message);
   });
 }
-
-/* ============================================
-WHATSAPP BOOKING (FIXED)
-============================================ */
-function saveLead() {
-  fetch("https://n8n-production-e685.up.railway.app/webhook-test/7e8cb436-3263-4063-9ed8-74ebcebf8214", {
-    method: "POST", headers: { "Content-Type": "application/json", "x-api-key": "packzen-webhook-key-2026" },
-    body: JSON.stringify({ name: document.getElementById("custName")?.value || "", phone: document.getElementById("custPhone")?.value || "", pickup: document.getElementById("pickup")?.value || "", drop: document.getElementById("drop")?.value || "" })
-  }).catch(() => {});
-}
-
-async function bookOnWhatsApp() {
-  const activeUser = currentUser || window._firebase?.auth?.currentUser;
-  if (!activeUser) { showToast("👋 Please login or create an account to book."); openAuthModal("login"); return; }
-  if (!document.getElementById("tncAccepted")?.checked) { showToast("⚠️ Please accept the Terms & Conditions to continue."); return; }
-
-  const name = document.getElementById("custName")?.value?.trim();
-  const phone = document.getElementById("custPhone")?.value?.trim();
-  if (!name) return showToast("⚠️ Please enter your name.");
-  if (!phone) return showToast("⚠️ Please enter a valid 10-digit phone number.");
-  if (lastCalculatedTotal === 0) return showToast("⚠️ Price not calculated yet.");
-
-  saveLead();
-  const pickup = document.getElementById("pickup")?.value || "";
-  const drop = document.getElementById("drop")?.value || "";
-
-  try {
-    await fetch("https://n8n-production-e685.up.railway.app/webhook/7e8cb436-3263-4063-9ed8-74ebcebf8214", {
-      method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name, phone, pickup, drop })
-    });
-  } catch (err) { console.error("❌ n8n error", err); }
-
-  const date = document.getElementById("shiftDate")?.value || "";
-  const houseEl = document.getElementById("house");
-  const vehicleEl = document.getElementById("vehicle");
-  const houseText = houseEl?.options[houseEl?.selectedIndex]?.text || "";
-  const vehicleText = vehicleEl?.options[vehicleEl?.selectedIndex]?.text || "";
-  const bookingRef = "WA-" + Date.now().toString(36).toUpperCase();
-  const discountedTotal = Math.max(lastCalculatedTotal - promoDiscount, 0);
-
-  if (window._firebase) {
-    try {
-      showToast("⏳ Saving booking...");
-      const docRef = await window._firebase.db.collection("bookings").add({
-        bookingRef, customerUid: activeUser.uid, customerName: name, phone, pickup, drop, date,
-        moveType: selectedMoveType, house: houseText, vehicle: vehicleText, furniture: getFurnitureSummary(),
-        pickupFloor: document.getElementById("pickupFloor")?.options[document.getElementById("pickupFloor")?.selectedIndex]?.text || "",
-        dropFloor: document.getElementById("dropFloor")?.options[document.getElementById("dropFloor")?.selectedIndex]?.text || "",
-        liftAvailable: !!document.getElementById("liftAvailable")?.checked, packingService: false, total: discountedTotal, originalTotal: lastCalculatedTotal,
-        paid: 0, status: "confirmed", source: "whatsapp", promoDiscount,
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-      });
-      currentBookingId = docRef.id; localStorage.setItem("packzen_active_booking", docRef.id);
-      queueSMS(phone, "booking_confirmed", { name, bookingRef, date, pickup, total: discountedTotal });
-      notifyOwner(bookingRef, name, phone, pickup, drop, date, discountedTotal, "pay_later", "whatsapp");
-      showConfirmationCard({ bookingRef, name, phone, pickup, drop, date, house: houseText || "—", vehicle: vehicleText || "—", total: discountedTotal, paymentLabel: "Cash on moving day", paymentNote: "Our team will confirm your slot shortly", source: "whatsapp", showInvoice: false });
-    } catch(e) { showToast("❌ Booking save failed: " + e.message); }
-  }
-}
-
-/* ============================================
-NOTIFY OWNER (FIXED - was missing!)
-============================================ */
-function notifyOwner(bookingRef, name, phone, pickup, drop, date, total, paymentType, source) {
-  const payLbl = paymentType === "pay_later" ? "Cash on delivery" : paymentType === "full" ? "Paid Full" : "Advance Paid";
-  const emoji = source === "whatsapp" ? "💬" : source === "payment" ? "💳" : "📋";
-  const msg = `${emoji} New Booking Alert — PackZen 🚚\n\nID: ${bookingRef}\nName: ${name}\nPhone: +91 ${phone}\nPickup: ${pickup}\nDrop: ${drop}\nDate: ${date || "To be confirmed"}\nAmount: ₹${Number(total).toLocaleString("en-IN")}\nPayment: ${payLbl}`;
-  console.log("📲 Owner notification:", msg);
-  // Send to n8n webhook for WhatsApp notification
-  try {
-    fetch("https://n8n-production-e685.up.railway.app/webhook/owner-notification", {
-      method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ bookingRef, name, phone, pickup, drop, date, total, paymentType, source })
-    }).catch(() => {});
-  } catch(e) {}
-}
-
-/* ============================================
-CONFIRMATION CARD
-============================================ */
-function showConfirmationCard({ bookingRef, name, phone, pickup, drop, date, house, vehicle, total, paymentLabel, paymentNote, source, showInvoice }) {
-  const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
-  set("bookingIdDisplay", bookingRef || "—");
-  set("ccTitle", source === "whatsapp" ? "Request Sent!" : "Booking Confirmed!");
-  set("ccSubtitle", source === "whatsapp" ? "Our team will call you shortly." : "We'll call you within 30 minutes.");
-  set("ccPickupShort", (pickup || "—").split(",")[0]);
-  set("ccDropShort", (drop || "—").split(",")[0]);
-  set("ccDate", date || "TBD");
-  set("ccAmount", "₹" + (total || 0).toLocaleString("en-IN"));
-  set("ccPriceNote", paymentNote || "Pay on delivery");
-  set("ccPickup", pickup || "—"); set("ccDrop", drop || "—");
-  set("ccName", name || "—"); set("ccPhone", phone || "—");
-  set("ccHouse", house || "—"); set("ccVehicle", vehicle || "—");
-  set("ccPayment", paymentLabel || "Pay on delivery");
-  const invBtn = document.getElementById("btnInvoice");
-  if (invBtn) invBtn.style.display = showInvoice ? "flex" : "none";
-  const fullDetails = document.getElementById("ccFullDetails");
-  const expandBtn = document.getElementById("ccExpandBtn");
-  if (fullDetails) fullDetails.style.display = "none";
-  if (expandBtn) expandBtn.textContent = "View Full Details ↓";
-  document.getElementById("paymentModal").style.display = "flex";
-}
-
 function toggleConfirmDetails() {
   const fullDetails = document.getElementById("ccFullDetails");
   const expandBtn = document.getElementById("ccExpandBtn");

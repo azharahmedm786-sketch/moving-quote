@@ -1,105 +1,39 @@
 /* ================================================
 firebase-config.js — PackZen
-Sequential loading + Auth + Firestore + Functions
-UPDATED: Includes Firebase App Check protection
+FIXED: Removed duplicate SDK loading (was loading v10.12.0
+on top of v9.6.1 already loaded in HTML, causing conflicts)
 ================================================ */
+(function initFirebase() {
+  try {
+    if (!window.ENV) {
+      console.error("❌ env-config.js not loaded! Make sure it's included before firebase-config.js");
+      return;
+    }
+    if (!window.ENV.FIREBASE_AUTH_KEY) {
+      console.error("❌ FIREBASE_AUTH_KEY not found in env-config.js!");
+      return;
+    }
 
-(function loadFirebase() {
+    if (!firebase.apps.length) {
+      firebase.initializeApp({
+        apiKey: window.ENV.FIREBASE_AUTH_KEY,
+        authDomain: "packzen-e7539.firebaseapp.com",
+        projectId: "packzen-e7539",
+        storageBucket: "packzen-e7539.firebasestorage.app",
+        messagingSenderId: "270978358338",
+        appId: "1:270978358338:web:20827d29d23b654925e1db",
+        measurementId: "G-9JXKP58GP3"
+      });
+      console.log("✅ Firebase initialized with Auth API key");
+    }
 
-const scripts = [
-"https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js",
-"https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js",
-"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js",
-"https://www.gstatic.com/firebasejs/10.12.0/firebase-analytics-compat.js",
-"https://www.gstatic.com/firebasejs/10.12.0/firebase-functions-compat.js",
-"https://www.gstatic.com/firebasejs/10.12.0/firebase-app-check-compat.js"
-];
+    const auth = firebase.auth();
+    const db = firebase.firestore();
 
-// Load scripts sequentially
-function loadNext(index) {
-if (index >= scripts.length) {
-initFirebase();
-return;
-}
-
-const s = document.createElement("script");
-s.src = scripts[index];
-s.onload = () => loadNext(index + 1);
-s.onerror = () => {
-console.error("Failed loading:", scripts[index]);
-loadNext(index + 1);
-};
-
-document.head.appendChild(s);
-}
-
-function initFirebase() {
-try {
-
-// Wait for env-config.js
-if (!window.ENV) {
-console.error("❌ env-config.js not loaded! Make sure it's included before firebase-config.js");
-return;
-}
-
-// Check API key
-if (!window.ENV.FIREBASE_AUTH_KEY) {
-console.error("❌ FIREBASE_AUTH_KEY not found in env-config.js!");
-return;
-}
-
-if (!firebase.apps.length) {
-
-firebase.initializeApp({
-apiKey: window.ENV.FIREBASE_AUTH_KEY,
-authDomain: "packzen-e7539.firebaseapp.com",
-projectId: "packzen-e7539",
-storageBucket: "packzen-e7539.firebasestorage.app",
-messagingSenderId: "270978358338",
-appId: "1:270978358338:web:20827d29d23b654925e1db",
-measurementId: "G-9JXKP58GP3"
-});
-  const functions = firebase.app().functions("us-central1");
-
-console.log("✅ Firebase initialized with Auth API key");
-
-// Enable Firebase App Check
-firebase.appCheck().activate(
- "6LerkI8sAAAAAIQQeOb-zS6teh__8STzmVigHgOD",
-true
-);
-
-console.log("🛡 Firebase App Check activated");
-}
-// Improve login persistence
-}
-catch (e) {
-console.error("❌ Firebase init failed:", e);
-return;
-}
-
-const auth = firebase.auth();
-const db = firebase.firestore();
-const functions = firebase.app().functions("us-central1");
-
-// Make Firebase globally accessible
-window._firebase = { auth, db, functions };
-
-console.log("✅ PackZen Firebase ready with Functions!");
-}
-
-// Wait for env-config.js to load
-if (window.ENV) {
-loadNext(0);
-} else {
-console.log("⏳ Waiting for env-config.js to load...");
-setTimeout(() => {
-if (window.ENV) {
-loadNext(0);
-} else {
-console.error("❌ env-config.js failed to load after waiting");
-}
-}, 500);
-}
-
+    // Make Firebase globally accessible
+    window._firebase = { auth, db };
+    console.log("✅ PackZen Firebase ready!");
+  } catch (e) {
+    console.error("❌ Firebase init failed:", e);
+  }
 })();
