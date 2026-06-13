@@ -1123,6 +1123,21 @@ function onPaymentSuccess(response, name, phone, paid, total) {
 /* ============================================
 BOOK WITHOUT PAYMENT (FIXED)
 ============================================ */
+/* ============================================
+NOTIFY OWNER (re-added — was missing!)
+============================================ */
+function notifyOwner(bookingRef, name, phone, pickup, drop, date, total, paymentType, source) {
+  const payLbl = paymentType === "pay_later" ? "Cash on delivery" : paymentType === "full" ? "Paid Full" : "Advance Paid";
+  const emoji = source === "whatsapp" ? "💬" : source === "payment" ? "💳" : "📋";
+  const msg = `${emoji} New Booking Alert — PackZen 🚚\n\nID: ${bookingRef}\nName: ${name}\nPhone: +91 ${phone}\nPickup: ${pickup}\nDrop: ${drop}\nDate: ${date || "To be confirmed"}\nAmount: ₹${Number(total).toLocaleString("en-IN")}\nPayment: ${payLbl}`;
+  console.log("📲 Owner notification:", msg);
+  try {
+    fetch("https://n8n-production-e685.up.railway.app/webhook/owner-notification", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ bookingRef, name, phone, pickup, drop, date, total, paymentType, source })
+    }).catch(() => {});
+  } catch(e) {}
+}
 function bookWithoutPayment() {
   const activeUser = currentUser || window._firebase?.auth?.currentUser;
   if (!activeUser) { showToast("👋 Please login to book."); openAuthModal("login"); return; }
