@@ -2090,7 +2090,7 @@ async function setNewPassword() {
         await targetUser.updatePassword(newPass);
         await _finaliseReset(auth, btn);
       } else if (linkErr.code === "auth/email-already-in-use") {
-        showError("resetPasswordError", "⚠️ Unable to update. Please contact support@packzenblr.in");
+        showError("resetPasswordError", "⚠️ Unable to update. Please contact moveeasyblr@gmail.com");
         if (btn) { btn.disabled = false; btn.textContent = "Set New Password →"; }
       } else throw linkErr;
     }
