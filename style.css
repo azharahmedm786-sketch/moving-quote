@@ -23,6 +23,10 @@
 --accent-light: #DCFCE7;
 --accent-gradient: linear-gradient(135deg, #16A34A, #22C55E);
    
+   --gold: #16A34A;
+--gold-bright: #22C55E;
+--gold-gradient: linear-gradient(135deg, #16A34A, #22C55E);
+--gold-glow: 0 8px 32px rgba(34,197,94,0.35);
 
   /* ── Success ── */
   --success:          #059669;
@@ -50,7 +54,7 @@
   --shadow-md:   0 6px 24px rgba(12,27,58,0.12);
   --shadow-lg:   0 16px 48px rgba(12,27,58,0.18);
   --shadow-xl:   0 28px 72px rgba(12,27,58,0.24);
-  --shadow-gold: 0 8px 32px rgba(234,88,12,0.38);
+--shadow-gold: 0 8px 32px rgba(34,197,94,0.35);
   --shadow-blue: 0 8px 32px rgba(26,86,219,0.30);
 
   /* ── Tints ── */
@@ -114,6 +118,7 @@ body {
   overflow-x: hidden;
   max-width: 100vw;
   min-height: 100vh;
+   padding-bottom: env(safe-area-inset-bottom);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -272,7 +277,10 @@ body.dark-mode.navbar { background: #06101f; }
   box-shadow: var(--gold-glow);
   letter-spacing: 0.3px;
 }
-.nav-auth-btn:hover { transform: translateY(-1px); box-shadow: 0 10px 28px rgba(234,88,12,0.50); }
+.nav-auth-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 28px rgba(34,197,94,0.45);
+}
 
 .nav-user {
   display: flex; align-items: center; gap: 0.5rem;
@@ -401,10 +409,11 @@ body.dark-mode.navbar { background: #06101f; }
   background: var(--accent-gradient);
   box-shadow: 0 8px 24px rgba(22,163,74,0.35);
   border-radius: 12px;
-  text-transform: none; /* remove all caps */
+  text-transform: none;
   letter-spacing: 0;
-}
-overflow: hidden; position: relative; max-width: fit-content;
+  overflow: hidden;
+  position: relative;
+  max-width: fit-content;
 }
 .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 16px 40px rgba(234,88,12,0.50); }
 .btn-ghost {
@@ -867,6 +876,11 @@ body.dark-mode .quote-section {
   display: grid; grid-template-columns: 1fr 1.5fr;
   gap: 3.5rem; max-width: 1200px; margin: 0 auto; align-items: start;
 }
+.quote-wrapper,
+.quote-right,
+.form-card {
+  min-width: 0;
+}
 .quote-left h2 { font-size: clamp(1.7rem, 3vw, 2.2rem); margin-bottom: 0.75rem; color: var(--navy-deep) !important; letter-spacing: -0.02em; }
 body.dark-mode .quote-left h2 { color: var(--text-primary) !important; }
 .quote-left p  { color: var(--text-secondary) !important; margin-bottom: 1.75rem; font-size: 0.95rem; line-height: 1.7; }
@@ -982,6 +996,7 @@ body.dark-mode .form-card { background: var(--bg-secondary); }
   padding: 1.7rem 1.75rem 1rem;
   animation: stepReveal 0.3s ease;
   overflow-x: hidden;
+   -webkit-overflow-scrolling: touch;
   /* Allow natural height — no scroll trap */
 }
 
@@ -999,6 +1014,7 @@ body.dark-mode .form-card { background: var(--bg-secondary); }
   display: flex;
   gap: 0.75rem;
   padding: 1rem 1.75rem 1.5rem;
+   padding-bottom: max(1.5rem, env(safe-area-inset-bottom));
   align-items: center;
   flex-shrink: 0;
   background: white;
@@ -1042,7 +1058,10 @@ select.field-input {
   font-family: 'Inter', sans-serif; font-size: 0.95rem; font-weight: 700;
   cursor: pointer; transition: all 0.25s; box-shadow: var(--gold-glow); min-height: 44px;
 }
-.btn-next:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(234,88,12,0.48); }
+.btn-next:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 28px rgba(34,197,94,0.45);
+}
 
 .btn-back {
   flex: 1; height: 52px;
@@ -1129,14 +1148,21 @@ select.field-input {
 
 #map {
   width: 100%;
-  height: 400px;
-  min-height: 400px;
+  height: clamp(220px, 35vh, 400px);
+  min-height: 220px;
   border-radius: var(--radius-md);
   overflow: hidden;
   margin-top: 0.8rem;
   border: 1.5px solid var(--border-light);
   background: var(--bg-secondary);
-  display: block;
+ touch-action: manipulation;
+   -webkit-transform: translateZ(0);
+transform: translateZ(0);
+  display: none;
+}
+.pac-container {
+  z-index: 9999999 !important;
+  border-radius: 12px;
 }
 
 /* Toggle switch */
@@ -1156,7 +1182,11 @@ select.field-input {
    ============================================ */
 
 /* House type cards */
-.select-cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.55rem; }
+.select-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+  gap: 0.55rem;
+}
 .select-card {
   border: 2px solid var(--border-light); border-radius: var(--radius-md);
   padding: 0.8rem 0.4rem; text-align: center; cursor: pointer;
@@ -1196,7 +1226,7 @@ select.field-input {
    ============================================ */
 .furniture-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(85px, 1fr));
   gap: 8px;
   margin-bottom: 1.2rem;
 }
@@ -2142,8 +2172,16 @@ input:focus-visible, select:focus-visible {
   .reviews-grid  { max-width: 1300px; }
   .why-grid      { max-width: 1200px; }
   .hiw-steps     { max-width: 1200px; }
-  .quote-wrapper { max-width: 1300px; }
+ .quote-wrapper,
+.quote-right,
+.form-card {
+  min-width: 0;
 }
+
+.quote-wrapper {
+  max-width: 1300px;
+}
+ 
 
 /* ============================================
    TABLET (769px – 1024px)
