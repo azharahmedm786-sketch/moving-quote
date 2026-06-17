@@ -1403,6 +1403,39 @@ function openTrackingOrLogin() {
 }
 
 /* ============================================
+SHOW CONFIRMATION CARD
+============================================ */
+function showConfirmationCard(data) {
+  const {
+    bookingRef, name, phone, pickup, drop, date,
+    house, vehicle, total, paymentLabel, paymentNote, showInvoice
+  } = data;
+
+  const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val || "—"; };
+
+  set("bookingIdDisplay", bookingRef);
+  set("ccTitle", "Booking Confirmed! 🎉");
+  set("ccSubtitle", "We'll call you within 30 minutes");
+  set("ccName", name);
+  set("ccPhone", phone);
+  set("ccPickup", pickup);
+  set("ccDrop", drop);
+  set("ccPickupShort", (pickup || "").split(",")[0]);
+  set("ccDropShort", (drop || "").split(",")[0]);
+  set("ccDate", date);
+  set("ccHouse", house);
+  set("ccVehicle", vehicle);
+  set("ccAmount", "₹" + Number(total).toLocaleString("en-IN"));
+  set("ccPayment", paymentLabel);
+  set("ccPriceNote", paymentNote);
+
+  const invoiceBtn = document.getElementById("btnInvoice");
+  if (invoiceBtn) invoiceBtn.style.display = showInvoice ? "inline-flex" : "none";
+
+  document.getElementById("paymentModal").style.display = "flex";
+}
+
+/* ============================================
 TRACKING MODAL
 ============================================ */
 function openTrackingModal() {
