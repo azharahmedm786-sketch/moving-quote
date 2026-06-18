@@ -989,7 +989,12 @@ body.dark-mode .form-card { background: var(--bg-secondary); }
 
 /* ── Form steps ── */
 .form-step        { display: none; }
-.form-step.active { display: block; }
+.form-step.active {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
 
 /* ─────────────────────────────────────────
    STEP BODY — critical fix for scroll trap
