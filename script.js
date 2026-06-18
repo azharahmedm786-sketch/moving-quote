@@ -722,12 +722,13 @@ if (status === google.maps.DirectionsStatus.OK) {
 
                 document.getElementById("pickup").value =
                     results[0].formatted_address;
-
-                pickupPlace = {
-                    geometry: {
-                        location: event.latLng
-                    }
-                };
+              
+pickupPlace = {
+    formatted_address: results[0].formatted_address,
+    geometry: {
+        location: event.latLng
+    }
+};
 
                 calculateQuote(true);
                 showLocation("pickup");
@@ -756,11 +757,12 @@ if (status === google.maps.DirectionsStatus.OK) {
                 document.getElementById("drop").value =
                     results[0].formatted_address;
 
-                dropPlace = {
-                    geometry: {
-                        location: event.latLng
-                    }
-                };
+               dropPlace = {
+    formatted_address: results[0].formatted_address,
+    geometry: {
+        location: event.latLng
+    }
+};
 
                 calculateQuote(true);
                 showLocation("drop");
