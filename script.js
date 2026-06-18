@@ -691,7 +691,7 @@ function showLocation(type) {
 
 directionsService.route(request, (result, status) => {
 
-  if (status === google.maps.DirectionsStatus.OK) {
+if (status === google.maps.DirectionsStatus.OK) {
 
     directionsRenderer.setDirections(result);
 
@@ -701,9 +701,26 @@ directionsService.route(request, (result, status) => {
     console.log("Distance:", leg.distance.text);
     console.log("Duration:", leg.duration.text);
 
+    if (pickupMarker) pickupMarker.setMap(null);
+    if (dropMarker) dropMarker.setMap(null);
+
+    pickupMarker = new google.maps.Marker({
+        position: pickupPlace.geometry.location,
+        map: map,
+        label: "A",
+        draggable: true
+    });
+
+    dropMarker = new google.maps.Marker({
+        position: dropPlace.geometry.location,
+        map: map,
+        label: "B",
+        draggable: true
+    });
+
     map.fitBounds(route.bounds);
 
-  } else {
+} else {
 
    alert("Directions failed: " + status);
 console.error("Directions request failed:", status);
