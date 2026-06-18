@@ -625,7 +625,7 @@ zoomControl: true
   directionsService = new google.maps.DirectionsService();
 directionsRenderer = new google.maps.DirectionsRenderer({
   map: map,
-  suppressMarkers: false,
+  suppressMarkers: true,
   preserveViewport: false,
   polylineOptions: {
     strokeColor: "#1a56db",
@@ -710,6 +710,32 @@ if (status === google.maps.DirectionsStatus.OK) {
         label: "A",
         draggable: true
     });
+  pickupMarker.addListener("dragend", function(event) {
+
+    const geocoder = new google.maps.Geocoder();
+
+    geocoder.geocode(
+        { location: event.latLng },
+        function(results, status) {
+
+            if (status === "OK" && results[0]) {
+
+                document.getElementById("pickup").value =
+                    results[0].formatted_address;
+
+                pickupPlace = {
+                    geometry: {
+                        location: event.latLng
+                    }
+                };
+
+                calculateQuote(true);
+                showLocation("pickup");
+            }
+        }
+    );
+
+});
 
     dropMarker = new google.maps.Marker({
         position: dropPlace.geometry.location,
@@ -717,6 +743,32 @@ if (status === google.maps.DirectionsStatus.OK) {
         label: "B",
         draggable: true
     });
+  dropMarker.addListener("dragend", function(event) {
+
+    const geocoder = new google.maps.Geocoder();
+
+    geocoder.geocode(
+        { location: event.latLng },
+        function(results, status) {
+
+            if (status === "OK" && results[0]) {
+
+                document.getElementById("drop").value =
+                    results[0].formatted_address;
+
+                dropPlace = {
+                    geometry: {
+                        location: event.latLng
+                    }
+                };
+
+                calculateQuote(true);
+                showLocation("drop");
+            }
+        }
+    );
+
+});
 
     map.fitBounds(route.bounds);
 
