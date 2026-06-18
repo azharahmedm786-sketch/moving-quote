@@ -613,9 +613,13 @@ map = new google.maps.Map(mapElement, {
     mapTypeControl: false,
     streetViewControl: false,
     fullscreenControl: false,
-    gestureHandling: "greedy",
+
+    gestureHandling: "cooperative",
+    scrollwheel: false,
+    disableDoubleClickZoom: true,
+
     zoomControl: true
-  });
+});
 
   directionsService = new google.maps.DirectionsService();
 directionsRenderer = new google.maps.DirectionsRenderer({
