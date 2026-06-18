@@ -608,18 +608,22 @@ window.initMap = function () {
   }
 
 map = new google.maps.Map(mapElement, {
-    center: { lat: 12.9716, lng: 77.5946 },
-    zoom: 11,
-    mapTypeControl: false,
-    streetViewControl: false,
-    fullscreenControl: false,
+center: { lat: 12.9716, lng: 77.5946 },
+zoom: 11,
+mapTypeControl: false,
+streetViewControl: false,
+fullscreenControl: false,
 
-    gestureHandling: "cooperative",
-    scrollwheel: false,
-    disableDoubleClickZoom: true,
+```
+gestureHandling: "cooperative",
+scrollwheel: false,
+disableDoubleClickZoom: true,
 
-    zoomControl: true
+zoomControl: true
+```
+
 });
+
 
   directionsService = new google.maps.DirectionsService();
 directionsRenderer = new google.maps.DirectionsRenderer({
