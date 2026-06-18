@@ -712,24 +712,32 @@ console.error("Directions request failed:", status);
     if (pickupMarker) pickupMarker.setMap(null);
     if (dropMarker) dropMarker.setMap(null);
 
-    pickupMarker = new google.maps.Marker({
-      position: pickupPlace.geometry.location,
-      map: map,
-      label: "A"
-    });
+   pickupMarker = new google.maps.Marker({
+    position: pickupPlace.geometry.location,
+    map: map,
+    label: "A",
+    draggable: true
+});
 
-    dropMarker = new google.maps.Marker({
-      position: dropPlace.geometry.location,
-      map: map,
-      label: "B"
-    });
-
+ dropMarker = new google.maps.Marker({
+    position: dropPlace.geometry.location,
+    map: map,
+    label: "B",
+    draggable: true
+});
     const bounds = new google.maps.LatLngBounds();
 
     bounds.extend(pickupPlace.geometry.location);
     bounds.extend(dropPlace.geometry.location);
 
     map.fitBounds(bounds);
+    pickupMarker.addListener("dragend", function(event) {
+    console.log("Pickup moved:", event.latLng.lat(), event.latLng.lng());
+});
+
+dropMarker.addListener("dragend", function(event) {
+    console.log("Drop moved:", event.latLng.lat(), event.latLng.lng());
+});
   }
 });
 }
