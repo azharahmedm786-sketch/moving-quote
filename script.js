@@ -613,14 +613,11 @@ zoom: 11,
 mapTypeControl: false,
 streetViewControl: false,
 fullscreenControl: false,
-
-```
 gestureHandling: "cooperative",
 scrollwheel: false,
 disableDoubleClickZoom: true,
 
 zoomControl: true
-```
 
 });
 
