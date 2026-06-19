@@ -538,7 +538,7 @@ for (let i = 1; i <= 10; i++) {
     const card = document.createElement("div");
    card.className = "date-card";
     card.dataset.date = d.toISOString().split("T")[0];
-    card.innerHTML = `<div class="dc-day">${days[d.getDay()]}</div><div class="dc-num">${d.getDate()}</div><div class="dc-month">${months[d.getMonth()]}</div>${i === 0 ? '<div class="dc-tag">Today</div>' : i === 1 ? '<div class="dc-tag">Tomorrow</div>' : ""}`;
+    card.innerHTML = `<div class="dc-day">${days[d.getDay()]}</div><div class="dc-num">${d.getDate()}</div><div class="dc-month">${months[d.getMonth()]}</div>${i === 1 ? '<div class="dc-tag">Tomorrow</div>' : ""}`;
     card.addEventListener("click", () => selectDateCard(card, d));
     strip.appendChild(card);
   }
@@ -1194,7 +1194,14 @@ function onPaymentSuccess(response, name, phone, paid, total) {
       furniture: getFurnitureSummary(), pickupFloor: document.getElementById("pickupFloor")?.options[document.getElementById("pickupFloor")?.selectedIndex]?.text || "",
       dropFloor: document.getElementById("dropFloor")?.options[document.getElementById("dropFloor")?.selectedIndex]?.text || "",
       liftAvailable: !!document.getElementById("liftAvailable")?.checked, packingService: false, total, originalTotal: lastCalculatedTotal,
-      paid, paymentType: selectedPayment, promoDiscount, date: shiftDate?.value || "", status: "confirmed", source: "payment",
+    paid,
+paymentType: selectedPayment,
+promoDiscount,
+date: shiftDate?.value || "",
+shiftTime: document.getElementById("shiftTime")?.value || "",
+shiftTimeLabel: document.getElementById("shiftTimeLabel")?.value || "",
+status: "confirmed",
+source: "payment",
       isIntercity: isIntercityMove, paymentId: response.razorpay_payment_id, photos: uploadedPhotos.slice(0, 3),
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
     }).then(docRef => {
@@ -1262,7 +1269,9 @@ function bookWithoutPayment() {
     pickup: pickupVal,
     drop: dropVal,
     date,
-    moveType: selectedMoveType,
+shiftTime: document.getElementById("shiftTime")?.value || "",
+shiftTimeLabel: document.getElementById("shiftTimeLabel")?.value || "",
+moveType: selectedMoveType,
     house: houseEl?.options[houseEl?.selectedIndex]?.text || "",
     vehicle: vehicleEl?.options[vehicleEl?.selectedIndex]?.text || "",
     furniture: getFurnitureSummary(),
