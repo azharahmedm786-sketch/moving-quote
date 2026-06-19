@@ -537,7 +537,11 @@ for (let i = 1; i <= 10; i++) {
     const d = new Date(today); d.setDate(today.getDate() + i);
     const card = document.createElement("div");
    card.className = "date-card";
-    card.dataset.date = d.toISOString().split("T")[0];
+   const year = d.getFullYear();
+const month = String(d.getMonth() + 1).padStart(2, "0");
+const day = String(d.getDate()).padStart(2, "0");
+
+card.dataset.date = `${year}-${month}-${day}`;
     card.innerHTML = `<div class="dc-day">${days[d.getDay()]}</div><div class="dc-num">${d.getDate()}</div><div class="dc-month">${months[d.getMonth()]}</div>${i === 1 ? '<div class="dc-tag">Tomorrow</div>' : ""}`;
     card.addEventListener("click", () => selectDateCard(card, d));
     strip.appendChild(card);
@@ -548,7 +552,13 @@ function selectDateCard(card, dateObj) {
   document.querySelectorAll(".date-card").forEach(c => c.classList.remove("selected"));
   card.classList.add("selected");
   const shiftDate = document.getElementById("shiftDate");
-  if (shiftDate) shiftDate.value = dateObj.toISOString().split("T")[0];
+ if (shiftDate) {
+  const year = dateObj.getFullYear();
+  const month = String(dateObj.getMonth() + 1).padStart(2, "0");
+  const day = String(dateObj.getDate()).padStart(2, "0");
+
+  shiftDate.value = `${year}-${month}-${day}`;
+}
   const label = document.getElementById("dateSelectedLabel");
   const days = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
   const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
@@ -564,7 +574,12 @@ function openCustomDate() {
   if (!input) return;
 const tomorrow = new Date();
 tomorrow.setDate(tomorrow.getDate() + 1);
-input.min = tomorrow.toISOString().split("T")[0];
+
+const year = tomorrow.getFullYear();
+const month = String(tomorrow.getMonth() + 1).padStart(2, "0");
+const day = String(tomorrow.getDate()).padStart(2, "0");
+
+input.min = `${year}-${month}-${day}`;
   input.style.cssText = "position:fixed;opacity:0;top:50%;left:50%;width:1px;height:1px;z-index:9999;";
   input.click();
   setTimeout(() => { input.style.cssText = "position:absolute;opacity:0;pointer-events:none;width:0;height:0;"; }, 500);
