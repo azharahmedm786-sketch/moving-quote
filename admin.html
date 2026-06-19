@@ -626,8 +626,17 @@ function buildShell(adminName) {
 /* ================================================================
    SHOW SHELL — only called after successful admin auth
    ================================================================ */
-let adminUser = null, allBookings = [], allDrivers = [], allCustomers = [], allReviews = [], allPromos = [];
-let assigningId = null, bookingsChart = null, revenueChart = null;
+let adminUser = null,
+    allBookings = [],
+    allDrivers = [],
+    allCustomers = [],
+    allReviews = [],
+    allPromos = [];
+
+let assigningId = null;
+let bookingsChart = null;
+let revenueChart = null;
+let expandedBookingId = null;
 
 function showShell(name) {
   document.getElementById("adminLogin").style.display = "none";
@@ -806,60 +815,7 @@ function renderBookingsTable(list) {
 </td>
     </tr>`).join("");
 }
-function viewBooking(id) {
-
-  const booking = allBookings.find(b => b.id === id);
-
-  if (!booking) {
-    toast("Booking not found");
-    return;
-  }
-
-  alert(`
-Booking Ref: ${booking.bookingRef || ""}
-
-Customer: ${booking.customerName || ""}
-Phone: ${booking.phone || ""}
-
-Pickup:
-${booking.pickup || ""}
-
-Drop:
-${booking.drop || ""}
-
-Date:
-${booking.date || ""}
-
-Time Slot:
-${booking.shiftTimeLabel || booking.shiftTime || ""}
-
-Move Type:
-${booking.moveType || ""}
-
-House Type:
-${booking.houseType || booking.house || ""}
-
-Vehicle:
-${booking.vehicleLabel || booking.vehicle || ""}
-
-Floor:
-Pickup ${booking.pickupFloor || 0}
-Drop ${booking.dropFloor || 0}
-
-Furniture:
-${JSON.stringify(booking.furniture || {}, null, 2)}
-
-Cartons:
-${booking.cartonQty || 0}
-
-Total:
-₹${booking.total || 0}
-
-Status:
-${booking.status || ""}
-  `);
-
-}
+  
 function filterBookings(q) {
   const f = allBookings.filter(b =>
     (b.customerName||"").toLowerCase().includes(q.toLowerCase()) ||
@@ -897,12 +853,18 @@ function exportCSV() {
   a.click();
   toast("📁 CSV downloaded!");
 }
-  function viewBooking(id) {
+ 
+ 
+function viewBooking(id) {
   const b = allBookings.find(x => x.id === id);
-  if (!b) return;
 
-  alert(
-`Booking Ref: ${b.bookingRef || "-"}
+  if (!b) {
+    toast("Booking not found");
+    return;
+  }
+
+  alert(`
+Booking Ref: ${b.bookingRef || "-"}
 
 Customer: ${b.customerName || "-"}
 Phone: ${b.phone || "-"}
@@ -917,26 +879,12 @@ Date: ${b.date || "-"}
 Time: ${b.shiftTimeLabel || b.shiftTime || "-"}
 
 Vehicle: ${b.vehicle || "-"}
-Move Type: ${b.moveType || "-"}
-House Type: ${b.house || "-"}
-
-Packing Service: ${b.packingService ? "Yes" : "No"}
-
-Pickup Floor: ${b.pickupFloor || "-"}
-Drop Floor: ${b.dropFloor || "-"}
-
-Lift Available: ${b.liftAvailable ? "Yes" : "No"}
 
 Total: ₹${b.total || 0}
-Payment Type: ${b.paymentType || "-"}
 
 Status: ${b.status || "-"}
-
-Furniture:
-${b.furniture || "-"}`
-  );
+`);
 }
-
 /* ── DRIVERS ── */
 function renderDrivers() {
   const el = document.getElementById("driversList");
