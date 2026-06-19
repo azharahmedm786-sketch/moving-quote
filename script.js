@@ -533,10 +533,10 @@ function buildDateStrip() {
   const today = new Date(); today.setHours(0, 0, 0, 0);
   const days = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
   const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-  for (let i = 0; i < 10; i++) {
+for (let i = 1; i <= 10; i++) {
     const d = new Date(today); d.setDate(today.getDate() + i);
     const card = document.createElement("div");
-    card.className = "date-card" + (i === 0 ? " today-card" : "");
+   card.className = "date-card";
     card.dataset.date = d.toISOString().split("T")[0];
     card.innerHTML = `<div class="dc-day">${days[d.getDay()]}</div><div class="dc-num">${d.getDate()}</div><div class="dc-month">${months[d.getMonth()]}</div>${i === 0 ? '<div class="dc-tag">Today</div>' : i === 1 ? '<div class="dc-tag">Tomorrow</div>' : ""}`;
     card.addEventListener("click", () => selectDateCard(card, d));
@@ -562,7 +562,9 @@ function selectDateCard(card, dateObj) {
 function openCustomDate() {
   const input = document.getElementById("shiftDate");
   if (!input) return;
-  input.min = new Date().toISOString().split("T")[0];
+const tomorrow = new Date();
+tomorrow.setDate(tomorrow.getDate() + 1);
+input.min = tomorrow.toISOString().split("T")[0];
   input.style.cssText = "position:fixed;opacity:0;top:50%;left:50%;width:1px;height:1px;z-index:9999;";
   input.click();
   setTimeout(() => { input.style.cssText = "position:absolute;opacity:0;pointer-events:none;width:0;height:0;"; }, 500);
@@ -572,7 +574,10 @@ function onCustomDatePicked(val) {
   if (!val) return;
   const d = new Date(val + "T00:00:00");
   const today = new Date(); today.setHours(0,0,0,0);
-  if (d < today) { showToast("⚠️ Please select today or a future date."); return; }
+const tomorrow = new Date(today);
+tomorrow.setDate(today.getDate() + 1);
+
+if (d < tomorrow) { showToast("⚠️ Please select tomorrow or a future date."); return; }
   document.querySelectorAll(".date-card").forEach(c => c.classList.remove("selected"));
   const match = document.querySelector(`.date-card[data-date="${val}"]`);
   if (match) match.classList.add("selected");
