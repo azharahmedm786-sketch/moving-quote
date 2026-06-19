@@ -790,16 +790,76 @@ function renderBookingsTable(list) {
         </select>
       </td>
       <td>${b.driverName||'<span style="color:var(--text-muted);font-size:.78rem">Unassigned</span>'}</td>
-   <td style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
-  <button class="btn-sm" style="background:#2563eb;color:white;" onclick="viewBooking('${b.id}')">👁 View</button>
+<td style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
+  <button class="btn-sm" onclick="viewBooking('${b.id}')">👁 View</button>
 
-  <button class="btn-sm btn-assign" onclick="openAssignModal('${b.id}')">🚚 Assign</button>
+  <button class="btn-sm btn-assign"
+          onclick="openAssignModal('${b.id}')">
+    🚚 Assign
+  </button>
 
-  <button class="btn-sm" style="background:rgba(220,38,38,.1);color:#dc2626;" onclick="deleteBooking('${b.id}','${b.bookingRef||b.id.slice(-6).toUpperCase()}')">🗑 Delete</button>
+  <button class="btn-sm"
+          style="background:rgba(220,38,38,.1);color:#dc2626;"
+          onclick="deleteBooking('${b.id}','${b.bookingRef||b.id.slice(-6).toUpperCase()}')">
+    🗑 Delete
+  </button>
 </td>
     </tr>`).join("");
 }
+function viewBooking(id) {
 
+  const booking = allBookings.find(b => b.id === id);
+
+  if (!booking) {
+    toast("Booking not found");
+    return;
+  }
+
+  alert(`
+Booking Ref: ${booking.bookingRef || ""}
+
+Customer: ${booking.customerName || ""}
+Phone: ${booking.phone || ""}
+
+Pickup:
+${booking.pickup || ""}
+
+Drop:
+${booking.drop || ""}
+
+Date:
+${booking.date || ""}
+
+Time Slot:
+${booking.shiftTimeLabel || booking.shiftTime || ""}
+
+Move Type:
+${booking.moveType || ""}
+
+House Type:
+${booking.houseType || booking.house || ""}
+
+Vehicle:
+${booking.vehicleLabel || booking.vehicle || ""}
+
+Floor:
+Pickup ${booking.pickupFloor || 0}
+Drop ${booking.dropFloor || 0}
+
+Furniture:
+${JSON.stringify(booking.furniture || {}, null, 2)}
+
+Cartons:
+${booking.cartonQty || 0}
+
+Total:
+₹${booking.total || 0}
+
+Status:
+${booking.status || ""}
+  `);
+
+}
 function filterBookings(q) {
   const f = allBookings.filter(b =>
     (b.customerName||"").toLowerCase().includes(q.toLowerCase()) ||
