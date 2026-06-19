@@ -813,7 +813,36 @@ function renderBookingsTable(list) {
     🗑 Delete
   </button>
 </td>
-    </tr>`).join("");
+</tr>
+
+${expandedBookingId === b.id ? `
+<tr>
+  <td colspan="9" style="background:#f8fafc;padding:16px;">
+
+    <b>Booking Ref:</b> ${b.bookingRef || "-"}<br><br>
+
+    <b>Customer:</b> ${b.customerName || "-"}<br>
+    <b>Phone:</b> ${b.phone || "-"}<br><br>
+
+    <b>Pickup:</b><br>
+    ${b.pickup || "-"}<br><br>
+
+    <b>Drop:</b><br>
+    ${b.drop || "-"}<br><br>
+
+    <b>Date:</b> ${b.date || "-"}<br>
+    <b>Time Slot:</b> ${b.shiftTimeLabel || b.shiftTime || "-"}<br>
+    <b>Move Type:</b> ${b.moveType || "-"}<br>
+    <b>House Type:</b> ${b.house || "-"}<br>
+    <b>Vehicle:</b> ${b.vehicle || "-"}<br>
+    <b>Total:</b> ₹${b.total || 0}<br>
+    <b>Status:</b> ${b.status || "-"}<br>
+
+  </td>
+</tr>
+` : ""}
+
+`).join("");
 }
   
 function filterBookings(q) {
@@ -854,41 +883,17 @@ function exportCSV() {
   toast("📁 CSV downloaded!");
 }
  
- function viewBooking(id) {
+function viewBooking(id) {
 
-  const booking = allBookings.find(b => b.id === id);
-
-  if (!booking) {
-    toast("Booking not found");
+  if (expandedBookingId === id) {
+    expandedBookingId = null;
+    renderBookingsTable(allBookings);
     return;
   }
 
-  alert(`
-Booking Ref: ${booking.bookingRef || "-"}
-
-Customer: ${booking.customerName || "-"}
-Phone: ${booking.phone || "-"}
-
-Pickup:
-${booking.pickup || "-"}
-
-Drop:
-${booking.drop || "-"}
-
-Date:
-${booking.date || "-"}
-
-Time Slot:
-${booking.shiftTimeLabel || booking.shiftTime || "-"}
-
-Vehicle:
-${booking.vehicleLabel || booking.vehicle || "-"}
-
-Total:
-₹${booking.total || 0}
-`);
+  expandedBookingId = id;
+  renderBookingsTable(allBookings);
 }
-
 /* ── DRIVERS ── */
 function renderDrivers() {
   const el = document.getElementById("driversList");
