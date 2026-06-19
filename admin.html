@@ -773,7 +773,11 @@ function renderOverview() {
       <td style="max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${(b.pickup||"").split(",")[0]} → ${(b.drop||"").split(",")[0]}</td>
       <td>${b.date||"—"}</td>
       <td><span class="badge badge-${b.status||"pending"}">${cap(b.status||"pending")}</span></td>
-      <td><button class="btn-sm btn-assign" onclick="openAssignModal('${b.id}')">Assign</button></td>
+      <td><button class="btn-sm btn-assign"
+onclick="openAssignModal('${b.id}')">
+🚚 ${b.driverUid ? "Change Driver" : "Assign Driver"}
+</button>
+</td>
     </tr>`).join("");
 }
 
@@ -802,10 +806,10 @@ function renderBookingsTable(list) {
 <td style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
   <button class="btn-sm" onclick="viewBooking('${b.id}')">👁 View</button>
 
-  <button class="btn-sm btn-assign"
-          onclick="openAssignModal('${b.id}')">
-    🚚 Assign
-  </button>
+<button class="btn-sm btn-assign"
+onclick="openAssignModal('${b.id}')">
+🚚 ${b.driverUid ? "Change" : "Assign"}
+</button>
 
   <button class="btn-sm"
           style="background:rgba(220,38,38,.1);color:#dc2626;"
@@ -850,14 +854,34 @@ line-height:1.8;
     <b>House Type:</b> ${b.house || "-"}<br>
     <b>Vehicle:</b> ${b.vehicle || "-"}<br>
     <b>Driver:</b> ${b.driverName || "Not Assigned"}<br>
+    <b>Driver Phone:</b> ${b.driverPhone || "-"}<br>
 <b>Payment Type:</b> ${b.paymentType || "-"}<br>
-    <b>Total:</b> ₹${b.total || 0}<br>
+<b>Advance Paid:</b> ₹${b.paid || 0}<br>
+
+<b>Original Quote:</b> ₹${b.originalTotal || b.total || 0}<br>
+<b>Promo Discount:</b> ₹${b.promoDiscount || 0}<br>
+<b>Total:</b> ₹${b.total || 0}<br>
+
+<b>Total:</b> ₹${b.total || 0}<br><br>
+
+<b>Items Selected:</b><br>
+
+${b.selectedFurniture
+? Object.entries(b.selectedFurniture)
+    .filter(([k,v]) => v > 0)
+    .map(([k,v]) => `${k} × ${v}`)
+    .join("<br>")
+: "No items recorded"}
+
+<br><br>
     <b>Status:</b> ${b.status || "-"}<br>
-    <br>
+    <b>Created:</b>
+${b.createdAt?.toDate ? b.createdAt.toDate().toLocaleString("en-IN") : "-"}
+<br>
 
 <button class="btn-sm btn-assign"
 onclick="openAssignModal('${b.id}')">
-🚚 Assign Driver
+🚚 ${b.driverUid ? "Change Driver" : "Assign Driver"}
 </button>
 
 <button class="btn-sm"
