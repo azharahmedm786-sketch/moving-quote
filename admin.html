@@ -889,11 +889,15 @@ style="background:#7c3aed;color:white;margin-left:8px;text-decoration:none;">
 }
   
 function filterBookings(q) {
+  q = q.toLowerCase();
+
   const f = allBookings.filter(b =>
-    (b.customerName||"").toLowerCase().includes(q.toLowerCase()) ||
-    (b.id||"").toLowerCase().includes(q.toLowerCase()) ||
-    (b.phone||"").includes(q)
+    (b.customerName || "").toLowerCase().includes(q) ||
+    (b.id || "").toLowerCase().includes(q) ||
+    (b.bookingRef || "").toLowerCase().includes(q) ||
+    (b.phone || "").includes(q)
   );
+
   renderBookingsTable(f);
 }
 function updateStatus(id, status) {
