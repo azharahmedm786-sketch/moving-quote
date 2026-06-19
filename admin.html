@@ -817,9 +817,23 @@ function renderBookingsTable(list) {
 
 ${expandedBookingId === b.id ? `
 <tr>
-  <td colspan="9" style="background:#f8fafc;padding:16px;">
+ <td colspan="9">
 
-    <b>Booking Ref:</b> ${b.bookingRef || "-"}<br><br>
+<div style="
+background:#ffffff;
+padding:20px;
+margin:10px;
+border-radius:12px;
+border:1px solid #e5e7eb;
+box-shadow:0 2px 8px rgba(0,0,0,.05);
+line-height:1.8;
+">
+
+  <h3 style="margin-bottom:15px;color:#2563eb;">
+📦 Booking Details
+</h3>
+
+<b>Booking Ref:</b> ${b.bookingRef || "-"}<br><br>
 
     <b>Customer:</b> ${b.customerName || "-"}<br>
     <b>Phone:</b> ${b.phone || "-"}<br><br>
@@ -835,8 +849,37 @@ ${expandedBookingId === b.id ? `
     <b>Move Type:</b> ${b.moveType || "-"}<br>
     <b>House Type:</b> ${b.house || "-"}<br>
     <b>Vehicle:</b> ${b.vehicle || "-"}<br>
+    <b>Driver:</b> ${b.driverName || "Not Assigned"}<br>
+<b>Payment Type:</b> ${b.paymentType || "-"}<br>
     <b>Total:</b> ₹${b.total || 0}<br>
     <b>Status:</b> ${b.status || "-"}<br>
+    <br>
+
+<button class="btn-sm btn-assign"
+onclick="openAssignModal('${b.id}')">
+🚚 Assign Driver
+</button>
+
+<button class="btn-sm"
+style="background:#16a34a;color:white;margin-left:8px;"
+onclick="updateStatus('${b.id}','delivered')">
+✅ Mark Delivered
+</button>
+${b.driverPhone ? `
+<a href="tel:${b.driverPhone}"
+class="btn-sm"
+style="background:#2563eb;color:white;margin-left:8px;text-decoration:none;">
+📞 Call Driver
+</a>
+` : ""}
+${b.phone ? `
+<a href="tel:${b.phone}"
+class="btn-sm"
+style="background:#7c3aed;color:white;margin-left:8px;text-decoration:none;">
+📱 Call Customer
+</a>
+` : ""}
+</div>
 
   </td>
 </tr>
