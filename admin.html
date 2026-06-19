@@ -854,37 +854,41 @@ function exportCSV() {
   toast("📁 CSV downloaded!");
 }
  
- 
-function viewBooking(id) {
-  const b = allBookings.find(x => x.id === id);
+ function viewBooking(id) {
 
-  if (!b) {
+  const booking = allBookings.find(b => b.id === id);
+
+  if (!booking) {
     toast("Booking not found");
     return;
   }
 
   alert(`
-Booking Ref: ${b.bookingRef || "-"}
+Booking Ref: ${booking.bookingRef || "-"}
 
-Customer: ${b.customerName || "-"}
-Phone: ${b.phone || "-"}
+Customer: ${booking.customerName || "-"}
+Phone: ${booking.phone || "-"}
 
 Pickup:
-${b.pickup || "-"}
+${booking.pickup || "-"}
 
 Drop:
-${b.drop || "-"}
+${booking.drop || "-"}
 
-Date: ${b.date || "-"}
-Time: ${b.shiftTimeLabel || b.shiftTime || "-"}
+Date:
+${booking.date || "-"}
 
-Vehicle: ${b.vehicle || "-"}
+Time Slot:
+${booking.shiftTimeLabel || booking.shiftTime || "-"}
 
-Total: ₹${b.total || 0}
+Vehicle:
+${booking.vehicleLabel || booking.vehicle || "-"}
 
-Status: ${b.status || "-"}
+Total:
+₹${booking.total || 0}
 `);
 }
+
 /* ── DRIVERS ── */
 function renderDrivers() {
   const el = document.getElementById("driversList");
