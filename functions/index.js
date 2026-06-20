@@ -36,6 +36,7 @@ exports.sendSMS = functions
     }
 
     try {
+    
       const result = await sendMsg91SMS(authKey, senderId, mobile, message);
       console.log(`✅ SMS sent to ${mobile}:`, result);
       await docRef.update({
@@ -153,6 +154,17 @@ exports.createRazorpayOrder = functions
       try {
 
         const { amount } = req.body;
+         const safeAmount = Number(amount);
+
+if (
+  !safeAmount ||
+  safeAmount < 500 ||
+  safeAmount > 100000
+) {
+  return res.status(400).json({
+    error: "Invalid amount"
+  });
+}
 
         if (!amount) {
           return res.status(400).json({
@@ -161,8 +173,8 @@ exports.createRazorpayOrder = functions
         }
 
         const order = await razorpay.orders.create({
-          amount: Number(amount) * 100,
-          currency: "INR",
+amount: safeAmount * 100,
+           currency: "INR",
           receipt: "receipt_" + Date.now()
         });
 
@@ -206,13 +218,24 @@ exports.verifyRazorpayPayment = functions
       return res.status(204).send("");
     }
 
-    try {
-      const {
-        razorpay_order_id,
-        razorpay_payment_id,
-        razorpay_signature,
-        bookingData
-      } = req.body;
+   try {
+
+  const {
+    razorpay_order_id,
+    razorpay_payment_id,
+    razorpay_signature,
+    bookingData
+  } = req.body;
+if (
+  !bookingData ||
+  !bookingData.customerName ||
+  !bookingData.phone
+) {
+  return res.status(400).json({
+    success: false,
+    error: "Invalid booking data"
+  });
+}
 
       const body = razorpay_order_id + "|" + razorpay_payment_id;
       const expectedSignature = crypto
@@ -231,15 +254,25 @@ exports.verifyRazorpayPayment = functions
       const bookingRef = "PKZ-" + Date.now().toString(36).toUpperCase();
       console.log("ABOUT TO CREATE BOOKING");
 console.log("BOOKING DATA:", bookingData);
-      await admin.firestore().collection("bookings").add({
-        ...bookingData,
-        bookingRef,
-        paymentId: razorpay_payment_id,
-        orderId: razorpay_order_id,
-        paymentStatus: "paid",
-        status: "confirmed",
-        createdAt: admin.firestore.FieldValue.serverTimestamp()
-      });
+     await admin.firestore().collection("bookings").add({
+
+  customerName: bookingData.customerName || "",
+  phone: bookingData.phone || "",
+  pickup: bookingData.pickup || "",
+  drop: bookingData.drop || "",
+  date: bookingData.date || "",
+  moveType: bookingData.moveType || "",
+
+  total: bookingData.total || 0,
+
+  bookingRef,
+  paymentId: razorpay_payment_id,
+  orderId: razorpay_order_id,
+  paymentStatus: "paid",
+  status: "confirmed",
+  createdAt: admin.firestore.FieldValue.serverTimestamp()
+});
+       
 console.log("BOOKING CREATED SUCCESSFULLY");
       console.log("✅ Payment verified:", razorpay_payment_id);
 
