@@ -229,14 +229,16 @@ exports.verifyRazorpayPayment = functions
 if (
   !bookingData ||
   !bookingData.customerName ||
-  !bookingData.phone
+  !bookingData.phone ||
+  !bookingData.total ||
+  bookingData.total < 500 ||
+  bookingData.total > 100000
 ) {
   return res.status(400).json({
     success: false,
     error: "Invalid booking data"
   });
 }
-
       const body = razorpay_order_id + "|" + razorpay_payment_id;
       const expectedSignature = crypto
        .createHmac("sha256", functions.config().razorpay.key_secret)
@@ -263,7 +265,7 @@ console.log("BOOKING DATA:", bookingData);
   date: bookingData.date || "",
   moveType: bookingData.moveType || "",
 
-  total: bookingData.total || 0,
+ total: Number(bookingData.total),
 
   bookingRef,
   paymentId: razorpay_payment_id,
