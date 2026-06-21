@@ -263,7 +263,7 @@ console.log("BOOKING DATA:", bookingData);
   pickup: bookingData.pickup || "",
   drop: bookingData.drop || "",
   date: bookingData.date || "",
-  moveType: bookingData.moveType || "",
+  moveType: bookingData.moveType || "", 
 
  total: Number(bookingData.total),
 
