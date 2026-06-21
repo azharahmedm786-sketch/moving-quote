@@ -23,23 +23,24 @@
   var CONFIG = {
     // Element on the current page to scroll to when the bot suggests booking.
     // Your existing booking form's id — change this if your form id differs.
-    bookingFormSelector: "#booking-form",
+   bookingFormSelector: "#quote",
+
 
     // Where to send visitors to book if they are NOT already on the page
     // that contains the booking form (e.g. they are on a blog page).
-    bookingPageUrl: "/index.html#booking-form",
+    bookingPageUrl: "/index.html#quote",
 
     // WhatsApp business number in international format, no "+" or spaces.
-    whatsappNumber: "919999999999",
+    whatsappNumber: "919945095453",
 
     // Support contact details shown in the "Talk to Support" reply.
-    supportPhone: "+91 99999 99999",
-    supportEmail: "support@packzenblr.in",
+    supportPhone: "+91 99450 95453",
+    supportEmail: "moveeasyblr@gmail.com",
     supportHours: "Mon–Sun, 8:00 AM – 9:00 PM",
 
     // Set to true once you have added the Firestore rules in this guide
     // and want chat leads (name + phone) saved to your database.
-    enableFirestoreLeadCapture: true,
+   enableFirestoreLeadCapture: false,
     firestoreCollection: "chatbot_leads",
 
     // Delay before the teaser bubble auto-appears next to the button (ms).
