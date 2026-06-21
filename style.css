@@ -2345,3 +2345,14 @@ input:focus-visible, select:focus-visible {
   font-weight:600;
   color:#334155;
 }
+.footer-founder{
+  margin-top:20px;
+  text-align:center;
+  font-size:14px;
+  opacity:.9;
+}
+
+.footer-founder a{
+  color:inherit;
+  font-weight:600;
+}
