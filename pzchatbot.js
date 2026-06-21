@@ -10,7 +10,7 @@
    - Offers quick-reply buttons and a "Book Now" call-to-action that
      scrolls to your existing booking form
    - Optionally captures a name + phone number as a lead and saves it
-     to Firestore when a visitor asks for a human, then hands them to
+     to Firestore when a visitor asks for a human, then hands them to 
      WhatsApp with the conversation context pre-filled
    ========================================================================== */
 
