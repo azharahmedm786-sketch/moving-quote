@@ -2320,3 +2320,28 @@ input:focus-visible, select:focus-visible {
     grid-template-columns:repeat(2,1fr);
   }
 }
+.quote-offer-box{
+  margin-top:20px;
+  background:#eff6ff;
+  border:1px solid #bfdbfe;
+  border-radius:16px;
+  padding:20px;
+}
+
+.quote-offer-box h3{
+  margin-bottom:12px;
+  text-align:center;
+  color:#1e40af;
+}
+
+.quote-offer-box ul{
+  list-style:none;
+  padding:0;
+  margin:0;
+}
+
+.quote-offer-box li{
+  padding:8px 0;
+  font-weight:600;
+  color:#334155;
+}
