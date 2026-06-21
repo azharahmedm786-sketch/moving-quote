@@ -74,22 +74,26 @@
           "fee", "fees", "how much", "estimate", "quote", "expensive",
           "cheap", "budget", "amount",
         ],
-        reply:
-          "Here's our standard pricing structure (final cost depends on distance, floor, and items):\n\n" +
-          "🏠 Local move (within city)\n" +
-          "• 1 RK / 1 BHK — ₹2,999 onwards\n" +
-          "• 2 BHK — ₹4,999 onwards\n" +
-          "• 3 BHK — ₹7,999 onwards\n" +
-          "• 4 BHK / Villa — ₹11,999 onwards\n\n" +
-          "🛣️ Intercity move\n" +
-          "• Starts at ₹15/km, varies by vehicle size\n\n" +
-          "➕ Additional charges\n" +
-          "• Floor charge (no lift): ₹150 per floor\n" +
-          "• Heavy furniture handling: ₹100–300 per item\n" +
-          "• Packing cartons: ₹40–60 per box (material included)\n\n" +
-          "🎁 Referral discount of ₹500 is auto-applied at checkout if you have a code.\n\n" +
-          "For an exact number, the quote form gives you an instant, itemised estimate.",
-        cta: { type: "book", label: "Get My Instant Quote" },
+       reply:
+  "🏠 PackZen Pricing Guide\n\n" +
+  "• 1 RK — ₹2,500 onwards\n" +
+  "• 1 BHK — ₹4,500 onwards\n" +
+  "• 2 BHK — ₹6,500 onwards\n" +
+  "• 3 BHK — ₹8,500 onwards\n" +
+  "• 4 BHK — ₹10,500 onwards\n" +
+  "• Villa — ₹13,500 onwards\n\n" +
+  "Final cost depends on:\n" +
+  "✅ Distance\n" +
+  "✅ Furniture quantity\n" +
+  "✅ Floor charges\n" +
+  "✅ Lift availability\n" +
+  "✅ Local or Intercity move\n\n" +
+  "🏢 Floor Charges:\n" +
+"• With Lift: Lower handling charges apply\n" +
+"• Without Lift: Additional floor charges apply\n\n" +
+  "🚚 Intercity pricing is calculated based on distance, house size and vehicle requirements.\n\n" +
+  "Use our Instant Quote form to get an exact price instantly.",
+         cta: { type: "book", label: "Get My Instant Quote" },
         followUp: ["vehicles", "booking_steps", "human"],
       },
 
