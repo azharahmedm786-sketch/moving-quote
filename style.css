@@ -2266,3 +2266,57 @@ input:focus-visible, select:focus-visible {
   -webkit-user-select: none;
   user-select: none;
 }
+
+/* TRUST BOX */
+
+.quote-trust-box{
+  margin-top:20px;
+  background:#ffffff;
+  border:1px solid #dbeafe;
+  border-radius:16px;
+  padding:20px;
+}
+
+.quote-trust-box h3{
+  text-align:center;
+  margin-bottom:15px;
+  color:#0f172a;
+}
+
+.trust-features{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:15px;
+}
+
+.trust-item{
+  text-align:center;
+}
+
+.trust-item span{
+  font-size:24px;
+  display:block;
+  margin-bottom:8px;
+}
+
+.trust-item p{
+  font-size:13px;
+  font-weight:600;
+  color:#334155;
+}
+
+.google-trust{
+  margin-top:15px;
+  text-align:center;
+  background:#ecfdf5;
+  padding:10px;
+  border-radius:10px;
+  font-weight:600;
+  color:#16a34a;
+}
+
+@media(max-width:768px){
+  .trust-features{
+    grid-template-columns:repeat(2,1fr);
+  }
+}
