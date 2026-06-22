@@ -1067,18 +1067,46 @@ function syncPayOnlineButton(total, advanceAmt, fullAmt) {
 
 function selectPayment(type) {
   selectedPayment = type;
-  ["optAdvance","optFull","optAtDrop"].forEach(id => document.getElementById(id)?.classList.remove("selected"));
-  const map = { advance: "optAdvance", full: "optFull", at_drop: "optAtDrop" };
-  document.getElementById(map[type])?.classList.add("selected");
-  const discounted = Math.max(lastCalculatedTotal - promoDiscount, 0);
-  syncPayOnlineButton(discounted, Math.round(discounted * 0.10), Math.max(discounted - 200, 0));
-}
 
-function initPaymentOptions() {
-  document.getElementById("optAtDrop")?.classList.add("selected");
-  document.getElementById("optAdvance")?.classList.remove("selected");
-  document.getElementById("optFull")?.classList.remove("selected");
-  selectedPayment = "at_drop";
+  ["optAdvance","optFull","optAtDrop"].forEach(id =>
+    document.getElementById(id)?.classList.remove("selected")
+  );
+
+  const map = {
+    advance: "optAdvance",
+    full: "optFull",
+    at_drop: "optAtDrop"
+  };
+
+  document.getElementById(map[type])?.classList.add("selected");
+
+  const discounted = Math.max(lastCalculatedTotal - promoDiscount, 0);
+  const advanceAmt = Math.round(discounted * 0.10);
+  const fullAmt = Math.max(discounted - 200, 0);
+
+  const payBtn = document.getElementById("btnPayOnline");
+  const confirmBtn = document.querySelector(
+    'button[onclick="bookWithoutPayment()"]'
+  );
+
+  if (type === "advance") {
+    payBtn.style.display = "";
+    confirmBtn.style.display = "none";
+    payBtn.innerHTML = `💰 Pay Advance ₹${advanceAmt.toLocaleString("en-IN")}`;
+  }
+
+  else if (type === "full") {
+    payBtn.style.display = "";
+    confirmBtn.style.display = "none";
+    payBtn.innerHTML = `✅ Pay Full ₹${fullAmt.toLocaleString("en-IN")}`;
+  }
+
+  else {
+    payBtn.style.display = "none";
+    confirmBtn.style.display = "";
+  }
+
+  syncPayOnlineButton(discounted, advanceAmt, fullAmt);
 }
 
 /* ============================================
