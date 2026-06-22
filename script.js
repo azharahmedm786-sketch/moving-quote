@@ -1107,6 +1107,13 @@ document.getElementById("dynamicBookingBtn");
 
   syncPayOnlineButton(discounted, advanceAmt, fullAmt);
 }
+function handleBookingAction() {
+  if (selectedPayment === "advance" || selectedPayment === "full") {
+    startPayment();
+  } else {
+    bookWithoutPayment();
+  }
+}
 
 /* ============================================
 PAYMENT (RAZORPAY)
