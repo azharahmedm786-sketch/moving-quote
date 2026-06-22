@@ -1085,9 +1085,8 @@ function selectPayment(type) {
   const fullAmt = Math.max(discounted - 200, 0);
 
   const payBtn = document.getElementById("btnPayOnline");
-  const confirmBtn = document.querySelector(
-    'button[onclick="bookWithoutPayment()"]'
-  );
+const confirmBtn =
+document.getElementById("dynamicBookingBtn");
 
   if (type === "advance") {
     payBtn.style.display = "";
