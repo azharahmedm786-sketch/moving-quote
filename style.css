@@ -873,8 +873,24 @@ body.dark-mode .quote-section {
   background: linear-gradient(160deg, #0a0f1e 0%, #0f172a 60%, #0a0f1e 100%) !important;
 }
 .quote-wrapper {
-  display: grid; grid-template-columns: 1fr 1.5fr;
-  gap: 3.5rem; max-width: 1200px; margin: 0 auto; align-items: start;
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 30px;
+  max-width: 1400px;
+  margin: 0 auto;
+  align-items: start;
+}
+.quote-left {
+  max-width: 320px;
+}
+
+.quote-right {
+  width: 100%;
+}
+
+.form-card {
+  width: 100%;
+  max-width: 900px;
 }
 .quote-wrapper,
 .quote-right,
