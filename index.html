@@ -1547,7 +1547,22 @@ Select items you're moving. Furniture charges are calculated individually based 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
 
 <!-- 5. Your main script (after Firebase) -->
-<script src="script.js?v=6"></script>
+<script src="script.js?v=7"></script>
+<script>
+window.addEventListener('load', function() {
+  setTimeout(function() {
+    if (typeof buildDateStrip === 'function') {
+      buildDateStrip();
+    }
+    if (typeof initPaymentOptions === 'function') {
+      initPaymentOptions();
+    }
+    if (typeof renderSizeCards === 'function') {
+      renderSizeCards('home');
+    }
+  }, 600);
+});
+</script>
 
 <!-- 6. Admin check -->
 <script>
