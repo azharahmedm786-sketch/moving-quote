@@ -3231,7 +3231,9 @@ function debounce(fn, ms) {
   let timer;
   return (...args) => { clearTimeout(timer); timer = setTimeout(() => fn(...args), ms); };
 }
-
+window.addEventListener("load", () => {
+  buildDateStrip();
+});
 /* ============================================
 END OF FILE
 ============================================ */
