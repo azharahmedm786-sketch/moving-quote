@@ -658,15 +658,21 @@ Select items you're moving. Furniture charges are calculated individually based 
               <input type="checkbox" id="tncAccepted">
               <span>I agree to the <a href="legal.html" target="_blank" rel="noopener noreferrer">Terms &amp; Conditions</a> and <a href="legal.html" target="_blank" rel="noopener noreferrer">Privacy Policy</a></span>
             </label>
-           <div class="book-actions">
+          <div class="book-actions">
+
+  <button
+      id="btnPayOnline"
+      class="btn-pay"
+      style="display:none"
+      onclick="startPayment()">
+      💳 Pay Online
+  </button>
 
   <button
       id="dynamicBookingBtn"
       class="btn-pay"
       onclick="handleBookingAction()">
-
       📋 Confirm Booking · Pay on Delivery
-
   </button>
 
 </div>
