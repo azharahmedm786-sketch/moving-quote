@@ -160,6 +160,13 @@ const INTERCITY_PRICING = {
 const RAZORPAY_KEY = (window.ENV && window.ENV.RAZORPAY_KEY) || "";
 const OWNER_WHATSAPP = "919945095453";
 
+function initPaymentOptions() {
+  selectPayment('at_drop');
+  const payBtn = document.getElementById("btnPayOnline");
+  if (payBtn) payBtn.style.display = "none";
+  const confirmBtn = document.getElementById("dynamicBookingBtn");
+  if (confirmBtn) confirmBtn.style.display = "";
+}
 /* ============================================
 SECURITY HELPERS
 ============================================ */
