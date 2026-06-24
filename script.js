@@ -1075,41 +1075,31 @@ function syncPayOnlineButton(total, advanceAmt, fullAmt) {
 function selectPayment(type) {
   selectedPayment = type;
 
-  ["optAdvance","optFull","optAtDrop"].forEach(id =>
-    document.getElementById(id)?.classList.remove("selected")
-  );
+  ["optAdvance","optFull","optAtDrop"].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.remove("selected");
+  });
 
-  const map = {
-    advance: "optAdvance",
-    full: "optFull",
-    at_drop: "optAtDrop"
-  };
-
-  document.getElementById(map[type])?.classList.add("selected");
+  const map = { advance: "optAdvance", full: "optFull", at_drop: "optAtDrop" };
+  const selected = document.getElementById(map[type]);
+  if (selected) selected.classList.add("selected");
 
   const discounted = Math.max(lastCalculatedTotal - promoDiscount, 0);
   const advanceAmt = Math.round(discounted * 0.10);
   const fullAmt = Math.max(discounted - 200, 0);
 
   const payBtn = document.getElementById("btnPayOnline");
-const confirmBtn =
-document.getElementById("dynamicBookingBtn");
+  const confirmBtn = document.getElementById("dynamicBookingBtn");
 
   if (type === "advance") {
-    payBtn.style.display = "";
-    confirmBtn.style.display = "none";
-    payBtn.innerHTML = `💰 Pay Advance ₹${advanceAmt.toLocaleString("en-IN")}`;
-  }
-
-  else if (type === "full") {
-    payBtn.style.display = "";
-    confirmBtn.style.display = "none";
-    payBtn.innerHTML = `✅ Pay Full ₹${fullAmt.toLocaleString("en-IN")}`;
-  }
-
-  else {
-    payBtn.style.display = "none";
-    confirmBtn.style.display = "";
+    if (payBtn) { payBtn.style.display = ""; payBtn.innerHTML = `💰 Pay Advance ₹${advanceAmt.toLocaleString("en-IN")}`; }
+    if (confirmBtn) confirmBtn.style.display = "none";
+  } else if (type === "full") {
+    if (payBtn) { payBtn.style.display = ""; payBtn.innerHTML = `✅ Pay Full ₹${fullAmt.toLocaleString("en-IN")}`; }
+    if (confirmBtn) confirmBtn.style.display = "none";
+  } else {
+    if (payBtn) payBtn.style.display = "none";
+    if (confirmBtn) confirmBtn.style.display = "";
   }
 
   syncPayOnlineButton(discounted, advanceAmt, fullAmt);
@@ -2937,6 +2927,8 @@ PAGE LOAD
 ============================================ */
 document.addEventListener("DOMContentLoaded", () => {
   setTimeout(() => { setupCurrentLocationListener(); initGeolocationFeature(); }, 1000);
+
+  try { buildDateStrip(); } catch(e) { console.error("buildDateStrip failed:", e); }
 
   if (localStorage.getItem("packzen-theme") === "dark") {
     document.body.classList.add("dark-mode");
