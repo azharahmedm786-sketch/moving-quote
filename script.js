@@ -158,7 +158,7 @@ const INTERCITY_PRICING = {
 };
 
 const RAZORPAY_KEY = (window.ENV && window.ENV.RAZORPAY_KEY) || "";
-const OWNER_WHATSAPP = "919945095453";
+const OWNER_WHATSAPP = "919945095453"; 
 
 function initPaymentOptions() {
   selectPayment('at_drop');
