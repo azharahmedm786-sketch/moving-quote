@@ -1067,9 +1067,10 @@ function updatePriceDisplay() {
 function syncPayOnlineButton(total, advanceAmt, fullAmt) {
   const btn = document.getElementById("btnPayOnline");
   if (!btn) return;
-  if (selectedPayment === "advance") btn.innerHTML = `💳 Pay Advance ₹${advanceAmt.toLocaleString("en-IN")} Online`;
+  if (selectedPayment === "advance") btn.innerHTML = `💳 Pay Advance ₹${advanceAmt.toLocaleString("en-IN")}`;
   else if (selectedPayment === "full") btn.innerHTML = `💳 Pay Full ₹${fullAmt.toLocaleString("en-IN")} (Save ₹200)`;
   else btn.innerHTML = `💳 Pay Online`;
+  btn.style.display = (selectedPayment === "at_drop") ? "none" : "";
 }
 
 function selectPayment(type) {
