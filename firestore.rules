@@ -56,11 +56,13 @@ service cloud.firestore {
       allow create: if isAuth()
         && request.resource.data.customerUid == request.auth.uid;
 
-      allow update: if isAuth()
+     allow update: if isAuth()
         && resource.data.customerUid == request.auth.uid
         && (
-          onlyFields(['status','cancelReason','cancelledAt','cancelledBy'])
-          || onlyFields(['date','time','rescheduledAt','rescheduledBy','status'])
+          (onlyFields(['status','cancelReason','cancelledAt','cancelledBy'])
+            && request.resource.data.status == 'cancelled')
+          || (onlyFields(['date','time','rescheduledAt','rescheduledBy','status'])
+            && request.resource.data.status == 'confirmed')
           || onlyFields(['driverRating','driverFeedback','ratedAt'])
           || onlyFields(['damageClaimed','damageClaimId','damageClaimedAt'])
         );
