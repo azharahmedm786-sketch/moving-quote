@@ -1687,23 +1687,6 @@ select.field-input {
   .app-main      { max-width: 480px; }
 }
 
-/* On true desktop, show as centered phone-like UI */
-@media (min-width: 768px) {
-  body {
-    background: #e2e8f0;
-    display: flex; flex-direction: column; align-items: center;
-  }
-  .app-bar {
-    max-width: 480px; left: 50%; right: auto;
-    transform: translateX(-50%);
-    border-radius: 0 0 var(--radius-md) var(--radius-md);
-  }
-  .app-main {
-    box-shadow: 0 0 0 1px var(--border-light), var(--shadow-2xl);
-    min-height: 100vh;
-    background: var(--bg-app);
-  }
-}
 
 /* ════════════════════════════════════════════
    REVEAL ANIMATIONS — always visible
@@ -1739,4 +1722,48 @@ select.field-input {
   .app-bar, .bottom-nav, .booking-sheet, .sheet-overlay,
   .float-call, .float-wa, .modal-overlay, #trackOrderBanner { display: none !important; }
   body { background: #fff !important; color: #000 !important; padding-bottom: 0 !important; }
+}
+/* ===========================
+   Desktop Layout
+=========================== */
+
+@media (min-width:768px){
+
+    body{
+        background:#f1f5f9;
+    }
+
+    .app-bar{
+        left:0;
+        right:0;
+        max-width:100%;
+        transform:none;
+        border-radius:0;
+    }
+
+    .app-bar-inner{
+        max-width:1200px;
+        width:95%;
+        margin:auto;
+    }
+
+    .app-main{
+        max-width:1200px;
+        width:95%;
+        margin:auto;
+        background:transparent;
+        box-shadow:none;
+    }
+
+    .bottom-nav{
+        max-width:1200px;
+        width:95%;
+        left:50%;
+        transform:translateX(-50%);
+    }
+
+    .booking-sheet{
+        max-width:700px;
+    }
+
 }
