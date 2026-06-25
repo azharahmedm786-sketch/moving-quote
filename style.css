@@ -1726,7 +1726,28 @@ select.field-input {
 /* ===========================
    Desktop Layout
 =========================== */
+.hero-app-card{
+    min-height:520px;
+}
 
+.quick-actions-grid{
+    grid-template-columns:repeat(4,1fr);
+}
+
+.services-scroll{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:20px;
+    overflow:visible;
+}
+
+.why-app-grid{
+    grid-template-columns:repeat(3,1fr);
+}
+
+.bottom-nav{
+    display:none;
+}
 @media (min-width:768px){
 
     body{
@@ -1748,7 +1769,7 @@ select.field-input {
     }
 
     .app-main{
-        max-width:1200px;
+        max-width:1400px;
         width:95%;
         margin:auto;
         background:transparent;
