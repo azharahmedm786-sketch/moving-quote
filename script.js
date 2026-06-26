@@ -258,6 +258,7 @@ function selectMoveType(el, type) {
 SIZE CARDS RENDERER (FIXED - was missing!)
 ============================================ */
 function renderSizeCards(type) {
+  console.log("renderSizeCards", type);
   const container = document.getElementById("houseCards");
   const select = document.getElementById("house");
   const labelText = document.getElementById("sizeLabelText");
@@ -461,6 +462,7 @@ function updateStepDots(n) {
 }
 
 function showStep(n) {
+  console.log("showStep", n);
   getSteps().forEach(s => s.classList.remove("active"));
   const steps = getSteps();
   if (steps[n]) steps[n].classList.add("active");
