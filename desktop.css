@@ -1,0 +1,930 @@
+/* ================================================================
+   PACKZEN — DESKTOP.CSS
+   Full-width premium desktop layout
+   Inspired by: Airbnb, Porter, Urban Company, Swiggy web
+   Add AFTER style.css:  <link rel="stylesheet" href="desktop.css">
+   ================================================================ */
+
+/* ────────────────────────────────────────────────────────────────
+   BREAKPOINT SYSTEM
+   sm  ≥ 640px
+   md  ≥ 768px
+   lg  ≥ 1024px
+   xl  ≥ 1280px
+   2xl ≥ 1440px
+   ──────────────────────────────────────────────────────────────── */
+
+@media (min-width: 768px) {
+
+  /* ── 1. RESET MOBILE-ONLY OVERRIDES ─────────────────────────── */
+  body {
+    background: #f0f4f9;
+    display: block;             /* undo flex centering */
+    padding-bottom: 0;          /* no bottom-nav gap */
+  }
+
+  .app-body {
+    background: #f0f4f9;
+  }
+
+  /* ── 2. TOP NAVBAR ───────────────────────────────────────────── */
+  .app-bar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    max-width: 100%;
+    height: 68px;
+    background: #060e24;
+    border-bottom: 1px solid rgba(34,197,94,0.25);
+    box-shadow: 0 2px 20px rgba(0,0,0,0.35);
+    border-radius: 0;
+    transform: none;
+  }
+
+  .app-bar-inner {
+    max-width: 1400px;
+    margin: 0 auto;
+    height: 68px;
+    padding: 0 2rem;
+    gap: 1.5rem;
+  }
+
+  .app-logo-text {
+    font-size: 1.25rem;
+  }
+
+  .app-logo img {
+    width: 40px;
+    height: 40px;
+  }
+
+  /* Desktop nav links inside app-bar */
+  .app-bar-center {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem;
+  }
+
+  .app-location-pill {
+    padding: 6px 16px;
+  }
+
+  .location-text {
+    font-size: 0.82rem;
+  }
+
+  /* Show desktop nav links */
+  .desktop-nav-links {
+    display: flex !important;
+    align-items: center;
+    gap: 0.25rem;
+    margin-left: 2rem;
+  }
+
+  .desktop-nav-links a {
+    color: rgba(255,255,255,0.72);
+    text-decoration: none;
+    font-size: 0.88rem;
+    font-weight: 500;
+    padding: 6px 14px;
+    border-radius: 8px;
+    transition: background 0.2s, color 0.2s;
+    white-space: nowrap;
+  }
+
+  .desktop-nav-links a:hover {
+    background: rgba(255,255,255,0.10);
+    color: #fff;
+  }
+
+  /* ── 3. HIDE BOTTOM NAV ON DESKTOP ──────────────────────────── */
+  .bottom-nav {
+    display: none !important;
+  }
+
+  /* ── 4. MAIN LAYOUT — FULL WIDTH ────────────────────────────── */
+  .app-main {
+    max-width: 100%;
+    padding-top: 68px;     /* account for fixed navbar */
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .home-screen {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 2rem 4rem;
+  }
+
+  /* ── 5. HERO — FULL-WIDTH CINEMATIC ─────────────────────────── */
+  .hero-app-card {
+    min-height: 480px;
+    border-radius: 24px;
+    margin-top: 1.5rem;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .hero-app-overlay {
+    background: linear-gradient(
+      120deg,
+      rgba(6,14,36,0.88) 0%,
+      rgba(6,14,36,0.60) 50%,
+      rgba(6,14,36,0.20) 100%
+    );
+  }
+
+  .hero-app-content {
+    padding: 3.5rem 3.5rem 2rem;
+    max-width: 560px;
+  }
+
+  .hero-greeting {
+    font-size: 0.95rem;
+    margin-bottom: 10px;
+  }
+
+  .hero-app-title {
+    font-size: 3.2rem;
+    line-height: 1.05;
+    margin-bottom: 12px;
+  }
+
+  .hero-app-sub {
+    font-size: 1rem;
+    margin-bottom: 1.75rem;
+  }
+
+  .hero-cta-btn {
+    font-size: 1rem;
+    padding: 0.95rem 2rem;
+  }
+
+  .hero-trust-chips {
+    padding: 1rem 3.5rem 2rem;
+    gap: 12px;
+  }
+
+  .trust-chip {
+    font-size: 0.8rem;
+    padding: 6px 14px;
+  }
+
+  /* ── 6. HOME SECTION SPACING ─────────────────────────────────── */
+  .home-section {
+    padding: 2rem 0 0;
+  }
+
+  .section-label {
+    font-size: 0.72rem;
+    margin-bottom: 1.1rem;
+  }
+
+  /* ── 7. QUICK ACTIONS — WIDER CARDS ─────────────────────────── */
+  .quick-actions-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+  }
+
+  .qa-card {
+    padding: 1.5rem 1rem;
+    border-radius: 16px;
+    min-height: 110px;
+    gap: 12px;
+    font-size: 0.82rem;
+    border: 1px solid #e2e8f0;
+    background: #fff;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+
+  .qa-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+  }
+
+  .qa-icon-wrap {
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+    font-size: 1.5rem;
+  }
+
+  /* ── 8. SERVICES — HORIZONTAL GRID ──────────────────────────── */
+  .services-scroll {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    overflow-x: visible;
+    padding-bottom: 0;
+  }
+
+  .service-app-card {
+    flex: none;
+    min-height: 96px;
+    border-radius: 16px;
+    padding: 1.25rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+
+  .service-app-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 32px rgba(0,0,0,0.12);
+  }
+
+  .sac-icon {
+    width: 48px;
+    height: 48px;
+    font-size: 1.5rem;
+    border-radius: 14px;
+  }
+
+  .sac-title {
+    font-size: 0.9rem;
+  }
+
+  .sac-sub {
+    font-size: 0.74rem;
+  }
+
+  /* ── 9. TWO-COLUMN LAYOUT (offer + why) ─────────────────────── */
+  .desktop-two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    padding-top: 2rem;
+  }
+
+  .offer-banner {
+    border-radius: 20px;
+    padding: 1.75rem;
+    min-height: 180px;
+    align-items: flex-start;
+  }
+
+  .offer-right {
+    font-size: 5rem;
+  }
+
+  .offer-title {
+    font-size: 1.4rem;
+  }
+
+  /* ── 10. WHY GRID — 3 COL ────────────────────────────────────── */
+  .why-app-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+  }
+
+  .why-app-card {
+    padding: 1.5rem 1.25rem;
+    border-radius: 16px;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+
+  .why-app-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 28px rgba(0,0,0,0.10);
+  }
+
+  .wac-icon {
+    font-size: 1.75rem;
+    margin-bottom: 8px;
+  }
+
+  .wac-title {
+    font-size: 0.9rem;
+  }
+
+  .wac-sub {
+    font-size: 0.75rem;
+  }
+
+  /* ── 11. THREE-COLUMN GRID (pricing + hiw + reviews) ─────────── */
+  .desktop-three-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 1.5rem;
+    padding-top: 2rem;
+  }
+
+  .pricing-app-card {
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+  }
+
+  .pricing-app-header {
+    padding: 1.25rem 1.5rem;
+  }
+
+  .pricing-app-title {
+    font-size: 1.05rem;
+  }
+
+  .pricing-rows {
+    padding: 0 1.5rem;
+  }
+
+  .pricing-row {
+    font-size: 0.88rem;
+    padding: 0.875rem 0;
+  }
+
+  .pricing-note {
+    margin: 0 1.5rem 1.25rem;
+    font-size: 0.76rem;
+  }
+
+  .pricing-cta {
+    width: calc(100% - 3rem);
+    margin: 0 1.5rem 1.5rem;
+    padding: 0.95rem;
+    font-size: 0.92rem;
+  }
+
+  /* How It Works */
+  .hiw-app-list {
+    border-radius: 20px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+  }
+
+  .hiw-app-item {
+    padding: 1.1rem 1.5rem;
+    gap: 16px;
+  }
+
+  .hiw-app-title {
+    font-size: 0.9rem;
+  }
+
+  .hiw-app-sub {
+    font-size: 0.76rem;
+  }
+
+  /* Reviews */
+  .reviews-app-card {
+    border-radius: 20px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+  }
+
+  /* ── 12. FAQ ─────────────────────────────────────────────────── */
+  .faq-app-list {
+    border-radius: 20px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+  }
+
+  .faq-q {
+    padding: 1.1rem 1.5rem;
+    font-size: 0.92rem;
+  }
+
+  .faq-a {
+    padding: 0 1.5rem;
+    font-size: 0.86rem;
+  }
+
+  .faq-item.open .faq-a {
+    padding: 6px 1.5rem 1.1rem;
+  }
+
+  /* ── 13. AREAS ───────────────────────────────────────────────── */
+  .areas-wrap {
+    gap: 10px;
+  }
+
+  .area-chip {
+    font-size: 0.82rem;
+    padding: 7px 16px;
+  }
+
+  /* ── 14. LOCAL SEO ───────────────────────────────────────────── */
+  .local-seo {
+    margin: 2rem 0;
+    padding: 1.5rem 2rem;
+    border-radius: 20px;
+  }
+
+  /* ── 15. FOOTER ──────────────────────────────────────────────── */
+  .app-footer {
+    margin-top: 3rem;
+    padding: 3rem 2rem 2rem;
+    max-width: 100%;
+  }
+
+  .app-footer-inner-desktop {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1.5fr 1fr 1fr 1fr;
+    gap: 3rem;
+  }
+
+  .app-footer-logo {
+    font-size: 1.6rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .app-footer p {
+    font-size: 0.85rem;
+    max-width: 280px;
+  }
+
+  .app-footer-links {
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 0;
+  }
+
+  .app-footer-links a {
+    font-size: 0.84rem;
+  }
+
+  .app-footer-contact {
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 0;
+  }
+
+  .app-footer-bottom {
+    max-width: 1400px;
+    margin: 2rem auto 0;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  /* ── 16. TRACK ORDER BANNER ──────────────────────────────────── */
+  #trackOrderBanner {
+    max-width: 1400px;
+    margin: 0.75rem auto;
+    padding: 0 2rem;
+  }
+
+  /* ── 17. BOOKING SHEET → SIDE PANEL on desktop ───────────────── */
+  .sheet-overlay {
+    /* keep full-screen on desktop too */
+  }
+
+  .booking-sheet {
+    /* Switch from bottom sheet to right side panel */
+    top: 68px;
+    right: 0;
+    left: auto;
+    bottom: 0;
+    max-width: 520px;
+    width: 520px;
+    border-radius: 24px 0 0 24px;
+    transform: translateX(100%);
+    max-height: calc(100vh - 68px);
+    border-top: none;
+    border-left: 3px solid var(--green-500);
+    border-top: 1px solid rgba(34,197,94,0.2);
+  }
+
+  .booking-sheet.open {
+    transform: translateX(0);
+  }
+
+  .sheet-handle-wrap {
+    display: none;
+  }
+
+  .sheet-header {
+    padding: 1.25rem 1.5rem 0.875rem;
+    border-bottom: 1px solid #e2e8f0;
+    background: #fff;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  .sheet-title {
+    font-size: 1.2rem;
+  }
+
+  .sheet-form-wrap {
+    height: calc(100% - 72px);
+  }
+
+  /* ── 18. MODALS — wider on desktop ──────────────────────────── */
+  .modal-box {
+    max-width: 560px;
+    border-radius: 24px;
+    padding: 2rem;
+  }
+
+  .modal-overlay {
+    align-items: center;
+    padding: 1.5rem;
+  }
+
+  .dashboard-box {
+    max-width: 700px;
+  }
+
+  .confirm-card {
+    max-width: 580px;
+  }
+
+  /* ── 19. USER DROPDOWN ───────────────────────────────────────── */
+  .user-dropdown {
+    top: 72px;
+    right: 1.5rem;
+    min-width: 240px;
+  }
+
+  /* ── 20. FLOATING BUTTONS — desktop positions ────────────────── */
+  .float-call {
+    display: flex;
+    bottom: 2.5rem;
+    left: 2.5rem;
+    padding: 0.75rem 1.4rem;
+    font-size: 0.88rem;
+  }
+
+  .float-wa {
+    display: flex;
+    bottom: 2.5rem;
+    right: 2.5rem;
+    padding: 0.75rem 1.4rem;
+    font-size: 0.88rem;
+  }
+
+  /* ── 21. TOAST POSITION ──────────────────────────────────────── */
+  .toast-msg {
+    bottom: 2rem;
+  }
+
+  /* ── 22. MAP HEIGHT ──────────────────────────────────────────── */
+  #map {
+    height: 300px;
+  }
+
+}
+
+/* ════════════════════════════════════════════════════════════════
+   LARGE DESKTOP  ≥ 1024px
+════════════════════════════════════════════════════════════════ */
+@media (min-width: 1024px) {
+
+  .app-bar-inner {
+    padding: 0 3rem;
+  }
+
+  .home-screen {
+    padding: 0 3rem 4rem;
+  }
+
+  .hero-app-card {
+    min-height: 540px;
+  }
+
+  .hero-app-title {
+    font-size: 3.8rem;
+  }
+
+  .hero-app-content {
+    max-width: 600px;
+    padding: 4rem 4rem 2.5rem;
+  }
+
+  .hero-trust-chips {
+    padding: 1.25rem 4rem 2.5rem;
+  }
+
+  /* Wider grid on large screens */
+  .services-scroll {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .why-app-grid {
+    grid-template-columns: repeat(6, 1fr);
+  }
+
+  .quick-actions-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+  }
+
+  .qa-card {
+    min-height: 120px;
+    padding: 1.75rem 1.25rem;
+  }
+
+  .qa-icon-wrap {
+    width: 56px;
+    height: 56px;
+    border-radius: 16px;
+    font-size: 1.6rem;
+  }
+
+  .app-footer {
+    padding: 4rem 3rem 2rem;
+  }
+
+}
+
+/* ════════════════════════════════════════════════════════════════
+   XL DESKTOP  ≥ 1280px
+════════════════════════════════════════════════════════════════ */
+@media (min-width: 1280px) {
+
+  .app-bar-inner {
+    padding: 0 4rem;
+  }
+
+  .home-screen {
+    padding: 0 4rem 5rem;
+  }
+
+  .hero-app-card {
+    min-height: 580px;
+  }
+
+  .hero-app-title {
+    font-size: 4.2rem;
+  }
+
+  .hero-app-content {
+    max-width: 660px;
+    padding: 5rem 5rem 3rem;
+  }
+
+  .hero-trust-chips {
+    padding: 1.5rem 5rem 3rem;
+    gap: 16px;
+  }
+
+  .trust-chip {
+    font-size: 0.85rem;
+    padding: 8px 18px;
+  }
+
+  /* 6-col why grid */
+  .why-app-grid {
+    grid-template-columns: repeat(6, 1fr);
+    gap: 16px;
+  }
+
+  .why-app-card {
+    padding: 1.5rem 1rem;
+  }
+
+  .desktop-three-col {
+    gap: 2rem;
+  }
+
+  .desktop-two-col {
+    gap: 2rem;
+  }
+
+  /* Large FAQs */
+  .faq-q {
+    font-size: 0.96rem;
+    padding: 1.2rem 1.75rem;
+  }
+
+  .faq-a {
+    font-size: 0.88rem;
+    padding: 0 1.75rem;
+  }
+
+  .faq-item.open .faq-a {
+    padding: 8px 1.75rem 1.2rem;
+  }
+
+  .app-footer {
+    padding: 5rem 4rem 2.5rem;
+  }
+
+}
+
+/* ════════════════════════════════════════════════════════════════
+   2XL DESKTOP  ≥ 1440px
+════════════════════════════════════════════════════════════════ */
+@media (min-width: 1440px) {
+
+  .app-bar-inner,
+  .home-screen,
+  #trackOrderBanner,
+  .app-footer-inner-desktop {
+    max-width: 1440px;
+  }
+
+  .home-screen {
+    padding: 0 5rem 5rem;
+  }
+
+  .app-bar-inner {
+    padding: 0 5rem;
+  }
+
+  .hero-app-card {
+    min-height: 620px;
+  }
+
+  .hero-app-title {
+    font-size: 4.6rem;
+  }
+
+  .hero-app-content {
+    max-width: 700px;
+    padding: 6rem 6rem 3rem;
+  }
+
+  .hero-trust-chips {
+    padding: 1.5rem 6rem 3.5rem;
+  }
+
+}
+
+/* ════════════════════════════════════════════════════════════════
+   DESKTOP GRID HELPER CLASSES
+   Add these wrapper divs in your HTML to activate the layouts.
+   They only apply ≥ 768px and collapse to single-col on mobile.
+════════════════════════════════════════════════════════════════ */
+
+/* Two-column layout wrapper */
+.desktop-two-col {
+  display: block;   /* single col default */
+}
+
+/* Three-column layout wrapper */
+.desktop-three-col {
+  display: block;   /* single col default */
+}
+
+/* Desktop nav links (hidden on mobile) */
+.desktop-nav-links {
+  display: none;
+}
+
+/* ════════════════════════════════════════════════════════════════
+   DESKTOP HOVER EFFECTS (only on pointer devices)
+════════════════════════════════════════════════════════════════ */
+@media (min-width: 768px) and (hover: hover) {
+
+  .service-app-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 16px 40px rgba(0,0,0,0.14);
+    border-top: 3px solid var(--green-500);
+  }
+
+  .why-app-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 32px rgba(0,0,0,0.12);
+  }
+
+  .pricing-app-card:hover {
+    box-shadow: 0 12px 36px rgba(0,0,0,0.12);
+  }
+
+  .hiw-app-item:hover {
+    background: #f8fafc;
+  }
+
+  .reviews-app-card:hover {
+    box-shadow: 0 10px 32px rgba(0,0,0,0.10);
+  }
+
+  .faq-q:hover {
+    background: #f8fafc;
+    padding-left: 1.75rem;
+    transition: padding-left 0.2s, background 0.2s;
+  }
+
+  .faq-app-list .faq-q:hover {
+    padding-left: 1.75rem;
+  }
+
+  .qa-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 28px rgba(0,0,0,0.12);
+  }
+
+  .area-chip:hover {
+    background: var(--green-50);
+    border-color: var(--green-500);
+    color: var(--green-600);
+    transform: translateY(-1px);
+    transition: all 0.2s;
+  }
+
+}
+
+/* ════════════════════════════════════════════════════════════════
+   FORM CARD INSIDE SHEET ON DESKTOP
+   Sheet is now a side panel; form card scrolls inside it
+════════════════════════════════════════════════════════════════ */
+@media (min-width: 768px) {
+
+  .step-header {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+  }
+
+  .step-footer {
+    position: sticky;
+    bottom: 0;
+    z-index: 20;
+  }
+
+  .step-body {
+    padding: 1.5rem 1.75rem 1rem;
+  }
+
+  .move-type-grid {
+    /* On desktop inside the side panel, keep column stack */
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .time-slots-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .select-cards {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .furniture-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .payment-opts {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .field-row-2 {
+    grid-template-columns: 1fr 1fr;
+  }
+
+}
+
+/* ════════════════════════════════════════════════════════════════
+   TRACKING MODAL ON DESKTOP
+════════════════════════════════════════════════════════════════ */
+@media (min-width: 768px) {
+
+  .tracking-box {
+    max-width: 640px;
+  }
+
+  .tracking-map-area {
+    height: 240px;
+  }
+
+  #map {
+    height: 320px;
+  }
+
+  .chat-box {
+    height: 600px;
+    max-height: 80vh;
+  }
+
+}
+
+/* ════════════════════════════════════════════════════════════════
+   PRINT (desktop-specific)
+════════════════════════════════════════════════════════════════ */
+@media print {
+
+  .app-bar,
+  .bottom-nav,
+  .booking-sheet,
+  .sheet-overlay,
+  .float-call,
+  .float-wa,
+  .modal-overlay,
+  #trackOrderBanner {
+    display: none !important;
+  }
+
+  body {
+    background: #fff !important;
+    padding: 0 !important;
+  }
+
+  .home-screen {
+    padding: 1rem !important;
+    max-width: 100% !important;
+  }
+
+}
