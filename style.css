@@ -412,6 +412,7 @@ img { max-width: 100%; height: auto; display: block; }
 /* Quick Actions */
 .quick-actions-grid {
   display: grid; grid-template-columns: repeat(4,1fr); gap: 10px;
+  align-items: start;
 }
 
 .qa-card {
@@ -422,8 +423,10 @@ img { max-width: 100%; height: auto; display: block; }
   font-size: 0.72rem; font-weight: 600;
   box-shadow: var(--shadow-xs);
   transition: transform 0.15s, box-shadow 0.15s;
-  min-height: 76px;
-  border: none;
+  height: 90px;
+  min-height: unset;
+  max-height: 90px;
+  justify-content: center;
 }
 .qa-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
 .qa-card:active { transform: scale(0.96); }
@@ -1687,6 +1690,23 @@ select.field-input {
   .app-main      { max-width: 480px; }
 }
 
+/* On true desktop, show as centered phone-like UI */
+@media (min-width: 768px) {
+  body {
+    background: #e2e8f0;
+    display: flex; flex-direction: column; align-items: center;
+  }
+  .app-bar {
+    max-width: 480px; left: 50%; right: auto;
+    transform: translateX(-50%);
+    border-radius: 0 0 var(--radius-md) var(--radius-md);
+  }
+  .app-main {
+    box-shadow: 0 0 0 1px var(--border-light), var(--shadow-2xl);
+    min-height: 100vh;
+    background: var(--bg-app);
+  }
+}
 
 /* ════════════════════════════════════════════
    REVEAL ANIMATIONS — always visible
@@ -1722,69 +1742,4 @@ select.field-input {
   .app-bar, .bottom-nav, .booking-sheet, .sheet-overlay,
   .float-call, .float-wa, .modal-overlay, #trackOrderBanner { display: none !important; }
   body { background: #fff !important; color: #000 !important; padding-bottom: 0 !important; }
-}
-/* ===========================
-   Desktop Layout
-=========================== */
-.hero-app-card{
-    min-height:520px;
-}
-
-.quick-actions-grid{
-    grid-template-columns:repeat(4,1fr);
-}
-
-.services-scroll{
-    display:grid;
-    grid-template-columns:repeat(4,1fr);
-    gap:20px;
-    overflow:visible;
-}
-
-.why-app-grid{
-    grid-template-columns:repeat(3,1fr);
-}
-
-.bottom-nav{
-    display:none;
-}
-@media (min-width:768px){
-
-    body{
-        background:#f1f5f9;
-    }
-
-    .app-bar{
-        left:0;
-        right:0;
-        max-width:100%;
-        transform:none;
-        border-radius:0;
-    }
-
-    .app-bar-inner{
-        max-width:1400px;
-        width:95%;
-        margin:auto;
-    }
-
-    .app-main{
-        max-width:1400px;
-        width:95%;
-        margin:auto;
-        background:transparent;
-        box-shadow:none;
-    }
-
-    .bottom-nav{
-        max-width:1200px;
-        width:95%;
-        left:50%;
-        transform:translateX(-50%);
-    }
-
-    .booking-sheet{
-        max-width:700px;
-    }
-
 }
