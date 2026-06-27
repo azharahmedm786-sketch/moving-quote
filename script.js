@@ -1,6 +1,7 @@
 /* ============================================
 PackZen — script.js (FULLY FIXED)
 SECURITY HARDENED VERSION - May 2026
+Pricing Engine: v2.0 (pricing-engine-v2.js)
 ============================================ */
 
 // ─── GLOBAL STATE ───────────────────────────────────
@@ -67,6 +68,8 @@ const MOVE_TYPE_CONFIG = {
 };
 
 // ─── FURNITURE DATA ─────────────────────────────────
+// FURNITURE_PRICES is kept for renderFurnitureGrid() display labels only.
+// All pricing calculations are handled exclusively by pricing-engine-v2.js.
 const FURNITURE_PRICES = {
   sofaCheck: 250, tvCheck: 150, tvUnitCheck: 250, coffeeCheck: 100, acCheck: 500,
   bedCheck: 350, wardrobeCheck: 600, dressingCheck: 250, sideTableCheck: 100,
@@ -147,18 +150,8 @@ const FURNITURE_CATEGORIES = {
   ]
 };
 
-// ─── INTERCITY PRICING ──────────────────────────────
-const INTERCITY_PRICING = {
-  "2500": { "400": 8000, "600": 9500, "1000": 14000, "2000": 20000 },
-  "4500": { "400": 8500, "600": 10500, "1000": 15500, "2000": 22000 },
-  "6500": { "400": 10500, "600": 12500, "1000": 18500, "2000": 26000 },
-  "8500": { "400": 12500, "600": 15000, "1000": 22000, "2000": 30000 },
-  "10500": { "400": 14500, "600": 17500, "1000": 26000, "2000": 35000 },
-  "13500": { "400": 17000, "600": 20500, "1000": 30000, "2000": 42000 }
-};
-
 const RAZORPAY_KEY = (window.ENV && window.ENV.RAZORPAY_KEY) || "";
-const OWNER_WHATSAPP = "919945095453"; 
+const OWNER_WHATSAPP = "919945095453";
 
 function initPaymentOptions() {
   selectPayment('at_drop');
@@ -167,6 +160,7 @@ function initPaymentOptions() {
   const confirmBtn = document.getElementById("dynamicBookingBtn");
   if (confirmBtn) confirmBtn.style.display = "";
 }
+
 /* ============================================
 SECURITY HELPERS
 ============================================ */
@@ -242,7 +236,7 @@ function showToast(msg, dur = 3000) {
 }
 
 /* ============================================
-MOVE TYPE SELECTION (FIXED - was missing!)
+MOVE TYPE SELECTION
 ============================================ */
 function selectMoveType(el, type) {
   selectedMoveType = type;
@@ -255,7 +249,7 @@ function selectMoveType(el, type) {
 }
 
 /* ============================================
-SIZE CARDS RENDERER (FIXED - was missing!)
+SIZE CARDS RENDERER
 ============================================ */
 function renderSizeCards(type) {
   console.log("renderSizeCards", type);
@@ -318,7 +312,7 @@ function syncFurnitureQty(id) {
 }
 
 /* ============================================
-FURNITURE GRID RENDERER (FIXED)
+FURNITURE GRID RENDERER
 ============================================ */
 function renderFurnitureGrid(type) {
   const grid = document.querySelector(".furniture-grid");
@@ -326,14 +320,24 @@ function renderFurnitureGrid(type) {
   const categories = FURNITURE_CATEGORIES[type] || FURNITURE_CATEGORIES.home;
   const FREE_CATS = ["cat-kitchen", "cat-other", "cat-appliances"];
 
+  // Use v2 engine prices if available, fall back to FURNITURE_PRICES for display
+  const getPriceForDisplay = (itemId, catId) => {
+    const isFree = FREE_CATS.includes(catId);
+    // Read from v2 config if loaded, otherwise fall back
+    const v2Price = window.PackZenPricing?.config?.furniturePrices?.[itemId];
+    const price = (v2Price !== undefined) ? v2Price : (FURNITURE_PRICES[itemId] || 0);
+    if (isFree || price === 0) return "FREE";
+    return `+₹${price}`;
+  };
+
   const itemCard = (item, catId) => {
     const isFree = FREE_CATS.includes(catId);
-    const price = FURNITURE_PRICES[item.id] || 0;
-    const priceLabel = isFree ? "FREE" : (price > 0 ? `+₹${price}` : "FREE");
+    const priceLabel = getPriceForDisplay(item.id, catId);
+    const priceColor = (isFree || priceLabel === "FREE") ? 'color:#94a3b8' : '';
     return `<div class="fc-qty-card" id="card-${item.id}" data-item-id="${item.id}">
       <span class="fc-emoji">${item.emoji}</span>
       <span class="fc-name">${item.name}</span>
-      <span class="fc-price-tag" style="${isFree || !price ? 'color:#94a3b8' : ''}">${priceLabel}</span>
+      <span class="fc-price-tag" style="${priceColor}">${priceLabel}</span>
       <div class="fc-qty-row">
         <button class="fc-qty-btn" data-action="minus" data-item="${item.id}" aria-label="Remove ${item.name}">−</button>
         <input type="number" id="${item.id}" value="0" min="0" max="20" class="fc-qty-input" aria-label="${item.name} quantity" readonly>
@@ -367,7 +371,7 @@ function renderFurnitureGrid(type) {
           <input type="number" id="cartonQty" value="0" min="0" max="50" class="fc-qty" onchange="calculateQuote(true)">
           <button class="qty-btn" data-carton-action="plus">+</button>
         </div>
-        <span class="carton-price-note">₹50 per box</span>
+        <span class="carton-price-note">₹${window.PackZenPricing?.config?.cartons?.pricePerBox || 50} per box</span>
       </div>
     </div>
   </div>`;
@@ -467,18 +471,13 @@ function showStep(n) {
   const steps = getSteps();
   if (steps[n]) steps[n].classList.add("active");
   setTimeout(() => {
-
-  if (map) {
-
-    google.maps.event.trigger(map, "resize");
-
-    if (pickupPlace?.geometry?.location) {
-      map.setCenter(pickupPlace.geometry.location);
+    if (map) {
+      google.maps.event.trigger(map, "resize");
+      if (pickupPlace?.geometry?.location) {
+        map.setCenter(pickupPlace.geometry.location);
+      }
     }
-
-  }
-
-}, 300);
+  }, 300);
   const pb = document.getElementById("progressBar");
   if (pb) pb.style.width = ((n + 1) / 5) * 100 + "%";
   updateStepDots(n);
@@ -542,15 +541,14 @@ function buildDateStrip() {
   const today = new Date(); today.setHours(0, 0, 0, 0);
   const days = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
   const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-for (let i = 1; i <= 10; i++) {
+  for (let i = 1; i <= 10; i++) {
     const d = new Date(today); d.setDate(today.getDate() + i);
     const card = document.createElement("div");
-   card.className = "date-card";
-   const year = d.getFullYear();
-const month = String(d.getMonth() + 1).padStart(2, "0");
-const day = String(d.getDate()).padStart(2, "0");
-
-card.dataset.date = `${year}-${month}-${day}`;
+    card.className = "date-card";
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    card.dataset.date = `${year}-${month}-${day}`;
     card.innerHTML = `<div class="dc-day">${days[d.getDay()]}</div><div class="dc-num">${d.getDate()}</div><div class="dc-month">${months[d.getMonth()]}</div>${i === 1 ? '<div class="dc-tag">Tomorrow</div>' : ""}`;
     card.addEventListener("click", () => selectDateCard(card, d));
     strip.appendChild(card);
@@ -561,13 +559,12 @@ function selectDateCard(card, dateObj) {
   document.querySelectorAll(".date-card").forEach(c => c.classList.remove("selected"));
   card.classList.add("selected");
   const shiftDate = document.getElementById("shiftDate");
- if (shiftDate) {
-  const year = dateObj.getFullYear();
-  const month = String(dateObj.getMonth() + 1).padStart(2, "0");
-  const day = String(dateObj.getDate()).padStart(2, "0");
-
-  shiftDate.value = `${year}-${month}-${day}`;
-}
+  if (shiftDate) {
+    const year = dateObj.getFullYear();
+    const month = String(dateObj.getMonth() + 1).padStart(2, "0");
+    const day = String(dateObj.getDate()).padStart(2, "0");
+    shiftDate.value = `${year}-${month}-${day}`;
+  }
   const label = document.getElementById("dateSelectedLabel");
   const days = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
   const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
@@ -581,14 +578,12 @@ function selectDateCard(card, dateObj) {
 function openCustomDate() {
   const input = document.getElementById("shiftDate");
   if (!input) return;
-const tomorrow = new Date();
-tomorrow.setDate(tomorrow.getDate() + 1);
-
-const year = tomorrow.getFullYear();
-const month = String(tomorrow.getMonth() + 1).padStart(2, "0");
-const day = String(tomorrow.getDate()).padStart(2, "0");
-
-input.min = `${year}-${month}-${day}`;
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  const year = tomorrow.getFullYear();
+  const month = String(tomorrow.getMonth() + 1).padStart(2, "0");
+  const day = String(tomorrow.getDate()).padStart(2, "0");
+  input.min = `${year}-${month}-${day}`;
   input.style.cssText = "position:fixed;opacity:0;top:50%;left:50%;width:1px;height:1px;z-index:9999;";
   input.click();
   setTimeout(() => { input.style.cssText = "position:absolute;opacity:0;pointer-events:none;width:0;height:0;"; }, 500);
@@ -598,10 +593,9 @@ function onCustomDatePicked(val) {
   if (!val) return;
   const d = new Date(val + "T00:00:00");
   const today = new Date(); today.setHours(0,0,0,0);
-const tomorrow = new Date(today);
-tomorrow.setDate(today.getDate() + 1);
-
-if (d < tomorrow) { showToast("⚠️ Please select tomorrow or a future date."); return; }
+  const tomorrow = new Date(today);
+  tomorrow.setDate(today.getDate() + 1);
+  if (d < tomorrow) { showToast("⚠️ Please select tomorrow or a future date."); return; }
   document.querySelectorAll(".date-card").forEach(c => c.classList.remove("selected"));
   const match = document.querySelector(`.date-card[data-date="${val}"]`);
   if (match) match.classList.add("selected");
@@ -628,47 +622,36 @@ function selectTimeSlot(btn, value, label, range) {
 GOOGLE MAPS
 ============================================ */
 window.initMap = function () {
-
   const mapElement = document.getElementById("map");
-
   if (!mapElement) {
     console.error("Map div not found");
     return;
   }
-
-map = new google.maps.Map(mapElement, {
-center: { lat: 12.9716, lng: 77.5946 },
-zoom: 11,
-mapTypeControl: false,
-streetViewControl: false,
-fullscreenControl: false,
-gestureHandling: "cooperative",
-scrollwheel: false,
-disableDoubleClickZoom: true,
-
-zoomControl: true
-
-});
-
-
+  map = new google.maps.Map(mapElement, {
+    center: { lat: 12.9716, lng: 77.5946 },
+    zoom: 11,
+    mapTypeControl: false,
+    streetViewControl: false,
+    fullscreenControl: false,
+    gestureHandling: "cooperative",
+    scrollwheel: false,
+    disableDoubleClickZoom: true,
+    zoomControl: true
+  });
   directionsService = new google.maps.DirectionsService();
-directionsRenderer = new google.maps.DirectionsRenderer({
-  map: map,
-  suppressMarkers: true,
-  preserveViewport: false,
-  polylineOptions: {
-    strokeColor: "#1a56db",
-    strokeOpacity: 1,
-    strokeWeight: 6
-  },
-  markerOptions: {
-    clickable: false
-  }
-});
+  directionsRenderer = new google.maps.DirectionsRenderer({
+    map: map,
+    suppressMarkers: true,
+    preserveViewport: false,
+    polylineOptions: {
+      strokeColor: "#1a56db",
+      strokeOpacity: 1,
+      strokeWeight: 6
+    },
+    markerOptions: { clickable: false }
+  });
   initAutocomplete();
-
   console.log("✅ Map initialized");
-
 };
 
 function initAutocomplete() {
@@ -699,7 +682,6 @@ function showLocation(type) {
   if (!pickupPlace || !dropPlace) return;
   if (!pickupPlace.geometry || !dropPlace.geometry) return;
 
-  // Make the map visible
   const mapDiv = document.getElementById("map");
   if (mapDiv) {
     mapDiv.style.display = "block";
@@ -707,7 +689,6 @@ function showLocation(type) {
     mapDiv.style.minHeight = "400px";
   }
 
-  // Trigger resize so Google Maps renders tiles properly
   if (map) {
     google.maps.event.trigger(map, "resize");
   }
@@ -718,128 +699,92 @@ function showLocation(type) {
     travelMode: google.maps.TravelMode.DRIVING
   };
 
-directionsService.route(request, (result, status) => {
+  directionsService.route(request, (result, status) => {
+    if (status === google.maps.DirectionsStatus.OK) {
+      directionsRenderer.setDirections(result);
+      const route = result.routes[0];
+      const leg = route.legs[0];
+      console.log("Distance:", leg.distance.text);
+      console.log("Duration:", leg.duration.text);
 
-if (status === google.maps.DirectionsStatus.OK) {
+      if (pickupMarker) pickupMarker.setMap(null);
+      if (dropMarker) dropMarker.setMap(null);
 
-    directionsRenderer.setDirections(result);
-
-    const route = result.routes[0];
-    const leg = route.legs[0];
-
-    console.log("Distance:", leg.distance.text);
-    console.log("Duration:", leg.duration.text);
-
-    if (pickupMarker) pickupMarker.setMap(null);
-    if (dropMarker) dropMarker.setMap(null);
-
-    pickupMarker = new google.maps.Marker({
+      pickupMarker = new google.maps.Marker({
         position: pickupPlace.geometry.location,
         map: map,
         label: "A",
         draggable: true
-    });
-  pickupMarker.addListener("dragend", function(event) {
+      });
+      pickupMarker.addListener("dragend", function(event) {
+        const geocoder = new google.maps.Geocoder();
+        geocoder.geocode({ location: event.latLng }, function(results, status) {
+          if (status === "OK" && results[0]) {
+            document.getElementById("pickup").value = results[0].formatted_address;
+            pickupPlace = {
+              formatted_address: results[0].formatted_address,
+              geometry: { location: event.latLng }
+            };
+            calculateQuote(true);
+            showLocation("pickup");
+          }
+        });
+      });
 
-    const geocoder = new google.maps.Geocoder();
-
-    geocoder.geocode(
-        { location: event.latLng },
-        function(results, status) {
-
-            if (status === "OK" && results[0]) {
-
-                document.getElementById("pickup").value =
-                    results[0].formatted_address;
-              
-pickupPlace = {
-    formatted_address: results[0].formatted_address,
-    geometry: {
-        location: event.latLng
-    }
-};
-
-                calculateQuote(true);
-                showLocation("pickup");
-            }
-        }
-    );
-
-});
-
-    dropMarker = new google.maps.Marker({
+      dropMarker = new google.maps.Marker({
         position: dropPlace.geometry.location,
         map: map,
         label: "B",
         draggable: true
-    });
-  dropMarker.addListener("dragend", function(event) {
+      });
+      dropMarker.addListener("dragend", function(event) {
+        const geocoder = new google.maps.Geocoder();
+        geocoder.geocode({ location: event.latLng }, function(results, status) {
+          if (status === "OK" && results[0]) {
+            document.getElementById("drop").value = results[0].formatted_address;
+            dropPlace = {
+              formatted_address: results[0].formatted_address,
+              geometry: { location: event.latLng }
+            };
+            calculateQuote(true);
+            showLocation("drop");
+          }
+        });
+      });
 
-    const geocoder = new google.maps.Geocoder();
+      map.fitBounds(route.bounds);
+    } else {
+      alert("Directions failed: " + status);
+      console.error("Directions request failed:", status);
+      directionsRenderer.setDirections({ routes: [] });
 
-    geocoder.geocode(
-        { location: event.latLng },
-        function(results, status) {
+      if (pickupMarker) pickupMarker.setMap(null);
+      if (dropMarker) dropMarker.setMap(null);
 
-            if (status === "OK" && results[0]) {
-
-                document.getElementById("drop").value =
-                    results[0].formatted_address;
-
-               dropPlace = {
-    formatted_address: results[0].formatted_address,
-    geometry: {
-        location: event.latLng
+      pickupMarker = new google.maps.Marker({
+        position: pickupPlace.geometry.location,
+        map: map,
+        label: "A",
+        draggable: true
+      });
+      dropMarker = new google.maps.Marker({
+        position: dropPlace.geometry.location,
+        map: map,
+        label: "B",
+        draggable: true
+      });
+      const bounds = new google.maps.LatLngBounds();
+      bounds.extend(pickupPlace.geometry.location);
+      bounds.extend(dropPlace.geometry.location);
+      map.fitBounds(bounds);
+      pickupMarker.addListener("dragend", function(event) {
+        console.log("Pickup moved:", event.latLng.lat(), event.latLng.lng());
+      });
+      dropMarker.addListener("dragend", function(event) {
+        console.log("Drop moved:", event.latLng.lat(), event.latLng.lng());
+      });
     }
-};
-
-                calculateQuote(true);
-                showLocation("drop");
-            }
-        }
-    );
-
-});
-
-    map.fitBounds(route.bounds);
-
-} else {
-
-   alert("Directions failed: " + status);
-console.error("Directions request failed:", status);
-    directionsRenderer.setDirections({ routes: [] });
-
-    if (pickupMarker) pickupMarker.setMap(null);
-    if (dropMarker) dropMarker.setMap(null);
-
-   pickupMarker = new google.maps.Marker({
-    position: pickupPlace.geometry.location,
-    map: map,
-    label: "A",
-    draggable: true
-});
-
- dropMarker = new google.maps.Marker({
-    position: dropPlace.geometry.location,
-    map: map,
-    label: "B",
-    draggable: true
-});
-    const bounds = new google.maps.LatLngBounds();
-
-    bounds.extend(pickupPlace.geometry.location);
-    bounds.extend(dropPlace.geometry.location);
-
-    map.fitBounds(bounds);
-    pickupMarker.addListener("dragend", function(event) {
-    console.log("Pickup moved:", event.latLng.lat(), event.latLng.lng());
-});
-
-dropMarker.addListener("dragend", function(event) {
-    console.log("Drop moved:", event.latLng.lat(), event.latLng.lng());
-});
-  }
-});
+  });
 }
 
 /* ============================================
@@ -854,7 +799,11 @@ function getCurrentLocation() {
       (position) => resolve({ lat: position.coords.latitude, lng: position.coords.longitude, accuracy: position.coords.accuracy }),
       (error) => {
         let message = "Unable to retrieve your location";
-        switch(error.code) { case error.PERMISSION_DENIED: message = "Location access denied. Please enter address manually."; break; case error.POSITION_UNAVAILABLE: message = "Location information unavailable."; break; case error.TIMEOUT: message = "Location request timed out."; break; }
+        switch(error.code) {
+          case error.PERMISSION_DENIED: message = "Location access denied. Please enter address manually."; break;
+          case error.POSITION_UNAVAILABLE: message = "Location information unavailable."; break;
+          case error.TIMEOUT: message = "Location request timed out."; break;
+        }
         reject(new Error(message));
       },
       { enableHighAccuracy: true, timeout: 15000, maximumAge: 60000 }
@@ -883,9 +832,20 @@ async function handleCurrentLocationToggle() {
       });
     });
     const pickupInput = document.getElementById("pickup");
-    if (pickupInput) { pickupInput.value = result.formatted_address; pickupPlace = result; showLocation("pickup"); calculateQuote(true); showToast(`✅ Location set: ${result.formatted_address.split(",")[0]}`); }
-  } catch (err) { showToast("⚠️ " + err.message); toggle.checked = false; }
-  finally { isLocating = false; if (toggleLabel) toggleLabel.textContent = originalText; }
+    if (pickupInput) {
+      pickupInput.value = result.formatted_address;
+      pickupPlace = result;
+      showLocation("pickup");
+      calculateQuote(true);
+      showToast(`✅ Location set: ${result.formatted_address.split(",")[0]}`);
+    }
+  } catch (err) {
+    showToast("⚠️ " + err.message);
+    toggle.checked = false;
+  } finally {
+    isLocating = false;
+    if (toggleLabel) toggleLabel.textContent = originalText;
+  }
 }
 
 function setupCurrentLocationListener() {
@@ -898,134 +858,96 @@ function setupCurrentLocationListener() {
 function initGeolocationFeature() { setupCurrentLocationListener(); }
 
 /* ============================================
-INTERCITY PRICING
+INTERCITY BADGE (UI only — detection done by v2 engine)
 ============================================ */
-function getIntercityBase(houseVal, km) {
-  const tiers = INTERCITY_PRICING[String(houseVal)];
-  if (!tiers) return 12000;
-  return km <= 400 ? tiers["400"] : km <= 600 ? tiers["600"] : km <= 1000 ? tiers["1000"] : tiers["2000"];
-}
-
 function detectAndShowIntercityBadge(km) {
   const badge = document.getElementById("intercityBadge");
   isIntercityMove = km > 100;
   if (badge) {
     badge.style.display = isIntercityMove ? "flex" : "none";
-    if (isIntercityMove) { const kmEl = badge.querySelector(".ic-km"); if (kmEl) kmEl.textContent = Math.round(km) + " km"; }
+    if (isIntercityMove) {
+      const kmEl = badge.querySelector(".ic-km");
+      if (kmEl) kmEl.textContent = Math.round(km) + " km";
+    }
   }
   const vg = document.getElementById("vehicleCardGroup");
   if (vg) vg.style.display = isIntercityMove ? "none" : "block";
 }
 
 /* ============================================
-PRICE CALCULATION (FIXED)
+PRICE CALCULATION
+Delegates ALL pricing logic to Pricing Engine v2.
+Google Maps distance API call is preserved exactly.
 ============================================ */
 function calculateQuote(auto = false) {
   const pickup = document.getElementById("pickup");
   const drop = document.getElementById("drop");
-  const house = document.getElementById("house");
-  const vehicle = document.getElementById("vehicle");
-  const result = document.getElementById("result");
 
   if (!pickup?.value || !drop?.value) {
     if (!auto) showToast("📍 Please enter pickup & drop locations.");
     return;
   }
 
-  // Count chargeable items
-  let itemCost = 0, itemCount = 0;
-  Object.keys(FURNITURE_PRICES).forEach(id => {
-    const input = document.getElementById(id);
-    const qty = parseInt(input?.value || 0);
-    if (qty > 0) { itemCost += FURNITURE_PRICES[id] * qty; itemCount += qty; }
-  });
-
-  const cartonQty = parseInt(document.getElementById("cartonQty")?.value || 0);
-  const cartonCost = cartonQty * 50;
-  const furnitureCost = itemCost + cartonCost;
-  const hasItems = itemCount > 0 || cartonQty > 0;
-  const houseBase = Number(house?.value || 0);
-  const vehicleRate = Number(vehicle?.value || 0);
-
-  // Floor costs
-const pickupFloor = parseInt(document.getElementById("pickupFloor")?.value) || 0;
-const dropFloor = parseInt(document.getElementById("dropFloor")?.value) || 0;
-
-const liftAvail = document.getElementById("liftAvailable")?.checked;
-
-const totalFloors = pickupFloor + dropFloor;
-
-let floorCost = 0;
-
-if (liftAvail) {
-  floorCost = totalFloors * 150;
-} else {
-  floorCost = totalFloors * 300;
-}
-
-  // Single item move
-  if (!houseBase && hasItems) {
-    if (itemCount <= 3 && !vehicleRate) {
-      const total = 1499 + furnitureCost + floorCost;
-      lastCalculatedTotal = total;
-      updatePriceDisplay();
-      if (result) result.innerHTML = `🪑 Single Item Move<br>Base: ₹1,499${furnitureCost ? ` • Items: ₹${furnitureCost}` : ""}${cartonQty ? ` • Cartons: ₹${cartonQty * 50}` : ""}${floorCost ? ` • Floor: ₹${floorCost}` : ""}<br><strong>Total: ₹${total}</strong>`;
-      return;
-    }
-    if (!vehicleRate) { showToast("🚚 Please select a vehicle for larger moves."); return; }
-    const total = 1499 + furnitureCost + floorCost;
-    lastCalculatedTotal = total;
-    updatePriceDisplay();
-    if (result) result.innerHTML = `🪑 Single Item Move<br>Base: ₹1,499${furnitureCost ? ` • Items: ₹${furnitureCost}` : ""}${cartonQty ? ` • Cartons: ₹${cartonQty * 50}` : ""}${floorCost ? ` • Floor: ₹${floorCost}` : ""}<br><strong>Total: ₹${total}</strong>`;
+  // Guard: v2 engine must be loaded
+  if (!window.PackZenPricing) {
+    if (!auto) showToast("⚠️ Pricing engine not ready. Please try again.");
     return;
   }
 
+  /**
+   * applyPrice(km) — called once Google Maps returns the distance.
+   * All pricing delegated to Pricing Engine v2.
+   */
   function applyPrice(km) {
-    if (km == null || isNaN(km)) { showToast("Unable to calculate distance."); return; }
+    if (km == null || isNaN(km)) {
+      showToast("Unable to calculate distance.");
+      return;
+    }
+
+    // Update intercity badge and vehicle selector visibility
     detectAndShowIntercityBadge(km);
 
+    // If intercity, clear vehicle selection (not required)
     if (isIntercityMove) {
       const vehicleField = document.getElementById("vehicle");
-      if (vehicleField && vehicleField.value) { vehicleField.dataset.previous = vehicleField.value; vehicleField.value = ""; }
+      if (vehicleField && vehicleField.value) {
+        vehicleField.dataset.previous = vehicleField.value;
+        vehicleField.value = "";
+      }
     } else {
       const vehicleField = document.getElementById("vehicle");
-      if (vehicleField && vehicleField.dataset.previous) { vehicleField.value = vehicleField.dataset.previous; }
+      if (vehicleField && vehicleField.dataset.previous) {
+        vehicleField.value = vehicleField.dataset.previous;
+      }
     }
 
-    let total, breakdownHtml;
+    // Run Pricing Engine v2 — this is the single source of truth
+    const quote = window.PackZenPricing.runPricingEngineV2(km);
 
-    if (km > 100) {
-      const baseRate = getIntercityBase(house?.value || "3950", km);
-      total = Math.round(baseRate + furnitureCost + floorCost);
-      const distLabel = km <= 400 ? "up to 400 km" : km <= 600 ? "up to 600 km" : km <= 1000 ? "up to 1000 km" : "1000+ km";
-      breakdownHtml = `🚛 Intercity · ~${Math.round(km)} km (${distLabel})<br>Base: ₹${baseRate.toLocaleString("en-IN")}` + (itemCost ? ` · Items: ₹${itemCost.toLocaleString("en-IN")}` : "") + (cartonQty ? ` · Cartons: ₹${cartonCost.toLocaleString("en-IN")}` : "") + (floorCost ? ` · Floor: ₹${floorCost.toLocaleString("en-IN")}` : "") + `<br><strong>Total Estimate: ₹${total.toLocaleString("en-IN")}</strong>`;
-    } else {
-      const vv = Number(vehicle?.value || 0);
-      let baseFare = 2500, perKmRate = 32;
-      if (vv === 88) { baseFare = 5500; perKmRate = 55; }
-      else if (vv === 69) { baseFare = 4500; perKmRate = 48; }
-      else if (vv === 54) { baseFare = 3500; perKmRate = 42; }
-
-      const distanceFare = km <= 5 ? baseFare : baseFare + ((km - 5) * perKmRate);
-      total = Math.round(distanceFare + furnitureCost + floorCost);
-      breakdownHtml = `📍 Local · ~${km.toFixed(1)} km<br>Base fare: ₹${baseFare.toLocaleString("en-IN")}` + (km > 5 ? ` · Extra km (${(km - 5).toFixed(1)}km × ₹${perKmRate}): ₹${Math.round((km - 5) * perKmRate).toLocaleString("en-IN")}` : "") + (itemCost ? ` · Items: ₹${itemCost.toLocaleString("en-IN")}` : "") + (cartonQty ? ` · Cartons: ₹${cartonCost.toLocaleString("en-IN")}` : "") + (floorCost ? ` · Floor: ₹${floorCost.toLocaleString("en-IN")}` : "") + `<br><strong>Total Estimate: ₹${total.toLocaleString("en-IN")}</strong>`;
+    if (quote && quote.valid) {
+      lastCalculatedTotal = quote.finalTotal;
+      updatePriceDisplay();
+      if (currentUser) saveQuoteToFirestore(quote.finalTotal);
+    } else if (quote && !quote.valid) {
+      // Engine returned errors — show first one
+      if (!auto && quote.errors && quote.errors.length > 0) {
+        showToast("⚠️ " + quote.errors[0]);
+      }
     }
-
-    if (result) result.innerHTML = breakdownHtml;
-    total = Math.max(total, 1499);
-    lastCalculatedTotal = total;
-    updatePriceDisplay();
-    if (currentUser) saveQuoteToFirestore(total);
   }
 
+  // ── Google Maps Distance Matrix (unchanged) ──────────────
   try {
     new google.maps.DistanceMatrixService().getDistanceMatrix({
-      origins: [pickup.value], destinations: [drop.value], travelMode: "DRIVING"
+      origins: [pickup.value],
+      destinations: [drop.value],
+      travelMode: "DRIVING"
     }, (res, status) => {
       const el = res?.rows?.[0]?.elements?.[0];
       if (status === "OK" && el?.status === "OK" && el?.distance?.value) {
         applyPrice(el.distance.value / 1000);
       } else {
+        // Fallback: haversine distance
         if (pickupPlace?.geometry && dropPlace?.geometry) {
           const R = 6371;
           const p1 = pickupPlace.geometry.location;
@@ -1036,14 +958,19 @@ if (liftAvail) {
           const dLng = (p2.lng() - p1.lng()) * Math.PI / 180;
           const a = Math.sin(dLat / 2) ** 2 + Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLng / 2) ** 2;
           applyPrice(Math.max(R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)) * 1.3, 5));
-        } else { applyPrice(15); }
+        } else {
+          applyPrice(15);
+        }
       }
     });
-  } catch (e) { applyPrice(15); }
+  } catch (e) {
+    applyPrice(15);
+  }
 }
 
 /* ============================================
 PRICE DISPLAY
+Reads lastCalculatedTotal (set by v2 engine via calculateQuote).
 ============================================ */
 function updatePriceDisplay() {
   const priceEl = document.getElementById("livePrice");
@@ -1054,23 +981,46 @@ function updatePriceDisplay() {
   const optFull = document.getElementById("optFullAmt");
   const optAtDrop = document.getElementById("optAtDropAmt");
   if (!priceEl) return;
-  const discounted = Math.max(lastCalculatedTotal - promoDiscount, 0);
-  const fullAmt = Math.max(discounted - 200, 0);
-  const advanceAmt = Math.round(discounted * 0.10);
-  priceEl.textContent = "₹" + discounted.toLocaleString("en-IN");
-  if (advanceEl) advanceEl.textContent = "₹" + advanceAmt.toLocaleString("en-IN");
-  if (optAdv) optAdv.textContent = "₹" + advanceAmt.toLocaleString("en-IN");
-  if (optFull) optFull.textContent = "₹" + fullAmt.toLocaleString("en-IN");
-  if (optAtDrop) optAtDrop.textContent = "₹" + discounted.toLocaleString("en-IN");
-  if (promoDiscount > 0 && discRow) { discRow.style.display = "block"; if (discAmt) discAmt.textContent = "₹" + promoDiscount.toLocaleString("en-IN"); }
-  syncPayOnlineButton(discounted, advanceAmt, fullAmt);
+
+  // Payment options come from v2 engine if available, otherwise compute locally
+  let paymentOpts;
+  if (window._lastQuoteResult?.paymentOptions) {
+    paymentOpts = window._lastQuoteResult.paymentOptions;
+    // _lastQuoteResult.finalTotal already has promo baked in via v2
+    const discounted = paymentOpts.atDropAmount;
+    priceEl.textContent = "₹" + discounted.toLocaleString("en-IN");
+    if (advanceEl) advanceEl.textContent = "₹" + paymentOpts.advanceAmount.toLocaleString("en-IN");
+    if (optAdv) optAdv.textContent = "₹" + paymentOpts.advanceAmount.toLocaleString("en-IN");
+    if (optFull) optFull.textContent = "₹" + paymentOpts.fullOnlineAmount.toLocaleString("en-IN");
+    if (optAtDrop) optAtDrop.textContent = "₹" + discounted.toLocaleString("en-IN");
+    if (promoDiscount > 0 && discRow) {
+      discRow.style.display = "block";
+      if (discAmt) discAmt.textContent = "₹" + promoDiscount.toLocaleString("en-IN");
+    }
+    syncPayOnlineButton(discounted, paymentOpts.advanceAmount, paymentOpts.fullOnlineAmount);
+  } else {
+    // Fallback if v2 result not yet available
+    const discounted = Math.max(lastCalculatedTotal - promoDiscount, 0);
+    const fullAmt = Math.max(discounted - 200, 0);
+    const advanceAmt = Math.round(discounted * 0.10);
+    priceEl.textContent = "₹" + discounted.toLocaleString("en-IN");
+    if (advanceEl) advanceEl.textContent = "₹" + advanceAmt.toLocaleString("en-IN");
+    if (optAdv) optAdv.textContent = "₹" + advanceAmt.toLocaleString("en-IN");
+    if (optFull) optFull.textContent = "₹" + fullAmt.toLocaleString("en-IN");
+    if (optAtDrop) optAtDrop.textContent = "₹" + discounted.toLocaleString("en-IN");
+    if (promoDiscount > 0 && discRow) {
+      discRow.style.display = "block";
+      if (discAmt) discAmt.textContent = "₹" + promoDiscount.toLocaleString("en-IN");
+    }
+    syncPayOnlineButton(discounted, advanceAmt, fullAmt);
+  }
 }
 
 function syncPayOnlineButton(total, advanceAmt, fullAmt) {
   const btn = document.getElementById("btnPayOnline");
   if (!btn) return;
   if (selectedPayment === "advance") btn.innerHTML = `💳 Pay Advance ₹${advanceAmt.toLocaleString("en-IN")}`;
-  else if (selectedPayment === "full") btn.innerHTML = `💳 Pay Full ₹${fullAmt.toLocaleString("en-IN")} (Save ₹200)`;
+  else if (selectedPayment === "full") btn.innerHTML = `💳 Pay Full ₹${fullAmt.toLocaleString("en-IN")} (Save ₹${window.PackZenPricing?.config?.payment?.fullPaymentDiscount || 200})`;
   else btn.innerHTML = `💳 Pay Online`;
   btn.style.display = (selectedPayment === "at_drop") ? "none" : "";
 }
@@ -1087,9 +1037,18 @@ function selectPayment(type) {
   const selected = document.getElementById(map[type]);
   if (selected) selected.classList.add("selected");
 
-  const discounted = Math.max(lastCalculatedTotal - promoDiscount, 0);
-  const advanceAmt = Math.round(discounted * 0.10);
-  const fullAmt = Math.max(discounted - 200, 0);
+  // Derive amounts — prefer v2 result
+  let discounted, advanceAmt, fullAmt;
+  if (window._lastQuoteResult?.paymentOptions) {
+    const opts = window._lastQuoteResult.paymentOptions;
+    discounted = opts.atDropAmount;
+    advanceAmt = opts.advanceAmount;
+    fullAmt    = opts.fullOnlineAmount;
+  } else {
+    discounted = Math.max(lastCalculatedTotal - promoDiscount, 0);
+    advanceAmt = Math.round(discounted * 0.10);
+    fullAmt    = Math.max(discounted - 200, 0);
+  }
 
   const payBtn = document.getElementById("btnPayOnline");
   const confirmBtn = document.getElementById("dynamicBookingBtn");
@@ -1107,12 +1066,39 @@ function selectPayment(type) {
 
   syncPayOnlineButton(discounted, advanceAmt, fullAmt);
 }
+
 function handleBookingAction() {
   if (selectedPayment === "advance" || selectedPayment === "full") {
     startPayment();
   } else {
     bookWithoutPayment();
   }
+}
+
+/* ============================================
+PAYMENT AMOUNT HELPERS
+Returns the correct amount to charge based on selectedPayment.
+Always derived from v2 engine result.
+============================================ */
+function _getPayAmount() {
+  if (window._lastQuoteResult?.paymentOptions) {
+    const opts = window._lastQuoteResult.paymentOptions;
+    if (selectedPayment === "full")    return Math.max(opts.fullOnlineAmount, 500);
+    if (selectedPayment === "advance") return Math.max(opts.advanceAmount, 199);
+    return opts.atDropAmount;
+  }
+  // Fallback
+  const discounted = Math.max(lastCalculatedTotal - promoDiscount, 0);
+  if (selectedPayment === "full")    return Math.max(discounted - 200, 500);
+  if (selectedPayment === "advance") return Math.max(Math.round(discounted * 0.10), 199);
+  return discounted;
+}
+
+function _getDiscountedTotal() {
+  if (window._lastQuoteResult?.paymentOptions) {
+    return window._lastQuoteResult.paymentOptions.atDropAmount;
+  }
+  return Math.max(lastCalculatedTotal - promoDiscount, 0);
 }
 
 /* ============================================
@@ -1136,12 +1122,10 @@ async function startPayment() {
   if (lastCalculatedTotal === 0) { showToast("⚠️ Price not calculated yet."); isProcessingPayment = false; if (payBtn) { payBtn.disabled = false; payBtn.innerText = "Pay Now"; } return; }
   if (!RAZORPAY_KEY) { showToast("⚠️ Payment not configured."); isProcessingPayment = false; if (payBtn) { payBtn.disabled = false; payBtn.innerText = "Pay Now"; } return; }
 
-  const discounted = Math.max(lastCalculatedTotal - promoDiscount, 0);
   if (selectedPayment === "at_drop") { bookWithoutPayment(); isProcessingPayment = false; if (payBtn) { payBtn.disabled = false; payBtn.innerText = "Pay Now"; } return; }
 
-  let payAmount = 0;
-  if (selectedPayment === "full") payAmount = Math.max(discounted - 200, 500);
-  else payAmount = Math.max(Math.round(discounted * 0.10), 199);
+  // Amount from v2 engine
+  const payAmount = _getPayAmount();
 
   paymentReceiptId = "PKZ-" + Date.now();
 
@@ -1169,57 +1153,61 @@ async function startPayment() {
           const verifyResponse = await fetch("https://asia-south1-packzen-e7539.cloudfunctions.net/verifyRazorpayPayment", {
             method: "POST", headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-              razorpay_order_id: response.razorpay_order_id, razorpay_payment_id: response.razorpay_payment_id, razorpay_signature: response.razorpay_signature,
-              bookingData: { customerName: name, phone: phone, moveType: selectedMoveType, pickup: pickupField, drop: dropField, date: shiftDate, total: payAmount, paymentType: selectedPayment, paymentStatus: "paid" }
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+              bookingData: {
+                customerName: name, phone: phone, moveType: selectedMoveType,
+                pickup: pickupField, drop: dropField, date: shiftDate,
+                total: payAmount, paymentType: selectedPayment, paymentStatus: "paid"
+              }
             })
           });
           const verifyData = await verifyResponse.json();
           if (!verifyData.success) { showToast("Payment verification failed"); return; }
           isProcessingPayment = false;
-if (payBtn) { payBtn.disabled = false; payBtn.innerText = "Pay Now"; }
-showToast("✅ Payment successful!");
-showConfirmationCard({
-  bookingRef: verifyData.bookingRef || paymentReceiptId,
-  name: name,
-  phone: phone,
-  pickup: pickupField,
-  drop: dropField,
-  date: shiftDate,
-  house: document.getElementById("house")?.options[document.getElementById("house")?.selectedIndex]?.text || "",
-  vehicle: document.getElementById("vehicle")?.options[document.getElementById("vehicle")?.selectedIndex]?.text || "",
-  total: payAmount,
-  paymentLabel: selectedPayment === "full" ? "Paid Full Online" : "Advance Paid Online",
-  paymentNote: "Payment ID: " + response.razorpay_payment_id,
-  source: "payment",
-  showInvoice: true
-});
-} catch (err) {
-  console.error("Verify error:", err);
-  isProcessingPayment = false;
-  if (payBtn) { payBtn.disabled = false; payBtn.innerText = "Pay Now"; }
-  showToast("✅ Payment received! Booking confirmed.");
-  showConfirmationCard({
-    bookingRef: paymentReceiptId,
-    name: name,
-    phone: phone,
-    pickup: pickupField,
-    drop: dropField,
-    date: shiftDate,
-    house: document.getElementById("house")?.options[document.getElementById("house")?.selectedIndex]?.text || "",
-    vehicle: document.getElementById("vehicle")?.options[document.getElementById("vehicle")?.selectedIndex]?.text || "",
-    total: payAmount,
-    paymentLabel: selectedPayment === "full" ? "Paid Full Online" : "Advance Paid Online",
-    paymentNote: "Payment received via Razorpay — ID: " + response.razorpay_payment_id,
-    source: "payment",
-    showInvoice: true
-  });
-}
+          if (payBtn) { payBtn.disabled = false; payBtn.innerText = "Pay Now"; }
+          showToast("✅ Payment successful!");
+          showConfirmationCard({
+            bookingRef: verifyData.bookingRef || paymentReceiptId,
+            name: name, phone: phone, pickup: pickupField, drop: dropField, date: shiftDate,
+            house: document.getElementById("house")?.options[document.getElementById("house")?.selectedIndex]?.text || "",
+            vehicle: document.getElementById("vehicle")?.options[document.getElementById("vehicle")?.selectedIndex]?.text || "",
+            total: payAmount,
+            paymentLabel: selectedPayment === "full" ? "Paid Full Online" : "Advance Paid Online",
+            paymentNote: "Payment ID: " + response.razorpay_payment_id,
+            source: "payment", showInvoice: true
+          });
+        } catch (err) {
+          console.error("Verify error:", err);
+          isProcessingPayment = false;
+          if (payBtn) { payBtn.disabled = false; payBtn.innerText = "Pay Now"; }
+          showToast("✅ Payment received! Booking confirmed.");
+          showConfirmationCard({
+            bookingRef: paymentReceiptId,
+            name: name, phone: phone, pickup: pickupField, drop: dropField, date: shiftDate,
+            house: document.getElementById("house")?.options[document.getElementById("house")?.selectedIndex]?.text || "",
+            vehicle: document.getElementById("vehicle")?.options[document.getElementById("vehicle")?.selectedIndex]?.text || "",
+            total: payAmount,
+            paymentLabel: selectedPayment === "full" ? "Paid Full Online" : "Advance Paid Online",
+            paymentNote: "Payment received via Razorpay — ID: " + response.razorpay_payment_id,
+            source: "payment", showInvoice: true
+          });
+        }
       },
       modal: { ondismiss: () => { isProcessingPayment = false; if (payBtn) { payBtn.disabled = false; payBtn.innerText = "Pay Now"; } } }
     });
     rzp.open();
-    rzp.on("payment.failed", r => { isProcessingPayment = false; if (payBtn) { payBtn.disabled = false; payBtn.innerText = "Pay Now"; } showToast("❌ Payment failed: " + r.error.description); });
-  } catch (err) { isProcessingPayment = false; if (payBtn) { payBtn.disabled = false; payBtn.innerText = "Pay Now"; } showToast("Payment error: " + err.message); }
+    rzp.on("payment.failed", r => {
+      isProcessingPayment = false;
+      if (payBtn) { payBtn.disabled = false; payBtn.innerText = "Pay Now"; }
+      showToast("❌ Payment failed: " + r.error.description);
+    });
+  } catch (err) {
+    isProcessingPayment = false;
+    if (payBtn) { payBtn.disabled = false; payBtn.innerText = "Pay Now"; }
+    showToast("Payment error: " + err.message);
+  }
 }
 
 function onPaymentSuccess(response, name, phone, paid, total) {
@@ -1237,27 +1225,38 @@ function onPaymentSuccess(response, name, phone, paid, total) {
   });
   if (window._firebase) {
     const activeUser = currentUser || window._firebase?.auth?.currentUser;
+    const discountedTotal = _getDiscountedTotal();
     window._firebase.db.collection("bookings").add({
-      bookingRef, customerUid: activeUser?.uid, customerName: name, phone, pickup: pickup?.value || "", drop: drop?.value || "", moveType: selectedMoveType,
-      house: houseEl?.options[houseEl?.selectedIndex]?.text || "", vehicle: vehicleEl?.options[vehicleEl?.selectedIndex]?.text || "",
-      furniture: getFurnitureSummary(), pickupFloor: document.getElementById("pickupFloor")?.options[document.getElementById("pickupFloor")?.selectedIndex]?.text || "",
+      bookingRef, customerUid: activeUser?.uid, customerName: name, phone,
+      pickup: pickup?.value || "", drop: drop?.value || "", moveType: selectedMoveType,
+      house: houseEl?.options[houseEl?.selectedIndex]?.text || "",
+      vehicle: vehicleEl?.options[vehicleEl?.selectedIndex]?.text || "",
+      furniture: getFurnitureSummary(),
+      pickupFloor: document.getElementById("pickupFloor")?.options[document.getElementById("pickupFloor")?.selectedIndex]?.text || "",
       dropFloor: document.getElementById("dropFloor")?.options[document.getElementById("dropFloor")?.selectedIndex]?.text || "",
-      liftAvailable: !!document.getElementById("liftAvailable")?.checked, packingService: false, total, originalTotal: lastCalculatedTotal,
-    paid,
-paymentType: selectedPayment,
-promoDiscount,
-date: shiftDate?.value || "",
-shiftTime: document.getElementById("shiftTime")?.value || "",
-shiftTimeLabel: document.getElementById("shiftTimeLabel")?.value || "",
-status: "confirmed",
-source: "payment",
-      isIntercity: isIntercityMove, paymentId: response.razorpay_payment_id, photos: uploadedPhotos.slice(0, 3),
+      liftAvailable: !!document.getElementById("liftAvailable")?.checked,
+      packingService: false,
+      total: discountedTotal,
+      originalTotal: lastCalculatedTotal,
+      paid,
+      paymentType: selectedPayment,
+      promoDiscount,
+      date: shiftDate?.value || "",
+      shiftTime: document.getElementById("shiftTime")?.value || "",
+      shiftTimeLabel: document.getElementById("shiftTimeLabel")?.value || "",
+      status: "confirmed",
+      source: "payment",
+      isIntercity: isIntercityMove,
+      paymentId: response.razorpay_payment_id,
+      photos: uploadedPhotos.slice(0, 3),
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
     }).then(docRef => {
-      currentBookingId = docRef.id; localStorage.setItem("packzen_active_booking", docRef.id);
-      requestPushPermission(); subscribeToBookingNotifications(docRef.id);
-      queueSMS(phone, "booking_confirmed", { name, bookingRef, date: shiftDate?.value || "TBD", pickup: pickup?.value || "", total });
-      notifyOwner(bookingRef, name, phone, pickup?.value || "—", drop?.value || "—", shiftDate?.value || "TBD", total, selectedPayment, "online");
+      currentBookingId = docRef.id;
+      localStorage.setItem("packzen_active_booking", docRef.id);
+      requestPushPermission();
+      subscribeToBookingNotifications(docRef.id);
+      queueSMS(phone, "booking_confirmed", { name, bookingRef, date: shiftDate?.value || "TBD", pickup: pickup?.value || "", total: discountedTotal });
+      notifyOwner(bookingRef, name, phone, pickup?.value || "—", drop?.value || "—", shiftDate?.value || "TBD", discountedTotal, selectedPayment, "online");
     }).catch((err) => {
       console.error("BOOKING SAVE FAILED:", err);
       showToast("❌ Booking save failed: " + err.message);
@@ -1266,10 +1265,7 @@ source: "payment",
 }
 
 /* ============================================
-BOOK WITHOUT PAYMENT (FIXED)
-============================================ */
-/* ============================================
-NOTIFY OWNER (re-added — was missing!)
+NOTIFY OWNER
 ============================================ */
 function notifyOwner(bookingRef, name, phone, pickup, drop, date, total, paymentType, source) {
   const payLbl = paymentType === "pay_later" ? "Cash on delivery" : paymentType === "full" ? "Paid Full" : "Advance Paid";
@@ -1283,6 +1279,10 @@ function notifyOwner(bookingRef, name, phone, pickup, drop, date, total, payment
     }).catch(() => {});
   } catch(e) {}
 }
+
+/* ============================================
+BOOK WITHOUT PAYMENT
+============================================ */
 function bookWithoutPayment() {
   const activeUser = currentUser || window._firebase?.auth?.currentUser;
   if (!activeUser) { showToast("👋 Please login to book."); openAuthModal("login"); return; }
@@ -1308,7 +1308,8 @@ function bookWithoutPayment() {
 
   const houseEl = document.getElementById("house");
   const vehicleEl = document.getElementById("vehicle");
-  const discountedTotal = Math.max(lastCalculatedTotal - promoDiscount, 0);
+  // Use v2 engine total as the canonical total
+  const discountedTotal = _getDiscountedTotal();
 
   window._firebase.db.collection("bookings").add({
     bookingRef,
@@ -1318,9 +1319,9 @@ function bookWithoutPayment() {
     pickup: pickupVal,
     drop: dropVal,
     date,
-shiftTime: document.getElementById("shiftTime")?.value || "",
-shiftTimeLabel: document.getElementById("shiftTimeLabel")?.value || "",
-moveType: selectedMoveType,
+    shiftTime: document.getElementById("shiftTime")?.value || "",
+    shiftTimeLabel: document.getElementById("shiftTimeLabel")?.value || "",
+    moveType: selectedMoveType,
     house: houseEl?.options[houseEl?.selectedIndex]?.text || "",
     vehicle: vehicleEl?.options[vehicleEl?.selectedIndex]?.text || "",
     furniture: getFurnitureSummary(),
@@ -1347,25 +1348,8 @@ moveType: selectedMoveType,
       btn.textContent = "📋 Confirm Booking · Pay on Delivery";
     }
 
-    queueSMS(phone, "booking_confirmed", {
-      name,
-      bookingRef,
-      date,
-      pickup: pickupVal,
-      total: discountedTotal
-    });
-
-    notifyOwner(
-      bookingRef,
-      name,
-      phone,
-      pickupVal,
-      dropVal,
-      date,
-      discountedTotal,
-      "pay_later",
-      "direct"
-    );
+    queueSMS(phone, "booking_confirmed", { name, bookingRef, date, pickup: pickupVal, total: discountedTotal });
+    notifyOwner(bookingRef, name, phone, pickupVal, dropVal, date, discountedTotal, "pay_later", "direct");
 
     showConfirmationCard({
       bookingRef,
@@ -1387,15 +1371,14 @@ moveType: selectedMoveType,
   })
   .catch((err) => {
     console.error("BOOKING SAVE FAILED:", err);
-
     if (btn) {
       btn.disabled = false;
       btn.textContent = "📋 Confirm Booking · Pay on Delivery";
     }
-
     showToast("❌ Booking failed: " + err.message);
   });
 }
+
 function toggleConfirmDetails() {
   const fullDetails = document.getElementById("ccFullDetails");
   const expandBtn = document.getElementById("ccExpandBtn");
@@ -1443,15 +1426,20 @@ function resetBookingForm() {
   ["custName","custPhone"].forEach(id => { const el = document.getElementById(id); if (el) el.value = ""; });
   document.querySelectorAll(".move-type-card, .select-card, .vehicle-card").forEach(c => c.classList.remove("selected"));
   selectedMoveType = null;
- const mapDiv = document.getElementById("map");
-if (mapDiv) {
-  mapDiv.style.display = "block";
-  mapDiv.style.height = "400px";
-}
-if (map) google.maps.event.trigger(map, "resize");
-if (directionsRenderer) directionsRenderer.setDirections({ routes: [] });
-  promoDiscount = 0; lastCalculatedTotal = 0;
-  updatePriceDisplay(); initPaymentOptions();
+  const mapDiv = document.getElementById("map");
+  if (mapDiv) {
+    mapDiv.style.display = "block";
+    mapDiv.style.height = "400px";
+  }
+  if (map) google.maps.event.trigger(map, "resize");
+  if (directionsRenderer) directionsRenderer.setDirections({ routes: [] });
+  promoDiscount = 0;
+  lastCalculatedTotal = 0;
+  // Clear v2 result cache
+  window._lastQuoteResult = null;
+  window._lastCalculatedKm = 0;
+  updatePriceDisplay();
+  initPaymentOptions();
   setTimeout(() => renderSizeCards("home"), 100);
 }
 
@@ -1528,7 +1516,10 @@ async function checkAndShowActiveBooking(uid) {
         } else localStorage.removeItem("packzen_active_booking");
       }
     }
-    const snap = await window._firebase.db.collection("bookings").where("customerUid","==",uid).where("status","in",["confirmed","assigned","packing","transit"]).limit(1).get();
+    const snap = await window._firebase.db.collection("bookings")
+      .where("customerUid","==",uid)
+      .where("status","in",["confirmed","assigned","packing","transit"])
+      .limit(1).get();
     if (snap.empty) return;
     const doc = snap.docs[0]; const b = doc.data();
     currentBookingId = doc.id; localStorage.setItem("packzen_active_booking", doc.id);
@@ -2406,19 +2397,35 @@ async function applyPromoCode() {
       if (!snap.exists) {
         const refSnap = await db.collection("users").where("referralCode","==",code).get();
         if (!refSnap.empty && currentUser && refSnap.docs[0].id !== currentUser.uid) {
-          promoDiscount = 100;
-          msgEl.textContent = "🎉 Referral code applied! ₹100 discount.";
+          promoDiscount = window.PackZenPricing?.config?.discounts?.referralAmount || 100;
+          msgEl.textContent = "🎉 Referral code applied! ₹" + promoDiscount + " discount.";
           msgEl.className = "promo-msg promo-success";
+          // Re-run v2 engine with updated promoDiscount
+          if (window._lastCalculatedKm) {
+            const quote = window.PackZenPricing.runPricingEngineV2(window._lastCalculatedKm);
+            if (quote?.valid) { lastCalculatedTotal = quote.finalTotal; }
+          }
           updatePriceDisplay(); return;
         }
         msgEl.textContent = "Invalid promo code."; msgEl.className = "promo-msg promo-error"; return;
       }
       const promo = snap.data();
       if (!promo.active) { msgEl.textContent = "This promo has expired."; msgEl.className = "promo-msg promo-error"; return; }
-      const discount = promo.type === "percent" ? Math.round(lastCalculatedTotal * promo.value / 100) : promo.value;
-      promoDiscount = Math.min(discount, lastCalculatedTotal * 0.5);
+
+      // Compute discount via v2 engine logic
+      const baseTotal = window._lastQuoteResult?.breakdown?.grandTotal || lastCalculatedTotal;
+      const maxFraction = window.PackZenPricing?.config?.discounts?.maxPromoFraction || 0.5;
+      const rawDiscount = promo.type === "percent" ? Math.round(baseTotal * promo.value / 100) : promo.value;
+      promoDiscount = Math.min(rawDiscount, Math.floor(baseTotal * maxFraction));
+
       msgEl.textContent = `🎉 Code applied! ₹${promoDiscount} off.`;
       msgEl.className = "promo-msg promo-success";
+
+      // Re-run v2 engine with updated promoDiscount so it incorporates the discount
+      if (window._lastCalculatedKm) {
+        const quote = window.PackZenPricing.runPricingEngineV2(window._lastCalculatedKm);
+        if (quote?.valid) { lastCalculatedTotal = quote.finalTotal; }
+      }
       updatePriceDisplay();
     } catch(e) { msgEl.textContent = "Error checking code."; msgEl.className = "promo-msg promo-error"; }
   });
@@ -2452,9 +2459,14 @@ async function saveQuoteToFirestore(total) {
   const vehicleEl = document.getElementById("vehicle");
   try {
     await db.collection("quotes").add({
-      uid: currentUser.uid, pickup: document.getElementById("pickup")?.value || "", drop: document.getElementById("drop")?.value || "",
-      house: houseEl?.options[houseEl?.selectedIndex]?.text || "", vehicle: vehicleEl?.options[vehicleEl?.selectedIndex]?.text || "",
-      total, date: new Date().toLocaleDateString("en-IN"), createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      uid: currentUser.uid,
+      pickup: document.getElementById("pickup")?.value || "",
+      drop: document.getElementById("drop")?.value || "",
+      house: houseEl?.options[houseEl?.selectedIndex]?.text || "",
+      vehicle: vehicleEl?.options[vehicleEl?.selectedIndex]?.text || "",
+      total,
+      date: new Date().toLocaleDateString("en-IN"),
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
     });
   } catch(e) {}
 }
@@ -2583,7 +2595,7 @@ function openProfile() {
 }
 
 /* ============================================
-CANCEL / RESCHEDULE / RATE / DAMAGE (FIXED)
+CANCEL / RESCHEDULE / RATE / DAMAGE
 ============================================ */
 function openCancelModal(bookingDocId, bookingRef, status) {
   if (["packing","transit","delivered"].includes(status)) { showToast("❌ Cannot cancel after packing has started."); return; }
@@ -3006,14 +3018,14 @@ document.addEventListener("DOMContentLoaded", () => {
     priceEl.classList.remove("updated"); void priceEl.offsetWidth; priceEl.classList.add("updated");
   }).observe(priceEl, { childList: true });
 
- document.querySelectorAll('a[href^="#"]').forEach(a => {
-  a.addEventListener("click", function (e) {
-    const href = this.getAttribute("href");
-    if (!href || href === "#") return;
-    const t = document.querySelector(href);
-    if (t) { e.preventDefault(); t.scrollIntoView({ behavior: "smooth" }); }
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener("click", function (e) {
+      const href = this.getAttribute("href");
+      if (!href || href === "#") return;
+      const t = document.querySelector(href);
+      if (t) { e.preventDefault(); t.scrollIntoView({ behavior: "smooth" }); }
+    });
   });
-});
 
   const navbar = document.querySelector(".navbar");
   if (navbar) {
@@ -3084,7 +3096,7 @@ window.addEventListener("load", () => {
 });
 
 /* ============================================
-BOTTOM SHEET SYSTEM (placeholder stubs)
+BOTTOM SHEET SYSTEM
 ============================================ */
 let _activeBs = null;
 
@@ -3233,9 +3245,11 @@ function debounce(fn, ms) {
   let timer;
   return (...args) => { clearTimeout(timer); timer = setTimeout(() => fn(...args), ms); };
 }
+
 window.addEventListener("load", () => {
   buildDateStrip();
 });
+
 /* ============================================
 END OF FILE
 ============================================ */
