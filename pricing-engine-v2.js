@@ -231,7 +231,7 @@ const PRICING_CONFIG = Object.freeze({
      * Expressed as a multiplier on the final total.
      */
     night: {
-      enabled: true,
+      enabled: false,
       startHour: 21,  // 9 PM
       endHour: 7,     // 7 AM
       multiplier: 1.15, // +15%
@@ -242,7 +242,7 @@ const PRICING_CONFIG = Object.freeze({
      * dayOfWeek: 0 = Sunday, 6 = Saturday
      */
     weekend: {
-      enabled: true,
+      enabled: false,
       days: [0, 6],
       multiplier: 1.10, // +10%
     },
@@ -252,7 +252,7 @@ const PRICING_CONFIG = Object.freeze({
      * Months: 0-indexed. 5 = Jun, 6 = Jul, 7 = Aug, 8 = Sep
      */
     rain: {
-      enabled: true,
+      enabled: false,
       months: [5, 6, 7, 8],
       multiplier: 1.08, // +8%
     },
