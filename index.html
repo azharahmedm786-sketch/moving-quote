@@ -1148,7 +1148,24 @@
 <!-- TRACKING MODAL -->
 <div id="trackingModal" class="modal-overlay" role="dialog" aria-modal="true" style="display:none;">
   <div class="modal-box tracking-box">
-    <button class="modal-x" onclick="closeTrackingModal()">✕</button>
+
+    <div class="tracking-window-header">
+
+      <button
+        class="tracking-minimize-btn"
+        onclick="minimizeTrackingModal()"
+        title="Minimize">
+        ─
+      </button>
+
+      <button
+        class="modal-x"
+        onclick="closeTrackingModal()"
+        title="Close">
+        ✕
+      </button>
+
+    </div>
     <div class="tracking-header">
       <div style="font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:800;color:var(--text);">📍 Track My Move</div>
       <div class="tracking-id" id="trackingBookingId">Booking #---</div>
