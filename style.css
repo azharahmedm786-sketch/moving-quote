@@ -346,7 +346,7 @@ img { max-width: 100%; height: auto; display: block; }
 /* Hero App Card */
 .hero-app-card {
   position: relative;
-  min-height: 260px;
+  min-height: 520px;
   background-size: cover;
   background-position: center;
   overflow: hidden;
@@ -379,8 +379,8 @@ img { max-width: 100%; height: auto; display: block; }
 
 .hero-app-title {
   font-family: 'Syne', sans-serif;
- font-size:2rem;
-line-height:1.08;
+ font-size:clamp(3rem, 6vw, 4.5rem)
+line-height:0.95;
 letter-spacing:-.04em;
 font-weight:800;
 }
