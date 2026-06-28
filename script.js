@@ -715,8 +715,14 @@ window.initMap = function () {
     },
     markerOptions: { clickable: false }
   });
-  initAutocomplete();
-  console.log("✅ Map initialized");
+initAutocomplete();
+
+// Automatically fetch current location
+setTimeout(() => {
+    getCurrentLocationAutomatically();
+}, 1000);
+
+console.log("✅ Map initialized");
 };
 
 function initAutocomplete() {
@@ -921,6 +927,52 @@ function setupCurrentLocationListener() {
 }
 
 function initGeolocationFeature() { setupCurrentLocationListener(); }
+async function getCurrentLocationAutomatically() {
+    if (isLocating) return;
+    if (!isGoogleMapsReady()) return;
+
+    isLocating = true;
+
+    try {
+        const coords = await getCurrentLocation();
+
+        const geocoder = new google.maps.Geocoder();
+
+        geocoder.geocode(
+            {
+                location: {
+                    lat: coords.lat,
+                    lng: coords.lng
+                }
+            },
+            function(results, status) {
+
+                if (status === "OK" && results[0]) {
+
+                    const pickupInput = document.getElementById("pickup");
+
+                    pickupInput.value = results[0].formatted_address;
+
+                    pickupPlace = {
+                        formatted_address: results[0].formatted_address,
+                        geometry: results[0].geometry
+                    };
+
+                    calculateQuote(true);
+
+                    showToast("📍 Current location detected");
+
+                }
+
+            }
+        );
+
+    } catch (e) {
+        console.log("Location permission denied.");
+    }
+
+    isLocating = false;
+}
 
 /* ============================================
 INTERCITY BADGE (UI only — detection done by v2 engine)
@@ -3006,7 +3058,9 @@ function toggleFaq(btn) {
 PAGE LOAD
 ============================================ */
 document.addEventListener("DOMContentLoaded", () => {
-  setTimeout(() => { setupCurrentLocationListener(); initGeolocationFeature(); }, 1000);
+ setTimeout(() => {
+    initGeolocationFeature();
+}, 1000);
 
   try { buildDateStrip(); } catch(e) { console.error("buildDateStrip failed:", e); }
 
