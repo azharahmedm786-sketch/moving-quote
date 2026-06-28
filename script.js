@@ -497,7 +497,7 @@ VEHICLE CARD SELECTION
 function selectCard(el, type, value) {
   const select = document.getElementById(type);
   if (select) select.value = value;
-  const parent = el.closest(type === "house" ? ".select-cards" : ".vehicle-cards");
+  const parent = el.closest(type === "house" ? ".select-cards" : ".vehicle-cards"); 
   if (parent) {
     const selector = type === "house" ? ".select-card" : ".vehicle-card";
     parent.querySelectorAll(selector).forEach(c => c.classList.remove("selected"));
