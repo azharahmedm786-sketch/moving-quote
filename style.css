@@ -392,6 +392,11 @@ img { max-width: 100%; height: auto; display: block; }
 
     text-shadow:0 2px 8px rgba(0,0,0,.45);
 }
+.hero-trust-text{
+    color:#ffffff !important;
+    font-weight:700;
+    text-shadow:0 2px 8px rgba(0,0,0,.55);
+}
 
 .trust-dot{
     width:8px;
@@ -1871,4 +1876,10 @@ select.field-input {
 .tracking-minimized .tracking-info,
 .tracking-minimized .tracking-chat{
     display:none;
+}
+.hero-trust-pill,
+.hero-trust-pill *,
+.hero-trust-text{
+    color:#fff !important;
+    fill:#fff !important;
 }
