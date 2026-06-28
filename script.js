@@ -210,7 +210,6 @@ const FURNITURE_CATEGORIES = {
   { id: "cycleCheck", emoji: "🚲", name: "Cycle" },
   { id: "acCheck", emoji: "❄️", name: "AC Unit" }
 ]
-      ]
     }
   ]
 };
