@@ -1785,3 +1785,43 @@ select.field-input {
   .float-call, .float-wa, .modal-overlay, #trackOrderBanner { display: none !important; }
   body { background: #fff !important; color: #000 !important; padding-bottom: 0 !important; }
 }
+/* ============================================
+   TRACKING WINDOW
+============================================ */
+
+.tracking-window-header{
+    display:flex;
+    justify-content:flex-end;
+    gap:8px;
+    padding:10px 12px 0;
+}
+
+.tracking-minimize-btn,
+.modal-x{
+    width:36px;
+    height:36px;
+    border:none;
+    border-radius:10px;
+    cursor:pointer;
+    background:#1f2937;
+    color:#fff;
+    font-size:18px;
+}
+
+.tracking-minimized{
+    position:fixed !important;
+    bottom:90px;
+    right:20px;
+    width:340px;
+    height:64px;
+    overflow:hidden;
+    z-index:99999;
+}
+
+.tracking-minimized .tracking-header,
+.tracking-minimized .tracking-status-bar,
+.tracking-minimized .tracking-map-area,
+.tracking-minimized .tracking-info,
+.tracking-minimized .tracking-chat{
+    display:none;
+}
