@@ -1540,10 +1540,29 @@ function toggleConfirmDetails() {
 }
 
 function closeModal() {
-  document.getElementById("paymentModal").style.display = "none";
-  if (currentBookingId) { showBookingSuccessState(); showTrackOrderBanner(); }
-}
 
+    document.getElementById("paymentModal").style.display = "none";
+
+    if (currentBookingId) {
+
+        showTrackOrderBanner();
+
+        // Close the booking sheet completely
+        const bookingSheet = document.getElementById("bookingSheet");
+        if (bookingSheet) {
+            bookingSheet.classList.remove("open");
+            bookingSheet.style.display = "none";
+        }
+
+        // Remove backdrop if you use one
+        document.body.classList.remove("modal-open");
+
+        // Scroll to the tracking banner
+        scrollToTrackBanner();
+
+    }
+
+}
 function showBookingSuccessState() {
   document.querySelectorAll(".form-step").forEach(s => s.style.display = "none");
   const successEl = document.getElementById("bookingSuccessState");
