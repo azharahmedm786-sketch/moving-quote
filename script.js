@@ -70,55 +70,113 @@ const MOVE_TYPE_CONFIG = {
 // ─── FURNITURE DATA ─────────────────────────────────
 // FURNITURE_PRICES is kept for renderFurnitureGrid() display labels only.
 // All pricing calculations are handled exclusively by pricing-engine-v2.js.
+
 const FURNITURE_PRICES = {
-  sofaCheck: 250, tvCheck: 150, tvUnitCheck: 250, coffeeCheck: 100, acCheck: 500,
-  bedCheck: 350, wardrobeCheck: 600, dressingCheck: 250, sideTableCheck: 100,
-  fridgeCheck: 350, wmCheck: 250, microwaveCheck: 100, chimneyCheck: 250, diningCheck: 300,
-  deskCheck: 0, chairCheck: 0, serverCheck: 0, printerCheck: 0,
-  confCheck: 0, cabinetCheck: 0, whiteboardCheck: 0,
-  bikeCheck: 0, cycleCheck: 0, plantCheck: 0, gymCheck: 0
+  sofaCheck: 200,
+  sofaCumBedCheck: 350,
+  reclinerCheck: 250,
+  tvCheck: 100,
+  tvUnitCheck: 200,
+  coffeeCheck: 75,
+  centerTableCheck: 100,
+  bookshelfCheck: 200,
+  showcaseCheck: 300,
+  shoeRackCheck: 100,
+  acCheck: 400,
+
+  bedCheck: 300,
+  mattressCheck: 100,
+  wardrobeCheck: 500,
+  dressingCheck: 200,
+  sideTableCheck: 75,
+  studyTableCheck: 150,
+
+  fridgeCheck: 200,
+  wmCheck: 175,
+  dishwasherCheck: 250,
+  microwaveCheck: 75,
+  ovenCheck: 150,
+  chimneyCheck: 200,
+  diningCheck: 250,
+  waterPurifierCheck: 100,
+
+  deskCheck: 200,
+  chairCheck: 50,
+  serverCheck: 500,
+  printerCheck: 150,
+  confCheck: 400,
+  cabinetCheck: 250,
+  whiteboardCheck: 100,
+
+  bikeCheck: 250,
+  cycleCheck: 100,
+  plantCheck: 75,
+  gymCheck: 400,
+  treadmillCheck: 500,
+  aquariumCheck: 300
 };
 
 const FURNITURE_CATEGORIES = {
   home: [
     {
-      id: "cat-living", icon: "🛋️", label: "Living Room",
+      id: "cat-living",
+      icon: "🛋️",
+      label: "Living Room",
       items: [
         { id: "sofaCheck", emoji: "🛋️", name: "Sofa" },
+        { id: "sofaCumBedCheck", emoji: "🛋️", name: "Sofa Cum Bed" },
+        { id: "reclinerCheck", emoji: "🪑", name: "Recliner" },
         { id: "tvCheck", emoji: "📺", name: "TV" },
         { id: "tvUnitCheck", emoji: "🗄️", name: "TV Unit" },
         { id: "coffeeCheck", emoji: "☕", name: "Coffee Table" },
+        { id: "centerTableCheck", emoji: "🪵", name: "Center Table" },
+        { id: "bookshelfCheck", emoji: "📚", name: "Bookshelf" },
+        { id: "showcaseCheck", emoji: "🪟", name: "Showcase" },
+        { id: "shoeRackCheck", emoji: "👞", name: "Shoe Rack" },
         { id: "acCheck", emoji: "❄️", name: "AC Unit" }
       ]
     },
-    {
-      id: "cat-bedroom", icon: "🛏️", label: "Bedroom",
-      items: [
-        { id: "bedCheck", emoji: "🛏️", name: "Bed" },
-        { id: "wardrobeCheck", emoji: "🚪", name: "Wardrobe" },
-        { id: "dressingCheck", emoji: "🪞", name: "Dressing Table" },
-        { id: "sideTableCheck", emoji: "🛏️", name: "Side Table" }
-      ]
+ {
+  id: "cat-bedroom",
+  icon: "🛏️",
+  label: "Bedroom",
+  items: [
+  { id: "bedCheck", emoji: "🛏️", name: "Bed" },
+  { id: "mattressCheck", emoji: "🛌", name: "Mattress" },
+  { id: "wardrobeCheck", emoji: "🚪", name: "Wardrobe" },
+  { id: "dressingCheck", emoji: "🪞", name: "Dressing Table" },
+  { id: "sideTableCheck", emoji: "🗄️", name: "Side Table" },
+  { id: "studyTableCheck", emoji: "💻", name: "Study Table" }
+]
     },
-    {
-      id: "cat-kitchen", icon: "🍳", label: "Kitchen",
-      items: [
-        { id: "fridgeCheck", emoji: "🧊", name: "Fridge" },
-        { id: "wmCheck", emoji: "🧺", name: "Washing Machine" },
-        { id: "microwaveCheck", emoji: "📟", name: "Microwave" },
-        { id: "chimneyCheck", emoji: "🔥", name: "Chimney" },
-        { id: "diningCheck", emoji: "🍽️", name: "Dining Table" }
-      ]
+{
+  id: "cat-kitchen",
+  icon: "🍳",
+  label: "Kitchen",
+  items: [
+    { id: "fridgeCheck", emoji: "🧊", name: "Fridge" },
+    { id: "wmCheck", emoji: "🧺", name: "Washing Machine" },
+    { id: "dishwasherCheck", emoji: "🍽️", name: "Dishwasher" },
+    { id: "microwaveCheck", emoji: "📟", name: "Microwave" },
+    { id: "ovenCheck", emoji: "🔥", name: "Oven / OTG" },
+    { id: "chimneyCheck", emoji: "🌬️", name: "Kitchen Chimney" },
+    { id: "diningCheck", emoji: "🍽️", name: "Dining Table" },
+    { id: "waterPurifierCheck", emoji: "💧", name: "Water Purifier" }
+  ]
     },
-    {
-      id: "cat-other", icon: "📦", label: "Other Items",
-      items: [
-        { id: "bikeCheck", emoji: "🏍️", name: "Bike/Scooter" },
-        { id: "cycleCheck", emoji: "🚲", name: "Cycle" },
-        { id: "plantCheck", emoji: "🪴", name: "Large Plants" },
-        { id: "gymCheck", emoji: "🏋️", name: "Gym Equipment" }
-      ]
-    }
+ {
+  id: "cat-other",
+  icon: "📦",
+  label: "Other Items",
+  items: [
+    { id: "bikeCheck", emoji: "🏍️", name: "Bike/Scooter" },
+    { id: "cycleCheck", emoji: "🚲", name: "Cycle" },
+    { id: "plantCheck", emoji: "🪴", name: "Large Plants" },
+    { id: "gymCheck", emoji: "🏋️", name: "Gym Equipment" },
+    { id: "treadmillCheck", emoji: "🏃", name: "Treadmill" },
+    { id: "aquariumCheck", emoji: "🐟", name: "Aquarium" }
+  ]
+},
   ],
   office: [
     {
@@ -137,14 +195,21 @@ const FURNITURE_CATEGORIES = {
   single: [
     {
       id: "cat-single", icon: "📦", label: "Single Items",
-      items: [
-        { id: "sofaCheck", emoji: "🛋️", name: "Sofa" },
-        { id: "bedCheck", emoji: "🛏️", name: "Bed" },
-        { id: "fridgeCheck", emoji: "🧊", name: "Fridge" },
-        { id: "tvCheck", emoji: "📺", name: "TV" },
-        { id: "wmCheck", emoji: "🧺", name: "Washing Machine" },
-        { id: "bikeCheck", emoji: "🏍️", name: "Bike/Scooter" },
-        { id: "acCheck", emoji: "❄️", name: "AC Unit" }
+     items: [
+  { id: "sofaCheck", emoji: "🛋️", name: "Sofa" },
+  { id: "sofaCumBedCheck", emoji: "🛋️", name: "Sofa Cum Bed" },
+  { id: "reclinerCheck", emoji: "🪑", name: "Recliner" },
+  { id: "bedCheck", emoji: "🛏️", name: "Bed" },
+  { id: "mattressCheck", emoji: "🛌", name: "Mattress" },
+  { id: "wardrobeCheck", emoji: "🚪", name: "Wardrobe" },
+  { id: "fridgeCheck", emoji: "🧊", name: "Fridge" },
+  { id: "wmCheck", emoji: "🧺", name: "Washing Machine" },
+  { id: "tvCheck", emoji: "📺", name: "TV" },
+  { id: "microwaveCheck", emoji: "📟", name: "Microwave" },
+  { id: "bikeCheck", emoji: "🏍️", name: "Bike/Scooter" },
+  { id: "cycleCheck", emoji: "🚲", name: "Cycle" },
+  { id: "acCheck", emoji: "❄️", name: "AC Unit" }
+]
       ]
     }
   ]
