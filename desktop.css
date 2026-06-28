@@ -119,7 +119,7 @@
 
   /* ── 5. HERO — FULL-WIDTH CINEMATIC ─────────────────────────── */
   .hero-app-card {
-    min-height: 480px;
+    min-height: 520px;
     border-radius: 24px;
     margin-top: 1.5rem;
     overflow: hidden;
@@ -602,7 +602,7 @@
   }
 
   .hero-app-card {
-    min-height: 540px;
+    min-height: 500px;
   }
 
   .hero-app-title {
@@ -667,7 +667,7 @@
   }
 
   .hero-app-card {
-    min-height: 580px;
+    min-height: 520px;
   }
 
   .hero-app-title {
@@ -749,7 +749,7 @@
   }
 
   .hero-app-card {
-    min-height: 620px;
+    min-height: 540px;
   }
 
   .hero-app-title {
