@@ -1541,25 +1541,40 @@ function toggleConfirmDetails() {
 
 function closeModal() {
 
+    // Close confirmation popup
     document.getElementById("paymentModal").style.display = "none";
 
     // Restore booking form
-    document.querySelectorAll(".form-step").forEach(step=>{
+    document.querySelectorAll(".form-step").forEach(step => {
         step.style.display = "";
     });
 
     const stepHeader = document.querySelector(".step-header");
-    if(stepHeader){
+    if (stepHeader) {
         stepHeader.style.display = "";
     }
 
-    if(currentBookingId){
-        showTrackOrderBanner();
+    // Open booking sheet again
+    const bookingSheet = document.getElementById("bookingSheet");
+    if (bookingSheet) {
+        bookingSheet.style.display = "block";
+        bookingSheet.classList.add("open");
     }
 
-    closeBookingSheet();
-}
+    const overlay = document.getElementById("bookingSheetOverlay");
+    if (overlay) {
+        overlay.classList.add("open");
+    }
 
+    // Return to first step
+    currentStep = 0;
+    showStep(0);
+
+    // If booking exists, show tracking banner
+    if (currentBookingId) {
+        showTrackOrderBanner();
+    }
+}
 function showBookingSuccessState() {
 
     const successEl = document.getElementById("bookingSuccessState");
