@@ -1543,34 +1543,38 @@ function closeModal() {
 
     document.getElementById("paymentModal").style.display = "none";
 
-    if (currentBookingId) {
+    // Restore booking form
+    document.querySelectorAll(".form-step").forEach(step=>{
+        step.style.display = "";
+    });
 
-        showTrackOrderBanner();
-
-        // Close the booking sheet completely
-        const bookingSheet = document.getElementById("bookingSheet");
-        if (bookingSheet) {
-            bookingSheet.classList.remove("open");
-            bookingSheet.style.display = "none";
-        }
-
-        // Remove backdrop if you use one
-        document.body.classList.remove("modal-open");
-
-        // Scroll to the tracking banner
-        scrollToTrackBanner();
-
+    const stepHeader = document.querySelector(".step-header");
+    if(stepHeader){
+        stepHeader.style.display = "";
     }
 
+    if(currentBookingId){
+        showTrackOrderBanner();
+    }
+
+    closeBookingSheet();
 }
+
 function showBookingSuccessState() {
-  document.querySelectorAll(".form-step").forEach(s => s.style.display = "none");
-  const successEl = document.getElementById("bookingSuccessState");
-  if (successEl) successEl.style.display = "block";
-  const stepHeader = document.querySelector(".step-header");
-  if (stepHeader) stepHeader.style.display = "none";
-  const bsId = document.getElementById("bsBookingId");
-  if (bsId) bsId.textContent = document.getElementById("bookingIdDisplay")?.textContent || "—";
+
+    const successEl = document.getElementById("bookingSuccessState");
+
+    if(successEl){
+        successEl.style.display = "block";
+    }
+
+    const bsId = document.getElementById("bsBookingId");
+
+    if(bsId){
+        bsId.textContent =
+            document.getElementById("bookingIdDisplay")?.textContent || "—";
+    }
+
 }
 
 function scrollToTrackBanner() {
