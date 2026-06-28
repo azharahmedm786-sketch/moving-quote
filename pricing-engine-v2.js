@@ -1116,6 +1116,7 @@ function _readFormState() {
     km:               window._lastCalculatedKm || 0, // set by calculateQuote
     houseValue:       Number(g("house")?.value) || 0,
     vehicleHtmlValue: g("vehicle")?.value || "0",
+     extraHelpers: parseInt(g("extraHelpers")?.value ?? 0, 10) || 0,
     furniture,
     cartonQty:        parseInt(g("cartonQty")?.value ?? 0, 10) || 0,
     pickupFloor:      parseInt(g("pickupFloor")?.value ?? 0, 10) || 0,
