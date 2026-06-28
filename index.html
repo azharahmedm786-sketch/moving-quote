@@ -209,7 +209,6 @@
     <div class="hero-app-card" style="background-image: url('images/mainbackground.jpg')">
       <div class="hero-app-overlay"></div>
       <div class="hero-app-content">
-        <div class="hero-greeting" id="heroGreeting">Good morning 👋</div>
         <h1 class="hero-app-title">Move smarter<br>across Bangalore</h1>
         <p class="hero-app-sub">Starting ₹1,999 · Same-day available</p>
         <a href="#quote" class="hero-cta-btn" onclick="openBookingSheet()">
@@ -1317,13 +1316,6 @@
 
 <!-- App UI logic (booking sheet, bottom nav, etc.) -->
 <script>
-// ── Greeting ──────────────────────────────────────────────
-(function() {
-  var h = new Date().getHours();
-  var g = h < 12 ? 'Good morning 👋' : h < 17 ? 'Good afternoon 👋' : 'Good evening 👋';
-  var el = document.getElementById('heroGreeting');
-  if (el) el.textContent = g;
-})();
 
 // ── Bottom sheet open/close ───────────────────────────────
 function openBookingSheet() {
