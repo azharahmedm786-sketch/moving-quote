@@ -336,12 +336,16 @@ function renderSizeCards(type) {
     card.className = "select-card";
     card.dataset.value = s.value;
     card.innerHTML = `<div class="sc-icon">${s.icon}</div><div class="sc-label">${s.label}</div><div class="sc-sub">${s.sub}</div>`;
-    card.addEventListener("click", () => {
-      container.querySelectorAll(".select-card").forEach(c => c.classList.remove("selected"));
-      card.classList.add("selected");
-      if (select) select.value = s.value;
-      calculateQuote(true);
-    });
+ card.addEventListener("click", () => {
+    container.querySelectorAll(".select-card").forEach(c => c.classList.remove("selected"));
+    card.classList.add("selected");
+
+    if (select) select.value = s.value;
+
+    recommendVehicle(type, s.label);
+
+    calculateQuote(true);
+});
     container.appendChild(card);
 
     if (select) {
@@ -501,8 +505,39 @@ function selectCard(el, type, value) {
   }
   el.classList.add("selected");
   calculateQuote(true);
-}
 
+}
+function recommendVehicle(moveType, sizeLabel) {
+
+  if (moveType !== "home") return;
+
+  const vehicle = document.getElementById("vehicle");
+  if (!vehicle) return;
+
+  const map = {
+    "1 RK": "ace",
+    "1 BHK": "14ft",
+    "2 BHK": "17ft",
+    "3 BHK": "22ft",
+    "4 BHK": "22ft",
+    "Villa": "22ft"
+  };
+
+  const recommended = map[sizeLabel];
+  if (!recommended) return;
+
+  vehicle.value = recommended;
+
+  document.querySelectorAll(".vehicle-card").forEach(card => {
+    card.classList.remove("selected");
+
+    if (card.dataset.value === recommended) {
+      card.classList.add("selected");
+    }
+  });
+
+  showToast("🚚 Recommended vehicle selected automatically.");
+}
 /* ============================================
 MULTI-STEP FORM
 ============================================ */
