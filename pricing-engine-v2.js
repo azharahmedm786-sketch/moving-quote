@@ -118,38 +118,56 @@ const PRICING_CONFIG = Object.freeze({
    * 0 = FREE (still tracked for recommendations).
    * Key matches the HTML input `id`.
    */
-  furniturePrices: {
-    /* Living Room */
-    sofaCheck:       250,
-    tvCheck:         150,
-    tvUnitCheck:     250,
-    coffeeCheck:     100,
-    acCheck:         500,
-    /* Bedroom */
-    bedCheck:        350,
-    wardrobeCheck:   600,
-    dressingCheck:   250,
-    sideTableCheck:  100,
-    /* Kitchen — FREE */
-    fridgeCheck:     0,
-    wmCheck:         0,
-    microwaveCheck:  0,
-    chimneyCheck:    0,
-    diningCheck:     0,
-    /* Office — FREE (base covers it) */
-    deskCheck:       0,
-    chairCheck:      0,
-    serverCheck:     0,
-    printerCheck:    0,
-    confCheck:       0,
-    cabinetCheck:    0,
-    whiteboardCheck: 0,
-    /* Others — FREE */
-    bikeCheck:       0,
-    cycleCheck:      0,
-    plantCheck:      0,
-    gymCheck:        0,
-  },
+ furniturePrices: {
+
+  // Living Room
+  sofaCheck: 200,
+  sofaCumBedCheck: 350,
+  reclinerCheck: 250,
+  tvCheck: 100,
+  tvUnitCheck: 200,
+  coffeeCheck: 75,
+  centerTableCheck: 100,
+  bookshelfCheck: 200,
+  showcaseCheck: 300,
+  shoeRackCheck: 100,
+  acCheck: 400,
+
+  // Bedroom
+  bedCheck: 300,
+  mattressCheck: 100,
+  wardrobeCheck: 500,
+  dressingCheck: 200,
+  sideTableCheck: 75,
+  studyTableCheck: 150,
+
+  // Kitchen
+  fridgeCheck: 200,
+  wmCheck: 175,
+  dishwasherCheck: 250,
+  microwaveCheck: 75,
+  ovenCheck: 150,
+  chimneyCheck: 200,
+  diningCheck: 250,
+  waterPurifierCheck: 100,
+
+  // Office
+  deskCheck: 200,
+  chairCheck: 50,
+  serverCheck: 500,
+  printerCheck: 150,
+  confCheck: 400,
+  cabinetCheck: 250,
+  whiteboardCheck: 100,
+
+  // Others
+  bikeCheck: 250,
+  cycleCheck: 100,
+  plantCheck: 75,
+  gymCheck: 400,
+  treadmillCheck: 500,
+  aquariumCheck: 300
+},
 
   /* ── CARTON BOXES ────────────────────────────────────────── */
   cartons: {
