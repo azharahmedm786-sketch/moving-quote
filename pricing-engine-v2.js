@@ -226,15 +226,7 @@ const PRICING_CONFIG = Object.freeze({
     operCostRatio: 0.8,
   },
 
-  /* ── GST ─────────────────────────────────────────────────── */
-  /**
-   * GST is currently factored into prices (inclusive).
-   * Set `inclusive: false` to add on top.
-   */
-  gst: {
-    inclusive: true,
-    rate: 18,   // 18%
-  },
+  // GST hidden until GST registration
 
   /* ── PAYMENT OPTIONS ─────────────────────────────────────── */
   payment: {
@@ -989,17 +981,9 @@ function calculateQuoteV2(raw) {
     applySurcharges(subtotalPreSurcharge, shiftDate, shiftHour);
 
   // ── Step 7: GST (currently inclusive) ────────────────────
-  const gstCfg = PRICING_CONFIG.gst;
-  let gstAmount = 0;
-  let subtotalWithGST = subtotalAfterSurcharge;
-
-  if (!gstCfg.inclusive) {
-    gstAmount      = Math.round(subtotalAfterSurcharge * gstCfg.rate / 100);
-    subtotalWithGST = subtotalAfterSurcharge + gstAmount;
-  } else {
-    // Show the implied GST amount for transparency
-    gstAmount = Math.round(subtotalAfterSurcharge * gstCfg.rate / (100 + gstCfg.rate));
-  }
+ // GST removed until GST registration
+let gstAmount = 0;
+let subtotalWithGST = subtotalAfterSurcharge;
 
   // ── Step 8: Minimum fare floor ────────────────────────────
   const totalBeforeDiscount = Math.max(subtotalWithGST, PRICING_CONFIG.minimumFare);
@@ -1043,8 +1027,8 @@ function calculateQuoteV2(raw) {
     insuranceCharge: 0,     // future: optional insurance
     surcharges:      surchargeLines,
     subtotal:        subtotalPreSurcharge,
-    gstAmount,
-    gstInclusive:    gstCfg.inclusive,
+ gstAmount: 0,
+gstInclusive: false,
     discount:        cappedDiscount,
     grandTotal,
     // Extra detail for local moves
@@ -1177,9 +1161,6 @@ function _renderV2Breakdown(result, resultEl) {
     rows.push(`${s.label} (+${s.percent}%): ₹${fmt(s.amount)}`);
   });
 
-  if (breakdown.gstInclusive) {
-    rows.push(`GST ${PRICING_CONFIG.gst.rate}% (incl.): ₹${fmt(breakdown.gstAmount)}`);
-  }
 
   if (breakdown.discount > 0) {
     rows.push(`Discount: −₹${fmt(breakdown.discount)}`);
