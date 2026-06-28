@@ -1727,16 +1727,46 @@ function showConfirmationCard(data) {
 /* ============================================
 TRACKING MODAL
 ============================================ */
+let trackingMinimized = false;
+
 function openTrackingModal() {
   document.getElementById("userDropdown")?.classList.remove("open");
-  if (!currentUser) { openAuthModal("login"); return; }
-  document.getElementById("trackingModal").style.display = "flex";
+
+  if (!currentUser) {
+    openAuthModal("login");
+    return;
+  }
+
+  trackingMinimized = false;
+
+  const modal = document.getElementById("trackingModal");
+
+  modal.style.display = "flex";
+  modal.classList.remove("tracking-minimized");
+
   loadTrackingData();
 }
 
+function minimizeTrackingModal() {
+  trackingMinimized = true;
+
+  document
+    .getElementById("trackingModal")
+    .classList.add("tracking-minimized");
+}
+
 function closeTrackingModal() {
+  trackingMinimized = false;
+
   document.getElementById("trackingModal").style.display = "none";
-  if (trackingListener) { trackingListener(); trackingListener = null; }
+  document
+    .getElementById("trackingModal")
+    .classList.remove("tracking-minimized");
+
+  if (trackingListener) {
+    trackingListener();
+    trackingListener = null;
+  }
 }
 
 function loadTrackingData() {
