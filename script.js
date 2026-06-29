@@ -2058,9 +2058,16 @@ function updateNavForUser(user) {
     const name = user.displayName || user.email?.split("@")[0] || "User";
     if (navName) navName.textContent = name.split(" ")[0];
     if (navAvatar) navAvatar.textContent = name.charAt(0).toUpperCase();
-    window._firebase.db.collection("users").doc(user.uid).get()
-      .then(doc => { if (doc.exists && doc.data().role === "admin" && adminLink) adminLink.style.display = "block"; })
+window._firebase.db.collection("users").doc(user.uid).get()
+      .then(doc => {
+        if (doc.exists && doc.data().role === "admin" && adminLink) adminLink.style.display = "block";
+      })
       .catch(() => {});
+    // Sync dropdown avatar
+    const dropAvatar = document.getElementById("dropAvatar");
+    const dropNameEl = document.querySelector(".dropdown-name");
+    if (navAvatar && dropAvatar) dropAvatar.textContent = navAvatar.textContent;
+    if (navName && dropNameEl) dropNameEl.textContent = navName.textContent;
   } else {
     if (loginBtn) loginBtn.style.display = "inline-block";
     if (navUser) navUser.style.display = "none";
@@ -2070,11 +2077,21 @@ function updateNavForUser(user) {
 function toggleUserMenu() {
   const dropdown = document.getElementById("userDropdown");
   const navUser = document.getElementById("navUser");
-  if (!dropdown || !navUser) return;
+  if (!dropdown) return;
   if (dropdown.classList.contains("open")) { dropdown.classList.remove("open"); return; }
-  const rect = navUser.getBoundingClientRect();
-  dropdown.style.top = (rect.bottom + 6) + "px";
-  dropdown.style.right = (window.innerWidth - rect.right) + "px";
+  if (navUser) {
+    const rect = navUser.getBoundingClientRect();
+    if (rect.width > 0) {
+      dropdown.style.top = (rect.bottom + 6) + "px";
+      dropdown.style.right = (window.innerWidth - rect.right) + "px";
+    } else {
+      dropdown.style.top = "65px";
+      dropdown.style.right = "12px";
+    }
+  } else {
+    dropdown.style.top = "65px";
+    dropdown.style.right = "12px";
+  }
   dropdown.classList.add("open");
 }
 
