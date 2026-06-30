@@ -19,7 +19,7 @@
 .partner-badge-pill {
   display: inline-flex;
   align-items: center;
-  background: var(--green-600);
+  background: var(--green-600); 
   color: #fff;
   font-size: 0.6rem;
   font-weight: 800;
