@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en-IN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0f172a">
+<meta name="robots" content="noindex, nofollow">
+<title>Partner with PackZen | Earn as a Verified Mover</title>
+<meta name="description" content="Join PackZen as a verified moving partner. Get booking requests, manage jobs, and grow your earnings in Bangalore.">
+<link rel="apple-touch-icon" href="assets/logo/packzen-logo.png">
+<link rel="icon" type="image/png" href="assets/logo/packzen-logo.png">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Syne:wght@700;800&display=swap">
+
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="desktop.css">
+<link rel="stylesheet" href="partner.css">
+</head>
+<body class="app-body partner-body">
+
+<a href="#main" class="skip-link">Skip to main content</a>
+
+<!-- ═══════════════════════════════════════════
+     TOP BAR
+═══════════════════════════════════════════ -->
+<header class="app-bar" role="banner">
+  <div class="app-bar-inner">
+    <div class="app-bar-left">
+      <a href="index.html" class="app-logo" aria-label="PackZen Home">
+        <img src="assets/logo/packzen-logo.png" width="36" height="36" alt="PackZen" fetchpriority="high">
+        <span class="app-logo-text">PackZen</span>
+        <span class="partner-badge-pill">Partner</span>
+      </a>
+    </div>
+    <div class="app-bar-right">
+      <a href="partner-login.html" class="pz-btn pz-btn-ghost pz-btn-sm">Login</a>
+    </div>
+  </div>
+</header>
+
+<main id="main" class="partner-landing">
+
+  <!-- HERO -->
+  <section class="partner-hero">
+    <h1>Drive Bookings. Grow Earnings.<br>Partner with PackZen.</h1>
+    <p class="partner-hero-sub">Join Bangalore's fastest-growing moving platform. Get verified, start receiving booking requests, and get paid on time — every time.</p>
+    <div class="partner-hero-actions">
+      <a href="partner-register.html" class="pz-btn pz-btn-primary pz-btn-lg">Become a Partner</a>
+      <a href="partner-login.html" class="pz-btn pz-btn-outline pz-btn-lg">Partner Login</a>
+    </div>
+  </section>
+
+  <!-- STATS STRIP -->
+  <section class="partner-stats-strip" aria-label="Why partners choose PackZen">
+    <div class="partner-stat">
+      <span class="partner-stat-num">0%</span>
+      <span class="partner-stat-label">Signup Fee</span>
+    </div>
+    <div class="partner-stat">
+      <span class="partner-stat-num">Weekly</span>
+      <span class="partner-stat-label">Payouts</span>
+    </div>
+    <div class="partner-stat">
+      <span class="partner-stat-num">24/7</span>
+      <span class="partner-stat-label">Support</span>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="partner-section">
+    <h2 class="partner-section-title">How it works</h2>
+    <div class="partner-steps">
+      <div class="partner-step-card">
+        <div class="partner-step-icon">1</div>
+        <h3>Register &amp; Verify</h3>
+        <p>Submit your business details, vehicle info, and KYC documents for review.</p>
+      </div>
+      <div class="partner-step-card">
+        <div class="partner-step-icon">2</div>
+        <h3>Get Approved</h3>
+        <p>Our team verifies your documents. Most applications are reviewed within 48 hours.</p>
+      </div>
+      <div class="partner-step-card">
+        <div class="partner-step-icon">3</div>
+        <h3>Receive Bookings</h3>
+        <p>Accept jobs that match your service area and vehicle type — right from your dashboard.</p>
+      </div>
+      <div class="partner-step-card">
+        <div class="partner-step-icon">4</div>
+        <h3>Get Paid</h3>
+        <p>Track earnings in real time and receive payouts directly to your bank account.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- REQUIREMENTS -->
+  <section class="partner-section partner-section-alt">
+    <h2 class="partner-section-title">What you'll need</h2>
+    <ul class="partner-req-list">
+      <li>Valid Aadhaar &amp; PAN</li>
+      <li>Vehicle registration &amp; insurance</li>
+      <li>Bank account or UPI for payouts</li>
+      <li>A smartphone with internet access</li>
+    </ul>
+  </section>
+
+  <!-- FINAL CTA -->
+  <section class="partner-final-cta">
+    <h2>Ready to start earning with PackZen?</h2>
+    <a href="partner-register.html" class="pz-btn pz-btn-primary pz-btn-lg">Register as a Partner</a>
+    <p class="partner-existing-link">Already a partner? <a href="partner-login.html">Log in here</a></p>
+  </section>
+
+</main>
+
+<footer class="partner-footer">
+  <p>&copy; <span id="partnerYear"></span> PackZen Packers &amp; Movers. Need help? <a href="https://wa.me/919945095453" target="_blank" rel="noopener">WhatsApp us</a></p>
+</footer>
+
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+<script src="env-config.js"></script>
+<script src="firebase-config.js"></script>
+<script src="https://packzen-config.azharahmedm786.workers.dev"></script>
+<script src="partner.js"></script>
+<script>
+  document.getElementById('partnerYear').textContent = new Date().getFullYear();
+
+  // If an already-logged-in, already-approved partner lands here, send them
+  // straight to their dashboard instead of the marketing page.
+  (function () {
+    function waitFB(cb, n) {
+      n = n || 0;
+      if (window._firebase) { cb(); return; }
+      if (n > 30) return;
+      setTimeout(function () { waitFB(cb, n + 1); }, 200);
+    }
+    waitFB(function () {
+      window._firebase.auth.onAuthStateChanged(function (user) {
+        if (!user) return;
+        window._firebase.db.collection('partners').doc(user.uid).get()
+          .then(function (doc) {
+            if (doc.exists && doc.data().verificationStatus === 'approved') {
+              window.location.href = 'partner-dashboard.html';
+            }
+          })
+          .catch(function () {});
+      });
+    });
+  })();
+</script>
+
+</body>
+</html>
