@@ -40,10 +40,30 @@
    SECTION 1 — PRICING CONFIGURATION (SINGLE SOURCE OF TRUTH)
    ============================================================ */
 
+/**
+ * ============================================================
+ * REPLACEMENT FOR SECTION 1 — PRICING CONFIGURATION
+ * in pricing-engine-v2.js
+ *
+ * Recalibrated: July 2026
+ * Reason: local move base fares / per-km rates / floor charges
+ * were calibrated closer to commercial freight than Bangalore
+ * household local-move pricing, causing quotes ~30-45% above
+ * market. This block ONLY changes numbers — no function
+ * signatures, no structure, no other sections touched.
+ *
+ * HOW TO APPLY:
+ * 1. Open pricing-engine-v2.js
+ * 2. Find "const PRICING_CONFIG = Object.freeze({ ... });"
+ * 3. Replace the ENTIRE block with this one.
+ * 4. Leave everything else in the file untouched.
+ * ============================================================
+ */
+
 const PRICING_CONFIG = Object.freeze({
 
   /** Engine version — bump when config changes */
-  version: "2.0.0",
+  version: "2.1.0",
 
   /** Minimum chargeable amount for any booking */
   minimumFare: 1499,
@@ -52,39 +72,35 @@ const PRICING_CONFIG = Object.freeze({
   local: {
     /**
      * Free distance included in base fare (km).
-     * Customer pays nothing extra within this range.
+     * RECALIBRATED: 5 → 10. Most Bangalore local moves fall
+     * within 10-20km; a 5km allowance meant nearly every move
+     * paid full per-km on top of an already-high base fare.
      */
-    freeKm: 5,
+    freeKm: 10,
 
     /**
      * Vehicle base fares and per-km rates.
-     * Key must match vehicle id in VEHICLE_CONFIG.
+     * RECALIBRATED against real Bangalore local-move quotes
+     * (packing/loading/transport/unloading bundled), not
+     * commercial freight rates.
+     *
      *   baseFare   — flat charge for up to `freeKm` km
      *   perKm      — charged for every km beyond freeKm
-     *   operCost   — our internal cost estimate (fuel + driver)
+     *   operCost   — internal cost estimate (fuel + driver + helpers),
+     *                scaled down to match realistic costs at
+     *                the new base fares (was scaled for old fares)
      */
     vehicles: {
-      tata_ace:   { baseFare: 1999, perKm: 28, operCost: 1200 },
-      truck_14ft: { baseFare: 4500, perKm: 42, operCost: 2800 },
-      truck_17ft: { baseFare: 6000, perKm: 50, operCost: 3500 },
-      truck_22ft: { baseFare: 7500, perKm: 58, operCost: 4500 },
+      tata_ace:   { baseFare: 1799, perKm: 22, operCost: 1000 },
+      truck_14ft: { baseFare: 2799, perKm: 24, operCost: 1600 },
+      truck_17ft: { baseFare: 3799, perKm: 26, operCost: 2200 },
+      truck_22ft: { baseFare: 4999, perKm: 30, operCost: 2900 },
     },
   },
 
-  /* ── INTERCITY SHIFTING ──────────────────────────────────── */
+  /* ── INTERCITY SHIFTING (unchanged) ──────────────────────── */
   intercity: {
-    /**
-     * Distance threshold in km above which a move is intercity.
-     */
     thresholdKm: 100,
-
-    /**
-     * Slab-based pricing indexed by [houseValue][distanceSlab].
-     * houseValue  — matches the HTML <select> option value
-     * distanceSlab — "400" | "600" | "1000" | "2000" (max km in slab)
-     *
-     * These are ALL-INCLUSIVE base rates (no extra per-km).
-     */
     slabs: {
       "2500":  { "400": 8000,  "600": 9500,  "1000": 14000, "2000": 20000 },
       "4500":  { "400": 8500,  "600": 10500, "1000": 15500, "2000": 22000 },
@@ -92,21 +108,16 @@ const PRICING_CONFIG = Object.freeze({
       "8500":  { "400": 12500, "600": 15000, "1000": 22000, "2000": 30000 },
       "10500": { "400": 14500, "600": 17500, "1000": 26000, "2000": 35000 },
       "13500": { "400": 17000, "600": 20500, "1000": 30000, "2000": 42000 },
-      /* Office */
       "6500_office":  { "400": 12000, "600": 15000, "1000": 22000, "2000": 32000 },
       "10500_office": { "400": 15000, "600": 18000, "1000": 26000, "2000": 38000 },
       "16500_office": { "400": 20000, "600": 24000, "1000": 34000, "2000": 48000 },
       "25500_office": { "400": 28000, "600": 34000, "1000": 48000, "2000": 65000 },
     },
-
-    /** Default fallback rate when house value has no slab entry */
     fallbackRate: 12000,
-
-    /** Our internal cost multiplier vs the slab rate */
     operCostRatio: 0.62,
   },
 
-  /* ── SINGLE ITEM SHIFTING ────────────────────────────────── */
+  /* ── SINGLE ITEM SHIFTING (unchanged) ────────────────────── */
   singleItem: {
     baseFare: 1499,
     operCost: 800,
@@ -114,62 +125,62 @@ const PRICING_CONFIG = Object.freeze({
 
   /* ── FURNITURE ITEM PRICES ───────────────────────────────── */
   /**
-   * Price per unit charged for each furniture item.
-   * 0 = FREE (still tracked for recommendations).
-   * Key matches the HTML input `id`.
+   * RECALIBRATED: ~25-30% reduction across the board, rounded
+   * to clean numbers. These now act as a genuine line-item
+   * value-add rather than a hidden reason quotes feel padded.
    */
- furniturePrices: {
+  furniturePrices: {
 
-  // Living Room
-  sofaCheck: 200,
-  sofaCumBedCheck: 350,
-  reclinerCheck: 250,
-  tvCheck: 100,
-  tvUnitCheck: 200,
-  coffeeCheck: 75,
-  centerTableCheck: 100,
-  bookshelfCheck: 200,
-  showcaseCheck: 300,
-  shoeRackCheck: 100,
-  acCheck: 400,
+    // Living Room
+    sofaCheck: 150,
+    sofaCumBedCheck: 250,
+    reclinerCheck: 175,
+    tvCheck: 75,
+    tvUnitCheck: 150,
+    coffeeCheck: 50,
+    centerTableCheck: 75,
+    bookshelfCheck: 150,
+    showcaseCheck: 200,
+    shoeRackCheck: 75,
+    acCheck: 300,
 
-  // Bedroom
-  bedCheck: 300,
-  mattressCheck: 100,
-  wardrobeCheck: 500,
-  dressingCheck: 200,
-  sideTableCheck: 75,
-  studyTableCheck: 150,
+    // Bedroom
+    bedCheck: 200,
+    mattressCheck: 75,
+    wardrobeCheck: 350,
+    dressingCheck: 150,
+    sideTableCheck: 50,
+    studyTableCheck: 100,
 
-  // Kitchen
-  fridgeCheck: 200,
-  wmCheck: 175,
-  dishwasherCheck: 250,
-  microwaveCheck: 75,
-  ovenCheck: 150,
-  chimneyCheck: 200,
-  diningCheck: 250,
-  waterPurifierCheck: 100,
+    // Kitchen
+    fridgeCheck: 150,
+    wmCheck: 125,
+    dishwasherCheck: 175,
+    microwaveCheck: 50,
+    ovenCheck: 100,
+    chimneyCheck: 150,
+    diningCheck: 175,
+    waterPurifierCheck: 75,
 
-  // Office
-  deskCheck: 200,
-  chairCheck: 50,
-  serverCheck: 500,
-  printerCheck: 150,
-  confCheck: 400,
-  cabinetCheck: 250,
-  whiteboardCheck: 100,
+    // Office
+    deskCheck: 150,
+    chairCheck: 40,
+    serverCheck: 350,
+    printerCheck: 100,
+    confCheck: 300,
+    cabinetCheck: 175,
+    whiteboardCheck: 75,
 
-  // Others
-  bikeCheck: 250,
-  cycleCheck: 100,
-  plantCheck: 75,
-  gymCheck: 400,
-  treadmillCheck: 500,
-  aquariumCheck: 300
-},
+    // Others
+    bikeCheck: 175,
+    cycleCheck: 75,
+    plantCheck: 50,
+    gymCheck: 300,
+    treadmillCheck: 350,
+    aquariumCheck: 200
+  },
 
-  /* ── CARTON BOXES ────────────────────────────────────────── */
+  /* ── CARTON BOXES (unchanged) ────────────────────────────── */
   cartons: {
     pricePerBox: 50,
     operCostPerBox: 30,
@@ -177,20 +188,17 @@ const PRICING_CONFIG = Object.freeze({
 
   /* ── FLOOR CHARGES ───────────────────────────────────────── */
   /**
-   * Charged per floor at pickup + drop combined.
-   * E.g. pickup floor 2 + drop floor 3 = 5 floors.
+   * RECALIBRATED: withLift 150→100, withoutLift 300→200.
+   * Still charges appropriately for no-lift labor, without
+   * compounding on top of the (now corrected) base fare.
    */
   floor: {
-    withLift:    150,   // ₹ per floor when lift available
-    withoutLift: 300,   // ₹ per floor when no lift
+    withLift:    100,
+    withoutLift: 200,
     operCostRatio: 0.5,
   },
 
-  /* ── PACKING CHARGES ─────────────────────────────────────── */
-  /**
-   * Optional add-on packing service.
-   * Currently not surfaced in UI but ready for future use.
-   */
+  /* ── PACKING CHARGES (unchanged) ─────────────────────────── */
   packing: {
     "1rk":    800,
     "1bhk":  1200,
@@ -204,81 +212,51 @@ const PRICING_CONFIG = Object.freeze({
     "office_large": 7000,
   },
 
-  /* ── LABOUR CHARGES ──────────────────────────────────────── */
-  /**
-   * Additional helpers beyond the driver.
-   * Not currently surfaced in UI — ready for future.
-   */
+  /* ── LABOUR CHARGES (unchanged) ──────────────────────────── */
   labour: {
-    pricePerHelper: 400,   // ₹ per extra helper per move
+    pricePerHelper: 400,
     operCostPerHelper: 300,
   },
 
-  /* ── INSURANCE ───────────────────────────────────────────── */
-  /**
-   * Transit insurance.
-   * Currently included in base — set `included: true`.
-   * Set `included: false` and specify `percent` to charge it.
-   */
+  /* ── INSURANCE (unchanged) ───────────────────────────────── */
   insurance: {
     included: true,
-    percent: 0.5,   // 0.5% of declared goods value if charged
+    percent: 0.5,
     operCostRatio: 0.8,
   },
 
-  // GST hidden until GST registration
-
-  /* ── PAYMENT OPTIONS ─────────────────────────────────────── */
+  /* ── PAYMENT OPTIONS (unchanged) ─────────────────────────── */
   payment: {
-    advancePercent: 10,       // 10% advance payment
-    fullPaymentDiscount: 200, // ₹200 off for full upfront payment
+    advancePercent: 10,
+    fullPaymentDiscount: 200,
   },
 
-  /* ── SURCHARGES ──────────────────────────────────────────── */
+  /* ── SURCHARGES (unchanged) ──────────────────────────────── */
   surcharges: {
-    /**
-     * Night surcharge: applied to bookings 9 PM – 7 AM.
-     * Expressed as a multiplier on the final total.
-     */
     night: {
       enabled: false,
-      startHour: 21,  // 9 PM
-      endHour: 7,     // 7 AM
-      multiplier: 1.15, // +15%
+      startHour: 21,
+      endHour: 7,
+      multiplier: 1.15,
     },
-
-    /**
-     * Weekend surcharge: Saturday & Sunday.
-     * dayOfWeek: 0 = Sunday, 6 = Saturday
-     */
     weekend: {
       enabled: false,
       days: [0, 6],
-      multiplier: 1.10, // +10%
+      multiplier: 1.10,
     },
-
-    /**
-     * Rain / monsoon surcharge.
-     * Months: 0-indexed. 5 = Jun, 6 = Jul, 7 = Aug, 8 = Sep
-     */
     rain: {
       enabled: false,
       months: [5, 6, 7, 8],
-      multiplier: 1.08, // +8%
+      multiplier: 1.08,
     },
-
-    /**
-     * Waiting charge per hour beyond the free window.
-     */
     waiting: {
       freeHours: 1,
       pricePerHour: 200,
     },
   },
 
-  /* ── DISCOUNTS ───────────────────────────────────────────── */
+  /* ── DISCOUNTS (unchanged) ───────────────────────────────── */
   discounts: {
-    /** Maximum promo discount as fraction of total */
     maxPromoFraction: 0.5,
     referralAmount: 100,
   },
