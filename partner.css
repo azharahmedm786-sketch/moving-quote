@@ -34,7 +34,7 @@
 /* Reuse pz-btn classes if not already present in style.css (safe fallback) */
 .pz-btn {
   display: inline-flex; align-items: center; justify-content: center;
-  gap: 8px; text-decoration: none; font-family: 'Inter', sans-serif;
+  gap: 8px; text-decoration: none; font-family: 'Manrope', sans-serif;
   font-weight: 700; border-radius: var(--radius-pill); cursor: pointer;
   transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
   border: none;
@@ -128,7 +128,7 @@
 }
 .partner-stat { text-align: center; }
 .partner-stat-num {
-  display: block; font-family: 'Syne', sans-serif;
+  display: block; font-family: 'Space Grotesk', sans-serif;
   font-size: 1.3rem; font-weight: 800; color: var(--green-600);
 }
 .partner-stat-label {
