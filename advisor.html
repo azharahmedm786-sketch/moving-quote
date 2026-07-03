@@ -692,6 +692,66 @@
       .stats-grid { grid-template-columns: 1fr 1fr; }
       .kpi-row { grid-template-columns: 1fr; }
     }
+
+    /* ════════════════════════════════════════════
+       NEW BOOKING MODULE (scoped nb- prefix)
+       ════════════════════════════════════════════ */
+    .nb-draft-banner {
+      background: rgba(61,156,245,.08); border: 1px solid rgba(61,156,245,.25);
+      color: var(--blue); border-radius: 10px; padding: 10px 16px; font-size: .8rem;
+      margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap;
+    }
+    .nb-draft-banner button { border: none; border-radius: 6px; padding: 6px 12px; font-size: .72rem; font-weight: 700; cursor: pointer; color: #fff; }
+    .nb-draft-banner .nb-restore { background: var(--blue); }
+    .nb-draft-banner .nb-discard { background: var(--red); }
+    .nb-grid { display: grid; grid-template-columns: 1fr 340px; gap: 16px; align-items: start; }
+    .nb-form-col { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+    .nb-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 18px 20px; }
+    .nb-card h3 { font-family: var(--mono); font-size: .8rem; color: var(--gold); margin-bottom: 14px; text-transform: uppercase; letter-spacing: .05em; }
+    .nb-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px,1fr)); gap: 12px; margin-bottom: 12px; }
+    .nb-row:last-child { margin-bottom: 0; }
+    .nb-field label { display: block; font-size: .68rem; color: var(--muted); font-weight: 700; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 6px; }
+    .nb-field input, .nb-field select, .nb-field textarea {
+      width: 100%; background: var(--bg); border: 1px solid var(--border2); border-radius: 8px;
+      padding: 9px 12px; color: var(--text); font-family: var(--sans); font-size: .85rem; outline: none; transition: border-color .2s;
+    }
+    .nb-field input:focus, .nb-field select:focus, .nb-field textarea:focus { border-color: var(--gold); }
+    .nb-type-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; }
+    .nb-type-card { border: 1.5px solid var(--border2); border-radius: 10px; padding: 14px 10px; text-align: center; cursor: pointer; transition: .15s; font-size: .82rem; font-weight: 600; }
+    .nb-type-card:hover { border-color: var(--gold); }
+    .nb-type-card.selected { border-color: var(--gold); background: rgba(245,166,35,.08); color: var(--gold); }
+    .nb-size-grid, .nb-vehicle-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px,1fr)); gap: 10px; }
+    .nb-select-card { border: 1.5px solid var(--border2); border-radius: 10px; padding: 10px 8px; text-align: center; cursor: pointer; font-size: .78rem; font-weight: 600; transition: .15s; }
+    .nb-select-card:hover { border-color: var(--gold); }
+    .nb-select-card.selected { border-color: var(--gold); background: rgba(245,166,35,.08); color: var(--gold); }
+    .nb-toggle-row { display: flex; align-items: center; justify-content: space-between; padding: 9px 0; border-bottom: 1px solid var(--border); font-size: .82rem; }
+    .nb-toggle-row:last-child { border-bottom: none; }
+    .nb-switch { position: relative; width: 38px; height: 22px; flex-shrink: 0; }
+    .nb-switch input { opacity: 0; width: 0; height: 0; }
+    .nb-switch .sldr { position: absolute; inset: 0; background: var(--border2); border-radius: 22px; cursor: pointer; transition: .2s; }
+    .nb-switch .sldr::before { content: ''; position: absolute; width: 16px; height: 16px; left: 3px; top: 3px; background: #fff; border-radius: 50%; transition: .2s; }
+    .nb-switch input:checked + .sldr { background: var(--gold); }
+    .nb-switch input:checked + .sldr::before { transform: translateX(16px); }
+    .nb-map { width: 100%; height: 200px; border-radius: 10px; margin-top: 10px; background: var(--bg); border: 1px solid var(--border2); display: none; }
+    .nb-distance-badge { font-size: .78rem; color: var(--gold); margin-top: 8px; font-weight: 600; }
+    .nb-furniture-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(128px,1fr)); gap: 8px; }
+    .nb-furn-card { border: 1.5px solid var(--border2); border-radius: 8px; padding: 8px; text-align: center; font-size: .72rem; transition: .15s; }
+    .nb-furn-card.active { border-color: var(--gold); background: rgba(245,166,35,.06); }
+    .nb-qty-row { display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 6px; }
+    .nb-qty-btn { width: 22px; height: 22px; border-radius: 50%; border: 1px solid var(--border2); background: var(--bg); color: var(--text); cursor: pointer; font-weight: 700; font-size: .85rem; line-height: 1; }
+    .nb-qty-btn:hover { border-color: var(--gold); color: var(--gold); }
+    .nb-summary { position: sticky; top: 0; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 20px; }
+    .nb-summary-line { display: flex; justify-content: space-between; font-size: .8rem; padding: 6px 0; border-bottom: 1px solid var(--border); color: var(--muted); gap: 10px; }
+    .nb-summary-line strong { color: var(--text); font-family: var(--mono); }
+    .nb-summary-total { font-family: var(--mono); font-size: 1.6rem; color: var(--gold); font-weight: 700; margin: 12px 0; }
+    .nb-pay-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: 8px; }
+    .nb-pay-opt { border: 1.5px solid var(--border2); border-radius: 8px; padding: 8px 4px; text-align: center; font-size: .7rem; font-weight: 600; cursor: pointer; }
+    .nb-pay-opt.selected { border-color: var(--gold); background: rgba(245,166,35,.08); color: var(--gold); font-weight: 700; }
+    .nb-btn-save { width: 100%; padding: 13px; background: var(--gold); color: #000; border: none; border-radius: 10px; font-weight: 800; font-size: .9rem; cursor: pointer; margin-top: 14px; transition: opacity .2s; }
+    .nb-btn-save:hover { opacity: .9; }
+    .nb-btn-save:disabled { opacity: .5; cursor: not-allowed; }
+    .nb-err { color: var(--red); font-size: .76rem; margin-top: 8px; min-height: 16px; font-weight: 600; }
+    @media (max-width: 900px) { .nb-grid { grid-template-columns: 1fr; } .nb-summary { position: static; } }
   </style>
 </head>
 <body>
@@ -728,6 +788,9 @@
 <!-- Load your existing Firebase config — same file, same project -->
 <script src="env-config.js"></script>
 <script src="firebase-config.js"></script>
+
+<!-- Same pricing engine your customer booking flow uses. Not duplicated — loaded as-is. -->
+<script src="pricing-engine-v2.js"></script>
 
 <script>
 /* ════════════════════════════════════════════
@@ -838,6 +901,7 @@ function buildShell() {
     <div class="nav-item active" onclick="showSection('overview',this)"><span class="nav-icon">📊</span> Overview</div>
     <div class="nav-item" onclick="showSection('revenue',this)"><span class="nav-icon">💰</span> Revenue</div>
     <div class="sb-section">Operations</div>
+    <div class="nav-item" onclick="showSection('newbooking',this)"><span class="nav-icon">➕</span> New Booking</div>
     <div class="nav-item" onclick="showSection('bookings',this)"><span class="nav-icon">📦</span> All Bookings</div>
     <div class="nav-item" onclick="showSection('customers',this)"><span class="nav-icon">👥</span> Customers</div>
     <div class="nav-item" onclick="showSection('drivers',this)"><span class="nav-icon">🚚</span> Drivers</div>
@@ -964,6 +1028,174 @@ function buildShell() {
             <thead><tr><th>Month</th><th>Bookings</th><th>Revenue</th><th>Avg. Value</th><th>% of Total</th></tr></thead>
             <tbody id="revTable"><tr><td class="empty-td" colspan="5"><span class="spinner"></span></td></tr></tbody>
           </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- NEW BOOKING -->
+    <div class="section" id="secNewbooking">
+      <div class="nb-draft-banner" id="nbDraftBanner" style="display:none">
+        <span>📝 You have an unsaved draft booking from earlier.</span>
+        <div style="display:flex;gap:8px">
+          <button class="nb-restore" onclick="nbRestoreDraft()">Restore</button>
+          <button class="nb-discard" onclick="nbDiscardDraft()">Discard</button>
+        </div>
+      </div>
+
+      <div class="nb-grid">
+        <div class="nb-form-col">
+
+          <div class="nb-card">
+            <h3>👤 Customer Details</h3>
+            <div class="nb-row">
+              <div class="nb-field"><label>Full Name *</label><input id="nbName" placeholder="Customer name" oninput="nbSaveDraft()"></div>
+              <div class="nb-field"><label>Phone *</label><input id="nbPhone" type="tel" maxlength="10" placeholder="10-digit mobile" oninput="nbSaveDraft()"></div>
+              <div class="nb-field"><label>Alternate Phone</label><input id="nbAltPhone" type="tel" maxlength="10" placeholder="Optional" oninput="nbSaveDraft()"></div>
+              <div class="nb-field"><label>Email</label><input id="nbEmail" type="email" placeholder="Optional" oninput="nbSaveDraft()"></div>
+              <div class="nb-field"><label>Lead Source</label>
+                <select id="nbLeadSource" onchange="nbSaveDraft()">
+                  <option value="walk_in">Walk-in / Call</option>
+                  <option value="whatsapp">WhatsApp</option>
+                  <option value="referral">Referral</option>
+                  <option value="website">Website</option>
+                  <option value="google">Google</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="nb-card">
+            <h3>📦 Move Type</h3>
+            <div class="nb-type-grid" id="nbTypeGrid">
+              <div class="nb-type-card" data-type="home" onclick="nbSelectMoveType('home')">🏠<br>Home</div>
+              <div class="nb-type-card" data-type="office" onclick="nbSelectMoveType('office')">🏢<br>Office</div>
+              <div class="nb-type-card" data-type="single" onclick="nbSelectMoveType('single')">📦<br>Single Item</div>
+            </div>
+            <div style="margin-top:16px">
+              <label style="display:block;font-size:.68rem;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px" id="nbSizeLabel">House Type</label>
+              <div class="nb-size-grid" id="nbSizeGrid"><span style="font-size:.78rem;color:var(--muted2)">Select a move type first</span></div>
+            </div>
+          </div>
+
+          <div class="nb-card">
+            <h3>📍 Pickup &amp; Drop</h3>
+            <div class="nb-field" style="margin-bottom:12px"><label>Pickup Address *</label><input id="nbPickup" placeholder="Enter pickup address" autocomplete="off"></div>
+            <div class="nb-field"><label>Drop Address *</label><input id="nbDrop" placeholder="Enter drop address" autocomplete="off"></div>
+            <div id="nbMap" class="nb-map"></div>
+            <div id="nbDistanceInfo" class="nb-distance-badge"></div>
+          </div>
+
+          <div class="nb-card">
+            <h3>🗓️ Schedule</h3>
+            <div class="nb-row">
+              <div class="nb-field"><label>Moving Date *</label><input id="nbDate" type="date" onchange="nbSaveDraft();nbCalc();"></div>
+              <div class="nb-field"><label>Preferred Time *</label>
+                <select id="nbTime" onchange="nbSaveDraft();nbCalc();">
+                  <option value="">Select slot</option>
+                  <option value="07:00">7–9 AM</option>
+                  <option value="09:00">9–11 AM</option>
+                  <option value="11:00">11–1 PM</option>
+                  <option value="13:00">1–3 PM</option>
+                  <option value="15:00">3–5 PM</option>
+                  <option value="17:00">5–7 PM</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="nb-card" id="nbVehicleCard">
+            <h3>🚚 Vehicle</h3>
+            <div class="nb-vehicle-grid" id="nbVehicleGrid"><span style="font-size:.78rem;color:var(--muted2)">Select a move type first</span></div>
+          </div>
+
+          <div class="nb-card">
+            <h3>🏗️ Floors, Access &amp; Add-on Services</h3>
+            <div class="nb-row">
+              <div class="nb-field"><label>Pickup Floor</label>
+                <select id="nbPickupFloor" onchange="nbCalc()">
+                  <option value="0">Ground/1st (free)</option><option value="2">2nd–4th</option><option value="5">5th–8th</option><option value="9">9th+</option>
+                </select>
+              </div>
+              <div class="nb-field"><label>Drop Floor</label>
+                <select id="nbDropFloor" onchange="nbCalc()">
+                  <option value="0">Ground/1st (free)</option><option value="2">2nd–4th</option><option value="5">5th–8th</option><option value="9">9th+</option>
+                </select>
+              </div>
+            </div>
+            <div class="nb-toggle-row"><span>🛗 Lift available (50% off floor charge)</span><label class="nb-switch"><input type="checkbox" id="nbLift" onchange="nbCalc()"><span class="sldr"></span></label></div>
+            <div class="nb-toggle-row"><span>📦 Packing service</span><label class="nb-switch"><input type="checkbox" id="nbPacking" onchange="nbCalc()"><span class="sldr"></span></label></div>
+            <div class="nb-toggle-row"><span>📤 Unpacking service</span><label class="nb-switch"><input type="checkbox" id="nbUnpacking"><span class="sldr"></span></label></div>
+            <div class="nb-toggle-row"><span>🔧 Dismantling</span><label class="nb-switch"><input type="checkbox" id="nbDismantle"><span class="sldr"></span></label></div>
+            <div class="nb-toggle-row"><span>🔩 Assembly</span><label class="nb-switch"><input type="checkbox" id="nbAssembly"><span class="sldr"></span></label></div>
+            <div class="nb-toggle-row"><span>🏬 Storage needed</span><label class="nb-switch"><input type="checkbox" id="nbStorage"><span class="sldr"></span></label></div>
+            <div class="nb-toggle-row"><span>🛡️ Insurance (included on every move)</span><label class="nb-switch"><input type="checkbox" id="nbInsurance" checked disabled><span class="sldr"></span></label></div>
+          </div>
+
+          <div class="nb-card">
+            <h3>🛋️ Items &amp; Cartons</h3>
+            <div class="nb-furniture-grid" id="nbFurnitureGrid"></div>
+            <div class="nb-row" style="margin-top:14px">
+              <div class="nb-field"><label>Carton Boxes</label>
+                <div class="nb-qty-row" style="justify-content:flex-start">
+                  <button class="nb-qty-btn" onclick="nbCartonQty(-1)">−</button>
+                  <input id="nbCartonQty" value="0" style="width:44px;text-align:center;background:transparent;border:none;color:var(--text)" readonly>
+                  <button class="nb-qty-btn" onclick="nbCartonQty(1)">+</button>
+                </div>
+              </div>
+              <div class="nb-field"><label>Fragile Items</label><input id="nbFragile" placeholder="e.g. TV, glassware"></div>
+              <div class="nb-field"><label>Special Items</label><input id="nbSpecial" placeholder="e.g. Piano, safe"></div>
+            </div>
+            <div class="nb-field" style="margin-top:10px"><label>Remarks</label><textarea id="nbRemarks" rows="2" placeholder="Any additional notes for the crew"></textarea></div>
+          </div>
+
+          <div class="nb-card">
+            <h3>⚙️ Booking Operations</h3>
+            <div class="nb-row">
+              <div class="nb-field"><label>Booking Status</label>
+                <select id="nbStatus">
+                  <option value="confirmed" selected>Confirmed</option>
+                  <option value="pending">Pending</option>
+                </select>
+              </div>
+              <div class="nb-field"><label>Assigned Driver (optional)</label><select id="nbDriver"><option value="">Unassigned</option></select></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="nb-form-col">
+          <div class="nb-summary">
+            <h3 style="font-family:var(--mono);color:var(--gold);font-size:.8rem;text-transform:uppercase;margin-bottom:12px;letter-spacing:.05em">💰 Live Quote</h3>
+            <div id="nbSummaryLines"><div class="nb-summary-line"><span>Enter move details to see price</span></div></div>
+            <div class="nb-summary-total" id="nbTotalDisplay">₹0</div>
+
+            <div class="nb-field" style="margin-top:6px">
+              <label>Coupon Code</label>
+              <div style="display:flex;gap:6px">
+                <input id="nbCoupon" placeholder="CODE" style="text-transform:uppercase">
+                <button onclick="nbApplyCoupon()" style="background:var(--gold);border:none;border-radius:8px;padding:0 14px;font-weight:700;cursor:pointer;flex-shrink:0">Apply</button>
+              </div>
+              <div class="nb-err" id="nbCouponMsg" style="min-height:14px"></div>
+            </div>
+
+            <div style="margin-top:10px">
+              <label style="display:block;font-size:.68rem;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">Payment Method</label>
+              <div class="nb-pay-grid">
+                <div class="nb-pay-opt selected" data-pay="pay_later" onclick="nbSelectPayment('pay_later')">Pay Later</div>
+                <div class="nb-pay-opt" data-pay="advance" onclick="nbSelectPayment('advance')">Advance</div>
+                <div class="nb-pay-opt" data-pay="full" onclick="nbSelectPayment('full')">Full Paid</div>
+              </div>
+            </div>
+
+            <div class="nb-toggle-row" style="margin-top:6px">
+              <span>💵 Payment already collected?</span>
+              <label class="nb-switch"><input type="checkbox" id="nbPaidToggle"><span class="sldr"></span></label>
+            </div>
+
+            <div class="nb-err" id="nbFormErr"></div>
+            <button class="nb-btn-save" id="nbSaveBtn" onclick="nbSaveBooking()">✅ Create Booking</button>
+            <div style="font-size:.68rem;color:var(--muted);margin-top:8px;text-align:center">Draft auto-saves as you type</div>
+          </div>
         </div>
       </div>
     </div>
@@ -1427,11 +1659,12 @@ function renderRevenue() {
    SECTION NAV
    ════════════════════════════════════════════ */
 const sectionMeta = {
-  overview:  { title: "Overview",   sub: "Live snapshot of your business" },
-  revenue:   { title: "Revenue",    sub: "Sales analytics & breakdown" },
-  bookings:  { title: "Bookings",   sub: "All move orders from packzenblr.in" },
-  customers: { title: "Customers",  sub: "Registered users & spending" },
-  drivers:   { title: "Drivers",    sub: "Fleet status & performance" }
+  overview:   { title: "Overview",    sub: "Live snapshot of your business" },
+  revenue:    { title: "Revenue",     sub: "Sales analytics & breakdown" },
+  newbooking: { title: "New Booking", sub: "Create a booking on behalf of a customer" },
+  bookings:   { title: "Bookings",    sub: "All move orders from packzenblr.in" },
+  customers:  { title: "Customers",   sub: "Registered users & spending" },
+  drivers:    { title: "Drivers",     sub: "Fleet status & performance" }
 };
 
 function showSection(name, navEl) {
@@ -1444,9 +1677,10 @@ function showSection(name, navEl) {
   setText("sectionTitle", meta.title || cap(name));
   setText("sectionSub",   meta.sub   || "Real-time data");
   activeSection = name;
-  if (name === "overview") renderCharts();
-  if (name === "revenue")  renderRevenue();
-  if (name === "drivers")  renderDrivers();
+  if (name === "overview")   renderCharts();
+  if (name === "revenue")    renderRevenue();
+  if (name === "drivers")    renderDrivers();
+  if (name === "newbooking") nbInit();
 }
 
 /* ════════════════════════════════════════════
