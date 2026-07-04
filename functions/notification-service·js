@@ -8,7 +8,7 @@
    the new email channel. Admin email notifications also flow
    through here so everything is logged consistently.
    ============================================================ */
-const admin = require("firebase-admin");
+const admin = require("firebase-admin"); 
 const { sendBrevoEmail } = require("./brevo-client");
 const { TEMPLATES } = require("./email-templates");
 
