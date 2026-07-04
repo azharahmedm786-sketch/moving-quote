@@ -253,6 +253,25 @@ if (
       }
       console.log("SIGNATURE VERIFIED SUCCESSFULLY");
 
+      // Prevent duplicate booking creation
+const existingBooking = await admin.firestore()
+  .collection("bookings")
+  .where("paymentId", "==", razorpay_payment_id)
+  .limit(1)
+  .get();
+
+if (!existingBooking.empty) {
+  const existingData = existingBooking.docs[0].data();
+
+  console.log("Duplicate payment verification request detected.");
+
+  return res.status(200).json({
+    success: true,
+    bookingRef: existingData.bookingRef,
+   message: "Payment already processed."
+  });
+}
+
       const bookingRef = "PKZ-" + Date.now().toString(36).toUpperCase();
       console.log("ABOUT TO CREATE BOOKING");
 console.log("BOOKING DATA:", bookingData);
