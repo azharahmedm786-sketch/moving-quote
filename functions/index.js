@@ -293,7 +293,14 @@ console.log("BOOKING DATA:", bookingData);
   status: "confirmed",
   createdAt: admin.firestore.FieldValue.serverTimestamp()
 });
-       
+       // Queue booking confirmation SMS
+await admin.firestore().collection("smsQueue").add({
+  mobile: bookingData.phone,
+  message: `Hi ${bookingData.customerName}, your PackZen booking (${bookingRef}) has been confirmed for ${bookingData.date}. Thank you for choosing PackZen!`,
+  status: "pending",
+  retries: 0,
+  createdAt: admin.firestore.FieldValue.serverTimestamp()
+});
 console.log("BOOKING CREATED SUCCESSFULLY");
       console.log("✅ Payment verified:", razorpay_payment_id);
 
