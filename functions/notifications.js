@@ -6,7 +6,7 @@
    verifyRazorpayPayment). Deploy it by requiring/exporting these
    functions from index.js — see the one-line addition documented
    below.
-
+ 
    All functions are region "asia-south1" to match your existing
    setup. All are wrapped so a notification failure NEVER throws
    past the trigger boundary — booking flow is never blocked.
