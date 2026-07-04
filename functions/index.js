@@ -7,7 +7,7 @@ admin.initializeApp();
 /* ============================================================
    SEND SMS VIA MSG91
    Triggered whenever a new doc is added to /smsQueue
-   ============================================================ */
+   ============================================================ */ 
 exports.sendSMS = functions
   .region("asia-south1")            // Mumbai — lowest latency for India
   .firestore.document("smsQueue/{docId}")
