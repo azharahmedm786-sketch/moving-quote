@@ -317,3 +317,5 @@ console.log("BOOKING CREATED SUCCESSFULLY");
       });
     }
   });
+Object.assign(exports, require("./notifications"));
+Object.assign(exports, require("./scheduled-notifications"));
