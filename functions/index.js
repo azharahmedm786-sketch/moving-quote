@@ -13,7 +13,7 @@ exports.sendSMS = functions
   .firestore.document("smsQueue/{docId}")
   .onCreate(async (snap, context) => {
     const data   = snap.data();
-    const docRef = snap.ref;
+    const docRef = snap.ref; 
 
     // Skip if already processed (safety check)
     if (data.status !== "pending") return null;
