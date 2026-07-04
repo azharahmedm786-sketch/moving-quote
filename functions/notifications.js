@@ -15,7 +15,7 @@ const functions = require("firebase-functions");
 const admin = require("firebase-admin");
 // admin.initializeApp() is already called in your existing index.js.
 // Do not call it again here — Firebase will throw "app already exists".
-
+ 
 const { sendCustomerEmail, sendAdminEmail } = require("./notification-service");
 
 /* ────────────────────────────────────────────────────────────
