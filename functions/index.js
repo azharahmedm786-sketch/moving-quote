@@ -18,7 +18,7 @@ exports.sendSMS = functions
     // Skip if already processed (safety check)
     if (data.status !== "pending") return null;
 
-    const { mobile, message } = data;
+    const { mobile, message } = data; 
     if (!mobile || !message) {
       await docRef.update({ status: "failed", error: "Missing mobile or message" });
       return null;
