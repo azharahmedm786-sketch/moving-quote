@@ -3,7 +3,15 @@ const admin     = require("firebase-admin");
 const https     = require("https");
 
 admin.initializeApp();
- 
+
+const {
+  sendBookingConfirmationEmail,
+  sendDriverAssignedEmail,
+  sendMoveReminderEmail,
+  sendBookingCompletedEmail,
+  sendReviewRequestEmail
+} = require("./booking-notifications");
+
 /* ============================================================
    SEND SMS VIA MSG91
    Triggered whenever a new doc is added to /smsQueue
@@ -301,6 +309,19 @@ await admin.firestore().collection("smsQueue").add({
   retries: 0,
   createdAt: admin.firestore.FieldValue.serverTimestamp()
 });
+
+       // Send booking confirmation email — never blocks or throws
+       await sendBookingConfirmationEmail({
+         bookingRef,
+         customerName: bookingData.customerName || "Customer",
+         customerEmail: bookingData.email || null,
+         pickup: bookingData.pickup || "",
+         drop: bookingData.drop || "",
+         date: bookingData.date || "",
+         total: Number(bookingData.total),
+         paymentStatus: "paid"
+       }).catch(err => console.error("Booking confirmation email error (non-blocking):", err.message));
+
 console.log("BOOKING CREATED SUCCESSFULLY");
       console.log("✅ Payment verified:", razorpay_payment_id);
 
@@ -317,3 +338,7 @@ console.log("BOOKING CREATED SUCCESSFULLY");
       });
     }
   });
+
+// Notification system (additive — booking-notifications.js, notifications.js, scheduled-notifications.js)
+Object.assign(exports, require("./notifications"));
+Object.assign(exports, require("./scheduled-notifications"));
