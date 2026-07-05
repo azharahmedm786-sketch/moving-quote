@@ -3483,7 +3483,32 @@ function debounce(fn, ms) {
   let timer;
   return (...args) => { clearTimeout(timer); timer = setTimeout(() => fn(...args), ms); };
 }
+/* ============================================
+   NOTIFICATION BELL
+============================================ */
 
+function openNotifications() {
+    showToast("🔔 No notifications yet.");
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+
+    const bell = document.getElementById("navNotifBtn");
+
+    if (bell) {
+
+        bell.addEventListener("click", function (e) {
+
+            e.preventDefault();
+            e.stopPropagation();
+
+            openNotifications();
+
+        });
+
+    }
+
+});
 window.addEventListener("load", () => {
   buildDateStrip();
 });
