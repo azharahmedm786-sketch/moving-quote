@@ -2823,13 +2823,12 @@ function savePreferences() {
   }).catch(() => {});
 }
 
-function openProfile() {
+async function openProfile() {
   document.getElementById("userDropdown")?.classList.remove("open");
   if (!currentUser) { openAuthModal("login"); return; }
-  openDashboard();
-  setTimeout(() => switchDashTab("profile", document.querySelectorAll(".dash-tab")[3]), 300);
+  await openDashboard();
+  switchDashTab("profile", document.querySelectorAll(".dash-tab")[3]);
 }
-
 /* ============================================
 CANCEL / RESCHEDULE / RATE / DAMAGE
 ============================================ */
