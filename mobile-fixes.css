@@ -1873,7 +1873,29 @@ touch-action: manipulation;
 /* ── Tracking ── */
 @media (max-width: 480px) {
   .tracking-box { padding: 1rem; }
-  .tracking-status-bar { margin: 1rem 0; }
+  .tracking-status-bar {
+    margin: 1rem 0;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 8px;
+    -webkit-overflow-scrolling: touch;
+    gap: 8px;
+  }
+  .tracking-status-bar::-webkit-scrollbar {
+    height: 4px;
+  }
+  .tracking-status-bar::-webkit-scrollbar-track {
+    background: var(--bg-secondary);
+    border-radius: 4px;
+  }
+  .tracking-status-bar::-webkit-scrollbar-thumb {
+    background: var(--border-light);
+    border-radius: 4px;
+  }
+  .ts-step {
+    flex: 0 0 auto;
+    min-width: 60px;
+  }
   .ts-dot { width: 24px; height: 24px; font-size: 0.65rem; }
   .ts-label { font-size: 0.55rem; }
 
