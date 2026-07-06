@@ -64,6 +64,8 @@
   font-weight: 800 !important;
   border: none !important;
   transition: all 0.22s ease !important;
+  position: relative !important;
+  overflow: hidden !important;
 }
 .nav-auth-btn:hover {
   box-shadow: 0 8px 26px rgba(34, 197, 94, 0.58) !important;
@@ -126,6 +128,8 @@
   font-weight: 700 !important;
   letter-spacing: 0.3px !important;
   transition: transform 0.22s, box-shadow 0.22s !important;
+  position: relative !important;
+  overflow: hidden !important;
 }
 .btn-next:hover {
   transform: translateY(-2px) !important;
@@ -141,6 +145,8 @@
   font-weight: 800 !important;
   letter-spacing: 0.3px !important;
   transition: transform 0.22s, box-shadow 0.22s !important;
+  position: relative !important;
+  overflow: hidden !important;
 }
 .btn-pay:hover {
   transform: translateY(-2px) !important;
@@ -236,6 +242,8 @@
   border-radius: 8px !important;
   font-weight: 700 !important;
   border: none !important;
+  position: relative !important;
+  overflow: hidden !important;
 }
 .am-btn-primary:hover, .am-btn-confirm:hover {
   transform: translateY(-1px) !important;

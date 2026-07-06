@@ -3252,7 +3252,10 @@ document.addEventListener("DOMContentLoaded", () => {
       r.style.width = r.style.height = size + "px";
       r.style.left = e.clientX - rect.left - size / 2 + "px";
       r.style.top = e.clientY - rect.top - size / 2 + "px";
-      this.appendChild(r); r.addEventListener("animationend", () => r.remove());
+      this.appendChild(r);
+      r.addEventListener("animationend", () => r.remove());
+      // Fallback in case animation doesn't play
+      setTimeout(() => { if (r.parentNode) r.remove(); }, 1000);
     });
   });
 
