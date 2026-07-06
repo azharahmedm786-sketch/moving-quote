@@ -1229,18 +1229,27 @@
     <div class="tracking-status-bar">
       <div class="ts-step"><div class="ts-dot done" id="ts0">✓</div><div class="ts-label">Booked</div></div>
       <div class="ts-step"><div class="ts-dot" id="ts1">🚛</div><div class="ts-label">Assigned</div></div>
-      <div class="ts-step"><div class="ts-dot" id="ts2">📦</div><div class="ts-label">Packing</div></div>
-      <div class="ts-step"><div class="ts-dot" id="ts3">🚚</div><div class="ts-label">Transit</div></div>
-      <div class="ts-step"><div class="ts-dot" id="ts4">🎉</div><div class="ts-label">Delivered</div></div>
+      <div class="ts-step"><div class="ts-dot" id="ts2">📍</div><div class="ts-label">En Route</div></div>
+      <div class="ts-step"><div class="ts-dot" id="ts3">🏠</div><div class="ts-label">At Pickup</div></div>
+      <div class="ts-step"><div class="ts-dot" id="ts4">📦</div><div class="ts-label">Loading</div></div>
+      <div class="ts-step"><div class="ts-dot" id="ts5">🚚</div><div class="ts-label">Transit</div></div>
+      <div class="ts-step"><div class="ts-dot" id="ts6">🏁</div><div class="ts-label">At Drop</div></div>
+      <div class="ts-step"><div class="ts-dot" id="ts7">📥</div><div class="ts-label">Unloading</div></div>
+      <div class="ts-step"><div class="ts-dot" id="ts8">🎉</div><div class="ts-label">Completed</div></div>
     </div>
     <div class="tracking-map-area" id="trackingMapDiv"><span>📍 Driver location appears here once assigned</span></div>
     <div class="tracking-info">
       <div class="ti-row"><span class="ti-lbl">Status</span><span class="ti-val" id="trackStatus">Confirmed</span></div>
+      <div class="ti-row"><span class="ti-lbl">Vehicle</span><span class="ti-val" id="trackVehicle">—</span></div>
+      <div class="ti-row"><span class="ti-lbl">Vehicle Reg No.</span><span class="ti-val" id="trackVehicleReg">—</span></div>
       <div class="ti-row"><span class="ti-lbl">Driver</span><span class="ti-val" id="trackDriver">Not yet assigned</span></div>
-      <div class="ti-row"><span class="ti-lbl">Driver Phone</span><span class="ti-val" id="trackDriverPhone">—</span></div>
+      <div class="ti-row"><span class="ti-lbl">Driver Phone</span><span class="ti-val"><a id="trackDriverPhone" href="#" style="text-decoration:none;color:var(--gold-gradient);">—</a></span></div>
       <div class="ti-row"><span class="ti-lbl">Moving Date</span><span class="ti-val" id="trackDate">—</span></div>
+      <div class="ti-row"><span class="ti-lbl">Estimated Arrival</span><span class="ti-val" id="trackEstArrival">—</span></div>
       <div class="ti-row"><span class="ti-lbl">Pickup</span><span class="ti-val" id="trackPickup">—</span></div>
       <div class="ti-row"><span class="ti-lbl">Drop</span><span class="ti-val" id="trackDrop">—</span></div>
+      <div class="ti-row"><span class="ti-lbl">Last Updated</span><span class="ti-val" id="trackLastUpdated">—</span></div>
+      <div class="ti-row" id="rowTrackCompletedAt" style="display:none;"><span class="ti-lbl">Completed</span><span class="ti-val" id="trackCompletedAt">—</span></div>
     </div>
     <button class="btn-open-chat" onclick="closeTrackingModal();openChatModal()">💬 Chat with Driver</button>
   </div>
