@@ -789,6 +789,7 @@ touch-action: manipulation;
   cursor: pointer;
   transition: border-color 0.2s, background 0.2s, transform 0.15s;
   position: relative;
+  overflow: hidden;
 }
 
 .time-slot-btn.selected {
