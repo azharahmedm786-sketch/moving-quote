@@ -13,3 +13,11 @@ firebase-debug.log
 Thumbs.db
 node_modules/ 
 functions/node_modules/ 
+twa/app/build/
+twa/.gradle/
+twa/build/
+twa/node_modules/
+twa/android.keystore
+*.apk
+*.aab
+*.idsig
