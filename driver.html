@@ -237,6 +237,18 @@
     </label>
   </div>
 
+  <!-- TODAY'S JOBS -->
+  <div id="todayJobsSection" style="display:none;margin-bottom:16px;">
+    <div style="font-family: 'Space Grotesk',sans-serif;font-size:1.1rem;font-weight:800;color:var(--text);margin-bottom:10px">📅 Today's Jobs</div>
+    <div id="todayJobsList" style="display:flex;flex-direction:column;gap:12px;"></div>
+  </div>
+
+  <!-- UPCOMING JOBS -->
+  <div id="upcomingJobsSection" style="display:none;margin-bottom:16px;">
+    <div style="font-family: 'Space Grotesk',sans-serif;font-size:1.1rem;font-weight:800;color:var(--text);margin-bottom:10px">⏳ Upcoming Jobs</div>
+    <div id="upcomingJobsList" style="display:flex;flex-direction:column;gap:12px;"></div>
+  </div>
+
   <!-- CURRENT BOOKING -->
   <div class="booking-card" id="bookingCard">
     <div class="booking-header">
@@ -251,7 +263,10 @@
     <div class="divider"></div>
     <div class="booking-amount">
       <div><div class="ba-lbl">Total Amount</div><div class="ba-val" id="bkAmount">₹0</div></div>
-      <a id="bkNavigate" href="#" target="_blank" style="background:var(--accent);color:#fff;padding:8px 18px;border-radius:30px;text-decoration:none;font-size:.82rem;font-weight:700">🗺️ Navigate</a>
+      <div style="display:flex;gap:8px">
+        <a id="bkCall" href="#" style="background:var(--primary);color:#fff;padding:8px 14px;border-radius:30px;text-decoration:none;font-size:.82rem;font-weight:700;box-shadow:0 4px 12px rgba(0,87,255,.2)">📞 Call</a>
+        <a id="bkNavigate" href="#" target="_blank" style="background:var(--accent);color:#fff;padding:8px 14px;border-radius:30px;text-decoration:none;font-size:.82rem;font-weight:700;box-shadow:0 4px 12px rgba(0,201,110,.2)">🗺️ Nav</a>
+      </div>
     </div>
 
     <!-- PAYMENT SUMMARY -->
@@ -288,6 +303,14 @@
     <div class="status-title">Update Job Status</div>
     <div class="status-steps" id="statusSteps"></div>
     <button class="btn-update" id="btnUpdateStatus" onclick="updateJobStatus()" style="margin-top:14px">Update Status →</button>
+    <div id="otpSection" style="display:none;margin-top:14px;background:var(--surface2);padding:16px;border-radius:14px;border:1px solid var(--border)">
+      <div style="font-size:.95rem;font-weight:800;color:var(--text);margin-bottom:4px">Delivery OTP Required</div>
+      <p style="font-size:.78rem;color:var(--text-muted);margin-bottom:12px">Ask the customer for the 4-digit OTP to complete delivery.</p>
+      <input type="text" id="deliveryOtpInput" inputmode="numeric" maxlength="4" style="width:100%;padding:12px;text-align:center;font-size:1.5rem;font-weight:800;letter-spacing:12px;border:1.5px solid var(--border);border-radius:10px;outline:none;background:var(--surface);color:var(--text);margin-bottom:12px" placeholder="••••">
+      <div id="otpError" style="font-size:.8rem;color:#e53e3e;margin-bottom:12px;display:none;text-align:center;font-weight:600"></div>
+      <button class="btn-update" style="background:var(--accent);box-shadow:0 5px 16px rgba(0,201,110,.3)" onclick="verifyDeliveryOtp()">Confirm Delivery ✓</button>
+      <button class="btn-update" style="background:transparent;color:var(--text-muted);box-shadow:none;margin-top:4px;padding:8px" onclick="cancelOtpEntry()">Cancel</button>
+    </div>
   </div>
 
   <!-- LIVE LOCATION MAP -->
@@ -524,9 +547,59 @@ function listenForBooking() {
   bookingListener = window._firebase.db.collection("bookings")
     .where("driverUid", "==", driverUser.uid)
     .where("status", "in", ["assigned","packing","transit"])
-    .limit(1)
     .onSnapshot(snap => {
-      if (snap.empty) {
+      const todayStr = new Date().toISOString().split("T")[0]; // YYYY-MM-DD
+      let activeDoc = null;
+      let todays = [];
+      let upcoming = [];
+
+      snap.docs.forEach(doc => {
+        const d = doc.data();
+        d.id = doc.id;
+        if (d.status === "packing" || d.status === "transit") {
+          activeDoc = d;
+        } else if (d.status === "assigned") {
+          // If no date or date <= today, goes to Today's Jobs, else Upcoming
+          // Date format in DB is assumed to be comparable strings like YYYY-MM-DD or standard formats
+          // Since some are random strings, we'll try to parse, else default to today
+          let jobDateStr = d.date || "";
+          let jobDateObj = new Date(jobDateStr);
+          let isFuture = false;
+
+          if (!isNaN(jobDateObj.getTime())) {
+            const jobStr = jobDateObj.toISOString().split("T")[0];
+            if (jobStr > todayStr) isFuture = true;
+          }
+
+          if (isFuture) upcoming.push(d);
+          else todays.push(d);
+        }
+      });
+
+      // Handle Today's Jobs UI
+      const todaySec = document.getElementById("todayJobsSection");
+      const todayList = document.getElementById("todayJobsList");
+      if (todays.length > 0) {
+        todaySec.style.display = "block";
+        todayList.innerHTML = todays.map(b => renderAssignedJobHtml(b, !!activeDoc)).join("");
+      } else {
+        todaySec.style.display = "none";
+        todayList.innerHTML = "";
+      }
+
+      // Handle Upcoming Jobs UI
+      const upcomingSec = document.getElementById("upcomingJobsSection");
+      const upcomingList = document.getElementById("upcomingJobsList");
+      if (upcoming.length > 0) {
+        upcomingSec.style.display = "block";
+        upcomingList.innerHTML = upcoming.map(b => renderAssignedJobHtml(b, !!activeDoc)).join("");
+      } else {
+        upcomingSec.style.display = "none";
+        upcomingList.innerHTML = "";
+      }
+
+      // Handle Active Job UI
+      if (!activeDoc) {
         currentBookingId = null; currentBookingData = null;
         document.getElementById("bookingCard").style.display = "none";
         document.getElementById("noBookingCard").style.display = "block";
@@ -535,15 +608,43 @@ function listenForBooking() {
         document.getElementById("chatCustomerName").textContent = "No active booking";
         document.getElementById("drvChatMessages").innerHTML = '<div class="chat-empty">No active booking.</div>';
         if (chatListener) { chatListener(); chatListener = null; }
-        return;
+      } else {
+        currentBookingId = activeDoc.id;
+        currentBookingData = activeDoc;
+        showBookingUI(currentBookingData);
+        buildStatusSteps(currentBookingData.status);
+        listenChat();
       }
-      const doc = snap.docs[0];
-      currentBookingId   = doc.id;
-      currentBookingData = { id: doc.id, ...doc.data() };
-      showBookingUI(currentBookingData);
-      buildStatusSteps(currentBookingData.status);
-      listenChat();
     });
+}
+
+function renderAssignedJobHtml(b, hasActiveJob) {
+  const btnAttr = hasActiveJob
+    ? 'disabled style="background:var(--text-muted);color:#fff;padding:8px 14px;border-radius:20px;border:none;font-weight:700;cursor:not-allowed;font-size:.8rem"'
+    : `onclick="startAssignedJob('${b.id}')" style="background:var(--primary);color:#fff;padding:8px 14px;border-radius:20px;border:none;font-weight:700;cursor:pointer;font-size:.8rem;box-shadow:0 4px 12px rgba(0,87,255,.2)"`;
+
+  return `
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px;box-shadow:var(--shadow-sm)">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <div style="font-family:'Space Grotesk',sans-serif;font-weight:800;font-size:.95rem;color:var(--text)">#${b.id.slice(-6).toUpperCase()}</div>
+        <div style="font-size:.75rem;color:var(--text-muted);background:var(--surface2);padding:3px 8px;border-radius:12px;border:1px solid var(--border)">${b.date || "—"}</div>
+      </div>
+      <div style="font-size:.85rem;color:var(--text);margin-bottom:6px">👤 ${b.customerName || "—"}</div>
+      <div style="font-size:.8rem;color:var(--text-muted);margin-bottom:4px">📍 ${b.pickup || "—"}</div>
+      <div style="font-size:.8rem;color:var(--text-muted);margin-bottom:12px">🏁 ${b.drop || "—"}</div>
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div style="font-family:'Space Grotesk',sans-serif;font-weight:800;color:var(--primary);font-size:1.1rem">₹${(b.total || 0).toLocaleString()}</div>
+        <button ${btnAttr}>▶ Start Job</button>
+      </div>
+    </div>
+  `;
+}
+
+function startAssignedJob(bookingId) {
+  if (!confirm("Are you sure you want to start this job?")) return;
+  window._firebase.db.collection("bookings").doc(bookingId).update({ status: "packing" })
+    .then(() => toast("🚀 Job started!"))
+    .catch(e => toast("❌ Error: " + e.message));
 }
 
 function showBookingUI(b) {
@@ -556,6 +657,8 @@ function showBookingUI(b) {
   const phoneEl = document.getElementById("bkPhone");
   phoneEl.textContent = b.phone || "—";
   phoneEl.href = "tel:" + (b.phone || "");
+  const callBtn = document.getElementById("bkCall");
+  if(callBtn) callBtn.href = "tel:" + (b.phone || "");
   document.getElementById("bkPickup").textContent  = b.pickup || "—";
   document.getElementById("bkDrop").textContent    = b.drop   || "—";
   document.getElementById("bkDate").textContent    = b.date   || "—";
@@ -630,17 +733,72 @@ function updateJobStatus() {
   const nextStatus  = statusOrder[currentIdx + 1];
   if (!nextStatus) return;
 
-  window._firebase.db.collection("bookings").doc(currentBookingId).update({ status: nextStatus })
+  if (nextStatus === "delivered") {
+    // Intercept delivery to ask for OTP
+    document.getElementById("btnUpdateStatus").style.display = "none";
+    document.getElementById("otpSection").style.display = "block";
+    document.getElementById("otpError").style.display = "none";
+    document.getElementById("deliveryOtpInput").value = "";
+    document.getElementById("deliveryOtpInput").focus();
+    return;
+  }
+
+  let updatePayload = { status: nextStatus };
+
+  // Generate OTP when transitioning to transit
+  if (nextStatus === "transit") {
+    const otp = String(Math.floor(1000 + Math.random() * 9000));
+    updatePayload.deliveryOtp = otp;
+    currentBookingData.deliveryOtp = otp;
+  }
+
+  window._firebase.db.collection("bookings").doc(currentBookingId).update(updatePayload)
     .then(() => {
       currentBookingData.status = nextStatus;
       buildStatusSteps(nextStatus);
       toast("✅ Status updated: " + nextStatus);
-      if (nextStatus === "delivered") {
-        document.getElementById("photoCard").style.display = "block";
-        toast("🎉 Job delivered! Upload proof photos.", 4000);
-      }
     })
     .catch(e => toast("❌ Error: " + e.message));
+}
+
+function verifyDeliveryOtp() {
+  const entered = document.getElementById("deliveryOtpInput").value.trim();
+  const errBox = document.getElementById("otpError");
+  if (entered.length !== 4) {
+    errBox.textContent = "Please enter 4 digits.";
+    errBox.style.display = "block";
+    return;
+  }
+
+  const correctOtp = currentBookingData.deliveryOtp;
+  if (correctOtp && entered !== String(correctOtp)) {
+    errBox.textContent = "Incorrect OTP. Please check with customer.";
+    errBox.style.display = "block";
+    return;
+  }
+
+  // OTP Correct
+  errBox.style.display = "none";
+  document.getElementById("otpSection").style.display = "none";
+
+  window._firebase.db.collection("bookings").doc(currentBookingId).update({ status: "delivered" })
+    .then(() => {
+      currentBookingData.status = "delivered";
+      buildStatusSteps("delivered");
+      toast("✅ Status updated: delivered");
+      document.getElementById("photoCard").style.display = "block";
+      toast("🎉 Job delivered! Upload proof photos.", 4000);
+      document.getElementById("btnUpdateStatus").style.display = "block";
+    })
+    .catch(e => {
+      toast("❌ Error: " + e.message);
+      document.getElementById("btnUpdateStatus").style.display = "block";
+    });
+}
+
+function cancelOtpEntry() {
+  document.getElementById("otpSection").style.display = "none";
+  document.getElementById("btnUpdateStatus").style.display = "block";
 }
 
 /* LOCATION SHARING */
