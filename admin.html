@@ -64,8 +64,6 @@
     .chart-row{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:20px}
     .chart-card{background:var(--surface);border-radius:18px;border:1px solid var(--border);padding:20px 22px;box-shadow:var(--shadow-sm)}
     .chart-card h3{font-size:.95rem;font-weight:700;color:var(--text);margin-bottom:16px}
-    .table-card{background:var(--surface);border-radius:18px;border:1px solid var(--border);box-shadow:var(--shadow-sm);overflow:hidden;margin-bottom:20px}
-    .table-hdr{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:8px}
     .table-title{font-family: 'Space Grotesk',sans-serif;font-weight:700;font-size:1rem;color:var(--text)}
     .table-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
     .search-input{padding:7px 14px;border:1.5px solid var(--border);border-radius:30px;font-family:'Manrope',sans-serif;font-size:.83rem;background:var(--surface2);color:var(--text);outline:none;width:170px}
@@ -117,6 +115,8 @@
     .driver-form-grid input:focus,.driver-form-grid select:focus{border-color:var(--primary)}
     .driver-form-actions{display:flex;align-items:flex-end}
     #adminDriverMsg{min-height:18px;font-size:.83rem;margin-top:6px;font-weight:600}
+    .table-card{background:var(--surface);border-radius:18px;border:1px solid var(--border);box-shadow:var(--shadow-sm);overflow-x:auto;margin-bottom:20px}
+    .table-hdr{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:8px}
     @media(max-width:768px){
       .admin-shell.active{flex-direction:column}
       .sidebar{position:static;width:100%;flex-direction:row;padding:10px;height:auto;flex-wrap:nowrap;overflow-x:auto}
@@ -126,6 +126,8 @@
       .nav-item.active{border-left:none;border-bottom-color:var(--primary)}
       .chart-row{grid-template-columns:1fr}
       .driver-form-grid{grid-template-columns:1fr}
+      .topbar{flex-direction:column;align-items:flex-start;gap:12px}
+      .topbar-right{width:100%;justify-content:space-between}
     }
   </style>
 </head>
@@ -433,19 +435,19 @@ function buildShell(adminName) {
     <!-- OVERVIEW -->
     <div class="section active" id="sectionOverview">
       <div class="stats-grid">
-        <div class="stat-card"><div class="sc-lbl">Total Bookings</div><div class="sc-val" id="statTotal">0</div><div class="sc-sub">All time</div></div>
-        <div class="stat-card"><div class="sc-lbl">Pending</div><div class="sc-val" id="statPending" style="color:#d97706">0</div><div class="sc-sub">Awaiting assignment</div></div>
-        <div class="stat-card"><div class="sc-lbl">In Progress</div><div class="sc-val" id="statProgress" style="color:#7c3aed">0</div><div class="sc-sub">Active moves</div></div>
-        <div class="stat-card"><div class="sc-lbl">Delivered</div><div class="sc-val" id="statDelivered" style="color:var(--accent)">0</div><div class="sc-sub">Completed</div></div>
-        <div class="stat-card"><div class="sc-lbl">Total Revenue</div><div class="sc-val" id="statRevenue" style="font-size:1.4rem">₹0</div><div class="sc-sub">From all bookings</div></div>
-        <div class="stat-card"><div class="sc-lbl">Avg. Rating</div><div class="sc-val" id="statRating" style="color:#f59e0b">—</div><div class="sc-sub">Customer reviews</div></div>
+        <div class="stat-card"><div class="sc-lbl">Today's Bookings</div><div class="sc-val" id="statToday">0</div><div class="sc-sub">Today</div></div>
+        <div class="stat-card"><div class="sc-lbl">Revenue</div><div class="sc-val" id="statRevenue" style="font-size:1.4rem;color:#00c96e">₹0</div><div class="sc-sub">Total</div></div>
+        <div class="stat-card"><div class="sc-lbl">Pending Bookings</div><div class="sc-val" id="statPending" style="color:#d97706">0</div><div class="sc-sub">Awaiting assignment</div></div>
+        <div class="stat-card"><div class="sc-lbl">Cancelled Bookings</div><div class="sc-val" id="statCancelled" style="color:#dc2626">0</div><div class="sc-sub">Cancelled</div></div>
+        <div class="stat-card"><div class="sc-lbl">Completed Bookings</div><div class="sc-val" id="statDelivered" style="color:var(--accent)">0</div><div class="sc-sub">Completed</div></div>
+        <div class="stat-card"><div class="sc-lbl">Driver Status</div><div class="sc-val" id="statDrivers" style="color:#7c3aed">0/0</div><div class="sc-sub">Online/Total</div></div>
       </div>
       <div class="chart-row">
         <div class="chart-card"><h3>📈 Monthly Bookings</h3><canvas id="bookingsChart" height="160"></canvas></div>
         <div class="chart-card"><h3>💰 Monthly Revenue (₹)</h3><canvas id="revenueChart" height="160"></canvas></div>
       </div>
       <div class="table-card">
-        <div class="table-hdr"><div class="table-title">Recent Bookings</div></div>
+        <div class="table-hdr"><div class="table-title">Recent Activity</div></div>
         <table><thead><tr><th>ID</th><th>Customer</th><th>Route</th><th>Date</th><th>Status</th><th>Action</th></tr></thead>
         <tbody id="overviewTable"><tr class="empty-row"><td colspan="6">Loading...</td></tr></tbody></table>
       </div>
@@ -456,7 +458,17 @@ function buildShell(adminName) {
         <div class="table-hdr">
           <div class="table-title">All Bookings</div>
           <div class="table-actions">
-            <input class="search-input" placeholder="Search..." oninput="filterBookings(this.value)">
+            <select class="status-sel" id="filterStatus" onchange="filterBookings(document.getElementById('searchInput').value)">
+              <option value="all">All</option>
+              <option value="pending">Pending</option>
+              <option value="confirmed">Confirmed</option>
+              <option value="assigned">Assigned</option>
+              <option value="packing">Packing</option>
+              <option value="transit">Transit</option>
+              <option value="delivered">Delivered</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+            <input class="search-input" id="searchInput" placeholder="Search..." oninput="filterBookings(this.value)">
             <button class="btn-export" onclick="exportCSV()">⬇ Export CSV</button>
           </div>
         </div>
@@ -637,6 +649,7 @@ let assigningId = null;
 let bookingsChart = null;
 let revenueChart = null;
 let expandedBookingId = null;
+let filteredBookings = [];
 
 function showShell(name) {
   document.getElementById("adminLogin").style.display = "none";
@@ -679,13 +692,14 @@ function loadAll() {
 function loadBookings() {
   window._firebase.db.collection("bookings").orderBy("createdAt","desc").onSnapshot(snap => {
     allBookings = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-    updateStats(); renderOverview(); renderBookingsTable(allBookings); renderCharts();
+    filteredBookings = allBookings;
+    updateStats(); renderOverview(); filterBookings(document.getElementById('searchInput') ? document.getElementById('searchInput').value : ''); renderCharts();
   });
 }
 function loadDrivers() {
   window._firebase.db.collection("users").where("role","==","driver").onSnapshot(snap => {
     allDrivers = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-    renderDrivers(); populateAssignSelect();
+    renderDrivers(); populateAssignSelect(); updateStats();
   });
 }
 function loadCustomers() {
@@ -723,15 +737,16 @@ function loadBroadcastHistory() {
 /* ── STATS ── */
 function updateStats() {
   const el = id => document.getElementById(id);
-  if (!el("statTotal")) return;
-  el("statTotal").textContent     = allBookings.length;
-  el("statPending").textContent   = allBookings.filter(b => !b.driverUid && b.status !== "delivered").length;
-  el("statProgress").textContent  = allBookings.filter(b => ["assigned","packing","transit"].includes(b.status)).length;
+  if (!el("statToday")) return;
+  const today = new Date().toLocaleDateString("en-IN");
+  el("statToday").textContent     = allBookings.filter(b => b.date === today).length;
+  el("statPending").textContent   = allBookings.filter(b => b.status === "pending").length;
+  el("statCancelled").textContent  = allBookings.filter(b => b.status === "cancelled").length;
   el("statDelivered").textContent = allBookings.filter(b => b.status === "delivered").length;
   const rev = allBookings.reduce((s, b) => s + (b.total || 0), 0);
   el("statRevenue").textContent = "₹" + (rev >= 100000 ? (rev/100000).toFixed(1)+"L" : rev.toLocaleString("en-IN"));
-  const ratings = allReviews.filter(r => r.rating).map(r => r.rating);
-  el("statRating").textContent = ratings.length ? (ratings.reduce((a,b)=>a+b,0)/ratings.length).toFixed(1)+"★" : "—";
+  const onlineDrivers = allDrivers.filter(d => d.isOnline).length;
+  el("statDrivers").textContent = `${onlineDrivers}/${allDrivers.length}`;
 }
 
 /* ── CHARTS ── */
@@ -799,7 +814,7 @@ function renderBookingsTable(list) {
       <td>₹${(b.total||0).toLocaleString("en-IN")} <small style="color:var(--text-muted)">${b.paymentType==="pay_later"?"(Pay Later)":b.source==="whatsapp"?"(WA)":b.paid?"(₹"+b.paid+" paid)":""}</small></td>
       <td>
         <select class="status-sel" onchange="updateStatus('${b.id}',this.value)">
-          ${["pending","confirmed","assigned","packing","transit","delivered"].map(s=>`<option value="${s}"${b.status===s?" selected":""}>${cap(s)}</option>`).join("")}
+          ${["pending","confirmed","assigned","packing","transit","delivered","cancelled"].map(s=>`<option value="${s}"${b.status===s?" selected":""}>${cap(s)}</option>`).join("")}
         </select>
       </td>
       <td>${b.driverName||'<span style="color:var(--text-muted);font-size:.78rem">Unassigned</span>'}</td>
@@ -913,16 +928,20 @@ style="background:#7c3aed;color:white;margin-left:8px;text-decoration:none;">
 }
   
 function filterBookings(q) {
-  q = q.toLowerCase();
+  q = (q || "").toLowerCase();
+  const statusFilterEl = document.getElementById("filterStatus");
+  const status = statusFilterEl ? statusFilterEl.value : "all";
 
-  const f = allBookings.filter(b =>
-    (b.customerName || "").toLowerCase().includes(q) ||
-    (b.id || "").toLowerCase().includes(q) ||
-    (b.bookingRef || "").toLowerCase().includes(q) ||
-    (b.phone || "").includes(q)
-  );
+  filteredBookings = allBookings.filter(b => {
+    const matchesSearch = (b.customerName || "").toLowerCase().includes(q) ||
+      (b.id || "").toLowerCase().includes(q) ||
+      (b.bookingRef || "").toLowerCase().includes(q) ||
+      (b.phone || "").includes(q);
+    const matchesStatus = status === "all" || b.status === status;
+    return matchesSearch && matchesStatus;
+  });
 
-  renderBookingsTable(f);
+  renderBookingsTable(filteredBookings);
 }
 function updateStatus(id, status) {
   requireAdmin(() => {
@@ -941,7 +960,7 @@ function deleteBooking(id, ref) {
 }
 function exportCSV() {
   const headers = ["ID","Customer","Phone","Pickup","Drop","Date","Total","Status","Driver"];
-  const rows = allBookings.map(b => [
+  const rows = filteredBookings.map(b => [
     b.id.slice(-6).toUpperCase(), b.customerName||"", b.phone||"",
     (b.pickup||"").replace(/,/g," "), (b.drop||"").replace(/,/g," "),
     b.date||"", b.total||0, b.status||"", b.driverName||""
