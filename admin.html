@@ -531,14 +531,16 @@ function buildShell(adminName) {
             <div><label class="field-label" style="margin-top:0">Type</label><select id="promoType"><option value="flat">Flat (₹)</option><option value="percent">Percent (%)</option></select></div>
             <div><label class="field-label" style="margin-top:0">Value</label><input id="promoValue" type="number" placeholder="e.g. 200"></div>
             <div><label class="field-label" style="margin-top:0">Max Uses</label><input id="promoMax" type="number" placeholder="e.g. 100"></div>
+            <div><label class="field-label" style="margin-top:0">Min Value</label><input id="promoMin" type="number" placeholder="e.g. 2000"></div>
+            <div><label class="field-label" style="margin-top:0">Expiry Date</label><input id="promoExpiry" type="date"></div>
           </div>
           <button class="btn-primary-sm" onclick="createPromo()">+ Create Promo Code</button>
         </div>
       </div>
       <div class="table-card">
         <div class="table-hdr"><div class="table-title">Active Promo Codes</div></div>
-        <table><thead><tr><th>Code</th><th>Type</th><th>Value</th><th>Used</th><th>Max</th><th>Status</th><th>Action</th></tr></thead>
-        <tbody id="promosTable"><tr class="empty-row"><td colspan="7">No promos yet.</td></tr></tbody></table>
+        <table><thead><tr><th>Code</th><th>Type</th><th>Value</th><th>Used</th><th>Max</th><th>Min Value</th><th>Expiry</th><th>Status</th><th>Action</th></tr></thead>
+        <tbody id="promosTable"><tr class="empty-row"><td colspan="9">No promos yet.</td></tr></tbody></table>
       </div>
     </div>
     <!-- CANCELLATIONS -->
@@ -1027,9 +1029,11 @@ function createPromo() {
     const type=document.getElementById("promoType").value;
     const value=Number(document.getElementById("promoValue").value);
     const max=Number(document.getElementById("promoMax").value)||999;
+    const min=Number(document.getElementById("promoMin").value)||0;
+    const expiry=document.getElementById("promoExpiry").value;
     if (!code||!value) { toast("⚠️ Fill in code & value"); return; }
-    window._firebase.db.collection("promos").doc(code).set({ code, type, value, max, used:0, active:true, createdAt:firebase.firestore.FieldValue.serverTimestamp() })
-      .then(()=>{ toast("✅ Promo created: "+code); document.getElementById("promoCode").value=""; document.getElementById("promoValue").value=""; })
+    window._firebase.db.collection("promos").doc(code).set({ code, type, value, max, min, expiry, usedBy: [], used:0, active:true, createdAt:firebase.firestore.FieldValue.serverTimestamp() })
+      .then(()=>{ toast("✅ Promo created: "+code); document.getElementById("promoCode").value=""; document.getElementById("promoValue").value=""; document.getElementById("promoMax").value=""; document.getElementById("promoMin").value=""; document.getElementById("promoExpiry").value=""; })
       .catch(e=>toast("❌ "+e.message));
   });
 }
@@ -1038,12 +1042,13 @@ function deletePromo(id) { requireAdmin(()=>{ if(!confirm("Delete promo?"))retur
 function renderPromos() {
   const tbody = document.getElementById("promosTable");
   if (!tbody) return;
-  if (!allPromos.length) { tbody.innerHTML = '<tr class="empty-row"><td colspan="7">No promo codes yet</td></tr>'; return; }
+  if (!allPromos.length) { tbody.innerHTML = '<tr class="empty-row"><td colspan="9">No promo codes yet</td></tr>'; return; }
   tbody.innerHTML = allPromos.map(p => `
     <tr>
       <td><strong style="font-family: 'Space Grotesk',sans-serif;color:var(--primary)">${p.code}</strong></td>
       <td>${cap(p.type)}</td><td>${p.type==="percent"?p.value+"%":"₹"+p.value}</td>
       <td>${p.used||0}</td><td>${p.max||"∞"}</td>
+      <td>₹${p.min||0}</td><td>${p.expiry||"—"}</td>
       <td><span class="badge ${p.active?"badge-delivered":"badge-pending"}">${p.active?"Active":"Inactive"}</span></td>
       <td>
         <button class="btn-sm btn-assign" onclick="togglePromo('${p.id}',${!p.active})">${p.active?"Pause":"Activate"}</button>
