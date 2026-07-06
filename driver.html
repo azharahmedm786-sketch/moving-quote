@@ -9,23 +9,23 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="PZ Driver">
 <link rel="apple-touch-icon" href="/assets/logo/newllogo1.png">
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root{--primary:#0057ff;--accent:#00c96e;--wa:#25D366;--dark:#050d1a;--text:#1a2744;--text-muted:#5a6a8a;--surface:#fff;--surface2:#f4f7ff;--border:#dde4f5;--shadow-sm:0 2px 12px rgba(0,60,180,.08);--shadow-md:0 8px 32px rgba(0,60,180,.12)}
     body.dark{--text:#e2e8f4;--text-muted:#8a9bbf;--surface:#0d1f3c;--surface2:#091529;--border:#1e3a5f}
     *{box-sizing:border-box;margin:0;padding:0}
-    body{font-family:'DM Sans',sans-serif;background:var(--surface2);color:var(--text);min-height:100vh;transition:background .3s,color .3s}
-    h1,h2,h3{font-family:'Syne',sans-serif}
+    body{font-family:'Manrope',sans-serif;background:var(--surface2);color:var(--text);min-height:100vh;transition:background .3s,color .3s}
+    h1,h2,h3{font-family: 'Space Grotesk',sans-serif}
 
     /* LOGIN */
     .driver-login{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#050d1a,#0d1f3c);padding:20px}
     .login-card{background:var(--surface);border-radius:24px;padding:40px 36px;max-width:380px;width:100%;box-shadow:0 30px 80px rgba(0,0,0,.4)}
-    .login-logo{font-family:'Syne',sans-serif;font-size:1.5rem;font-weight:800;color:var(--primary);margin-bottom:4px}
+    .login-logo{font-family: 'Space Grotesk',sans-serif;font-size:1.5rem;font-weight:800;color:var(--primary);margin-bottom:4px}
     .login-role{font-size:.8rem;font-weight:700;color:var(--accent);background:rgba(0,201,110,.1);border:1px solid rgba(0,201,110,.3);padding:3px 12px;border-radius:20px;display:inline-block;margin-bottom:20px}
     .field-label{display:block;font-size:.85rem;font-weight:600;color:var(--text-muted);margin-bottom:8px;margin-top:16px}
-    .field-input{width:100%;padding:12px 16px;border:1.5px solid var(--border);border-radius:12px;font-family:'DM Sans',sans-serif;font-size:.95rem;color:var(--text);background:var(--surface);outline:none;transition:border-color .2s}
+    .field-input{width:100%;padding:12px 16px;border:1.5px solid var(--border);border-radius:12px;font-family:'Manrope',sans-serif;font-size:.95rem;color:var(--text);background:var(--surface);outline:none;transition:border-color .2s}
     .field-input:focus{border-color:var(--primary)}
-    .btn-auth{width:100%;padding:14px;background:var(--primary);color:#fff;border:none;border-radius:50px;font-family:'DM Sans',sans-serif;font-size:1rem;font-weight:700;cursor:pointer;margin-top:20px;box-shadow:0 6px 20px rgba(0,87,255,.3);transition:transform .2s}
+    .btn-auth{width:100%;padding:14px;background:var(--primary);color:#fff;border:none;border-radius:50px;font-family:'Manrope',sans-serif;font-size:1rem;font-weight:700;cursor:pointer;margin-top:20px;box-shadow:0 6px 20px rgba(0,87,255,.3);transition:transform .2s}
     .btn-auth:hover{transform:translateY(-2px)}
     .auth-err{font-size:.85rem;color:#e53e3e;margin-top:10px;min-height:18px}
 
@@ -35,11 +35,11 @@
     .app-header{display:flex;align-items:center;justify-content:space-between;background:linear-gradient(135deg,var(--primary),#7c3aed);border-radius:20px;padding:18px 22px;color:#fff;margin-bottom:20px;box-shadow:var(--shadow-md)}
     .app-header-info h2{font-size:1.1rem;font-weight:800}
     .app-header-info p{font-size:.8rem;opacity:.75;margin-top:2px}
-    .driver-avatar{width:46px;height:46px;border-radius:50%;background:rgba(255,255,255,.2);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.3rem;font-weight:800;font-family:'Syne',sans-serif;flex-shrink:0}
+    .driver-avatar{width:46px;height:46px;border-radius:50%;background:rgba(255,255,255,.2);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.3rem;font-weight:800;font-family: 'Space Grotesk',sans-serif;flex-shrink:0}
     .header-actions{display:flex;gap:8px;align-items:center}
     .theme-btn{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.2);color:#fff;width:34px;height:34px;border-radius:50%;cursor:pointer;font-size:.95rem;display:flex;align-items:center;justify-content:center;transition:transform .3s}
     .theme-btn:hover{transform:rotate(20deg)}
-    .btn-signout-sm{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.2);color:#fff;padding:6px 14px;border-radius:20px;font-family:'DM Sans',sans-serif;font-size:.78rem;font-weight:600;cursor:pointer;transition:background .2s}
+    .btn-signout-sm{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.2);color:#fff;padding:6px 14px;border-radius:20px;font-family:'Manrope',sans-serif;font-size:.78rem;font-weight:600;cursor:pointer;transition:background .2s}
     .btn-signout-sm:hover{background:rgba(255,80,80,.3)}
 
     /* ONLINE TOGGLE */
@@ -59,7 +59,7 @@
     .booking-card{background:var(--surface);border-radius:18px;border:1px solid var(--border);padding:20px;margin-bottom:16px;box-shadow:var(--shadow-sm);transition:background .3s}
     .booking-card.no-booking{text-align:center;padding:40px 20px}
     .booking-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
-    .booking-title{font-family:'Syne',sans-serif;font-size:1rem;font-weight:800;color:var(--text)}
+    .booking-title{font-family: 'Space Grotesk',sans-serif;font-size:1rem;font-weight:800;color:var(--text)}
     .booking-id{font-size:.75rem;color:var(--text-muted);background:var(--surface2);padding:3px 10px;border-radius:20px;border:1px solid var(--border)}
     .info-row{display:flex;gap:10px;margin-bottom:10px;align-items:flex-start}
     .info-icon{font-size:1.1rem;flex-shrink:0;width:22px;text-align:center;margin-top:1px}
@@ -68,7 +68,7 @@
     .divider{height:1px;background:var(--border);margin:14px 0}
     .booking-amount{display:flex;justify-content:space-between;align-items:center}
     .ba-lbl{font-size:.82rem;color:var(--text-muted);font-weight:500}
-    .ba-val{font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:800;color:var(--primary)}
+    .ba-val{font-family: 'Space Grotesk',sans-serif;font-size:1.4rem;font-weight:800;color:var(--primary)}
     .payment-summary{background:var(--surface2);border-radius:14px;padding:14px;margin-top:14px;border:1px solid var(--border)}
     .pay-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0}
     .pay-row:not(:last-child){border-bottom:1px solid var(--border)}
@@ -79,11 +79,11 @@
     .collect-banner{background:linear-gradient(135deg,#f97316,#ea580c);border-radius:12px;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;margin-top:10px}
     .collect-banner.paid-full{background:linear-gradient(135deg,var(--accent),#059669)}
     .collect-lbl{color:rgba(255,255,255,.85);font-size:.8rem;font-weight:600}
-    .collect-val{color:#fff;font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:800}
+    .collect-val{color:#fff;font-family: 'Space Grotesk',sans-serif;font-size:1.2rem;font-weight:800}
 
     /* STATUS BUTTONS */
     .status-section{background:var(--surface);border-radius:18px;border:1px solid var(--border);padding:20px;margin-bottom:16px;box-shadow:var(--shadow-sm);transition:background .3s}
-    .status-title{font-family:'Syne',sans-serif;font-size:.95rem;font-weight:800;color:var(--text);margin-bottom:14px}
+    .status-title{font-family: 'Space Grotesk',sans-serif;font-size:.95rem;font-weight:800;color:var(--text);margin-bottom:14px}
     .status-steps{display:flex;flex-direction:column;gap:10px}
     .status-step{display:flex;align-items:center;gap:14px;padding:13px 16px;border-radius:14px;border:1.5px solid var(--border);cursor:pointer;transition:all .2s;background:var(--surface2)}
     .status-step:hover{border-color:var(--primary);background:rgba(0,87,255,.04)}
@@ -96,13 +96,13 @@
     .step-name{font-weight:700;font-size:.9rem;color:var(--text)}
     .step-desc{font-size:.75rem;color:var(--text-muted);margin-top:2px}
     .step-check{color:var(--accent);font-size:1.1rem}
-    .btn-update{width:100%;padding:13px;background:var(--primary);color:#fff;border:none;border-radius:50px;font-family:'DM Sans',sans-serif;font-size:.95rem;font-weight:700;cursor:pointer;box-shadow:0 5px 16px rgba(0,87,255,.3);transition:transform .2s}
+    .btn-update{width:100%;padding:13px;background:var(--primary);color:#fff;border:none;border-radius:50px;font-family:'Manrope',sans-serif;font-size:.95rem;font-weight:700;cursor:pointer;box-shadow:0 5px 16px rgba(0,87,255,.3);transition:transform .2s}
     .btn-update:hover{transform:translateY(-2px)}
     .btn-update:disabled{background:var(--text-muted);box-shadow:none;cursor:not-allowed;transform:none}
 
     /* MAP CARD */
     .map-card{background:var(--surface);border-radius:18px;border:1px solid var(--border);padding:16px 20px;margin-bottom:16px;box-shadow:var(--shadow-sm);transition:background .3s}
-    .map-card h3{font-family:'Syne',sans-serif;font-size:.9rem;font-weight:800;color:var(--text);margin-bottom:12px}
+    .map-card h3{font-family: 'Space Grotesk',sans-serif;font-size:.9rem;font-weight:800;color:var(--text);margin-bottom:12px}
     #driverMapDiv{height:200px;border-radius:12px;border:1px solid var(--border);overflow:hidden;background:var(--surface2)}
     .location-info{font-size:.8rem;color:var(--text-muted);margin-top:10px;display:flex;align-items:center;gap:6px}
     .loc-dot{width:8px;height:8px;border-radius:50%;background:var(--primary);animation:locPulse 2s infinite;flex-shrink:0}
@@ -111,7 +111,7 @@
     /* CHAT SECTION */
     .chat-card{background:var(--surface);border-radius:18px;border:1px solid var(--border);overflow:hidden;margin-bottom:16px;box-shadow:var(--shadow-sm)}
     .chat-hdr{background:linear-gradient(135deg,var(--primary),#7c3aed);padding:14px 18px;display:flex;align-items:center;gap:10px}
-    .chat-hdr-title{font-family:'Syne',sans-serif;font-weight:800;font-size:.9rem;color:#fff}
+    .chat-hdr-title{font-family: 'Space Grotesk',sans-serif;font-weight:800;font-size:.9rem;color:#fff}
     .chat-hdr-sub{font-size:.73rem;color:rgba(255,255,255,.7)}
     .chat-messages{height:220px;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:8px;background:var(--surface2)}
     .chat-bubble{max-width:75%;padding:9px 13px;border-radius:16px;font-size:.86rem;line-height:1.4;word-break:break-word}
@@ -120,14 +120,14 @@
     .chat-time{font-size:.67rem;opacity:.6;margin-top:2px}
     .chat-empty{text-align:center;color:var(--text-muted);font-size:.82rem;padding:30px}
     .chat-input-row{display:flex;gap:8px;padding:10px 14px;border-top:1px solid var(--border);background:var(--surface)}
-    .chat-input{flex:1;padding:9px 13px;border:1.5px solid var(--border);border-radius:25px;font-family:'DM Sans',sans-serif;font-size:.88rem;background:var(--surface2);color:var(--text);outline:none}
+    .chat-input{flex:1;padding:9px 13px;border:1.5px solid var(--border);border-radius:25px;font-family:'Manrope',sans-serif;font-size:.88rem;background:var(--surface2);color:var(--text);outline:none}
     .chat-input:focus{border-color:var(--primary)}
     .btn-send{padding:9px 16px;background:var(--primary);color:#fff;border:none;border-radius:25px;font-size:.85rem;font-weight:700;cursor:pointer;transition:background .2s}
     .btn-send:hover{background:#0040cc}
 
     /* DELIVERY PHOTOS */
     .photo-card{background:var(--surface);border-radius:18px;border:1px solid var(--border);padding:18px 20px;margin-bottom:16px;box-shadow:var(--shadow-sm)}
-    .photo-card h3{font-family:'Syne',sans-serif;font-size:.9rem;font-weight:800;color:var(--text);margin-bottom:12px}
+    .photo-card h3{font-family: 'Space Grotesk',sans-serif;font-size:.9rem;font-weight:800;color:var(--text);margin-bottom:12px}
     .photo-upload-area{border:2px dashed var(--border);border-radius:12px;padding:18px;text-align:center;cursor:pointer;transition:border-color .2s}
     .photo-upload-area:hover{border-color:var(--primary)}
     .photo-upload-area input{display:none}
@@ -135,7 +135,7 @@
     .photo-upload-lbl span{color:var(--primary);font-weight:600}
     .delivery-thumbs{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
     .delivery-thumb{width:62px;height:62px;border-radius:8px;object-fit:cover;border:2px solid var(--border)}
-    .btn-upload-photos{width:100%;margin-top:12px;padding:11px;background:rgba(0,201,110,.1);color:var(--accent);border:1.5px solid rgba(0,201,110,.3);border-radius:50px;font-family:'DM Sans',sans-serif;font-size:.88rem;font-weight:700;cursor:pointer;transition:background .2s}
+    .btn-upload-photos{width:100%;margin-top:12px;padding:11px;background:rgba(0,201,110,.1);color:var(--accent);border:1.5px solid rgba(0,201,110,.3);border-radius:50px;font-family:'Manrope',sans-serif;font-size:.88rem;font-weight:700;cursor:pointer;transition:background .2s}
     .btn-upload-photos:hover{background:var(--accent);color:#fff}
 
     /* TOAST */
@@ -145,7 +145,7 @@
     /* ===== BOTTOM NAV ===== */
     .bottom-nav{position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);display:none;z-index:100;box-shadow:0 -4px 20px rgba(0,0,0,.1)}
     .bottom-nav.active{display:flex}
-    .bn-item{flex:1;display:flex;flex-direction:column;align-items:center;padding:10px 4px 14px;cursor:pointer;transition:color .2s;color:var(--text-muted);font-size:.68rem;font-weight:600;gap:3px;border:none;background:none;font-family:'DM Sans',sans-serif}
+    .bn-item{flex:1;display:flex;flex-direction:column;align-items:center;padding:10px 4px 14px;cursor:pointer;transition:color .2s;color:var(--text-muted);font-size:.68rem;font-weight:600;gap:3px;border:none;background:none;font-family:'Manrope',sans-serif}
     .bn-item.active{color:var(--primary)}
     .bn-icon{font-size:1.3rem;line-height:1}
     .driver-app.active{padding-bottom:85px}
@@ -159,22 +159,22 @@
     .earn-card{background:var(--surface);border-radius:16px;border:1px solid var(--border);padding:16px;box-shadow:var(--shadow-sm);text-align:center}
     .earn-card.full{grid-column:1/-1;background:linear-gradient(135deg,var(--primary),#7c3aed);border:none}
     .earn-card.full .earn-val,.earn-card.full .earn-lbl{color:#fff}
-    .earn-val{font-family:'Syne',sans-serif;font-size:1.7rem;font-weight:800;color:var(--primary);margin-bottom:4px}
+    .earn-val{font-family: 'Space Grotesk',sans-serif;font-size:1.7rem;font-weight:800;color:var(--primary);margin-bottom:4px}
     .earn-val.green{color:var(--accent)}
     .earn-lbl{font-size:.75rem;color:var(--text-muted);font-weight:600}
     .earn-period{display:flex;gap:8px;margin-bottom:16px}
-    .earn-period-btn{flex:1;padding:8px;border-radius:30px;border:1.5px solid var(--border);background:var(--surface2);color:var(--text-muted);font-family:'DM Sans',sans-serif;font-size:.8rem;font-weight:600;cursor:pointer;transition:all .2s}
+    .earn-period-btn{flex:1;padding:8px;border-radius:30px;border:1.5px solid var(--border);background:var(--surface2);color:var(--text-muted);font-family:'Manrope',sans-serif;font-size:.8rem;font-weight:600;cursor:pointer;transition:all .2s}
     .earn-period-btn.active{background:var(--primary);color:#fff;border-color:var(--primary)}
 
     /* ===== HISTORY ===== */
     .hist-empty{text-align:center;padding:40px 20px;color:var(--text-muted);font-size:.9rem}
     .hist-card{background:var(--surface);border-radius:16px;border:1px solid var(--border);padding:16px;margin-bottom:12px;box-shadow:var(--shadow-sm)}
     .hist-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
-    .hist-id{font-family:'Syne',sans-serif;font-size:.85rem;font-weight:800;color:var(--primary)}
+    .hist-id{font-family: 'Space Grotesk',sans-serif;font-size:.85rem;font-weight:800;color:var(--primary)}
     .hist-badge{background:rgba(0,201,110,.12);color:var(--accent);font-size:.7rem;font-weight:700;padding:3px 10px;border-radius:20px}
     .hist-route{font-size:.8rem;color:var(--text-muted);margin-bottom:8px;line-height:1.5}
     .hist-footer{display:flex;justify-content:space-between;align-items:center;padding-top:8px;border-top:1px solid var(--border)}
-    .hist-amount{font-family:'Syne',sans-serif;font-size:1rem;font-weight:800;color:var(--text)}
+    .hist-amount{font-family: 'Space Grotesk',sans-serif;font-size:1rem;font-weight:800;color:var(--text)}
     .hist-date{font-size:.75rem;color:var(--text-muted)}
 
     @media(max-width:480px){.driver-app{padding:14px}}
@@ -279,7 +279,7 @@
   <!-- NO BOOKING STATE -->
   <div class="booking-card no-booking" id="noBookingCard" style="display:none">
     <div style="font-size:3rem;margin-bottom:12px">🚗</div>
-    <div style="font-family:'Syne',sans-serif;font-weight:800;color:var(--text);margin-bottom:6px">No Active Booking</div>
+    <div style="font-family: 'Space Grotesk',sans-serif;font-weight:800;color:var(--text);margin-bottom:6px">No Active Booking</div>
     <div style="font-size:.85rem;color:var(--text-muted)">Go online and wait for the admin to assign a job.</div>
   </div>
 
@@ -329,13 +329,13 @@
 
   <!-- TAB: HISTORY -->
   <div class="drv-tab" id="tabHistory">
-    <div style="font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:800;color:var(--text);margin-bottom:16px">📋 Completed Jobs</div>
+    <div style="font-family: 'Space Grotesk',sans-serif;font-size:1.1rem;font-weight:800;color:var(--text);margin-bottom:16px">📋 Completed Jobs</div>
     <div id="historyList"><div class="hist-empty">⏳ Loading history...</div></div>
   </div>
 
   <!-- TAB: EARNINGS -->
   <div class="drv-tab" id="tabEarnings">
-    <div style="font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:800;color:var(--text);margin-bottom:16px">💰 My Earnings</div>
+    <div style="font-family: 'Space Grotesk',sans-serif;font-size:1.1rem;font-weight:800;color:var(--text);margin-bottom:16px">💰 My Earnings</div>
 
     <!-- Period Filter -->
     <div class="earn-period">
@@ -361,7 +361,7 @@
     </div>
 
     <!-- Per-job breakdown -->
-    <div style="font-family:'Syne',sans-serif;font-size:.85rem;font-weight:700;color:var(--text-muted);margin-bottom:10px;text-transform:uppercase;letter-spacing:.05em">Breakdown</div>
+    <div style="font-family: 'Space Grotesk',sans-serif;font-size:.85rem;font-weight:700;color:var(--text-muted);margin-bottom:10px;text-transform:uppercase;letter-spacing:.05em">Breakdown</div>
     <div id="earningsList"><div class="hist-empty">⏳ Loading earnings...</div></div>
   </div>
 
