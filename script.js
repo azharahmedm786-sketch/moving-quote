@@ -1830,13 +1830,47 @@ function updateTrackingUI(b) {
   const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
   set("trackingBookingId", "#" + b.id.slice(-6).toUpperCase());
   set("trackStatus", capitalize(b.status || "confirmed"));
+  set("trackVehicle", b.vehicle || "—");
+  set("trackVehicleReg", b.driverVehicleReg || b.vehicleNumber || b.vehicleRegistration || "—");
   set("trackDriver", b.driverName || "Not yet assigned");
-  set("trackDriverPhone", b.driverPhone || "—");
+
+  const phoneEl = document.getElementById("trackDriverPhone");
+  if (phoneEl) {
+    phoneEl.textContent = b.driverPhone || "—";
+    if (b.driverPhone) phoneEl.href = "tel:" + b.driverPhone;
+    else phoneEl.removeAttribute("href");
+  }
+
   set("trackDate", b.date || "—");
+
+  if (b.status !== "delivered" && b.status !== "completed") {
+    set("trackEstArrival", b.time ? b.date + " " + b.time : b.date);
+  } else {
+    set("trackEstArrival", "Arrived");
+  }
+
   set("trackPickup", b.pickup || "—");
   set("trackDrop", b.drop || "—");
-  const order = ["confirmed","assigned","packing","transit","delivered"];
-  const icons = ["✓","🚛","📦","🚚","🎉"];
+
+  const lastUpdated = b.updatedAt || b.rescheduledAt || b.createdAt;
+  if (lastUpdated) {
+    const dt = lastUpdated.toDate ? lastUpdated.toDate() : new Date(lastUpdated);
+    set("trackLastUpdated", dt.toLocaleString("en-IN"));
+  } else {
+    set("trackLastUpdated", "—");
+  }
+
+  const completedRow = document.getElementById("rowTrackCompletedAt");
+  if (b.completedAt && completedRow) {
+    const dt = b.completedAt.toDate ? b.completedAt.toDate() : new Date(b.completedAt);
+    set("trackCompletedAt", dt.toLocaleString("en-IN"));
+    completedRow.style.display = "flex";
+  } else if (completedRow) {
+    completedRow.style.display = "none";
+  }
+
+  const order = ["confirmed","assigned","en_route","arrived","loading","transit","delivered","unloading","completed"];
+  const icons = ["✓","🚛","📍","🏠","📦","🚚","🏁","📥","🎉"];
   const idx = order.indexOf(b.status || "confirmed");
   order.forEach((s, i) => {
     const dot = document.getElementById("ts" + i);
