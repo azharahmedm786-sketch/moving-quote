@@ -1,0 +1,46 @@
+{
+  "packageId": "in.packzen.twa",
+  "host": "packzen.in",
+  "name": "PackZen Packers & Movers",
+  "launcherName": "PackZen",
+  "display": "standalone",
+  "themeColor": "#3B82F6",
+  "themeColorDark": "#000000",
+  "navigationColor": "#050D1A",
+  "navigationColorDark": "#050D1A",
+  "navigationDividerColor": "#000000",
+  "navigationDividerColorDark": "#000000",
+  "backgroundColor": "#050D1A",
+  "enableNotifications": true,
+  "startUrl": "/",
+  "iconUrl": "https://packzen.in/assets/logo/newllogo.png",
+  "maskableIconUrl": "https://packzen.in/assets/logo/newllogo.png",
+  "signingKey": {
+    "path": "./android.keystore",
+    "alias": "android"
+  },
+  "appVersionName": "packzen123",
+  "appVersionCode": 2,
+  "shortcuts": [],
+  "generatorApp": "bubblewrap-cli",
+  "webManifestUrl": "https://packzen.in/manifest.json",
+  "fallbackType": "customtabs",
+  "features": {
+    "locationDelegation": {
+      "enabled": true
+    }
+  },
+  "alphaDependencies": {
+    "enabled": false
+  },
+  "enableSiteSettingsShortcut": true,
+  "isChromeOSOnly": false,
+  "isMetaQuest": false,
+  "minSdkVersion": 21,
+  "orientation": "portrait-primary",
+  "fingerprints": [],
+  "additionalTrustedOrigins": [],
+  "retainedBundles": [],
+  "displayOverride": [],
+  "appVersion": "packzen123"
+}
