@@ -482,7 +482,7 @@
   /* ── 16. TRACK ORDER BANNER ──────────────────────────────────── */
   #trackOrderBanner {
     max-width: 1400px;
-    margin: 0.75rem auto;
+    margin: calc(var(--app-bar-h) + 0.75rem) auto 0.75rem;
     padding: 0 2rem;
   }
 

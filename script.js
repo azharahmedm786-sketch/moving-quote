@@ -3272,7 +3272,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   document.addEventListener("click", (e) => {
-    if (!e.target.closest(".nav-user")) document.getElementById("userDropdown")?.classList.remove("open");
+    if (!e.target.closest("#navUser")) document.getElementById("userDropdown")?.classList.remove("open");
   });
 
   waitForFirebase(() => {
