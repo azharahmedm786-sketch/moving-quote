@@ -1748,13 +1748,17 @@ select.field-input {
 .tracking-box { max-width: 560px; }
 .tracking-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem; }
 .tracking-id { font-size: 0.8rem; color: var(--text-muted); }
-.tracking-status-bar { display: flex; gap: 0; margin: 1.25rem 0; }
-.ts-step { display: flex; flex-direction: column; align-items: center; flex: 1; }
+.tracking-status-bar { display: flex; gap: 0; margin: 1.25rem 0; flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 8px; }
+.tracking-status-bar::-webkit-scrollbar { height: 6px; }
+.tracking-status-bar::-webkit-scrollbar-track { background: var(--bg-secondary); border-radius: 4px; }
+.tracking-status-bar::-webkit-scrollbar-thumb { background: var(--border-light); border-radius: 4px; }
+.ts-step { display: flex; flex-direction: column; align-items: center; flex: 1; min-width: 60px; position: relative; }
 .ts-dot  { width: 28px; height: 28px; border-radius: 50%; background: var(--border-light); display: flex; align-items: center; justify-content: center; font-size: 0.75rem; position: relative; z-index: 1; }
 .ts-step.done   .ts-dot { background: var(--success); color: #fff; }
 .ts-step.active .ts-dot { background: var(--green-500); color: #fff; }
-.ts-step-line { flex: 1; height: 2px; background: var(--border-light); margin-top: 13px; align-self: flex-start; }
-.ts-step.done .ts-step-line { background: var(--success); }
+.ts-step::after { content: ''; position: absolute; top: 13px; left: 50%; width: 100%; height: 2px; background: var(--border-light); z-index: 0; }
+.ts-step:last-child::after { display: none; }
+.ts-step.done::after { background: var(--success); }
 .ts-label { font-size: 0.6rem; color: var(--text-muted); margin-top: 4px; text-align: center; font-weight: 600; }
 .tracking-map-area { width: 100%; height: 180px; border-radius: var(--radius-md); background: var(--bg-secondary); margin-bottom: 1rem; overflow: hidden; border: 1.5px solid var(--border-light); display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: 0.85rem; }
 .tracking-info { display: flex; flex-direction: column; gap: 4px; }
