@@ -1398,6 +1398,8 @@ function onPaymentSuccess(response, name, phone, paid, total) {
       status: "confirmed",
       source: "payment",
       isIntercity: isIntercityMove,
+      distance: window._lastCalculatedKm || 0,
+      quoteBreakdown: window._lastQuoteResult?.breakdown || null,
       paymentId: response.razorpay_payment_id,
       photos: uploadedPhotos.slice(0, 3),
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
@@ -1487,6 +1489,8 @@ function bookWithoutPayment() {
     status: "confirmed",
     source: "direct",
     promoDiscount,
+    distance: window._lastCalculatedKm || 0,
+    quoteBreakdown: window._lastQuoteResult?.breakdown || null,
     photos: uploadedPhotos.slice(0, 3),
     createdAt: firebase.firestore.FieldValue.serverTimestamp()
   })
@@ -1764,6 +1768,8 @@ function showConfirmationCard(data) {
 
   const invoiceBtn = document.getElementById("btnInvoice");
   if (invoiceBtn) invoiceBtn.style.display = showInvoice ? "inline-flex" : "none";
+  const emailInvoiceBtn = document.getElementById("btnEmailInvoice");
+  if (emailInvoiceBtn) emailInvoiceBtn.style.display = showInvoice ? "inline-flex" : "none";
 
   document.getElementById("paymentModal").style.display = "flex";
 }
@@ -2769,6 +2775,9 @@ ${canReschedule?`<button class="bk-btn reschedule" data-action="reschedule" data
 ${canCancel?`<button class="bk-btn cancel" data-action="cancel" data-id="${id}" data-ref="${b.bookingRef||id}" data-status="${b.status||""}">✕ Cancel</button>`:""}
 ${canRate?`<button class="bk-btn rate" data-action="rate" data-id="${id}" data-ref="${b.bookingRef||id}" data-driver="${b.driverName||""}">⭐ Rate Driver</button>`:""}
 ${canClaim?`<button class="bk-btn claim" data-action="claim" data-id="${id}" data-ref="${b.bookingRef||id}">🔧 Report Damage</button>`:""}
+<button class="bk-btn invoice" onclick="downloadInvoice('${id}')" style="background:#0ea5e9;color:white;border:none;">📄 Invoice</button>
+<button class="bk-btn email" onclick="emailInvoice('${id}')" style="background:#0284c7;color:white;border:none;">✉️ Email</button>
+
 `:""} </div>`;
       }).join("");
       attachBookingButtonListeners();
@@ -3111,32 +3120,268 @@ async function createDriver() {
 /* ============================================
 INVOICE / PDF
 ============================================ */
-function downloadInvoice() {
+async function emailInvoice(docId) {
+  if (typeof emailjs === "undefined") { showToast("⚠️ Email service not ready."); return; }
+  if (!window._firebase) { showToast("⚠️ Firebase not initialized."); return; }
+
+  let targetId = docId || currentBookingId;
+  if (!targetId) { showToast("⚠️ No booking found."); return; }
+
+  showToast("⏳ Sending Email...");
+
+  try {
+    const docSnap = await window._firebase.db.collection("bookings").doc(targetId).get();
+    if (!docSnap.exists) { showToast("⚠️ Booking not found."); return; }
+
+    const b = docSnap.data();
+
+    if (!b.email && !currentUser?.email) {
+      // Fallback if no email on booking, try to fetch from user profile
+      const userSnap = await window._firebase.db.collection("users").doc(b.customerUid).get();
+      if(userSnap.exists && userSnap.data().email) {
+        b.email = userSnap.data().email;
+      } else {
+        showToast("⚠️ No email address found for this customer.");
+        return;
+      }
+    }
+
+    const recipientEmail = b.email || currentUser?.email;
+
+    // We send an invoice notification email since we can't easily attach the generated PDF via client-side EmailJS
+    // Reusing the template_hffggde or similar to notify them it's ready/provide the details
+    emailjs.send("service_surriec", "template_hffggde", {
+      booking_id: b.bookingRef || targetId,
+      name: b.customerName || "Customer",
+      email: recipientEmail,
+      phone: b.phone || "—",
+      pickup: (b.pickup || "").split(",")[0],
+      drop: (b.drop || "").split(",")[0],
+      date: b.date || "TBD",
+      amount: b.total || 0,
+      message: "Your invoice has been generated. You can download the PDF from your PackZen dashboard."
+    }).then(() => {
+      showToast("✅ Invoice emailed successfully!");
+    }).catch((err) => {
+      console.error("Email failed:", err);
+      showToast("❌ Failed to send email.");
+    });
+
+  } catch (err) {
+     console.error("Error fetching for email:", err);
+     showToast("❌ Error sending email.");
+  }
+}
+
+async function downloadInvoice(docId) {
   if (typeof window.jspdf === "undefined") { showToast("⚠️ PDF library loading..."); return; }
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF();
-  const bookingId = document.getElementById("bookingIdDisplay")?.textContent || "—";
-  const lines = [
-    "Customer : " + (document.getElementById("ccName")?.textContent||"—"),
-    "Phone : " + (document.getElementById("ccPhone")?.textContent||"—"),
-    "Pickup : " + (document.getElementById("ccPickup")?.textContent||"—"),
-    "Drop : " + (document.getElementById("ccDrop")?.textContent||"—"),
-    "Date : " + (document.getElementById("ccDate")?.textContent||"—"),
-    "House : " + (document.getElementById("ccHouse")?.textContent||"—"),
-    "Vehicle : " + (document.getElementById("ccVehicle")?.textContent||"—"),
-    "Payment : " + (document.getElementById("ccPayment")?.textContent||"—"),
-    "Amount : " + (document.getElementById("ccAmount")?.textContent||"₹0"),
-  ];
-  doc.setFillColor(234,88,12); doc.rect(0,0,210,30,"F");
-  doc.setTextColor(255,255,255); doc.setFontSize(18); doc.setFont("helvetica","bold");
-  doc.text("PackZen Packers & Movers",14,15);
-  doc.setFontSize(10); doc.setFont("helvetica","normal"); doc.text("GST Invoice",14,22);
-  doc.setTextColor(0,0,0); doc.setFontSize(11);
-  doc.text("Invoice No: " + bookingId, 14, 42);
-  doc.text("Date: " + new Date().toLocaleDateString("en-IN"), 14, 50);
-  let y = 66;
-  lines.forEach(line => { doc.text(line, 14, y); y += 9; });
-  doc.save("PackZen-Invoice-" + bookingId + ".pdf");
+  if (!window._firebase) { showToast("⚠️ Firebase not initialized."); return; }
+
+  let targetId = docId || currentBookingId;
+  if (!targetId) { showToast("⚠️ No booking found."); return; }
+
+  showToast("⏳ Generating Invoice...");
+
+  try {
+    const docSnap = await window._firebase.db.collection("bookings").doc(targetId).get();
+    if (!docSnap.exists) { showToast("⚠️ Booking not found."); return; }
+
+    const b = docSnap.data();
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+
+    const fmt = n => Number(n || 0).toLocaleString("en-IN");
+    const safe = str => (str || "—").toString();
+
+    // --- Header ---
+    doc.setFillColor(0, 87, 255); // var(--primary)
+    doc.rect(0, 0, 210, 40, "F");
+
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(22);
+    doc.setFont("helvetica", "bold");
+    doc.text("PackZen", 14, 20);
+
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "normal");
+    doc.text("Professional Packers & Movers", 14, 28);
+
+    doc.setFontSize(16);
+    doc.setFont("helvetica", "bold");
+    doc.text("INVOICE", 160, 22);
+
+    // --- Invoice Info ---
+    doc.setTextColor(0, 0, 0);
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "bold");
+    doc.text("Invoice No:", 140, 50);
+    doc.setFont("helvetica", "normal");
+    doc.text(safe(b.bookingRef), 170, 50);
+
+    doc.setFont("helvetica", "bold");
+    doc.text("Invoice Date:", 140, 56);
+    doc.setFont("helvetica", "normal");
+    const invDate = b.createdAt && b.createdAt.toDate ? b.createdAt.toDate().toLocaleDateString("en-IN") : new Date().toLocaleDateString("en-IN");
+    doc.text(invDate, 170, 56);
+
+    // --- Customer Details ---
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(12);
+    doc.text("Customer Details", 14, 50);
+
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "normal");
+    doc.text(`Name: ${safe(b.customerName)}`, 14, 56);
+    doc.text(`Phone: ${safe(b.phone)}`, 14, 62);
+    if(b.email) doc.text(`Email: ${safe(b.email)}`, 14, 68);
+
+    // --- Move Details ---
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(12);
+    doc.text("Move Details", 14, 80);
+
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "normal");
+
+    const pickupLines = doc.splitTextToSize(`Pickup: ${safe(b.pickup)}`, 85);
+    doc.text(pickupLines, 14, 86);
+    let yPos = 86 + (pickupLines.length * 5);
+
+    const dropLines = doc.splitTextToSize(`Drop: ${safe(b.drop)}`, 85);
+    doc.text(dropLines, 14, yPos);
+    yPos += (dropLines.length * 5);
+
+    doc.text(`Move Date: ${safe(b.date)} ${safe(b.shiftTimeLabel)}`, 14, yPos);
+    doc.text(`Distance: ${b.distance ? b.distance + ' km' : '—'}`, 14, yPos + 6);
+    doc.text(`Vehicle: ${safe(b.vehicle)}`, 14, yPos + 12);
+
+    // Driver Info (Right side)
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(12);
+    doc.text("Driver Details", 120, 80);
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "normal");
+    doc.text(`Name: ${safe(b.driverName)}`, 120, 86);
+    doc.text(`Phone: ${safe(b.driverPhone)}`, 120, 92);
+
+    yPos = yPos + 22;
+
+    // --- Itemized Charges ---
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(12);
+    doc.text("Charges Breakdown", 14, yPos);
+    yPos += 8;
+
+    // Draw table header
+    doc.setFillColor(240, 244, 255);
+    doc.rect(14, yPos - 5, 182, 8, "F");
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(10);
+    doc.text("Description", 16, yPos);
+    doc.text("Amount (INR)", 160, yPos);
+    yPos += 8;
+
+    doc.setFont("helvetica", "normal");
+
+    const bd = b.quoteBreakdown || {};
+
+    const addCharge = (label, amount) => {
+      if (amount > 0) {
+        doc.text(label, 16, yPos);
+        doc.text(`Rs. ${fmt(amount)}`, 160, yPos);
+        yPos += 6;
+      }
+    };
+
+    if (bd.baseFare) addCharge("Base Fare", bd.baseFare);
+    else if (b.total) addCharge("Move Charge", b.originalTotal || b.total);
+
+    addCharge("Distance Charge", bd.distanceCharge);
+    addCharge("Floor & Handling Charge", bd.floorCharge);
+    addCharge("Packing Service", bd.packingCharge);
+    addCharge("Furniture & Assembly", bd.furnitureCharge);
+    addCharge("Carton Boxes", bd.cartonCharge);
+
+    if (bd.surcharges && bd.surcharges.length > 0) {
+       bd.surcharges.forEach(s => addCharge(`Surcharge (${s.label})`, s.amount));
+    }
+
+    if (b.promoDiscount > 0 || bd.discount > 0) {
+      doc.setTextColor(22, 163, 74); // Green
+      addCharge("Discount", -(b.promoDiscount || bd.discount));
+      doc.setTextColor(0, 0, 0);
+    }
+
+    // Line separator
+    yPos += 2;
+    doc.setDrawColor(200, 200, 200);
+    doc.line(14, yPos, 196, yPos);
+    yPos += 6;
+
+    // Total
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(12);
+    doc.text("Grand Total:", 120, yPos);
+    doc.text(`Rs. ${fmt(b.total)}`, 160, yPos);
+
+    yPos += 15;
+
+    // --- Payment Info ---
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(12);
+    doc.text("Payment Details", 14, yPos);
+    yPos += 6;
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "normal");
+
+    let paymentMethod = "Pay Later / Cash";
+    if (b.paymentType === "full") paymentMethod = "Online (Paid in Full)";
+    else if (b.paymentType === "advance") paymentMethod = "Online (Advance Paid)";
+
+    doc.text(`Payment Method: ${paymentMethod}`, 14, yPos);
+    doc.text(`Amount Paid: Rs. ${fmt(b.paid || 0)}`, 14, yPos + 6);
+    const balance = Math.max((b.total || 0) - (b.paid || 0), 0);
+    doc.setFont("helvetica", "bold");
+    doc.text(`Balance Due: Rs. ${fmt(balance)}`, 14, yPos + 12);
+
+    // Items / Furniture Summary (if any)
+    yPos += 25;
+    if (b.furniture || (b.selectedFurniture && Object.keys(b.selectedFurniture).length > 0)) {
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(11);
+        doc.text("Items Summary", 14, yPos);
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(9);
+
+        let furnText = b.furniture || "";
+        if (!furnText && b.selectedFurniture) {
+            furnText = Object.entries(b.selectedFurniture)
+                .filter(([k,v]) => v > 0)
+                .map(([k,v]) => `${k} x${v}`)
+                .join(", ");
+        }
+        const furnLines = doc.splitTextToSize(furnText || "None specified", 180);
+        doc.text(furnLines, 14, yPos + 5);
+    }
+
+    // --- Footer ---
+    const pageHeight = doc.internal.pageSize.height;
+    doc.setFillColor(245, 247, 250);
+    doc.rect(0, pageHeight - 20, 210, 20, "F");
+
+    doc.setTextColor(100, 100, 100);
+    doc.setFontSize(9);
+    doc.text("Thank you for choosing PackZen.", 14, pageHeight - 12);
+    doc.text("Website: packzenblr.in", 14, pageHeight - 7);
+    doc.text("Support: 9945095453", 150, pageHeight - 7);
+
+    doc.save(`PackZen-Invoice-${b.bookingRef || targetId}.pdf`);
+    showToast("✅ Invoice downloaded successfully!");
+
+  } catch (error) {
+    console.error("Error generating invoice:", error);
+    showToast("❌ Error generating invoice.");
+  }
 }
 
 function copyBookingId() {
