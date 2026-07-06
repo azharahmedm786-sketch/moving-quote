@@ -2759,7 +2759,7 @@ DASHBOARD TABS
 function closeDashboard() { document.getElementById("dashboardModal").style.display = "none"; }
 
 function switchDashTab(tab, el) {
-  ["dashQuotes","dashBookings","dashReferral","dashProfile","dashAdmin"].forEach(id => {
+  ["dashQuotes","dashBookings","dashAddresses","dashInvoices","dashReviews","dashReferral","dashProfile","dashAdmin"].forEach(id => {
     const panel = document.getElementById(id);
     if (panel) panel.style.display = "none";
   });
@@ -2770,6 +2770,9 @@ function switchDashTab(tab, el) {
   if (tab === "referral") loadReferralData();
   if (tab === "bookings") loadUserBookings();
   if (tab === "profile") loadProfileData();
+  if (tab === "addresses") loadUserAddresses();
+  if (tab === "invoices") loadUserInvoices();
+  if (tab === "reviews") loadUserReviews();
 }
 
 function loadUserQuotes() {
@@ -2836,6 +2839,96 @@ function attachBookingButtonListeners() {
       else if (action === 'claim') openDamageModal(id, ref);
     });
   });
+}
+
+function loadUserAddresses() {
+  if (!currentUser || !window._firebase) return;
+  const list = document.getElementById("addressesList");
+  if (!list) return;
+  window._firebase.db.collection("users").doc(currentUser.uid).collection("addresses").get()
+    .then(snap => {
+      if (snap.empty) { list.innerHTML = '<div class="dash-empty">No saved addresses yet.</div>'; return; }
+      list.innerHTML = snap.docs.map(d => {
+        const addr = d.data();
+        return `<div class="quote-item" style="display:flex;justify-content:space-between;align-items:center;">
+                  <div>📍 ${escapeHTML(addr.address)}</div>
+                  <button class="btn-auth" style="background:#dc2626;padding:4px 8px;font-size:0.75rem;min-height:unset;" onclick="deleteAddress('${d.id}')">Delete</button>
+                </div>`;
+      }).join("");
+    }).catch(err => { console.error("Error loading addresses:", err); });
+}
+
+function addNewAddress() {
+  if (!currentUser || !window._firebase) return;
+  const input = document.getElementById("newAddressInput");
+  const address = input?.value.trim();
+  if (!address) { showToast("⚠️ Please enter an address."); return; }
+  window._firebase.db.collection("users").doc(currentUser.uid).collection("addresses").add({ address, createdAt: firebase.firestore.FieldValue.serverTimestamp() })
+    .then(() => {
+      input.value = "";
+      showToast("✅ Address added!");
+      loadUserAddresses();
+    }).catch(err => { console.error("Error adding address:", err); showToast("❌ Failed to add address."); });
+}
+
+function deleteAddress(id) {
+  if (!currentUser || !window._firebase) return;
+  if (!confirm("Are you sure you want to delete this address?")) return;
+  window._firebase.db.collection("users").doc(currentUser.uid).collection("addresses").doc(id).delete()
+    .then(() => {
+      showToast("✅ Address deleted!");
+      loadUserAddresses();
+    }).catch(err => { console.error("Error deleting address:", err); showToast("❌ Failed to delete address."); });
+}
+
+function loadUserInvoices() {
+  if (!currentUser || !window._firebase) return;
+  const list = document.getElementById("invoicesList");
+  if (!list) return;
+  list.innerHTML = 'Loading invoices...';
+  window._firebase.db.collection("bookings")
+    .where("customerUid", "==", currentUser.uid)
+    .where("status", "in", ["completed", "delivered"])
+    .orderBy("createdAt", "desc").limit(10).get()
+    .then(snap => {
+      if (snap.empty) { list.innerHTML = '<div class="dash-empty">No invoices available.</div>'; return; }
+      list.innerHTML = snap.docs.map(d => {
+        const b = d.data();
+        return `<div class="quote-item" style="display:flex;justify-content:space-between;align-items:center;">
+                  <div>
+                    <div style="font-weight:bold;">Invoice #${b.bookingRef || d.id.substring(0,8)}</div>
+                    <div style="font-size:0.8rem;color:var(--text-muted);">₹${(b.total||0).toLocaleString("en-IN")} • ${b.date||"N/A"}</div>
+                  </div>
+                  <button class="btn-auth" style="padding:6px 12px;font-size:0.8rem;min-height:unset;" onclick="downloadInvoice('${d.id}')">Download</button>
+                </div>`;
+      }).join("");
+    }).catch(err => { console.error("Error loading invoices:", err); list.innerHTML = '<div class="dash-empty">Error loading invoices.</div>'; });
+}
+
+function downloadInvoice(bookingId) {
+  showToast("📄 Generating invoice... (Simulation)");
+  setTimeout(() => showToast("✅ Invoice downloaded!"), 1500);
+}
+
+function loadUserReviews() {
+  if (!currentUser || !window._firebase) return;
+  const list = document.getElementById("userReviewsList");
+  if (!list) return;
+  list.innerHTML = 'Loading reviews...';
+  window._firebase.db.collection("reviews")
+    .where("uid", "==", currentUser.uid)
+    .orderBy("createdAt", "desc").limit(10).get()
+    .then(snap => {
+      if (snap.empty) { list.innerHTML = '<div class="dash-empty">You haven\'t submitted any reviews yet.</div>'; return; }
+      list.innerHTML = snap.docs.map(d => {
+        const r = d.data();
+        return `<div class="quote-item">
+                  <div style="color:var(--gold-500);font-size:1.1rem;margin-bottom:4px;">${"★".repeat(r.rating || 5)}${"☆".repeat(5 - (r.rating || 5))}</div>
+                  <div style="font-size:0.9rem;">"${escapeHTML(r.text || "")}"</div>
+                  <div style="font-size:0.75rem;color:var(--text-muted);margin-top:4px;">Status: ${escapeHTML(r.status || "pending")}</div>
+                </div>`;
+      }).join("");
+    }).catch(err => { console.error("Error loading reviews:", err); list.innerHTML = '<div class="dash-empty">Error loading reviews.</div>'; });
 }
 
 function loadProfileData() {

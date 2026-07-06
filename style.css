@@ -1642,7 +1642,8 @@ select.field-input {
 .dashboard-name   { font-size: 1.1rem; font-weight: 700; color: var(--text-primary); }
 .dashboard-email  { font-size: 0.82rem; color: var(--text-muted); }
 
-.dash-tabs { display: flex; gap: 2px; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border-light); flex-wrap: wrap; }
+.dash-tabs { display: flex; gap: 2px; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border-light); flex-wrap: nowrap; overflow-x: auto; white-space: nowrap; scrollbar-width: none; }
+.dash-tabs::-webkit-scrollbar { display: none; }
 .dash-tab  { padding: 0.7rem 1rem; background: none; border: none; font-size: 0.82rem; font-weight: 600; color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1); min-height: 44px; }
 .dash-tab:hover  { color: var(--navy-800); }
 .dash-tab.active { color: var(--green-600); border-bottom-color: var(--green-500); }
