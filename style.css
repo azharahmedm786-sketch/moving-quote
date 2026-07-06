@@ -178,7 +178,7 @@ img { max-width: 100%; height: auto; display: block; }
 }
 :focus:not(:focus-visible) { outline: none; }
 
-::placeholder { color: #94a3b8; opacity: 1; }
+::placeholder { color: #64748b; opacity: 1; font-weight: 500; }
 
 /* ════════════════════════════════════════════
    SKIP LINK
@@ -488,7 +488,7 @@ img { max-width: 100%; height: auto; display: block; }
     font-weight:800;
     text-transform:uppercase;
     letter-spacing:1.8px;
-    color:#64748b;
+    color:var(--text-secondary);
 }
 
 .see-all-link{
@@ -970,7 +970,7 @@ img { max-width: 100%; height: auto; display: block; }
   to   { opacity: 1; transform: translateY(0); }
 }
 
-.step-hint { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1rem; line-height: 1.55; }
+.step-hint { font-size: 0.8rem; color: var(--text-secondary); font-weight: 500; margin-bottom: 1rem; line-height: 1.55; }
 
 /* Step footer */
 .step-footer {
@@ -989,7 +989,7 @@ img { max-width: 100%; height: auto; display: block; }
 .field-row-2   { display: grid; grid-template-columns: 1fr 1fr; gap: 0.875rem; margin-bottom: 1.1rem; }
 .field-label   {
   display: flex; align-items: center; gap: 0.35rem;
-  font-size: 0.68rem; font-weight: 700; color: var(--text-muted);
+  font-size: 0.68rem; font-weight: 700; color: var(--text-secondary);
   margin-bottom: 0.4rem; text-transform: uppercase; letter-spacing: 0.8px;
 }
 .field-icon { font-size: 0.85rem; }
@@ -1499,24 +1499,57 @@ select.field-input {
 ════════════════════════════════════════════ */
 .app-footer {
   background: var(--navy-900); color: rgba(255,255,255,0.6);
-  padding: 2rem 1.25rem 1.5rem;
+  padding: 2.5rem 1.25rem 1.5rem;
   margin-top: 2rem;
 }
+
+.app-footer-inner-desktop {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.app-footer-col {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.app-footer-col-title {
+  font-family: 'Space Grotesk', sans-serif;
+  color: #fff;
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
 .app-footer-logo {
-  font-family: 'Space Grotesk',sans-serif; font-size: 1.4rem; font-weight: 800;
-  color: #fff; margin-bottom: 0.5rem;
+  font-family: 'Space Grotesk',sans-serif; font-size: 1.8rem; font-weight: 800;
+  color: #fff; margin-bottom: 0.25rem;
 }
 .app-footer-logo span { color: var(--green-400); }
-.app-footer p { font-size: 0.8rem; margin-bottom: 1.25rem; line-height: 1.6; max-width: 280px; }
-.app-footer-links { display: flex; flex-wrap: wrap; gap: 4px 16px; margin-bottom: 1rem; }
-.app-footer-links a { color: rgba(255,255,255,0.5); text-decoration: none; font-size: 0.78rem; transition: color 0.2s; }
-.app-footer-links a:hover { color: rgba(255,255,255,0.85); }
-.app-footer-contact { display: flex; gap: 1.5rem; margin-bottom: 1.25rem; }
-.app-footer-contact a { color: var(--green-400); text-decoration: none; font-size: 0.82rem; font-weight: 600; }
-.app-footer-bottom { font-size: 0.72rem; color: rgba(255,255,255,0.3); line-height: 1.7; }
-.app-footer-bottom strong { color: rgba(255,255,255,0.6); }
-.app-footer-bottom a { color: rgba(255,255,255,0.4); text-decoration: none; }
-.app-footer-bottom a:hover { color: rgba(255,255,255,0.7); }
+.app-footer p { font-size: 0.85rem; margin-bottom: 0.5rem; line-height: 1.6; max-width: 280px; }
+.app-footer-links { display: flex; flex-direction: column; gap: 10px; }
+.app-footer-links a { color: rgba(255,255,255,0.6); text-decoration: none; font-size: 0.85rem; transition: color 0.2s; }
+.app-footer-links a:hover { color: rgba(255,255,255,1); }
+.app-footer-contact { display: flex; flex-direction: column; gap: 10px; }
+.app-footer-contact a { color: var(--green-400); text-decoration: none; font-size: 0.85rem; font-weight: 600; display: flex; align-items: center; gap: 6px; }
+.app-footer-bottom {
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.4);
+  line-height: 1.7;
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(255,255,255,0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: center;
+  text-align: center;
+}
+.app-footer-bottom strong { color: rgba(255,255,255,0.7); }
+.app-footer-bottom a { color: rgba(255,255,255,0.5); text-decoration: none; }
+.app-footer-bottom a:hover { color: rgba(255,255,255,0.9); }
 
 /* ════════════════════════════════════════════
    LOCAL SEO (visually hidden but accessible/indexed)
