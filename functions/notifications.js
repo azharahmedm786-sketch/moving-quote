@@ -19,6 +19,41 @@ const admin = require("firebase-admin");
 const { sendCustomerEmail, sendAdminEmail } = require("./notification-service");
 
 /* ────────────────────────────────────────────────────────────
+   HELPERS: queue SMS and WhatsApp messages directly to Firestore
+   ──────────────────────────────────────────────────────────── */
+async function queueSMS(phone, message, bookingRef) {
+  if (!phone) return;
+  try {
+    await admin.firestore().collection("smsQueue").add({
+      mobile: phone,
+      message,
+      bookingRef: bookingRef || null,
+      status: "pending",
+      retries: 0,
+      createdAt: admin.firestore.FieldValue.serverTimestamp()
+    });
+  } catch (e) {
+    console.error(`Error queueing SMS for ${bookingRef}: ${e.message}`);
+  }
+}
+
+async function queueWhatsApp(phone, message, bookingRef) {
+  if (!phone) return;
+  try {
+    await admin.firestore().collection("whatsappQueue").add({
+      mobile: phone,
+      message,
+      bookingRef: bookingRef || null,
+      status: "pending",
+      retries: 0,
+      createdAt: admin.firestore.FieldValue.serverTimestamp()
+    });
+  } catch (e) {
+    console.error(`Error queueing WhatsApp for ${bookingRef}: ${e.message}`);
+  }
+}
+
+/* ────────────────────────────────────────────────────────────
    HELPER: safely pull the fields templates need out of a
    booking document, regardless of which flow created it
    (Razorpay webhook, script.js bookWithoutPayment, WhatsApp/n8n).
@@ -83,6 +118,10 @@ exports.onBookingCreatedNotify = functions
         }
       }
 
+      const msgCustomer = `Hi ${b.customerName}, your PackZen booking (${b.bookingRef}) is confirmed for ${b.date}! Pickup: ${b.pickup}. Est. cost: Rs.${b.total || 0}. Track: packzenblr.in. Queries: 9945095453`;
+      await queueSMS(b.phone, msgCustomer, b.bookingRef);
+      await queueWhatsApp(b.phone, msgCustomer, b.bookingRef);
+
       await sendAdminEmail("New Booking Received", [
         ["Booking Ref", b.bookingRef],
         ["Customer", b.customerName],
@@ -125,6 +164,15 @@ exports.onBookingUpdatedNotify = functions
       // ── DRIVER ASSIGNED ──
       if (driverJustAssigned) {
         if (email) await sendCustomerEmail("driver_assigned", email, data);
+
+        const msgCustomer = `Hi ${after.customerName}, your PackZen driver ${after.driverName} (${after.driverPhone}) is assigned for booking ${after.bookingRef}. Track live on packzenblr.in. Queries: 9945095453`;
+        await queueSMS(after.phone, msgCustomer, after.bookingRef);
+        await queueWhatsApp(after.phone, msgCustomer, after.bookingRef);
+
+        const msgDriver = `New Booking Assigned: ${after.bookingRef} on ${after.date}. Pickup: ${after.pickup}. Drop: ${after.drop}. Customer: ${after.customerName} (${after.phone}). Log in to PackZen partner app to start.`;
+        await queueSMS(after.driverPhone, msgDriver, after.bookingRef);
+        await queueWhatsApp(after.driverPhone, msgDriver, after.bookingRef);
+
         await sendAdminEmail("Driver Assigned to Booking", [
           ["Booking Ref", after.bookingRef],
           ["Customer", after.customerName],
@@ -134,8 +182,15 @@ exports.onBookingUpdatedNotify = functions
       }
 
       // ── DRIVER ARRIVING (custom flag some flows may set) ──
-      if (!before.driverArrivingNotified && after.driverArriving === true) {
+      if (!after.driverArrivingNotified && after.driverArriving === true) {
         if (email) await sendCustomerEmail("driver_arriving", email, data);
+
+        const msgCustomer = `Hi ${after.customerName}, your goods are now in transit for booking ${after.bookingRef}. Track your driver live on packzenblr.in.`;
+        await queueSMS(after.phone, msgCustomer, after.bookingRef);
+        await queueWhatsApp(after.phone, msgCustomer, after.bookingRef);
+
+        // Prevent duplicate driver arriving notifications
+        await change.after.ref.update({ driverArrivingNotified: true });
       }
 
       // ── PAYMENT SUCCESSFUL ──
@@ -159,6 +214,9 @@ exports.onBookingUpdatedNotify = functions
             // job (scheduled-notifications.js) also re-checks and
             // is idempotent via feedbackRequestSent flag below.
           }
+          const msgCustomer = `Hi ${after.customerName}, your PackZen move ${after.bookingRef} is complete! Please rate your driver on packzenblr.in. Thank you for choosing PackZen!`;
+          await queueSMS(after.phone, msgCustomer, after.bookingRef);
+          await queueWhatsApp(after.phone, msgCustomer, after.bookingRef);
         }
 
         // ── BOOKING CANCELLED ──
