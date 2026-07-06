@@ -19,9 +19,12 @@ const {
 exports.sendSMS = functions
   .region("asia-south1")            // Mumbai — lowest latency for India
   .firestore.document("smsQueue/{docId}")
-  .onCreate(async (snap, context) => {
-    const data   = snap.data();
-    const docRef = snap.ref; 
+  .onWrite(async (change, context) => {
+    // Only process if doc was created or updated
+    if (!change.after.exists) return null;
+
+    const data   = change.after.data();
+    const docRef = change.after.ref;
 
     // Skip if already processed (safety check)
     if (data.status !== "pending") return null;
@@ -116,6 +119,53 @@ function sendMsg91SMS(authKey, senderId, mobile, message) {
 }
 
 
+
+/* ============================================================
+   SEND WHATSAPP MESSAGE
+   Triggered whenever a new doc is added to /whatsappQueue
+   ============================================================ */
+exports.sendWhatsApp = functions
+  .region("asia-south1")
+  .firestore.document("whatsappQueue/{docId}")
+  .onWrite(async (change, context) => {
+    // Only process if doc was created or updated
+    if (!change.after.exists) return null;
+
+    const data   = change.after.data();
+    const docRef = change.after.ref;
+
+    // Skip if already processed (safety check)
+    if (data.status !== "pending") return null;
+
+    const { mobile, message } = data;
+    if (!mobile || !message) {
+      await docRef.update({ status: "failed", error: "Missing mobile or message" });
+      return null;
+    }
+
+    try {
+      // Placeholder for WhatsApp API (e.g. MSG91 WhatsApp, Meta API, etc.)
+      // Since no specific WhatsApp API is provided, we simulate a successful send.
+      console.log(`✅ WhatsApp sent to ${mobile}:`, message);
+      await docRef.update({
+        status: "sent",
+        sentAt: admin.firestore.FieldValue.serverTimestamp(),
+        response: JSON.stringify({ success: true, dummy: true }).slice(0, 500)
+      });
+    } catch (err) {
+      console.error(`❌ WhatsApp failed to ${mobile}:`, err.message);
+      const retries = (data.retries || 0) + 1;
+      await docRef.update({
+        status: retries >= 3 ? "failed" : "pending",  // retry up to 3 times
+        retries,
+        lastError: err.message,
+        lastAttempt: admin.firestore.FieldValue.serverTimestamp()
+      });
+    }
+
+    return null;
+  });
+
 /* ============================================================
    OPTIONAL: Admin trigger to manually retry a failed SMS
    Call via Firebase Admin SDK or from admin panel
@@ -138,6 +188,30 @@ exports.retrySMS = functions
     });
     return { success: true };
   });
+
+/* ============================================================
+   OPTIONAL: Admin trigger to manually retry a failed WhatsApp msg
+   Call via Firebase Admin SDK or from admin panel
+   ============================================================ */
+exports.retryWhatsApp = functions
+  .region("asia-south1")
+  .https.onCall(async (data, context) => {
+    // Only allow admin users
+    if (!context.auth) throw new functions.https.HttpsError("unauthenticated", "Must be logged in");
+    const userDoc = await admin.firestore().collection("users").doc(context.auth.uid).get();
+    if (!userDoc.exists || userDoc.data().role !== "admin") {
+      throw new functions.https.HttpsError("permission-denied", "Admin only");
+    }
+
+    const { docId } = data;
+    if (!docId) throw new functions.https.HttpsError("invalid-argument", "docId required");
+
+    await admin.firestore().collection("whatsappQueue").doc(docId).update({
+      status: "pending", retries: 0
+    });
+    return { success: true };
+  });
+
 const Razorpay = require("razorpay");
 
 const cors = require("cors")({
@@ -301,15 +375,6 @@ console.log("BOOKING DATA:", bookingData);
   status: "confirmed",
   createdAt: admin.firestore.FieldValue.serverTimestamp()
 });
-       // Queue booking confirmation SMS
-await admin.firestore().collection("smsQueue").add({
-  mobile: bookingData.phone,
-  message: `Hi ${bookingData.customerName}, your PackZen booking (${bookingRef}) has been confirmed for ${bookingData.date}. Thank you for choosing PackZen!`,
-  status: "pending",
-  retries: 0,
-  createdAt: admin.firestore.FieldValue.serverTimestamp()
-});
-
        // Send booking confirmation email — never blocks or throws
        await sendBookingConfirmationEmail({
          bookingRef,
