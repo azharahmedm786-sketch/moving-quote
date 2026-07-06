@@ -405,7 +405,7 @@ function renderFurnitureGrid(type) {
     return `<div class="fc-qty-card" id="card-${item.id}" data-item-id="${item.id}">
       <span class="fc-emoji">${item.emoji}</span>
       <span class="fc-name">${item.name}</span>
-      <span class="fc-price-tag" style="${priceColor}">${priceLabel}</span>
+      <span class="fc-price-tag" style="display:none!important; ${priceColor}">${priceLabel}</span>
       <div class="fc-qty-row">
         <button class="fc-qty-btn" data-action="minus" data-item="${item.id}" aria-label="Remove ${item.name}">−</button>
         <input type="number" id="${item.id}" value="0" min="0" max="20" class="fc-qty-input" aria-label="${item.name} quantity" readonly>
@@ -1595,8 +1595,14 @@ function showBookingSuccessState() {
 function scrollToTrackBanner() {
   const banner = document.getElementById("trackOrderBanner");
   if (banner) {
-    const navH = document.querySelector("nav")?.offsetHeight || 65;
-    window.scrollTo({ top: banner.getBoundingClientRect().top + window.scrollY - navH - 8, behavior: "smooth" });
+    const navH = document.querySelector(".app-bar")?.offsetHeight || 65;
+    const safeTopStr = getComputedStyle(document.documentElement).getPropertyValue('--safe-top').trim();
+    let safeTop = 0;
+    if (safeTopStr.includes('px')) {
+      safeTop = parseInt(safeTopStr) || 0;
+    }
+    // ensure that the scroll accounts for the header plus some padding
+    window.scrollTo({ top: banner.getBoundingClientRect().top + window.scrollY - navH - safeTop - 8, behavior: "smooth" });
   }
 }
 
@@ -3303,7 +3309,7 @@ document.addEventListener("DOMContentLoaded", () => {
   if (!document.getElementById("pz-fc-styles")) {
     const s = document.createElement("style");
     s.id = "pz-fc-styles";
-    s.textContent = `.furniture-grid{display:flex;flex-direction:column;gap:8px;} .fc-category{border:1px solid rgba(255,255,255,0.08);border-radius:12px;overflow:hidden;} .fc-category-header{display:flex;align-items:center;gap:10px;padding:12px 16px;background:rgba(255,255,255,0.04);cursor:pointer;transition:background .2s;user-select:none;} .fc-category-header:hover{background:rgba(255,255,255,0.08);} .fc-cat-icon{font-size:1.1rem;} .fc-cat-label{flex:1;font-weight:600;font-size:.9rem;color:var(--text,#fff);} .fc-cat-arrow{font-size:.8rem;color:var(--text-muted,#aaa);transition:transform .2s;} .fc-category-items{display:none;flex-wrap:wrap;gap:10px;padding:12px;background:rgba(255,255,255,0.02);} .fc-qty-card{display:flex;flex-direction:column;align-items:center;gap:5px;padding:10px 8px;border-radius:10px;border:2px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.03);transition:all .2s;width:88px;text-align:center;} .fc-qty-card.active{border-color:#3b82f6;background:rgba(59,130,246,0.13);} .fc-emoji{font-size:1.4rem;line-height:1;} .fc-name{font-size:.68rem;font-weight:500;color:var(--text,#fff);line-height:1.2;min-height:2em;display:flex;align-items:center;justify-content:center;} .fc-price-tag{font-size:.64rem;color:#22c55e;font-weight:600;} .fc-qty-row{display:flex;align-items:center;gap:4px;margin-top:2px;} .fc-qty-btn{width:26px;height:26px;border-radius:6px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.07);color:var(--text,#fff);font-size:1rem;font-weight:700;cursor:pointer;transition:background .15s,border-color .15s;display:flex;align-items:center;justify-content:center;padding:0;line-height:1;-webkit-tap-highlight-color:transparent;} .fc-qty-btn:hover,.fc-qty-btn:active{background:#3b82f6;border-color:#3b82f6;} .fc-qty-input{width:26px;text-align:center;background:transparent;border:none;color:var(--text,#fff);font-size:.85rem;font-weight:700;-moz-appearance:textfield;pointer-events:none;} .fc-qty-input::-webkit-outer-spin-button,.fc-qty-input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;} .carton-box-row{display:flex;align-items:center;flex-wrap:wrap;gap:10px;padding:4px 0;width:100%;} .carton-label{font-size:.85rem;color:var(--text,#fff);flex:1;min-width:160px;} .carton-qty-wrap{display:flex;align-items:center;gap:6px;} .carton-price-note{font-size:.8rem;color:#22c55e;font-weight:600;} @media(max-width:380px){.fc-qty-card{width:78px;padding:8px 5px;}}`;
+    s.textContent = `.furniture-grid{display:flex;flex-direction:column;gap:8px;} .fc-category{border:1px solid rgba(255,255,255,0.08);border-radius:12px;overflow:hidden;} .fc-category-header{display:flex;align-items:center;gap:10px;padding:12px 16px;background:rgba(255,255,255,0.04);cursor:pointer;transition:background .2s;user-select:none;} .fc-category-header:hover{background:rgba(255,255,255,0.08);} .fc-cat-icon{font-size:1.1rem;} .fc-cat-label{flex:1;font-weight:600;font-size:.9rem;color:var(--text,#fff);} .fc-cat-arrow{font-size:.8rem;color:var(--text-muted,#aaa);transition:transform .2s;} .fc-category-items{display:none;flex-wrap:wrap;gap:10px;padding:12px;background:rgba(255,255,255,0.02);} .fc-qty-card{display:flex;flex-direction:column;align-items:center;gap:5px;padding:10px 8px;border-radius:10px;border:2px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.03);transition:all .2s;width:88px;text-align:center;} .fc-qty-card.active{border-color:#3b82f6;background:rgba(59,130,246,0.13);} .fc-emoji{font-size:1.4rem;line-height:1;} .fc-name{font-size:.68rem;font-weight:500;color:var(--text,#fff);line-height:1.2;min-height:2em;display:flex;align-items:center;justify-content:center;} .fc-price-tag{font-size:.64rem;color:#22c55e;font-weight:600;display:none!important;} .fc-qty-row{display:flex;align-items:center;gap:4px;margin-top:2px;} .fc-qty-btn{width:26px;height:26px;border-radius:6px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.07);color:var(--text,#fff);font-size:1rem;font-weight:700;cursor:pointer;transition:background .15s,border-color .15s;display:flex;align-items:center;justify-content:center;padding:0;line-height:1;-webkit-tap-highlight-color:transparent;} .fc-qty-btn:hover,.fc-qty-btn:active{background:#3b82f6;border-color:#3b82f6;} .fc-qty-input{width:26px;text-align:center;background:transparent;border:none;color:var(--text,#fff);font-size:.85rem;font-weight:700;-moz-appearance:textfield;pointer-events:none;} .fc-qty-input::-webkit-outer-spin-button,.fc-qty-input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;} .carton-box-row{display:flex;align-items:center;flex-wrap:wrap;gap:10px;padding:4px 0;width:100%;} .carton-label{font-size:.85rem;color:var(--text,#fff);flex:1;min-width:160px;} .carton-qty-wrap{display:flex;align-items:center;gap:6px;} .carton-price-note{font-size:.8rem;color:#22c55e;font-weight:600;} @media(max-width:380px){.fc-qty-card{width:78px;padding:8px 5px;}}`;
     document.head.appendChild(s);
   }
 

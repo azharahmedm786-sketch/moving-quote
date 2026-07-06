@@ -757,18 +757,7 @@
           <button class="btn-next" onclick="nextStep()">Continue <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
         </div>
       </div>
-      <div class="field-group" id="helperCardGroup">
-    <label class="field-label">
-        <span class="field-icon">👷</span> Additional Helpers (Optional)
-    </label>
 
-    <select id="extraHelpers" class="field-input" onchange="calculateQuote(true)">
-        <option value="0">No Extra Helper (Included)</option>
-        <option value="1">+1 Helper (+₹400)</option>
-        <option value="2">+2 Helpers (+₹800)</option>
-        <option value="3">+3 Helpers (+₹1200)</option>
-    </select>
-</div>
 
       <!-- STEP 3: ITEMS -->
       <div class="form-step">
@@ -821,6 +810,19 @@
               <span class="advance-note">· 10% now, rest on moving day</span>
             </div>
           </div>
+
+          <div class="field-group" id="helperCardGroup">
+            <label class="field-label">
+              <span class="field-icon">👷</span> Additional Helpers (Optional)
+            </label>
+            <select id="extraHelpers" class="field-input" onchange="calculateQuote(true)">
+              <option value="0">No Extra Helper (Included)</option>
+              <option value="1">+1 Helper (+₹400)</option>
+              <option value="2">+2 Helpers (+₹800)</option>
+              <option value="3">+3 Helpers (+₹1200)</option>
+            </select>
+          </div>
+
           <div class="field-group">
             <label class="field-label"><span class="field-icon">🏷️</span> Promo / Referral Code</label>
             <div class="promo-row">
@@ -1418,15 +1420,7 @@ document.addEventListener('click', function(e) {
 
 // ── Swipe-down to close sheet (touch) ─────────────────────
 (function() {
-  var sheet = document.getElementById('bookingSheet');
-  var startY = 0;
-  sheet.addEventListener('touchstart', function(e) {
-    startY = e.touches[0].clientY;
-  }, { passive: true });
-  sheet.addEventListener('touchend', function(e) {
-    var dy = e.changedTouches[0].clientY - startY;
-    if (dy > 80) closeBookingSheet();
-  }, { passive: true });
+  // Swipe to close removed to fix scrolling issue inside bottom sheet
 })();
 </script>
 

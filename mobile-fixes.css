@@ -813,7 +813,7 @@ touch-action: manipulation;
 }
 
 .time-slot-btn:active {
-  transform: scale(0.97);
+  /* Removed scaling to prevent layout shift */
 }
 
 .ts-emoji { font-size: 1.4rem; margin-bottom: 5px; line-height: 1; }
@@ -1681,11 +1681,11 @@ touch-action: manipulation;
    27. TRACK ORDER BANNER
    ============================================================ */
 #trackOrderBanner {
-  margin: calc(var(--app-bar-h) + 0.75rem) 1rem 0.75rem;
+  margin: calc(var(--app-bar-h) + var(--safe-top, 0px) + 0.75rem) 1rem 0.75rem;
 }
 
 @media (max-width: 480px) {
-  #trackOrderBanner { margin: calc(var(--app-bar-h) + 0.5rem) 0.75rem 0.5rem; }
+  #trackOrderBanner { margin: calc(var(--app-bar-h) + var(--safe-top, 0px) + 0.5rem) 0.75rem 0.5rem; }
   .tob-title        { font-size: 0.78rem; }
   .tob-id           { font-size: 0.7rem; }
   .tob-step-label   { font-size: 0.5rem; }
@@ -1693,7 +1693,7 @@ touch-action: manipulation;
 }
 
 @media (max-width: 360px) {
-  #trackOrderBanner    { margin: calc(var(--app-bar-h) + 0.4rem) 0.5rem 0.4rem; }
+  #trackOrderBanner    { margin: calc(var(--app-bar-h) + var(--safe-top, 0px) + 0.4rem) 0.5rem 0.4rem; }
   .tob-inner           { padding: 0.75rem 0.75rem 0.6rem; }
   .tob-title           { font-size: 0.74rem; }
   .tob-btn-track       { padding: 0.3rem 0.6rem; font-size: 0.7rem; }
