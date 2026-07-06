@@ -611,9 +611,9 @@ img { max-width: 100%; height: auto; display: block; }
   font-size: 0.8rem; font-weight: 700;
   padding: 8px 16px; border-radius: 100px; border: none;
   cursor: pointer; box-shadow: var(--gold-glow);
-  transition: transform 0.15s;
+  transition: box-shadow 0.15s;
 }
-.offer-btn:hover { transform: translateY(-1px); }
+.offer-btn:hover { box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4); }
 .offer-right { font-size: 3.5rem; position: relative; z-index: 1; }
 
 /* Why App Grid */
@@ -1043,10 +1043,10 @@ select.field-input {
   background: var(--gold-gradient); color: #fff;
   border: none; border-radius: var(--radius-pill);
   font-family: 'Manrope', sans-serif; font-size: 0.95rem; font-weight: 700;
-  cursor: pointer; transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+  cursor: pointer; transition: box-shadow 0.3s cubic-bezier(0.25, 1, 0.5, 1);
   box-shadow: var(--gold-glow);
 }
-.btn-next:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(34,197,94,0.45); }
+.btn-next:hover { box-shadow: 0 8px 24px rgba(34,197,94,0.45); }
 
 .btn-back {
   flex: 1; height: 52px; min-height: 44px;
@@ -1416,7 +1416,7 @@ select.field-input {
 /* ════════════════════════════════════════════
    TRACK ORDER BANNER
 ════════════════════════════════════════════ */
-#trackOrderBanner { margin: calc(var(--app-bar-h) + 0.5rem) 1rem 0.5rem; }
+#trackOrderBanner { margin: calc(var(--app-bar-h) + var(--safe-top) + 0.5rem) 1rem 0.5rem; }
 
 .tob-inner {
   background: linear-gradient(135deg, var(--navy-900), var(--navy-800));
