@@ -210,7 +210,8 @@ const PRICING_CONFIG = Object.freeze({
     "office_small": 2500,
     "office_medium": 4000,
     "office_large": 7000,
-  },
+    operCostRatio: 0.7,
+},
 
   /* ── LABOUR CHARGES (unchanged) ──────────────────────────── */
   labour: {
@@ -234,18 +235,18 @@ const PRICING_CONFIG = Object.freeze({
   /* ── SURCHARGES (unchanged) ──────────────────────────────── */
   surcharges: {
     night: {
-      enabled: false,
+      enabled: true,
       startHour: 21,
       endHour: 7,
       multiplier: 1.15,
     },
     weekend: {
-      enabled: false,
+      enabled: true,
       days: [0, 6],
       multiplier: 1.10,
     },
     rain: {
-      enabled: false,
+      enabled: true,
       months: [5, 6, 7, 8],
       multiplier: 1.08,
     },
@@ -462,6 +463,7 @@ function validateQuoteInput(raw) {
     pickupFloor,
     dropFloor,
     liftAvailable:    liftAvail,
+    packingService:   !!raw.packingService,
     moveType,
     shiftDate,
     shiftHour,
@@ -554,6 +556,36 @@ function calcFloorCost(pickupFloor, dropFloor, liftAvailable) {
     : PRICING_CONFIG.floor.withoutLift;
   return totalFloors * rate;
 }
+
+
+/**
+ * Calculates the packing cost based on house value and move type.
+ */
+function calcPackingCost(houseValue, moveType) {
+  const cfg = PRICING_CONFIG.packing;
+  if (!houseValue) return 0;
+
+  const h = Number(houseValue);
+  let key = "";
+
+  if (moveType === "office") {
+    if (h <= 6500) key = "office_cabin";
+    else if (h <= 10500) key = "office_small";
+    else if (h <= 16500) key = "office_medium";
+    else key = "office_large";
+  } else {
+    // home move
+    if (h <= 2500) key = "1rk";
+    else if (h <= 4500) key = "1bhk";
+    else if (h <= 6500) key = "2bhk";
+    else if (h <= 8500) key = "3bhk";
+    else if (h <= 10500) key = "4bhk";
+    else key = "villa";
+  }
+
+  return cfg[key] || 0;
+}
+
 
 /**
  * Determines which distance slab applies for intercity.
@@ -720,13 +752,13 @@ function calcPaymentOptions(discountedTotal) {
 function calcInternalProfit(quoteComponents) {
   const {
     km, vehicleCfg, isIntercity, furniture, cartonQty,
-    totalFloors, liftAvailable, finalTotal,
+    totalFloors, liftAvailable, baseFare, packingCharge, finalTotal,
   } = quoteComponents;
 
   let operCost = 0;
 
   if (isIntercity) {
-    operCost = Math.round(finalTotal * PRICING_CONFIG.intercity.operCostRatio);
+    operCost = Math.round(baseFare * PRICING_CONFIG.intercity.operCostRatio);
   } else if (vehicleCfg) {
     const vRates = PRICING_CONFIG.local.vehicles[vehicleCfg.id];
     if (vRates) {
@@ -745,6 +777,7 @@ function calcInternalProfit(quoteComponents) {
     ? PRICING_CONFIG.floor.withLift * PRICING_CONFIG.floor.operCostRatio
     : PRICING_CONFIG.floor.withoutLift * PRICING_CONFIG.floor.operCostRatio;
   operCost += Math.round(totalFloors * floorRate);
+  operCost += Math.round((packingCharge || 0) * PRICING_CONFIG.packing.operCostRatio);
 
   // Carton cost
   operCost += cartonQty * PRICING_CONFIG.cartons.operCostPerBox;
@@ -912,7 +945,7 @@ function calculateQuoteV2(raw) {
   const {
     km, houseValue, vehicleCfg, vehicleHtmlValue,
     furniture, cartonQty, pickupFloor, dropFloor,
-    liftAvailable, moveType, shiftDate, shiftHour,
+    liftAvailable, packingService, moveType, shiftDate, shiftHour,
     promoDiscount: rawPromo,
   } = data;
 
@@ -950,8 +983,13 @@ function calculateQuoteV2(raw) {
   }
 
   // ── Step 5: Subtotal before surcharges ───────────────────
+  let packingCharge = 0;
+  if (isIntercity || packingService) {
+    packingCharge = calcPackingCost(houseValue, moveType);
+  }
+
   const subtotalPreSurcharge = Math.round(
-    baseFare + distanceCharge + furnitureCost + cartonCost + floorCost
+    baseFare + distanceCharge + furnitureCost + cartonCost + floorCost + packingCharge
   );
 
   // ── Step 6: Surcharges ────────────────────────────────────
@@ -967,32 +1005,43 @@ let subtotalWithGST = subtotalAfterSurcharge;
   const totalBeforeDiscount = Math.max(subtotalWithGST, PRICING_CONFIG.minimumFare);
 
   // ── Step 9: Promo discount ────────────────────────────────
-  const cappedDiscount = applyPromoDiscount(totalBeforeDiscount, rawPromo);
-  const grandTotal = Math.max(totalBeforeDiscount - cappedDiscount, 0);
+  let cappedDiscount = applyPromoDiscount(totalBeforeDiscount, rawPromo);
+  let grandTotal = Math.max(totalBeforeDiscount - cappedDiscount, 0);
 
-  // ── Step 10: Payment options ──────────────────────────────
+  // ── Step 10: Operational Cost & Minimum Profit Check ──────
+  // Calculate internal costs before finalizing the discount
+  const _internal = calcInternalProfit({
+    km, vehicleCfg, isIntercity, furniture, cartonQty,
+    totalFloors, liftAvailable, baseFare, packingCharge, finalTotal: grandTotal,
+  });
+
+  // Prevent underpricing: ensure grandTotal >= operCost + 10%
+  const minRequiredTotal = Math.ceil(_internal.operCost * 1.1);
+  if (grandTotal < minRequiredTotal) {
+    grandTotal = minRequiredTotal;
+    cappedDiscount = Math.max(totalBeforeDiscount - grandTotal, 0);
+    // update internal profit based on the new final total
+    _internal.profit = Math.max(0, grandTotal - _internal.operCost);
+    _internal.profitPercent = Math.round((_internal.profit / grandTotal) * 100);
+  }
+  _internal.engineVersion = PRICING_CONFIG.version;
+
+  // ── Step 11: Payment options ──────────────────────────────
   const paymentOptions = calcPaymentOptions(grandTotal);
 
-  // ── Step 11: Surcharge line items (with ₹ amounts) ───────
+  // ── Step 12: Surcharge line items (with ₹ amounts) ───────
   const surchargeLines = appliedSurcharges.map(s => ({
     ...s,
     amount: Math.round(subtotalPreSurcharge * (s.percent / 100)),
   }));
 
-  // ── Step 12: Recommendations ─────────────────────────────
+  // ── Step 13: Recommendations ─────────────────────────────
   const recVehicle  = recommendVehicle(houseValue, moveType, isIntercity);
   const recHelpers  = recommendHelpers(houseValue, itemCount);
   const recPacking  = recommendPackingMaterials(furniture, cartonQty, houseValue);
   const deliveryHrs = isIntercity ? estimateDeliveryHours(km) : null;
   const loadTime    = vehicleCfg?.loadTimeMin  ?? recVehicle.loadTimeMin;
   const unloadTime  = vehicleCfg?.unloadTimeMin ?? recVehicle.unloadTimeMin;
-
-  // ── Step 13: Internal profit ──────────────────────────────
-  const _internal = calcInternalProfit({
-    km, vehicleCfg, isIntercity, furniture, cartonQty,
-    totalFloors, liftAvailable, finalTotal: grandTotal,
-  });
-  _internal.engineVersion = PRICING_CONFIG.version;
 
   // ── Step 14: Build breakdown ──────────────────────────────
   const breakdown = {
@@ -1001,7 +1050,7 @@ let subtotalWithGST = subtotalAfterSurcharge;
     furnitureCharge: furnitureCost,
     cartonCharge:    cartonCost,
     floorCharge:     floorCost,
-    packingCharge:   0,     // future: packing add-on
+    packingCharge,        // future: packing add-on
     insuranceCharge: 0,     // future: optional insurance
     surcharges:      surchargeLines,
     subtotal:        subtotalPreSurcharge,
@@ -1100,6 +1149,7 @@ function _readFormState() {
     pickupFloor:      parseInt(g("pickupFloor")?.value ?? 0, 10) || 0,
     dropFloor:        parseInt(g("dropFloor")?.value  ?? 0, 10) || 0,
     liftAvailable:    !!g("liftAvailable")?.checked,
+    packingService:   !!(g("packingService")?.checked || window._packingServiceRequested),
     moveType:         window.selectedMoveType || "home",
     shiftDate:        g("shiftDate")?.value || null,
     shiftHour,
@@ -1135,6 +1185,7 @@ function _renderV2Breakdown(result, resultEl) {
   if (breakdown.furnitureCharge > 0) rows.push(`Furniture: ₹${fmt(breakdown.furnitureCharge)}`);
   if (breakdown.cartonCharge    > 0) rows.push(`Cartons: ₹${fmt(breakdown.cartonCharge)}`);
   if (breakdown.floorCharge     > 0) rows.push(`Floor Charge: ₹${fmt(breakdown.floorCharge)}`);
+  if (breakdown.packingCharge   > 0) rows.push(`Packing: ₹${fmt(breakdown.packingCharge)}`);
 
   breakdown.surcharges?.forEach(s => {
     rows.push(`${s.label} (+${s.percent}%): ₹${fmt(s.amount)}`);
@@ -1273,6 +1324,7 @@ window.PackZenPricing = {
   calcFurnitureCost,
   calcCartonCost,
   calcFloorCost,
+  calcPackingCost,
   calcLocalDistanceFare,
   calcIntercityBase,
   applySurcharges,
