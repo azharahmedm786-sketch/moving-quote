@@ -214,6 +214,12 @@ const FURNITURE_CATEGORIES = {
   ]
 };
 
+// Expose configs on a shared namespace so Advisor Dashboard can use them without duplication
+window.PackZenShared = window.PackZenShared || {};
+window.PackZenShared.MOVE_TYPE_CONFIG = MOVE_TYPE_CONFIG;
+window.PackZenShared.FURNITURE_CATEGORIES = FURNITURE_CATEGORIES;
+window.PackZenShared.FURNITURE_PRICES = FURNITURE_PRICES;
+
 const RAZORPAY_KEY = (window.ENV && window.ENV.RAZORPAY_KEY) || "";
 const OWNER_WHATSAPP = "919945095453";
 
@@ -1377,7 +1383,7 @@ function onPaymentSuccess(response, name, phone, paid, total) {
   if (window._firebase) {
     const activeUser = currentUser || window._firebase?.auth?.currentUser;
     const discountedTotal = _getDiscountedTotal();
-    window._firebase.db.collection("bookings").add({
+    const payload = {
       bookingRef, customerUid: activeUser?.uid, customerName: name, phone,
       pickup: pickup?.value || "", drop: drop?.value || "", moveType: selectedMoveType,
       house: houseEl?.options[houseEl?.selectedIndex]?.text || "",
@@ -1401,19 +1407,57 @@ function onPaymentSuccess(response, name, phone, paid, total) {
       paymentId: response.razorpay_payment_id,
       photos: uploadedPhotos.slice(0, 3),
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
-    }).then(docRef => {
-      currentBookingId = docRef.id;
-      localStorage.setItem("packzen_active_booking", docRef.id);
+    };
+    window.PackZenShared.createBooking(payload, (docId) => {
+      currentBookingId = docId;
+      localStorage.setItem("packzen_active_booking", docId);
       requestPushPermission();
-      subscribeToBookingNotifications(docRef.id);
-      queueSMS(phone, "booking_confirmed", { name, bookingRef, date: shiftDate?.value || "TBD", pickup: pickup?.value || "", total: discountedTotal });
-      notifyOwner(bookingRef, name, phone, pickup?.value || "—", drop?.value || "—", shiftDate?.value || "TBD", discountedTotal, selectedPayment, "online");
-    }).catch((err) => {
+      subscribeToBookingNotifications(docId);
+    }, (err) => {
       console.error("BOOKING SAVE FAILED:", err);
       showToast("❌ Booking save failed: " + err.message);
     });
   }
 }
+
+/* ============================================
+SHARED BOOKING CREATION LOGIC
+============================================ */
+window.PackZenShared.createBooking = async function(payload, onComplete, onError) {
+  if (!window._firebase) {
+    if (onError) onError(new Error("Firebase not ready."));
+    return;
+  }
+  try {
+    const docRef = await window._firebase.db.collection("bookings").add(payload);
+
+    // Attempt notifications in background
+    try {
+      queueSMS(payload.phone, "booking_confirmed", {
+        name: payload.customerName,
+        bookingRef: payload.bookingRef,
+        date: payload.date || "TBD",
+        pickup: payload.pickup || "",
+        total: payload.total
+      });
+      notifyOwner(
+        payload.bookingRef,
+        payload.customerName,
+        payload.phone,
+        payload.pickup || "—",
+        payload.drop || "—",
+        payload.date || "TBD",
+        payload.total,
+        payload.paymentType,
+        payload.source || "online" // Fallback to online if missing
+      );
+    } catch(e) {}
+
+    if (onComplete) onComplete(docRef.id);
+  } catch(err) {
+    if (onError) onError(err);
+  }
+};
 
 /* ============================================
 NOTIFY OWNER
@@ -1462,7 +1506,7 @@ function bookWithoutPayment() {
   // Use v2 engine total as the canonical total
   const discountedTotal = _getDiscountedTotal();
 
-  window._firebase.db.collection("bookings").add({
+  const payload = {
     bookingRef,
     customerUid: activeUser.uid,
     customerName: name,
@@ -1489,18 +1533,16 @@ function bookWithoutPayment() {
     promoDiscount,
     photos: uploadedPhotos.slice(0, 3),
     createdAt: firebase.firestore.FieldValue.serverTimestamp()
-  })
-  .then((docRef) => {
-    currentBookingId = docRef.id;
-    localStorage.setItem("packzen_active_booking", docRef.id);
+  };
+
+  window.PackZenShared.createBooking(payload, (docId) => {
+    currentBookingId = docId;
+    localStorage.setItem("packzen_active_booking", docId);
 
     if (btn) {
       btn.disabled = false;
       btn.textContent = "📋 Confirm Booking · Pay on Delivery";
     }
-
-    queueSMS(phone, "booking_confirmed", { name, bookingRef, date, pickup: pickupVal, total: discountedTotal });
-    notifyOwner(bookingRef, name, phone, pickupVal, dropVal, date, discountedTotal, "pay_later", "direct");
 
     showConfirmationCard({
       bookingRef,

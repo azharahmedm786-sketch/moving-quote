@@ -1765,4 +1765,389 @@ function toast(msg, dur=3000) {
 }
 </script>
 </body>
+<script>
+/* ════════════════════════════════════════════
+   ADVISOR NEW BOOKING INTEGRATION
+   ════════════════════════════════════════════ */
+let nbState = {
+  moveType: "", size: "", mapDistance: 0,
+  furniture: {}, cartons: 0, paymentOption: "pay_later", appliedCoupon: ""
+};
+
+function nbInit() {
+  if (nbState.initialized) return;
+
+  // Populate Driver Select
+  const driverSel = document.getElementById("nbDriver");
+  driverSel.innerHTML = '<option value="">Unassigned</option>';
+  (window.allDrivers || allDrivers || []).forEach(d => {
+    driverSel.innerHTML += `<option value="${d.id}">${d.name || d.displayName}</option>`;
+  });
+
+  // Setup Google Maps Autocomplete if available
+  if (window.google && window.google.maps && window.google.maps.places) {
+    new google.maps.places.Autocomplete(document.getElementById("nbPickup"), { componentRestrictions: { country: "in" } });
+    new google.maps.places.Autocomplete(document.getElementById("nbDrop"), { componentRestrictions: { country: "in" } });
+  }
+
+  // Bind change events
+  document.getElementById("nbPickup").addEventListener("change", nbCalc);
+  document.getElementById("nbDrop").addEventListener("change", nbCalc);
+
+  // Initialize Maps (optional, simplistic version to prevent errors)
+  const mapEl = document.getElementById("nbMap");
+  if (mapEl && !mapEl.innerHTML) {
+    mapEl.innerHTML = `<div style="padding:20px;text-align:center;color:var(--muted)">Map View Enabled</div>`;
+  }
+
+  // Load draft if any
+  const draft = localStorage.getItem("pz_nb_draft");
+  if (draft) {
+    document.getElementById("nbDraftBanner").style.display = "flex";
+  }
+
+  nbState.initialized = true;
+}
+
+function nbSelectMoveType(type) {
+  nbState.moveType = type;
+  document.querySelectorAll(".nb-type-card").forEach(el => el.classList.remove("selected"));
+  document.querySelector(`.nb-type-card[data-type="${type}"]`).classList.add("selected");
+
+  const sizeGrid = document.getElementById("nbSizeGrid");
+  const sizeLabel = document.getElementById("nbSizeLabel");
+  const vehicleCard = document.getElementById("nbVehicleCard");
+  const vehicleGrid = document.getElementById("nbVehicleGrid");
+  const furnGrid = document.getElementById("nbFurnitureGrid");
+
+  // Default values
+  sizeLabel.style.display = "block";
+  vehicleCard.style.display = "none";
+  furnGrid.innerHTML = "";
+
+  if (type === "home") {
+    sizeGrid.innerHTML = `
+      <div class="nb-size-btn" onclick="nbSelectSize('1BHK')">1 BHK</div>
+      <div class="nb-size-btn" onclick="nbSelectSize('2BHK')">2 BHK</div>
+      <div class="nb-size-btn" onclick="nbSelectSize('3BHK')">3 BHK</div>
+      <div class="nb-size-btn" onclick="nbSelectSize('4BHK')">4 BHK</div>
+      <div class="nb-size-btn" onclick="nbSelectSize('Villa')">Villa</div>
+    `;
+    // Populate furniture options
+    Object.keys(window.PackZenShared.FURNITURE_CATEGORIES || {}).forEach(cat => {
+      const catHTML = window.PackZenShared.FURNITURE_CATEGORIES[cat].map(item => `
+        <div class="nb-furn-item">
+          <span>${item.name}</span>
+          <div class="nb-qty-row">
+            <button class="nb-qty-btn" onclick="nbFurnQty('${item.id}', -1)">−</button>
+            <input id="nbfq_${item.id}" value="0" readonly style="width:30px;text-align:center;border:none;background:transparent;">
+            <button class="nb-qty-btn" onclick="nbFurnQty('${item.id}', 1)">+</button>
+          </div>
+        </div>
+      `).join('');
+      furnGrid.innerHTML += `
+        <div style="font-size:0.75rem;font-weight:700;color:var(--text);margin:10px 0 5px;">${cat.toUpperCase()}</div>
+        ${catHTML}
+      `;
+    });
+  } else if (type === "office") {
+    sizeGrid.innerHTML = `
+      <div class="nb-size-btn" onclick="nbSelectSize('Small Office')">Small Office</div>
+      <div class="nb-size-btn" onclick="nbSelectSize('Medium Office')">Medium Office</div>
+      <div class="nb-size-btn" onclick="nbSelectSize('Large Office')">Large Office</div>
+    `;
+  } else if (type === "single") {
+    sizeLabel.style.display = "none";
+    sizeGrid.innerHTML = "";
+    vehicleCard.style.display = "block";
+    vehicleGrid.innerHTML = `
+      <div class="nb-vehicle-btn" onclick="nbSelectVehicle('2 Wheeler')">🏍️ 2 Wheeler</div>
+      <div class="nb-vehicle-btn" onclick="nbSelectVehicle('3 Wheeler')">🛺 3 Wheeler</div>
+      <div class="nb-vehicle-btn" onclick="nbSelectVehicle('Tata Ace')">🚚 Tata Ace</div>
+      <div class="nb-vehicle-btn" onclick="nbSelectVehicle('Pickup 8ft')">🚛 Pickup 8ft</div>
+    `;
+  }
+
+  nbCalc();
+  nbSaveDraft();
+}
+
+function nbSelectSize(size) {
+  nbState.size = size;
+  document.querySelectorAll(".nb-size-btn").forEach(el => el.classList.remove("selected"));
+  document.querySelectorAll(".nb-size-btn").forEach(el => {
+    if(el.textContent.includes(size)) el.classList.add("selected");
+  });
+  nbCalc();
+  nbSaveDraft();
+}
+
+function dummy1() {
+  nbState.size = size;
+  document.querySelectorAll(".nb-size-btn").forEach(el => el.classList.remove("selected"));
+  if (window.event && window.event.target) {
+    window.event.target.classList.add("selected");
+  } else {
+    document.querySelectorAll(".nb-size-btn").forEach(el => {
+      if(el.textContent.includes(size)) el.classList.add("selected");
+    });
+  }
+  nbCalc();
+  nbSaveDraft();
+}
+
+function nbSelectVehicle(vehicle) {
+  nbState.vehicle = vehicle;
+  document.querySelectorAll(".nb-vehicle-btn").forEach(el => el.classList.remove("selected"));
+  document.querySelectorAll(".nb-vehicle-btn").forEach(el => {
+    if(el.textContent.includes(vehicle)) el.classList.add("selected");
+  });
+  nbCalc();
+  nbSaveDraft();
+}
+
+function dummy2() {
+  nbState.vehicle = vehicle;
+  document.querySelectorAll(".nb-vehicle-btn").forEach(el => el.classList.remove("selected"));
+  if (window.event && window.event.target) {
+    window.event.target.classList.add("selected");
+  } else {
+    document.querySelectorAll(".nb-vehicle-btn").forEach(el => {
+      if(el.textContent.includes(vehicle)) el.classList.add("selected");
+    });
+  }
+  nbCalc();
+  nbSaveDraft();
+}
+
+function nbFurnQty(id, change) {
+  const input = document.getElementById(`nbfq_${id}`);
+  if (!input) return;
+  let val = parseInt(input.value) || 0;
+  val = Math.max(0, val + change);
+  input.value = val;
+  nbState.furniture[id] = val;
+  nbCalc();
+  nbSaveDraft();
+}
+
+function nbCartonQty(change) {
+  let val = parseInt(document.getElementById("nbCartonQty").value) || 0;
+  val = Math.max(0, val + change);
+  document.getElementById("nbCartonQty").value = val;
+  nbState.cartons = val;
+  nbCalc();
+  nbSaveDraft();
+}
+
+function nbSelectPayment(opt) {
+  nbState.paymentOption = opt;
+  document.querySelectorAll(".nb-pay-opt").forEach(el => el.classList.remove("selected"));
+  document.querySelector(`.nb-pay-opt[data-pay="${opt}"]`).classList.add("selected");
+}
+
+function nbCalc() {
+  if (!nbState.moveType || (!nbState.size && nbState.moveType !== "single") || (nbState.moveType === "single" && !nbState.vehicle)) {
+    return;
+  }
+
+  // Construct items object matching customer flow format
+  const items = {};
+  if (nbState.moveType === "home") {
+    // Only pass items with qty > 0
+    Object.keys(nbState.furniture).forEach(id => {
+      if (nbState.furniture[id] > 0) items[id] = nbState.furniture[id];
+    });
+    if (nbState.cartons > 0) items['cartons'] = nbState.cartons;
+  }
+
+  // Format for the shared calculation function
+  const quoteData = {
+    moveType: nbState.moveType,
+    propertySize: nbState.size,
+    vehicleType: nbState.vehicle,
+    distanceKm: nbState.mapDistance || 10, // Mock distance if real map calculation failed
+    pickupFloor: parseInt(document.getElementById("nbPickupFloor")?.value || 0),
+    dropFloor: parseInt(document.getElementById("nbDropFloor")?.value || 0),
+    hasLift: document.getElementById("nbLift")?.checked || false,
+    services: {
+      packing: document.getElementById("nbPacking")?.checked || false,
+      unpacking: document.getElementById("nbUnpacking")?.checked || false,
+      dismantling: document.getElementById("nbDismantle")?.checked || false,
+      assembly: document.getElementById("nbAssembly")?.checked || false
+    },
+    items: items,
+    couponCode: nbState.appliedCoupon
+  };
+
+  try {
+    const result = window.PackZenPricing.calculateQuote(quoteData);
+    nbState.currentQuote = result;
+
+    // Update summary UI
+    let linesHTML = `<div class="nb-summary-line"><span>Base Rate</span><strong>₹${result.basePrice}</strong></div>`;
+
+    if (result.distanceCharge > 0) {
+      linesHTML += `<div class="nb-summary-line"><span>Distance (${nbState.mapDistance || 10}km)</span><strong>+ ₹${result.distanceCharge}</strong></div>`;
+    }
+    if (result.floorCharge > 0) {
+      linesHTML += `<div class="nb-summary-line"><span>Floor Charge</span><strong>+ ₹${result.floorCharge}</strong></div>`;
+    }
+    if (result.servicesCharge > 0) {
+      linesHTML += `<div class="nb-summary-line"><span>Services</span><strong>+ ₹${result.servicesCharge}</strong></div>`;
+    }
+    if (result.discountAmount > 0) {
+      linesHTML += `<div class="nb-summary-line" style="color:var(--green)"><span>Discount</span><strong>- ₹${result.discountAmount}</strong></div>`;
+    }
+
+    document.getElementById("nbSummaryLines").innerHTML = linesHTML;
+    document.getElementById("nbTotalDisplay").textContent = `₹${result.finalTotal}`;
+
+  } catch (error) {
+    console.error("Quote calculation error:", error);
+    document.getElementById("nbSummaryLines").innerHTML = `<div class="nb-err">${error.message}</div>`;
+  }
+}
+
+function nbApplyCoupon() {
+  const code = document.getElementById("nbCoupon").value.trim().toUpperCase();
+  if (!code) return;
+  nbState.appliedCoupon = code;
+  nbCalc();
+  if (nbState.currentQuote && nbState.currentQuote.discountAmount > 0) {
+    document.getElementById("nbCouponMsg").style.color = "var(--green)";
+    document.getElementById("nbCouponMsg").textContent = "Coupon applied!";
+  } else {
+    document.getElementById("nbCouponMsg").style.color = "var(--red)";
+    document.getElementById("nbCouponMsg").textContent = "Invalid or non-applicable coupon.";
+  }
+}
+
+async function nbSaveBooking() {
+  const errEl = document.getElementById("nbFormErr");
+  errEl.textContent = "";
+
+  const name = document.getElementById("nbName").value.trim();
+  const phone = document.getElementById("nbPhone").value.trim();
+  const pickup = document.getElementById("nbPickup").value.trim();
+  const drop = document.getElementById("nbDrop").value.trim();
+  const dateStr = document.getElementById("nbDate").value;
+
+  if (!name || !phone || !pickup || !drop || !dateStr) {
+    errEl.textContent = "Please fill all required fields marked with *";
+    return;
+  }
+  if (!nbState.currentQuote) {
+    errEl.textContent = "Please complete move details to calculate price.";
+    return;
+  }
+
+  const btn = document.getElementById("nbSaveBtn");
+  btn.disabled = true;
+  btn.textContent = "Saving...";
+
+  try {
+    const isPaid = document.getElementById("nbPaidToggle").checked;
+    const paymentOption = document.querySelector('.nb-pay-opt.selected')?.dataset.pay || 'pay_later';
+
+    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    let bookingRef = "PZ";
+    for(let i=0; i<6; i++) bookingRef += chars.charAt(Math.floor(Math.random() * chars.length));
+
+    // Create payload mimicking Customer flow output exactly
+    const bookingData = {
+      bookingRef: bookingRef,
+      customerUid: null, // Advisor might not be creating this for an existing user account
+      customerName: name,
+      phone: phone,
+      email: document.getElementById("nbEmail").value.trim(),
+      pickup: pickup,
+      drop: drop,
+      date: dateStr,
+      time: document.getElementById("nbTime").value,
+      moveType: nbState.moveType,
+      house: nbState.size,
+      vehicle: nbState.vehicle,
+      items: nbState.currentQuote.items || {},
+      promoDiscount: nbState.currentQuote.discountAmount || 0,
+      total: nbState.currentQuote.finalTotal,
+      amountPaid: isPaid ? (paymentOption === 'advance' ? nbState.currentQuote.finalTotal * 0.1 : nbState.currentQuote.finalTotal) : 0,
+      paymentStatus: isPaid ? "completed" : "pending",
+      paymentType: isPaid ? paymentOption : "pay_later",
+      status: document.getElementById("nbStatus").value || "confirmed",
+      source: document.getElementById("nbLeadSource")?.value || "direct",
+      notes: document.getElementById("nbRemarks").value.trim(),
+      driverUid: document.getElementById("nbDriver")?.value || null,
+      driverName: document.getElementById("nbDriver")?.options[document.getElementById("nbDriver")?.selectedIndex]?.text || "Unassigned",
+      createdAt: window.firebase.firestore.FieldValue.serverTimestamp()
+    };
+
+    // Use shared logic - Note: callback-based in script.js
+    window.PackZenShared.createBooking(bookingData, (docId) => {
+      toast(`Booking created! Ref: ${bookingRef}`);
+      localStorage.removeItem("pz_nb_draft");
+      btn.disabled = false;
+      btn.textContent = "✅ Create Booking";
+      setTimeout(() => { showSection("bookings"); }, 1500);
+    }, (error) => {
+      console.error("Save failed:", error);
+      errEl.textContent = `Error: ${error.message}`;
+      btn.disabled = false;
+      btn.textContent = "✅ Create Booking";
+    });
+
+  } catch (error) {
+    console.error("Save failed:", error);
+    errEl.textContent = `Error: ${error.message}`;
+    btn.disabled = false;
+    btn.textContent = "✅ Create Booking";
+  }
+}
+
+function nbSaveDraft() {
+  const draft = {
+    name: document.getElementById("nbName").value,
+    phone: document.getElementById("nbPhone").value,
+    pickup: document.getElementById("nbPickup").value,
+    drop: document.getElementById("nbDrop").value,
+    date: document.getElementById("nbDate").value
+  };
+  localStorage.setItem("pz_nb_draft", JSON.stringify(draft));
+}
+
+function nbRestoreDraft() {
+  try {
+    const draft = JSON.parse(localStorage.getItem("pz_nb_draft"));
+    if (draft) {
+      if(draft.name) document.getElementById("nbName").value = draft.name;
+      if(draft.phone) document.getElementById("nbPhone").value = draft.phone;
+      if(draft.pickup) document.getElementById("nbPickup").value = draft.pickup;
+      if(draft.drop) document.getElementById("nbDrop").value = draft.drop;
+      if(draft.date) document.getElementById("nbDate").value = draft.date;
+    }
+  } catch (e) {}
+  document.getElementById("nbDraftBanner").style.display = "none";
+}
+
+function nbDiscardDraft() {
+  localStorage.removeItem("pz_nb_draft");
+  document.getElementById("nbDraftBanner").style.display = "none";
+}
+
+// Global exposure for event handlers in HTML
+window.nbInit = nbInit;
+window.nbSelectMoveType = nbSelectMoveType;
+window.nbSelectSize = nbSelectSize;
+window.nbSelectVehicle = nbSelectVehicle;
+window.nbFurnQty = nbFurnQty;
+window.nbCartonQty = nbCartonQty;
+window.nbSelectPayment = nbSelectPayment;
+window.nbCalc = nbCalc;
+window.nbApplyCoupon = nbApplyCoupon;
+window.nbSaveBooking = nbSaveBooking;
+window.nbSaveDraft = nbSaveDraft;
+window.nbRestoreDraft = nbRestoreDraft;
+window.nbDiscardDraft = nbDiscardDraft;
+</script>
+</body>
 </html>
