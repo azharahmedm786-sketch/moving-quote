@@ -1039,12 +1039,24 @@
     <div class="dash-tabs">
       <button class="dash-tab active" onclick="switchDashTab('quotes',this)">📋 Quotes</button>
       <button class="dash-tab" onclick="switchDashTab('bookings',this)">📦 Bookings</button>
+      <button class="dash-tab" onclick="switchDashTab('addresses',this)">📍 Addresses</button>
+      <button class="dash-tab" onclick="switchDashTab('invoices',this)">📄 Invoices</button>
+      <button class="dash-tab" onclick="switchDashTab('reviews',this)">⭐ Reviews</button>
       <button class="dash-tab" onclick="switchDashTab('referral',this)">🎁 Referral</button>
       <button class="dash-tab" onclick="switchDashTab('profile',this)">👤 Profile</button>
       <button class="dash-tab" id="adminTabBtn" style="display:none;" onclick="switchDashTab('admin',this)">🛠 Admin</button>
     </div>
     <div class="dash-content" id="dashQuotes"><div id="quotesList" class="quotes-list"><div class="dash-empty">No saved quotes yet.</div></div></div>
     <div class="dash-content" id="dashBookings" style="display:none;"><div id="bookingsList" class="quotes-list"><div class="dash-empty">No bookings yet.</div></div></div>
+    <div class="dash-content" id="dashAddresses" style="display:none;">
+      <div id="addressesList" class="quotes-list"><div class="dash-empty">No saved addresses yet.</div></div>
+      <div style="margin-top:16px;">
+        <input id="newAddressInput" class="field-input" placeholder="Enter new address (e.g., Home, Work, etc.)">
+        <button class="btn-auth" onclick="addNewAddress()" style="margin-top:8px;">Add Address</button>
+      </div>
+    </div>
+    <div class="dash-content" id="dashInvoices" style="display:none;"><div id="invoicesList" class="quotes-list"><div class="dash-empty">No invoices available.</div></div></div>
+    <div class="dash-content" id="dashReviews" style="display:none;"><div id="userReviewsList" class="quotes-list"><div class="dash-empty">You haven't submitted any reviews yet.</div></div></div>
     <div class="dash-content" id="dashReferral" style="display:none;">
       <div class="referral-box">
         <div class="referral-title">🎁 Refer &amp; Earn</div>
