@@ -13,7 +13,8 @@ let paymentReceiptId = "";
 let confirmationResult = null;
 let pendingSignupData = null;
 let currentUser = null;
-let promoDiscount = 0; 
+let promoDiscount = 0;
+let appliedPromoCode = null;
 let selectedPayment = "at_drop";
 let isProcessingPayment = false;
 let currentRating = 0;
@@ -1218,11 +1219,11 @@ function selectPayment(type) {
   syncPayOnlineButton(discounted, advanceAmt, fullAmt);
 }
 
-function handleBookingAction() {
+async function handleBookingAction() {
   if (selectedPayment === "advance" || selectedPayment === "full") {
-    startPayment();
+    await startPayment();
   } else {
-    bookWithoutPayment();
+    await bookWithoutPayment();
   }
 }
 
@@ -1255,7 +1256,7 @@ function _getDiscountedTotal() {
 /* ============================================
 PAYMENT (RAZORPAY)
 ============================================ */
-function startRazorpayPayment() { startPayment(); }
+async function startRazorpayPayment() { await startPayment(); }
 
 async function startPayment() {
   if (isProcessingPayment) return;
@@ -1273,7 +1274,22 @@ async function startPayment() {
   if (lastCalculatedTotal === 0) { showToast("⚠️ Price not calculated yet."); isProcessingPayment = false; if (payBtn) { payBtn.disabled = false; payBtn.innerText = "Pay Now"; } return; }
   if (!RAZORPAY_KEY) { showToast("⚠️ Payment not configured."); isProcessingPayment = false; if (payBtn) { payBtn.disabled = false; payBtn.innerText = "Pay Now"; } return; }
 
-  if (selectedPayment === "at_drop") { bookWithoutPayment(); isProcessingPayment = false; if (payBtn) { payBtn.disabled = false; payBtn.innerText = "Pay Now"; } return; }
+  if (appliedPromoCode && window._firebase) {
+    try {
+        const snap = await window._firebase.db.collection("promos").doc(appliedPromoCode).get();
+        if (snap.exists) {
+            const promo = snap.data();
+            if (promo.usedBy && promo.usedBy.includes(currentUser.uid)) {
+                showToast("⚠️ You have already used this promo code.");
+                isProcessingPayment = false; if (payBtn) { payBtn.disabled = false; payBtn.innerText = "Pay Now"; } return;
+            }
+        }
+    } catch (e) {
+        console.error("Promo validation failed:", e);
+    }
+  }
+
+  if (selectedPayment === "at_drop") { await bookWithoutPayment(); isProcessingPayment = false; if (payBtn) { payBtn.disabled = false; payBtn.innerText = "Pay Now"; } return; }
 
   // Amount from v2 engine
   const payAmount = _getPayAmount();
@@ -1392,6 +1408,7 @@ function onPaymentSuccess(response, name, phone, paid, total) {
       paid,
       paymentType: selectedPayment,
       promoDiscount,
+      appliedPromoCode,
       date: shiftDate?.value || "",
       shiftTime: document.getElementById("shiftTime")?.value || "",
       shiftTimeLabel: document.getElementById("shiftTimeLabel")?.value || "",
@@ -1402,6 +1419,12 @@ function onPaymentSuccess(response, name, phone, paid, total) {
       photos: uploadedPhotos.slice(0, 3),
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
     }).then(docRef => {
+      if (appliedPromoCode) {
+          window._firebase.db.collection("promos").doc(appliedPromoCode).update({
+              used: firebase.firestore.FieldValue.increment(1),
+              usedBy: firebase.firestore.FieldValue.arrayUnion(activeUser?.uid)
+          }).catch(console.error);
+      }
       currentBookingId = docRef.id;
       localStorage.setItem("packzen_active_booking", docRef.id);
       requestPushPermission();
@@ -1434,7 +1457,7 @@ function notifyOwner(bookingRef, name, phone, pickup, drop, date, total, payment
 /* ============================================
 BOOK WITHOUT PAYMENT
 ============================================ */
-function bookWithoutPayment() {
+async function bookWithoutPayment() {
   const activeUser = currentUser || window._firebase?.auth?.currentUser;
   if (!activeUser) { showToast("👋 Please login to book."); openAuthModal("login"); return; }
   if (!document.getElementById("tncAccepted")?.checked) { showToast("⚠️ Please accept the Terms & Conditions to continue."); return; }
@@ -1447,6 +1470,21 @@ function bookWithoutPayment() {
   if (!phone || phone.length < 10) { phoneEl.style.borderColor = "#e53e3e"; phoneEl.focus(); return; }
   if (lastCalculatedTotal === 0) { showToast("⚠️ Price not calculated yet."); return; }
   if (!window._firebase) { showToast("⚠️ Service not ready. Try again."); return; }
+
+  if (appliedPromoCode && window._firebase) {
+    try {
+        const snap = await window._firebase.db.collection("promos").doc(appliedPromoCode).get();
+        if (snap.exists) {
+            const promo = snap.data();
+            if (promo.usedBy && promo.usedBy.includes(activeUser.uid)) {
+                showToast("⚠️ You have already used this promo code.");
+                return;
+            }
+        }
+    } catch (e) {
+        console.error("Promo validation failed:", e);
+    }
+  }
 
   const date = document.getElementById("shiftDate")?.value || "";
   if (!date) { showToast("📅 Please select a moving date."); return; }
@@ -1487,10 +1525,17 @@ function bookWithoutPayment() {
     status: "confirmed",
     source: "direct",
     promoDiscount,
+    appliedPromoCode,
     photos: uploadedPhotos.slice(0, 3),
     createdAt: firebase.firestore.FieldValue.serverTimestamp()
   })
   .then((docRef) => {
+    if (appliedPromoCode) {
+        window._firebase.db.collection("promos").doc(appliedPromoCode).update({
+            used: firebase.firestore.FieldValue.increment(1),
+            usedBy: firebase.firestore.FieldValue.arrayUnion(activeUser.uid)
+        }).catch(console.error);
+    }
     currentBookingId = docRef.id;
     localStorage.setItem("packzen_active_booking", docRef.id);
 
@@ -1629,6 +1674,7 @@ function resetBookingForm() {
   if (map) google.maps.event.trigger(map, "resize");
   if (directionsRenderer) directionsRenderer.setDirections({ routes: [] });
   promoDiscount = 0;
+  appliedPromoCode = null;
   lastCalculatedTotal = 0;
   // Clear v2 result cache
   window._lastQuoteResult = null;
@@ -2654,11 +2700,25 @@ async function applyPromoCode() {
       const promo = snap.data();
       if (!promo.active) { msgEl.textContent = "This promo has expired."; msgEl.className = "promo-msg promo-error"; return; }
 
+      const today = new Date().toISOString().split("T")[0];
+      if (promo.expiry && promo.expiry < today) { msgEl.textContent = "This promo code has expired."; msgEl.className = "promo-msg promo-error"; return; }
+      if (promo.used >= promo.max) { msgEl.textContent = "This promo code has reached its usage limit."; msgEl.className = "promo-msg promo-error"; return; }
+
+      if (currentUser && promo.usedBy && promo.usedBy.includes(currentUser.uid)) {
+          msgEl.textContent = "You have already used this promo code."; msgEl.className = "promo-msg promo-error"; return;
+      }
+
       // Compute discount via v2 engine logic
       const baseTotal = window._lastQuoteResult?.breakdown?.grandTotal || lastCalculatedTotal;
+
+      if (promo.min && baseTotal < promo.min) {
+          msgEl.textContent = `Minimum booking value of ₹${promo.min} required.`; msgEl.className = "promo-msg promo-error"; return;
+      }
+
       const maxFraction = window.PackZenPricing?.config?.discounts?.maxPromoFraction || 0.5;
       const rawDiscount = promo.type === "percent" ? Math.round(baseTotal * promo.value / 100) : promo.value;
       promoDiscount = Math.min(rawDiscount, Math.floor(baseTotal * maxFraction));
+      appliedPromoCode = promo.code || code;
 
       msgEl.textContent = `🎉 Code applied! ₹${promoDiscount} off.`;
       msgEl.className = "promo-msg promo-success";
