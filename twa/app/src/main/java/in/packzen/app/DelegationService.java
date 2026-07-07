@@ -1,4 +1,4 @@
-package in.packzen.twa;
+package in.packzen.app;
 
 
 import com.google.androidbrowserhelper.locationdelegation.LocationDelegationExtraCommandHandler;
