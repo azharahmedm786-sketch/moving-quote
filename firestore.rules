@@ -54,13 +54,21 @@ service cloud.firestore {
       // tables (db.collection("users").where("role","==",...)) can
       // actually return results for advisors outside the admin email list.
       allow read: if isOwner(uid) || isAdmin() || isAdvisor();
-      allow create: if isOwner(uid);
+      allow create: if isOwner(uid) || isAdmin();
       // ✅ ADDED: narrow allowance — advisors may ONLY touch a driver's
       // currentBooking field (needed by confirmAssign() in
       // advisor-dashboard-patch.js). They cannot edit email, role,
       // password, or any other field on someone else's user doc.
       allow update: if isOwner(uid) || isAdmin() || (isAdvisor() && onlyFields(['currentBooking']));
       allow delete: if false;
+    }
+
+    // PARTNERS (Fixes partner registration failing)
+    match /partners/{uid} {
+      allow read: if isOwner(uid) || isAdmin();
+      allow create: if isOwner(uid) || isAdmin();
+      allow update: if isOwner(uid) || isAdmin();
+      allow delete: if isAdmin();
     }
 
     // BOOKINGS — ✅ FIXED create rule
@@ -79,7 +87,7 @@ service cloud.firestore {
       // customer), so the New Booking module in
       // advisor-dashboard-patch.js needs its own create path.
       allow create: if isAuth()
-        && (request.resource.data.customerUid == request.auth.uid || isAdvisor());
+        && (request.resource.data.customerUid == request.auth.uid || isAdvisor() || isAdmin());
 
      allow update: if isAuth()
         && resource.data.customerUid == request.auth.uid
@@ -149,6 +157,12 @@ service cloud.firestore {
 
     // SMS QUEUE
     match /smsQueue/{docId} {
+      allow create: if isAuth();
+      allow read, update, delete: if isAdmin();
+    }
+
+    // WHATSAPP QUEUE
+    match /whatsappQueue/{docId} {
       allow create: if isAuth();
       allow read, update, delete: if isAdmin();
     }
