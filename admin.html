@@ -420,6 +420,7 @@ function buildShell(adminName) {
     <div class="nav-item" onclick="showSection('claims',this)"><span class="ni">🔧</span> Damage Claims</div>
     <div class="nav-item" onclick="showSection('promos',this)"><span class="ni">🏷️</span> Promo Codes</div>
     <div class="nav-item" onclick="showSection('broadcast',this)"><span class="ni">📢</span> Broadcast</div>
+    <div class="nav-item" onclick="showSection('deletion',this)"><span class="ni">🗑️</span> Deletion Requests</div>
     <div class="nav-item" onclick="showSection('analytics',this)"><span class="ni">📈</span> Analytics</div>
     <div class="sidebar-bottom">
       <button class="btn-signout" onclick="adminSignOut()">🚪 Sign Out</button>
@@ -624,6 +625,31 @@ function buildShell(adminName) {
         </div>
       </div>
     </div>
+    <!-- DELETION REQUESTS -->
+    <div class="section" id="sectionDeletion">
+      <div class="table-card">
+        <div class="table-hdr">
+          <div class="table-title">🗑️ Account Deletion Requests</div>
+          <button class="btn-export" onclick="loadDeletionRequests()">🔄 Refresh</button>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Req ID</th>
+              <th>Name</th>
+              <th>Email / Phone</th>
+              <th>Date</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="deletionTable">
+            <tr class="empty-row"><td colspan="6">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
     <!-- BROADCAST -->
     <div class="section" id="sectionBroadcast">
       <div class="table-card">
@@ -1250,7 +1276,137 @@ function showSection(name, el) {
   if (name==="overview") renderCharts();
   if (name==="cancels")  loadCancelRequests();
   if (name==="claims")   loadDamageClaims();
+  if (name==="deletion") loadDeletionRequests();
   if (name==="analytics") renderAnalytics();
+}
+
+function escapeHTML(str) {
+  if (!str) return "";
+  return String(str).replace(/[&<>'"]/g, tag => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+  }[tag]));
+}
+
+/* ── ACCOUNT DELETION REQUESTS ── */
+async function loadDeletionRequests() {
+  const tbody = document.getElementById("deletionTable");
+  if (!tbody || !window._firebase) return;
+  tbody.innerHTML = "<tr><td colspan='6' style='text-align:center;padding:1rem'>Loading...</td></tr>";
+  try {
+    const snap = await window._firebase.db.collection("accountDeletionRequests").orderBy("createdAt", "desc").limit(100).get();
+    if (snap.empty) {
+      tbody.innerHTML = "<tr class='empty-row'><td colspan='6'>No deletion requests yet.</td></tr>";
+      return;
+    }
+
+    const statusColor = { "Pending": "#d97706", "Processed": "#16a34a", "Rejected": "#dc2626" };
+
+    tbody.innerHTML = snap.docs.map(doc => {
+      const data = doc.data();
+      const reqId = doc.id;
+      const date = data.createdAt?.toDate?.().toLocaleDateString("en-IN") || "—";
+      const safeFirst = escapeHTML(data.firstName);
+      const safeLast = escapeHTML(data.lastName);
+      const safeEmail = escapeHTML(data.email);
+      const safePhone = escapeHTML(data.phone);
+      const name = `${safeFirst} ${safeLast}`.trim() || "—";
+      const contact = `${safeEmail || '—'}<br><small style="color:var(--text-muted)">${safePhone || '—'}</small>`;
+      const status = escapeHTML(data.status) || "Pending";
+      const sColor = statusColor[status] || "#d97706";
+
+      let actions = `<button class="btn-action" style="background:#2563eb;color:white" onclick="viewDeletionRequest('${reqId}')">View</button>`;
+
+      if (status === "Pending") {
+         actions += `<button class="btn-action" style="background:#16a34a;color:white;margin-left:4px" onclick="updateDeletionStatus('${reqId}', 'Processed')">Approve & Process</button>
+                     <button class="btn-action" style="background:#dc2626;color:white;margin-left:4px" onclick="updateDeletionStatus('${reqId}', 'Rejected')">Reject</button>`;
+      }
+
+      actions += `<button class="btn-action" style="background:#ef4444;color:white;margin-left:4px;opacity:0.8" onclick="deleteDeletionRequest('${reqId}')">🗑️</button>`;
+
+      return `<tr>
+        <td style="font-family:'Space Grotesk',sans-serif;font-weight:600;">${reqId}</td>
+        <td>${name}</td>
+        <td>${contact}</td>
+        <td>${date}</td>
+        <td><span style="display:inline-block;padding:2px 8px;border-radius:12px;font-size:0.8rem;background:${sColor}20;color:${sColor};font-weight:600;">${status}</span></td>
+        <td>${actions}</td>
+      </tr>`;
+    }).join("");
+  } catch (err) {
+    console.error("Error loading deletion requests:", err);
+    tbody.innerHTML = "<tr class='empty-row'><td colspan='6' style='color:red;'>Failed to load. See console.</td></tr>";
+  }
+}
+
+async function viewDeletionRequest(reqId) {
+  try {
+    const doc = await window._firebase.db.collection("accountDeletionRequests").doc(reqId).get();
+    if (!doc.exists) return toast("⚠️ Request not found.");
+    const data = doc.data();
+
+    const details = `
+      <b>Name:</b> ${escapeHTML(data.firstName)} ${escapeHTML(data.lastName)}<br>
+      <b>Email:</b> ${escapeHTML(data.email)}<br>
+      <b>Phone:</b> ${escapeHTML(data.phone)}<br>
+      <b>Reason:</b> ${escapeHTML(data.reason) || "None provided"}<br>
+      <b>Date:</b> ${data.createdAt?.toDate?.().toLocaleString("en-IN") || "—"}<br>
+      <b>Status:</b> ${escapeHTML(data.status)}<br>
+      ${data.processedAt ? `<b>Processed At:</b> ${data.processedAt.toDate().toLocaleString("en-IN")}<br>` : ""}
+      ${data.processedBy ? `<b>Processed By:</b> ${escapeHTML(data.processedBy)}<br>` : ""}
+      ${data.userId ? `<b>User ID:</b> ${escapeHTML(data.userId)}<br>` : ""}
+    `;
+
+    // Using a simple alert since there's no pre-built modal for this specifically
+    // In a real scenario we'd use a modal, but alert/toast or custom overlay works
+    const html = `<div style="text-align:left;line-height:1.6;font-size:0.95rem">${details}</div>`;
+
+    // We can piggyback on the general modal if it exists, but let's just create a quick overlay
+    const overlay = document.createElement("div");
+    overlay.style.position = "fixed"; overlay.style.top = "0"; overlay.style.left = "0"; overlay.style.width = "100%"; overlay.style.height = "100%";
+    overlay.style.background = "rgba(0,0,0,0.6)"; overlay.style.zIndex = "99999"; overlay.style.display = "flex"; overlay.style.alignItems = "center"; overlay.style.justifyContent = "center";
+
+    overlay.innerHTML = `
+      <div style="background:var(--bg-primary, white); padding:2rem; border-radius:12px; max-width:500px; width:90%; color:var(--text-primary, black);">
+        <h2 style="margin-top:0;font-family:'Space Grotesk',sans-serif">Request Details</h2>
+        ${html}
+        <button onclick="this.parentElement.parentElement.remove()" style="margin-top:1.5rem;background:var(--accent,#2563eb);color:white;border:none;padding:8px 16px;border-radius:6px;cursor:pointer;">Close</button>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+
+  } catch (err) {
+    console.error("View error:", err);
+    toast("❌ Failed to load request details.");
+  }
+}
+
+async function updateDeletionStatus(reqId, newStatus) {
+  if (!confirm(`Are you sure you want to mark this request as ${newStatus}?`)) return;
+  try {
+    const processedBy = window._firebase.auth.currentUser ? window._firebase.auth.currentUser.email : "Admin";
+    await window._firebase.db.collection("accountDeletionRequests").doc(reqId).update({
+      status: newStatus,
+      processedAt: firebase.firestore.FieldValue.serverTimestamp(),
+      processedBy: processedBy
+    });
+    toast(`✅ Request marked as ${newStatus}`);
+    loadDeletionRequests();
+  } catch (err) {
+    console.error("Update error:", err);
+    toast("❌ Failed to update request status.");
+  }
+}
+
+async function deleteDeletionRequest(reqId) {
+  if (!confirm("Are you sure you want to permanently delete this request record?")) return;
+  try {
+    await window._firebase.db.collection("accountDeletionRequests").doc(reqId).delete();
+    toast("🗑️ Request deleted");
+    loadDeletionRequests();
+  } catch (err) {
+    console.error("Delete error:", err);
+    toast("❌ Failed to delete request.");
+  }
 }
 
 /* ── DAMAGE CLAIMS ── */

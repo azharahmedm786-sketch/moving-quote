@@ -319,6 +319,34 @@ exports.onDamageClaimCreatedNotify = functions
   });
 
 /* ════════════════════════════════════════════════════════════
+   ACCOUNT DELETION REQUEST — admin alert
+   ════════════════════════════════════════════════════════════ */
+exports.onAccountDeletionRequestCreatedNotify = functions
+  .region("asia-south1")
+  .firestore.document("accountDeletionRequests/{requestId}")
+  .onWrite(async (change, context) => {
+    // Only send on create (when before doc doesn't exist)
+    if (change.before.exists) return null;
+    if (!change.after.exists) return null;
+
+    const req = change.after.data();
+    try {
+      await sendAdminEmail("New Account Deletion Request", [
+        ["Request ID", req.requestId],
+        ["Name", `${req.firstName || ''} ${req.lastName || ''}`.trim()],
+        ["Email", req.email],
+        ["Phone", req.phone],
+        ["Reason", req.reason || "None provided"],
+        ["Date", new Date().toLocaleString("en-IN")],
+        ["Action", "<a href='https://packzenblr.in/admin.html'>View in Admin Dashboard -> Deletion Requests</a>"]
+      ], null);
+    } catch (e) {
+      console.error("onAccountDeletionRequestCreatedNotify error:", e.message);
+    }
+    return null;
+  });
+
+/* ════════════════════════════════════════════════════════════
    MANUAL RETRY — callable function, admin-only, mirrors your
    existing retrySMS pattern in index.js
    ════════════════════════════════════════════════════════════ */
