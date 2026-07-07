@@ -21,3 +21,4 @@ twa/android.keystore
 *.apk
 *.aab
 *.idsig
+venv/
