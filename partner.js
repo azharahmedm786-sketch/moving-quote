@@ -286,6 +286,7 @@ function initLoginPage() {
           else window.location.href = "registration-success.html?status=rejected";
         })
         .catch(function (err) {
+          console.error('Partner Auth Error:', err.code, err.message);
           setBtnLoading(btn, false);
           errBox.textContent = friendlyAuthError(err);
           errBox.classList.add("show");

@@ -2297,7 +2297,7 @@ function signupUser() {
           document.getElementById("signupOtpInput").focus();
           if (btn) { btn.disabled = false; btn.textContent = "Send OTP →"; }
         })
-        .catch(err => { _clearSignupRecaptcha(); showError("signupError", getAuthErrorMessage(err.code)); if (btn) { btn.disabled = false; btn.textContent = "Send OTP →"; } });
+        .catch(err => { console.error('Customer Phone Auth Error:', err.code, err.message); _clearSignupRecaptcha(); showError("signupError", getAuthErrorMessage(err.code)); if (btn) { btn.disabled = false; btn.textContent = "Send OTP →"; } });
     }).catch(() => { _clearSignupRecaptcha(); showError("signupError", "⚠️ reCAPTCHA error. Please refresh and try again."); if (btn) { btn.disabled = false; btn.textContent = "Send OTP →"; } });
   });
 }
@@ -2396,7 +2396,10 @@ async function loginUser() {
       await auth.signInWithEmailAndPassword(email, pass);
       closeAuthModal();
       showToast("✅ Login successful");
-    } catch (err) { showError("loginError", "⚠️ Incorrect email or password"); }
+    } catch (err) {
+      console.error('Customer Auth Error:', err.code, err.message);
+      showError("loginError", "⚠️ Incorrect email or password");
+    }
     finally { if (btn) { btn.disabled = false; btn.textContent = "Login →"; } }
   });
 }
