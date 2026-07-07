@@ -1274,8 +1274,10 @@ async function startPayment() {
 
   const name = document.getElementById("custName")?.value?.trim();
   const phone = document.getElementById("custPhone")?.value?.trim();
+  const email = document.getElementById("custEmail")?.value?.trim();
   if (!name) { showToast("⚠️ Please enter your name."); isProcessingPayment = false; if (payBtn) { payBtn.disabled = false; payBtn.innerText = "Pay Now"; } return; }
   if (!phone || !/^\d{10}$/.test(phone)) { showToast("⚠️ Please enter a valid 10-digit phone number."); isProcessingPayment = false; if (payBtn) { payBtn.disabled = false; payBtn.innerText = "Pay Now"; } return; }
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showToast("⚠️ Please enter a valid email address."); isProcessingPayment = false; if (payBtn) { payBtn.disabled = false; payBtn.innerText = "Pay Now"; } return; }
   if (lastCalculatedTotal === 0) { showToast("⚠️ Price not calculated yet."); isProcessingPayment = false; if (payBtn) { payBtn.disabled = false; payBtn.innerText = "Pay Now"; } return; }
   if (!RAZORPAY_KEY) { showToast("⚠️ Payment not configured."); isProcessingPayment = false; if (payBtn) { payBtn.disabled = false; payBtn.innerText = "Pay Now"; } return; }
 
@@ -1367,7 +1369,7 @@ async function startPayment() {
   }
 }
 
-function onPaymentSuccess(response, name, phone, paid, total) {
+function onPaymentSuccess(response, name, phone, email, paid, total) {
   const pickup = document.getElementById("pickup");
   const drop = document.getElementById("drop");
   const shiftDate = document.getElementById("shiftDate");
@@ -1384,7 +1386,9 @@ function onPaymentSuccess(response, name, phone, paid, total) {
     const activeUser = currentUser || window._firebase?.auth?.currentUser;
     const discountedTotal = _getDiscountedTotal();
     const payload = {
-      bookingRef, customerUid: activeUser?.uid, customerName: name, phone,
+      bookingRef, customerUid: activeUser?.uid, customerName: name,
+    phone,
+    email,
       pickup: pickup?.value || "", drop: drop?.value || "", moveType: selectedMoveType,
       house: houseEl?.options[houseEl?.selectedIndex]?.text || "",
       vehicle: vehicleEl?.options[vehicleEl?.selectedIndex]?.text || "",
@@ -1487,10 +1491,13 @@ function bookWithoutPayment() {
 
   const nameEl = document.getElementById("custName");
   const phoneEl = document.getElementById("custPhone");
+  const emailEl = document.getElementById("custEmail");
   const name = nameEl?.value?.trim();
   const phone = phoneEl?.value?.trim();
+  const email = emailEl?.value?.trim();
   if (!name) { nameEl.style.borderColor = "#e53e3e"; nameEl.focus(); return; }
   if (!phone || phone.length < 10) { phoneEl.style.borderColor = "#e53e3e"; phoneEl.focus(); return; }
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { emailEl.style.borderColor = "#e53e3e"; emailEl.focus(); return; }
   if (lastCalculatedTotal === 0) { showToast("⚠️ Price not calculated yet."); return; }
   if (!window._firebase) { showToast("⚠️ Service not ready. Try again."); return; }
 
@@ -1513,6 +1520,7 @@ function bookWithoutPayment() {
     customerUid: activeUser.uid,
     customerName: name,
     phone,
+    email,
     pickup: pickupVal,
     drop: dropVal,
     date,
@@ -2196,27 +2204,18 @@ function openAuthModal(panel = "login") {
 function closeAuthModal() {
   document.getElementById("authModal").style.display = "none";
   clearAuthErrors();
-  _clearSignupRecaptcha();
-  _clearResetRecaptcha();
-  resetFlowPhone = "";
-  confirmationResult = null;
-  pendingSignupData = null;
-  window._resetVerifiedEmail = null;
-  window._resetPhoneUser = null;
-  window._resetConfirmationVerificationId = null;
-  window._resetOtpCode = null;
-  clearInterval(otpTimerInterval);
+
 }
 
 function switchPanel(id) {
-  ["panelLogin","panelSignup","panelSignupOTP","panelSetPassword","panelRecover","panelResetOTP","panelResetPassword"].forEach(p => {
+  ["panelLogin","panelSignup","panelRecover"].forEach(p => {
     const el = document.getElementById(p);
     if (el) el.style.display = p === id ? "block" : "none";
   });
 }
 
 function clearAuthErrors() {
-  ["loginError","signupError","signupOtpError","setPasswordError","recoverError","resetOtpError","resetPasswordError"].forEach(id => {
+  ["loginError","signupError","recoverError"].forEach(id => {
     const el = document.getElementById(id);
     if (el) { el.textContent = ""; el.style.color = "#dc2626"; }
   });
@@ -2248,168 +2247,68 @@ function getAuthErrorMessage(code) {
   return map[code] || ("⚠️ " + (code || "Something went wrong. Please try again."));
 }
 
-/* ─────────────────────────────────────────────
-RECAPTCHA HELPERS
-───────────────────────────────────────────── */
-function _clearSignupRecaptcha() {
-  if (window._signupRecaptcha) { try { window._signupRecaptcha.clear(); } catch (e) {} window._signupRecaptcha = null; }
-  const c = document.getElementById("recaptcha-container-signup");
-  if (c) c.innerHTML = "";
-}
-
-function _clearResetRecaptcha() {
-  if (window._resetRecaptcha) { try { window._resetRecaptcha.clear(); } catch (e) {} window._resetRecaptcha = null; }
-  const c = document.getElementById("recaptcha-container-reset");
-  if (c) c.innerHTML = "";
-}
-
 /* ═══════════════════════════════════════════════
 SIGN UP FLOW
 ═══════════════════════════════════════════════ */
-function signupUser() {
+async function signupUser() {
   if (!checkRateLimit("signup_otp", 3, 300000)) { showError("signupError", "⚠️ Too many OTP requests. Please try again later."); return; }
   const firstName = document.getElementById("signupFirstName").value.trim();
   const lastName = document.getElementById("signupLastName").value.trim();
   const phone = document.getElementById("signupPhone").value.trim();
   const email = document.getElementById("signupEmail").value.trim();
+  const password = document.getElementById("signupPassword").value;
   const referral = document.getElementById("signupReferral")?.value.trim().toUpperCase() || "";
 
   if (!firstName) return showError("signupError", "⚠️ Please enter your first name.");
   if (!lastName) return showError("signupError", "⚠️ Please enter your last name.");
   if (!/^\d{10}$/.test(phone)) return showError("signupError", "⚠️ Please enter a valid 10-digit mobile number.");
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return showError("signupError", "⚠️ Please enter a valid email address.");
+  if (password.length < 6) return showError("signupError", "⚠️ Password must be at least 6 characters.");
 
-  showError("signupError", "⏳ Sending OTP to +91 " + phone + "...", "info");
-  const btn = document.getElementById("btnSignupSendOtp");
-  if (btn) { btn.disabled = true; btn.textContent = "Sending OTP..."; }
-
-  pendingSignupData = { firstName, lastName, phone, email, referral };
-  _clearSignupRecaptcha();
-
-  waitForFirebase(() => {
-    window._signupRecaptcha = new firebase.auth.RecaptchaVerifier("recaptcha-container-signup", { size: "invisible", callback: () => {} });
-    window._signupRecaptcha.render().then(() => {
-      window._firebase.auth.signInWithPhoneNumber("+91" + phone, window._signupRecaptcha)
-        .then(result => {
-          confirmationResult = result;
-          document.getElementById("signupOtpPhone").textContent = "+91 " + phone;
-          switchPanel("panelSignupOTP");
-          document.getElementById("signupOtpInput").focus();
-          if (btn) { btn.disabled = false; btn.textContent = "Send OTP →"; }
-        })
-        .catch(err => { console.error('Customer Phone Auth Error:', err.code, err.message); _clearSignupRecaptcha(); showError("signupError", getAuthErrorMessage(err.code)); if (btn) { btn.disabled = false; btn.textContent = "Send OTP →"; } });
-    }).catch(() => { _clearSignupRecaptcha(); showError("signupError", "⚠️ reCAPTCHA error. Please refresh and try again."); if (btn) { btn.disabled = false; btn.textContent = "Send OTP →"; } });
-  });
-}
-
-function verifySignupOTP() {
-  const otp = document.getElementById("signupOtpInput").value.trim();
-  if (!/^\d{6}$/.test(otp)) return showError("signupOtpError", "⚠️ Please enter the 6-digit OTP.");
-  if (!confirmationResult) return showError("signupOtpError", "⚠️ OTP session expired. Please go back and try again.");
-
-  const btn = document.getElementById("btnVerifySignupOtp");
-  if (btn) { btn.disabled = true; btn.textContent = "Verifying..."; }
-  showError("signupOtpError", "⏳ Verifying OTP...", "info");
-
-  confirmationResult.confirm(otp)
-    .then(result => {
-      pendingSignupData.phoneUser = result.user;
-      if (btn) { btn.disabled = false; btn.textContent = "Verify OTP →"; }
-      switchPanel("panelSetPassword");
-      document.getElementById("setPasswordInput").focus();
-    })
-    .catch(err => { showError("signupOtpError", getAuthErrorMessage(err.code)); if (btn) { btn.disabled = false; btn.textContent = "Verify OTP →"; } });
-}
-
-async function completeSignup() {
-  const password = document.getElementById("setPasswordInput").value;
-  const confirm = document.getElementById("setPasswordConfirm").value;
-
-  if (password.length < 6) return showError("setPasswordError", "⚠️ Password must be at least 6 characters.");
-  if (password !== confirm) return showError("setPasswordError", "⚠️ Passwords do not match.");
-  if (!pendingSignupData?.phoneUser) return showError("setPasswordError", "⚠️ Session expired. Please start again.");
-
-  const btn = document.getElementById("btnCompleteSignup");
-  if (btn) { btn.disabled = true; btn.textContent = "Creating account..."; }
-  showError("setPasswordError", "⏳ Creating your account...", "info");
-
-  const { firstName, lastName, phone, email, referral, phoneUser } = pendingSignupData;
   const fullName = firstName + " " + lastName;
-  const { auth, db } = window._firebase;
+  const btn = document.getElementById("btnSignup");
+  if (btn) { btn.disabled = true; btn.textContent = "Creating account..."; }
+  showError("signupError", "⏳ Creating your account...", "info");
 
-  const verifiedPhoneUid = phoneUser.uid;
-  const verifiedPhoneNumber = phoneUser.phoneNumber || ("+91" + phone);
-
-  let secondaryApp = null;
-
-  try {
-    secondaryApp = firebase.initializeApp(firebase.app().options, "signupCreation" + Date.now());
-    const secondaryAuth = secondaryApp.auth();
-
-    const cred = await secondaryAuth.createUserWithEmailAndPassword(email, password);
-    const newUser = cred.user;
-    await newUser.updateProfile({ displayName: fullName });
-
-    const refCode = newUser.uid.slice(0, 8).toUpperCase();
-    await db.collection("users").doc(newUser.uid).set({
-      firstName, lastName, name: fullName, email, phone,
-      role: "customer",
-      phoneVerified: true,
-      verifiedPhoneNumber: verifiedPhoneNumber,
-      prefEmail: true, prefSMS: true,
-      referralCode: refCode, referralCount: 0, referralCredits: 0,
-      createdAt: firebase.firestore.FieldValue.serverTimestamp()
-    });
-
-    if (referral) await processReferral(referral, newUser.uid);
-
-    await secondaryAuth.signOut().catch(() => {});
-    await secondaryApp.delete().catch(() => {});
-
+  waitForFirebase(async () => {
+    const { auth, db } = window._firebase;
     try {
-      if (auth.currentUser && auth.currentUser.uid === verifiedPhoneUid) {
-        await auth.signOut();
-      }
-    } catch (e) {}
+      // 1. Create User
+      const cred = await auth.createUserWithEmailAndPassword(email, password);
+      const newUser = cred.user;
 
-    await auth.signInWithEmailAndPassword(email, password);
+      // 2. Update Profile Name
+      await newUser.updateProfile({ displayName: fullName });
 
-    pendingSignupData = null;
-    _clearSignupRecaptcha();
-    closeAuthModal();
-    showToast(`👋 Welcome to PackZen, ${firstName}!`);
+      // 3. Send Email Verification
+      await newUser.sendEmailVerification();
 
-} catch (err) {
-    if (secondaryApp) {
-      try { await secondaryApp.delete(); } catch (e) {}
+      // 4. Create Firestore Document
+      const refCode = newUser.uid.slice(0, 8).toUpperCase();
+      await db.collection("users").doc(newUser.uid).set({
+        firstName, lastName, name: fullName, email, phone: "+91" + phone,
+        role: "customer",
+        phoneVerified: false,
+        emailVerified: false,
+        prefEmail: true, prefSMS: true,
+        referralCode: refCode, referralCount: 0, referralCredits: 0,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        lastLoginAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+
+      if (referral) await processReferral(referral, newUser.uid);
+
+      closeAuthModal();
+      showToast(`👋 Welcome to PackZen, ${firstName}! Please verify your email.`);
+    } catch (err) {
+      console.error("Signup error:", err);
+      if (err.code === "auth/email-already-in-use") showError("signupError", "⚠️ This email is already registered. Please login.");
+      else if (err.code === "auth/weak-password") showError("signupError", "⚠️ Password too weak. Use at least 6 characters.");
+      else showError("signupError", getAuthErrorMessage(err.code));
+    } finally {
+      if (btn) { btn.disabled = false; btn.textContent = "Create Account →"; }
     }
-
-    try {
-      if (auth.currentUser && auth.currentUser.uid === verifiedPhoneUid) {
-        await auth.signOut();
-      }
-    } catch (e) {}
-
-    if (btn) { btn.disabled = false; btn.textContent = "Create Account →"; }
-    if (err.code === "auth/email-already-in-use") showError("setPasswordError", "⚠️ This email is already registered. Please login.");
-    else if (err.code === "auth/weak-password") showError("setPasswordError", "⚠️ Password too weak. Use at least 6 characters.");
-    else showError("setPasswordError", getAuthErrorMessage(err.code));
-  }
-}
-async function processReferral(refCode, newUserUid) {
-  try {
-    const snap = await window._firebase.db.collection("users").where("referralCode", "==", refCode).get();
-    if (!snap.empty) {
-      await snap.docs[0].ref.update({ referralCount: firebase.firestore.FieldValue.increment(1), referralCredits: firebase.firestore.FieldValue.increment(100) });
-      await window._firebase.db.collection("users").doc(newUserUid).update({ referralDiscount: 100, referredBy: refCode });
-    }
-  } catch (e) {}
-}
-
-function resendSignupOTP() {
-  document.getElementById("signupOtpInput").value = "";
-  showError("signupOtpError", "");
-  switchPanel("panelSignup");
+  });
 }
 
 /* ═══════════════════════════════════════════════
@@ -2424,9 +2323,10 @@ async function loginUser() {
   if (btn) { btn.disabled = true; btn.textContent = "Signing in..."; }
 
   waitForFirebase(async () => {
-    const { auth } = window._firebase;
+    const { auth, db } = window._firebase;
     try {
-      await auth.signInWithEmailAndPassword(email, pass);
+      const cred = await auth.signInWithEmailAndPassword(email, pass);
+      await db.collection("users").doc(cred.user.uid).update({ lastLoginAt: firebase.firestore.FieldValue.serverTimestamp() }).catch(()=>{});
       closeAuthModal();
       showToast("✅ Login successful");
     } catch (err) {
@@ -2437,25 +2337,26 @@ async function loginUser() {
   });
 }
 
-async function _handleGoogleUser(user, db) {
+async function _handleOAuthUser(user, db, providerName) {
   const userRef = db.collection("users").doc(user.uid);
   const existingDoc = await userRef.get();
   if (existingDoc.exists) {
-    await userRef.update({ lastLoginAt: firebase.firestore.FieldValue.serverTimestamp(), loginMethod: "google" });
+    await userRef.update({ lastLoginAt: firebase.firestore.FieldValue.serverTimestamp(), loginMethod: providerName });
     return;
   }
   const emailSnap = await db.collection("users").where("email", "==", user.email).limit(1).get();
   if (!emailSnap.empty) {
     const existingData = emailSnap.docs[0].data();
     const oldDocId = emailSnap.docs[0].id;
-    await userRef.set({ ...existingData, loginMethod: "google", googleLinked: true, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
+    await userRef.set({ ...existingData, loginMethod: providerName, [providerName + 'Linked']: true, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
     if (oldDocId !== user.uid) await db.collection("users").doc(oldDocId).delete().catch(() => {});
   } else {
     const refCode = user.uid.slice(0, 8).toUpperCase();
     await userRef.set({
-      name: user.displayName || "", email: user.email || "", phone: user.phoneNumber || "", role: "customer",
-      loginMethod: "google", phoneVerified: false, prefEmail: true, prefSMS: true,
-      referralCode: refCode, referralCount: 0, referralCredits: 0, createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      name: user.displayName || user.email.split('@')[0], email: user.email || "", phone: user.phoneNumber || "", role: "customer",
+      loginMethod: providerName, phoneVerified: false, emailVerified: user.emailVerified, prefEmail: true, prefSMS: true,
+      referralCode: refCode, referralCount: 0, referralCredits: 0, createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      lastLoginAt: firebase.firestore.FieldValue.serverTimestamp()
     });
   }
 }
@@ -2467,7 +2368,7 @@ window.signInWithGoogle = async function () {
     provider.setCustomParameters({ prompt: "select_account" });
     try {
       const result = await auth.signInWithPopup(provider);
-      await _handleGoogleUser(result.user, db);
+      await _handleOAuthUser(result.user, db, 'google');
       closeAuthModal();
       const name = (result.user.displayName || result.user.email?.split("@")[0] || "User").split(" ")[0];
       showToast(`👋 Welcome, ${name}!`);
@@ -2480,194 +2381,54 @@ window.signInWithGoogle = async function () {
   });
 };
 
+window.signInWithApple = async function () {
+  waitForFirebase(async () => {
+    const { auth, db } = window._firebase;
+    const provider = new firebase.auth.OAuthProvider('apple.com');
+    provider.addScope('email');
+    provider.addScope('name');
+    try {
+      const result = await auth.signInWithPopup(provider);
+      await _handleOAuthUser(result.user, db, 'apple');
+      closeAuthModal();
+      const name = (result.user.displayName || result.user.email?.split("@")[0] || "User").split(" ")[0];
+      showToast(`👋 Welcome, ${name}!`);
+    } catch (err) {
+      if (err.code === "auth/popup-blocked") showError("loginError", "⚠️ Popup blocked — please allow popups for this site and try again.");
+      else if (err.code === "auth/popup-closed-by-user" || err.code === "auth/cancelled-popup-request") {}
+      else if (err.code === "auth/unauthorized-domain") showError("loginError", "⚠️ Domain not authorized.");
+      else showError("loginError", getAuthErrorMessage(err.code));
+    }
+  });
+};
+
 /* ═══════════════════════════════════════════════
 PASSWORD RESET FLOW
 ═══════════════════════════════════════════════ */
-/* ═══════════════════════════════════════════════
-PASSWORD RESET FLOW (Phone OTP based)
-═══════════════════════════════════════════════ */
-async function sendResetOTP() {
-  const phone = document.getElementById("resetPhone").value.trim();
-  if (!/^\d{10}$/.test(phone)) return showError("recoverError", "⚠️ Please enter a valid 10-digit phone number.");
+async function sendResetEmail() {
+  const email = document.getElementById("resetEmail").value.trim();
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return showError("recoverError", "⚠️ Please enter a valid email address.");
 
-  const btn = document.getElementById("btnSendResetOtp");
-  if (btn) { btn.disabled = true; btn.textContent = "Checking..."; }
-  showError("recoverError", "⏳ Looking up your account...", "info");
+  const btn = document.getElementById("btnSendResetEmail");
+  if (btn) { btn.disabled = true; btn.textContent = "Sending..."; }
+  showError("recoverError", "⏳ Sending reset link...", "info");
 
   waitForFirebase(async () => {
-    const { auth, db } = window._firebase;
+    const { auth } = window._firebase;
     try {
-      const resetEmail = document.getElementById("resetEmail").value.trim();
-      if (!resetEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(resetEmail)) {
-        if (btn) { btn.disabled = false; btn.textContent = "Send OTP →"; }
-        return showError("recoverError", "⚠️ Please enter a valid email address.");
-      }
-      const emailSnap = await db.collection("users").where("email", "==", resetEmail).limit(1).get();
-      if (emailSnap.empty) {
-        if (btn) { btn.disabled = false; btn.textContent = "Send OTP →"; }
-        return showError("recoverError", "⚠️ No account found with this email. Please sign up.");
-      }
-      const userData = emailSnap.docs[0].data();
-      const storedPhone = (userData.phone || "").replace("+91", "").trim();
-      if (storedPhone !== phone) {
-        if (btn) { btn.disabled = false; btn.textContent = "Send OTP →"; }
-        return showError("recoverError", "⚠️ Phone number does not match this email account.");
-      }
-      resetFlowPhone = phone;
-      showError("recoverError", "⏳ Sending OTP to +91 " + phone + "...", "info");
-      if (btn) btn.textContent = "Sending OTP...";
-      _clearResetRecaptcha();
-      window._resetRecaptcha = new firebase.auth.RecaptchaVerifier("recaptcha-container-reset", { size: "invisible", callback: () => {} });
-      await window._resetRecaptcha.render();
-      confirmationResult = await auth.signInWithPhoneNumber("+91" + phone, window._resetRecaptcha);
-      window._resetConfirmationVerificationId = confirmationResult.verificationId;
-      document.getElementById("resetOtpPhone").textContent = "+91 " + phone;
-      switchPanel("panelResetOTP");
-      document.getElementById("resetOtpInput").focus();
-      if (btn) { btn.disabled = false; btn.textContent = "Send OTP →"; }
-      _startOtpTimer();
+      await auth.sendPasswordResetEmail(email);
+      showError("recoverError", "✅ Reset link sent! Check your inbox.", "success");
+      setTimeout(() => switchPanel('panelLogin'), 3000);
     } catch (err) {
-      _clearResetRecaptcha();
-      if (btn) { btn.disabled = false; btn.textContent = "Send OTP →"; }
-      const msg = err.code === "auth/invalid-phone-number" ? "⚠️ Invalid phone number." : err.code === "auth/too-many-requests" ? "⚠️ Too many requests. Please wait a few minutes." : "⚠️ Failed to send OTP. Please try again.";
-      showError("recoverError", msg);
+      console.error(err);
+      if (err.code === "auth/user-not-found") showError("recoverError", "⚠️ No account found with this email.");
+      else showError("recoverError", getAuthErrorMessage(err.code));
+    } finally {
+      if (btn) { btn.disabled = false; btn.textContent = "Send Reset Link →"; }
     }
   });
 }
 
-async function verifyResetOTP() {
-  const otp = document.getElementById("resetOtpInput").value.trim();
-  if (!/^\d{6}$/.test(otp)) return showError("resetOtpError", "⚠️ Please enter the 6-digit OTP.");
-  if (!confirmationResult) return showError("resetOtpError", "⚠️ OTP session expired. Please go back and try again.");
-
-  const btn = document.getElementById("btnVerifyResetOtp");
-  if (btn) { btn.disabled = true; btn.textContent = "Verifying..."; }
-  showError("resetOtpError", "⏳ Verifying OTP...", "info");
-
-  try {
-    const result = await confirmationResult.confirm(otp);
-    clearInterval(otpTimerInterval);
-    window._resetConfirmationVerificationId = confirmationResult.verificationId;
-    window._resetOtpCode = otp;
-    window._resetPhoneUser = result.user;
-
-    const { db } = window._firebase;
-    const phone = resetFlowPhone;
-    let verifiedEmail = null;
-    const snap1 = await db.collection("users").where("phone", "==", phone).limit(1).get();
-    if (!snap1.empty) verifiedEmail = snap1.docs[0].data().email;
-    if (!verifiedEmail) {
-      const snap2 = await db.collection("users").where("phone", "==", "+91" + phone).limit(1).get();
-      if (!snap2.empty) verifiedEmail = snap2.docs[0].data().email;
-    }
-    if (!verifiedEmail) {
-      await window._firebase.auth.signOut().catch(() => {});
-      if (btn) { btn.disabled = false; btn.textContent = "Verify OTP →"; }
-      return showError("resetOtpError", "⚠️ Account not found. Please contact support.");
-    }
-    window._resetVerifiedEmail = verifiedEmail;
-    if (btn) { btn.disabled = false; btn.textContent = "Verify OTP →"; }
-    const np = document.getElementById("newPasswordInput");
-    const co = document.getElementById("confirmPasswordInput");
-    if (np) np.value = ""; if (co) co.value = "";
-    switchPanel("panelResetPassword");
-    np?.focus();
-  } catch (err) {
-    if (btn) { btn.disabled = false; btn.textContent = "Verify OTP →"; }
-    if (err.code === "auth/invalid-verification-code") showError("resetOtpError", "❌ Incorrect OTP. Please check and try again.");
-    else if (["auth/session-expired","auth/code-expired"].includes(err.code)) showError("resetOtpError", "⚠️ OTP expired. Please go back and request a new one.");
-    else showError("resetOtpError", "⚠️ Verification failed. Please try again.");
-  }
-}
-
-async function setNewPassword() {
-  const newPass = document.getElementById("newPasswordInput").value;
-  const confPass = document.getElementById("confirmPasswordInput").value;
-  if (newPass.length < 6) return showError("resetPasswordError", "⚠️ Password must be at least 6 characters.");
-  if (newPass !== confPass) return showError("resetPasswordError", "⚠️ Passwords do not match.");
-
-  const email = window._resetVerifiedEmail;
-  const verificationId = window._resetConfirmationVerificationId;
-  const otpCode = window._resetOtpCode;
-  const freshUser = window._resetPhoneUser;
-  if (!email || !freshUser) return showError("resetPasswordError", "⚠️ Session expired. Please restart.");
-
-  const btn = document.getElementById("btnSetNewPassword");
-  if (btn) { btn.disabled = true; btn.textContent = "Updating..."; }
-  showError("resetPasswordError", "⏳ Updating your password...", "info");
-
-  const auth = window._firebase.auth;
-  try {
-    let targetUser = freshUser;
-    try {
-      await targetUser.updatePassword(newPass);
-      await _finaliseReset(auth, btn); return;
-    } catch (firstErr) {
-      if (firstErr.code === "auth/requires-recent-login") {
-        if (verificationId && otpCode) {
-          try {
-            const phoneCred = firebase.auth.PhoneAuthProvider.credential(verificationId, otpCode);
-            await targetUser.reauthenticateWithCredential(phoneCred);
-            await targetUser.reload();
-            await targetUser.updatePassword(newPass);
-            await _finaliseReset(auth, btn); return;
-          } catch (reAuthErr) {}
-        }
-      } else if (firstErr.code !== "auth/no-such-provider") throw firstErr;
-    }
-    const emailCred = firebase.auth.EmailAuthProvider.credential(email, newPass);
-    try {
-      await targetUser.linkWithCredential(emailCred);
-      await _finaliseReset(auth, btn);
-    } catch (linkErr) {
-      if (linkErr.code === "auth/provider-already-linked" || linkErr.code === "auth/credential-already-in-use") {
-        await targetUser.updatePassword(newPass);
-        await _finaliseReset(auth, btn);
-      } else if (linkErr.code === "auth/email-already-in-use") {
-        showError("resetPasswordError", "⚠️ Unable to update. Please contact moveeasyblr@gmail.com");
-        if (btn) { btn.disabled = false; btn.textContent = "Set New Password →"; }
-      } else throw linkErr;
-    }
-  } catch (err) {
-    if (btn) { btn.disabled = false; btn.textContent = "Set New Password →"; }
-    if (err.code === "auth/requires-recent-login") showError("resetPasswordError", "⚠️ Session timed out. Please go back and request a new OTP.");
-    else if (err.code === "auth/weak-password") showError("resetPasswordError", "⚠️ Password too weak. Use at least 6 characters.");
-    else if (err.code === "auth/too-many-requests") showError("resetPasswordError", "⚠️ Too many attempts. Please wait a few minutes.");
-    else showError("resetPasswordError", "⚠️ " + (err.code || err.message || "Something went wrong."));
-  }
-}
-
-async function _finaliseReset(auth, btn) {
-  window._resetVerifiedEmail = null; window._resetPhoneUser = null;
-  window._resetConfirmationVerificationId = null; window._resetOtpCode = null;
-  resetFlowPhone = ""; confirmationResult = null;
-  if (btn) { btn.disabled = false; btn.textContent = "Set New Password →"; }
-  setTimeout(() => { auth.signOut().catch(() => {}); }, 800);
-  showToast("✅ Password updated! Please login with your new password.");
-  closeAuthModal();
-  setTimeout(() => openAuthModal("login"), 500);
-}
-
-function _startOtpTimer() {
-  clearInterval(otpTimerInterval);
-  let seconds = 60;
-  const timerEl = document.getElementById("resetOtpTimer");
-  const resendBtn = document.getElementById("btnResendResetOtp");
-  if (resendBtn) resendBtn.disabled = true;
-  if (timerEl) timerEl.textContent = "Resend in 60s";
-  otpTimerInterval = setInterval(() => {
-    seconds--;
-    if (timerEl) timerEl.textContent = seconds > 0 ? `Resend in ${seconds}s` : "";
-    if (seconds <= 0) { clearInterval(otpTimerInterval); if (resendBtn) resendBtn.disabled = false; }
-  }, 1000);
-}
-
-function resendResetOTP() {
-  switchPanel("panelRecover");
-  document.getElementById("resetOtpInput").value = "";
-  showError("recoverError", "");
-  _clearResetRecaptcha();
-}
 function signOutUser() {
   waitForFirebase(() => {
     window._firebase.auth.signOut().then(() => {
@@ -2682,8 +2443,10 @@ DASHBOARD
 function prefillBookingForm(userData) {
   const nameEl = document.getElementById("custName");
   const phoneEl = document.getElementById("custPhone");
+  const emailEl = document.getElementById("custEmail");
   if (nameEl && !nameEl.value.trim() && userData?.name) nameEl.value = userData.name;
   if (phoneEl && !phoneEl.value.trim() && userData?.phone) phoneEl.value = userData.phone.replace("+91","").trim();
+  if (emailEl && !emailEl.value.trim() && userData?.email) emailEl.value = userData.email;
 }
 
 async function openDashboard() {
