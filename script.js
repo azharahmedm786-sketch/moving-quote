@@ -2337,28 +2337,55 @@ async function completeSignup() {
   const fullName = firstName + " " + lastName;
   const { auth, db } = window._firebase;
 
-  try {
-    const emailCred = firebase.auth.EmailAuthProvider.credential(email, password);
-    await phoneUser.linkWithCredential(emailCred);
-    await phoneUser.updateProfile({ displayName: fullName });
+  const verifiedPhoneUid = phoneUser.uid;
+  const verifiedPhoneNumber = phoneUser.phoneNumber || ("+91" + phone);
 
-    const refCode = phoneUser.uid.slice(0, 8).toUpperCase();
-    await db.collection("users").doc(phoneUser.uid).set({
-      firstName, lastName, name: fullName, email, phone, role: "customer", phoneVerified: true,
-      prefEmail: true, prefSMS: true, referralCode: refCode, referralCount: 0, referralCredits: 0,
+  let secondaryApp = null;
+
+  try {
+    secondaryApp = firebase.initializeApp(firebase.app().options, "signupCreation" + Date.now());
+    const secondaryAuth = secondaryApp.auth();
+
+    const cred = await secondaryAuth.createUserWithEmailAndPassword(email, password);
+    const newUser = cred.user;
+    await newUser.updateProfile({ displayName: fullName });
+
+    const refCode = newUser.uid.slice(0, 8).toUpperCase();
+    await db.collection("users").doc(newUser.uid).set({
+      firstName, lastName, name: fullName, email, phone,
+      role: "customer",
+      phoneVerified: true,
+      verifiedPhoneNumber: verifiedPhoneNumber,
+      prefEmail: true, prefSMS: true,
+      referralCode: refCode, referralCount: 0, referralCredits: 0,
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
     });
 
-    if (referral) await processReferral(referral, phoneUser.uid);
+    if (referral) await processReferral(referral, newUser.uid);
+
+    await secondaryAuth.signOut().catch(() => {});
+    await secondaryApp.delete().catch(() => {});
+
+    try {
+      if (auth.currentUser && auth.currentUser.uid === verifiedPhoneUid) {
+        await auth.signOut();
+      }
+    } catch (e) {}
+
+    await auth.signInWithEmailAndPassword(email, password);
 
     pendingSignupData = null;
     _clearSignupRecaptcha();
     closeAuthModal();
     showToast(`👋 Welcome to PackZen, ${firstName}!`);
+
   } catch (err) {
+    if (secondaryApp) {
+      try { await secondaryApp.delete(); } catch (e) {}
+    }
     if (btn) { btn.disabled = false; btn.textContent = "Create Account →"; }
     if (err.code === "auth/email-already-in-use") showError("setPasswordError", "⚠️ This email is already registered. Please login.");
-    else if (err.code === "auth/credential-already-in-use") showError("setPasswordError", "⚠️ This phone number is already registered.");
+    else if (err.code === "auth/weak-password") showError("setPasswordError", "⚠️ Password too weak. Use at least 6 characters.");
     else showError("setPasswordError", getAuthErrorMessage(err.code));
   }
 }
