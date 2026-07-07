@@ -2379,10 +2379,17 @@ async function completeSignup() {
     closeAuthModal();
     showToast(`👋 Welcome to PackZen, ${firstName}!`);
 
-  } catch (err) {
+} catch (err) {
     if (secondaryApp) {
       try { await secondaryApp.delete(); } catch (e) {}
     }
+
+    try {
+      if (auth.currentUser && auth.currentUser.uid === verifiedPhoneUid) {
+        await auth.signOut();
+      }
+    } catch (e) {}
+
     if (btn) { btn.disabled = false; btn.textContent = "Create Account →"; }
     if (err.code === "auth/email-already-in-use") showError("setPasswordError", "⚠️ This email is already registered. Please login.");
     else if (err.code === "auth/weak-password") showError("setPasswordError", "⚠️ Password too weak. Use at least 6 characters.");
