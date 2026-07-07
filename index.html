@@ -822,6 +822,10 @@
               <input id="custPhone" aria-label="Mobile phone number" aria-required="true" placeholder="Mobile number" class="field-input" type="tel">
             </div>
           </div>
+          <div class="field-group">
+            <label class="field-label"><span class="field-icon">✉️</span> Email Address</label>
+            <input id="custEmail" aria-label="Email address" aria-required="true" placeholder="Email address" class="field-input" type="email">
+          </div>
           <div class="price-box">
             <div class="price-box-top">
               <div>
@@ -924,8 +928,9 @@
       <input id="loginPassword" type="password" placeholder="Enter your password" class="field-input" onkeydown="if(event.key==='Enter')loginUser()">
       <div id="loginError" class="auth-error"></div>
       <button class="btn-auth" id="btnLogin" onclick="loginUser()">Login →</button>
-      <div style="margin-top:15px;text-align:center;">
+      <div style="margin-top:15px;text-align:center;display:flex;flex-direction:column;gap:10px;">
         <button onclick="signInWithGoogle()" class="btn-auth-outline" style="width:100%;">🔵 Continue with Google</button>
+        <button onclick="signInWithApple()" class="btn-auth-outline" style="width:100%;"> Continue with Apple</button>
       </div>
       <div class="auth-divider"><span>or</span></div>
       <button class="btn-auth-outline" onclick="switchPanel('panelSignup')">Create New Account</button>
@@ -936,7 +941,7 @@
       <button class="modal-x" onclick="closeAuthModal()">✕</button>
       <div class="auth-logo">📦 PackZen</div>
       <h2 class="auth-title">Create Account</h2>
-      <p class="auth-sub">Enter your details — we'll verify your phone number</p>
+      <p class="auth-sub">Enter your details</p>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
         <div><label>First Name</label><input id="signupFirstName" type="text" placeholder="First name" class="field-input" onkeydown="if(event.key==='Enter')document.getElementById('signupLastName').focus()"></div>
         <div><label>Last Name</label><input id="signupLastName" type="text" placeholder="Last name" class="field-input" onkeydown="if(event.key==='Enter')document.getElementById('signupPhone').focus()"></div>
@@ -944,39 +949,14 @@
       <label style="margin-top:12px;display:block;">Phone Number</label>
       <div class="phone-row"><span class="phone-prefix">+91</span><input id="signupPhone" type="tel" placeholder="10-digit mobile number" maxlength="10" onkeydown="if(event.key==='Enter')document.getElementById('signupEmail').focus()"></div>
       <label style="margin-top:12px;display:block;">Email Address</label>
-      <input id="signupEmail" type="email" placeholder="your@email.com" class="field-input" onkeydown="if(event.key==='Enter')signupUser()">
+      <input id="signupEmail" type="email" placeholder="your@email.com" class="field-input" onkeydown="if(event.key==='Enter')document.getElementById('signupPassword').focus()">
+      <label style="margin-top:12px;display:block;">Password</label>
+      <input id="signupPassword" type="password" placeholder="Min. 6 characters" class="field-input" onkeydown="if(event.key==='Enter')signupUser()">
       <label style="margin-top:12px;display:block;">Referral Code <span style="font-weight:400;color:var(--text-muted)">(optional)</span></label>
       <input id="signupReferral" type="text" placeholder="Enter referral code" class="field-input" style="text-transform:uppercase;">
-      <div id="recaptcha-container-signup"></div>
       <div id="signupError" class="auth-error"></div>
-      <button class="btn-auth" id="btnSignupSendOtp" onclick="signupUser()" style="margin-top:16px;">Send OTP →</button>
+      <button class="btn-auth" id="btnSignup" onclick="signupUser()" style="margin-top:16px;">Create Account →</button>
       <p class="auth-link" onclick="switchPanel('panelLogin')">Already have an account? Login</p>
-    </div>
-
-    <div class="auth-panel" id="panelSignupOTP" style="display:none;">
-      <button class="modal-x" onclick="closeAuthModal()">✕</button>
-      <div class="auth-logo">📱</div>
-      <h2 class="auth-title">Verify Your Phone</h2>
-      <p class="auth-sub">We sent a 6-digit OTP to</p>
-      <p id="signupOtpPhone" style="text-align:center;font-weight:700;font-size:.95rem;margin-bottom:20px;color:var(--text);">your phone</p>
-      <label>Enter OTP</label>
-      <input id="signupOtpInput" type="text" inputmode="numeric" maxlength="6" placeholder="• • • • • •" class="field-input" style="text-align:center;font-size:1.6rem;font-weight:800;letter-spacing:8px;" onkeydown="if(event.key==='Enter')verifySignupOTP()">
-      <div id="signupOtpError" class="auth-error"></div>
-      <button class="btn-auth" id="btnVerifySignupOtp" onclick="verifySignupOTP()" style="margin-top:16px;">Verify OTP →</button>
-      <p class="auth-link" onclick="resendSignupOTP()">Didn't receive? Go back & resend</p>
-    </div>
-
-    <div class="auth-panel" id="panelSetPassword" style="display:none;">
-      <button class="modal-x" onclick="closeAuthModal()">✕</button>
-      <div class="auth-logo">🔒</div>
-      <h2 class="auth-title">Set Your Password</h2>
-      <p class="auth-sub">Phone verified ✅ — Choose a strong password to complete signup</p>
-      <label>Password</label>
-      <input id="setPasswordInput" type="password" placeholder="Min. 6 characters" class="field-input" onkeydown="if(event.key==='Enter')document.getElementById('setPasswordConfirm').focus()">
-      <label style="margin-top:12px;display:block;">Confirm Password</label>
-      <input id="setPasswordConfirm" type="password" placeholder="Re-enter password" class="field-input" onkeydown="if(event.key==='Enter')completeSignup()">
-      <div id="setPasswordError" class="auth-error"></div>
-      <button class="btn-auth" id="btnCompleteSignup" onclick="completeSignup()" style="margin-top:16px;">Create Account →</button>
     </div>
 
     <div class="auth-panel" id="panelRecover" style="display:none;">
