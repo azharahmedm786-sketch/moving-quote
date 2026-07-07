@@ -29,9 +29,10 @@ on top of v9.6.1 already loaded in HTML, causing conflicts)
 
     const auth = firebase.auth();
     const db = firebase.firestore();
+    const storage = firebase.storage ? firebase.storage() : null;
 
     // Make Firebase globally accessible
-    window._firebase = { auth, db };
+    window._firebase = { auth, db, storage };
     console.log("✅ PackZen Firebase ready!");
   } catch (e) {
     console.error("❌ Firebase init failed:", e);

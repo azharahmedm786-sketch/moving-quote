@@ -469,7 +469,10 @@ function driverLogin() {
         driverUser = cred.user;
         showApp(doc.data());
       }))
-      .catch(e => { err.textContent = "Login failed: " + (e.code === "auth/wrong-password" ? "Wrong password" : e.message); });
+      .catch(e => {
+        console.error('Driver Auth Error:', e.code, e.message);
+        err.textContent = "Login failed: " + (e.code === "auth/wrong-password" ? "Wrong password" : e.message);
+      });
   });
 }
 
