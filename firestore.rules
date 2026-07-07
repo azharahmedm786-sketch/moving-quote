@@ -175,6 +175,18 @@ service cloud.firestore {
       allow delete: if false;
     }
 
+    // ACCOUNT DELETION REQUESTS
+    match /accountDeletionRequests/{requestId} {
+      allow create: if request.resource.data.keys().hasAll(['requestId', 'firstName', 'lastName', 'email', 'phone', 'status', 'createdAt']) &&
+                       request.resource.data.firstName is string && request.resource.data.firstName.size() <= 50 &&
+                       request.resource.data.lastName is string && request.resource.data.lastName.size() <= 50 &&
+                       request.resource.data.email is string && request.resource.data.email.size() <= 100 &&
+                       request.resource.data.phone is string && request.resource.data.phone.size() <= 20 &&
+                       (!('reason' in request.resource.data) || (request.resource.data.reason is string && request.resource.data.reason.size() <= 1000)) &&
+                       request.resource.data.status == 'Pending';
+      allow read, update, delete: if isAdmin();
+    }
+
     // BROADCASTS
     match /broadcasts/{broadcastId} {
       allow write: if isAdmin();
