@@ -2450,188 +2450,27 @@ window.signInWithGoogle = async function () {
 /* ═══════════════════════════════════════════════
 PASSWORD RESET FLOW
 ═══════════════════════════════════════════════ */
-async function sendResetOTP() {
-  const phone = document.getElementById("resetPhone").value.trim();
-  if (!/^\d{10}$/.test(phone)) return showError("recoverError", "⚠️ Please enter a valid 10-digit phone number.");
+async function sendResetEmail() {
+  const email = document.getElementById("resetEmail").value.trim();
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return showError("recoverError", "⚠️ Please enter a valid email address.");
 
-  const btn = document.getElementById("btnSendResetOtp");
-  if (btn) { btn.disabled = true; btn.textContent = "Checking..."; }
-  showError("recoverError", "⏳ Looking up your account...", "info");
+  const btn = document.getElementById("btnSendResetEmail");
+  if (btn) { btn.disabled = true; btn.textContent = "Sending..."; }
+  showError("recoverError", "⏳ Sending password reset email...", "info");
 
   waitForFirebase(async () => {
-    const { auth, db } = window._firebase;
+    const { auth } = window._firebase;
     try {
-      const resetEmail = document.getElementById("resetEmail").value.trim();
-      if (!resetEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(resetEmail)) {
-        if (btn) { btn.disabled = false; btn.textContent = "Send OTP →"; }
-        return showError("recoverError", "⚠️ Please enter a valid email address.");
-      }
-      const emailSnap = await db.collection("users").where("email", "==", resetEmail).limit(1).get();
-      if (emailSnap.empty) {
-        if (btn) { btn.disabled = false; btn.textContent = "Send OTP →"; }
-        return showError("recoverError", "⚠️ No account found with this email. Please sign up.");
-      }
-      const userData = emailSnap.docs[0].data();
-      const storedPhone = (userData.phone || "").replace("+91", "").trim();
-      if (storedPhone !== phone) {
-        if (btn) { btn.disabled = false; btn.textContent = "Send OTP →"; }
-        return showError("recoverError", "⚠️ Phone number does not match this email account.");
-      }
-      resetFlowPhone = phone;
-      showError("recoverError", "⏳ Sending OTP to +91 " + phone + "...", "info");
-      if (btn) btn.textContent = "Sending OTP...";
-      _clearResetRecaptcha();
-      window._resetRecaptcha = new firebase.auth.RecaptchaVerifier("recaptcha-container-reset", { size: "invisible", callback: () => {} });
-      await window._resetRecaptcha.render();
-      confirmationResult = await auth.signInWithPhoneNumber("+91" + phone, window._resetRecaptcha);
-      window._resetConfirmationVerificationId = confirmationResult.verificationId;
-      document.getElementById("resetOtpPhone").textContent = "+91 " + phone;
-      switchPanel("panelResetOTP");
-      document.getElementById("resetOtpInput").focus();
-      if (btn) { btn.disabled = false; btn.textContent = "Send OTP →"; }
-      _startOtpTimer();
+      await auth.sendPasswordResetEmail(email);
+      showError("recoverError", "✅ Password reset link sent! Check your inbox.", "success");
+      if (btn) { btn.disabled = false; btn.textContent = "Send Reset Link →"; }
     } catch (err) {
-      _clearResetRecaptcha();
-      if (btn) { btn.disabled = false; btn.textContent = "Send OTP →"; }
-      const msg = err.code === "auth/invalid-phone-number" ? "⚠️ Invalid phone number." : err.code === "auth/too-many-requests" ? "⚠️ Too many requests. Please wait a few minutes." : "⚠️ Failed to send OTP. Please try again.";
-      showError("recoverError", msg);
+      if (btn) { btn.disabled = false; btn.textContent = "Send Reset Link →"; }
+      showError("recoverError", getAuthErrorMessage(err.code));
     }
   });
 }
 
-async function verifyResetOTP() {
-  const otp = document.getElementById("resetOtpInput").value.trim();
-  if (!/^\d{6}$/.test(otp)) return showError("resetOtpError", "⚠️ Please enter the 6-digit OTP.");
-  if (!confirmationResult) return showError("resetOtpError", "⚠️ OTP session expired. Please go back and try again.");
-
-  const btn = document.getElementById("btnVerifyResetOtp");
-  if (btn) { btn.disabled = true; btn.textContent = "Verifying..."; }
-  showError("resetOtpError", "⏳ Verifying OTP...", "info");
-
-  try {
-    const result = await confirmationResult.confirm(otp);
-    clearInterval(otpTimerInterval);
-    window._resetConfirmationVerificationId = confirmationResult.verificationId;
-    window._resetOtpCode = otp;
-    window._resetPhoneUser = result.user;
-
-    const { db } = window._firebase;
-    const phone = resetFlowPhone;
-    let verifiedEmail = null;
-    const snap1 = await db.collection("users").where("phone", "==", phone).limit(1).get();
-    if (!snap1.empty) verifiedEmail = snap1.docs[0].data().email;
-    if (!verifiedEmail) {
-      const snap2 = await db.collection("users").where("phone", "==", "+91" + phone).limit(1).get();
-      if (!snap2.empty) verifiedEmail = snap2.docs[0].data().email;
-    }
-    if (!verifiedEmail) {
-      await window._firebase.auth.signOut().catch(() => {});
-      if (btn) { btn.disabled = false; btn.textContent = "Verify OTP →"; }
-      return showError("resetOtpError", "⚠️ Account not found. Please contact support.");
-    }
-    window._resetVerifiedEmail = verifiedEmail;
-    if (btn) { btn.disabled = false; btn.textContent = "Verify OTP →"; }
-    const np = document.getElementById("newPasswordInput");
-    const co = document.getElementById("confirmPasswordInput");
-    if (np) np.value = ""; if (co) co.value = "";
-    switchPanel("panelResetPassword");
-    np?.focus();
-  } catch (err) {
-    if (btn) { btn.disabled = false; btn.textContent = "Verify OTP →"; }
-    if (err.code === "auth/invalid-verification-code") showError("resetOtpError", "❌ Incorrect OTP. Please check and try again.");
-    else if (["auth/session-expired","auth/code-expired"].includes(err.code)) showError("resetOtpError", "⚠️ OTP expired. Please go back and request a new one.");
-    else showError("resetOtpError", "⚠️ Verification failed. Please try again.");
-  }
-}
-
-async function setNewPassword() {
-  const newPass = document.getElementById("newPasswordInput").value;
-  const confPass = document.getElementById("confirmPasswordInput").value;
-  if (newPass.length < 6) return showError("resetPasswordError", "⚠️ Password must be at least 6 characters.");
-  if (newPass !== confPass) return showError("resetPasswordError", "⚠️ Passwords do not match.");
-
-  const email = window._resetVerifiedEmail;
-  const verificationId = window._resetConfirmationVerificationId;
-  const otpCode = window._resetOtpCode;
-  const freshUser = window._resetPhoneUser;
-  if (!email || !freshUser) return showError("resetPasswordError", "⚠️ Session expired. Please restart.");
-
-  const btn = document.getElementById("btnSetNewPassword");
-  if (btn) { btn.disabled = true; btn.textContent = "Updating..."; }
-  showError("resetPasswordError", "⏳ Updating your password...", "info");
-
-  const auth = window._firebase.auth;
-  try {
-    let targetUser = freshUser;
-    try {
-      await targetUser.updatePassword(newPass);
-      await _finaliseReset(auth, btn); return;
-    } catch (firstErr) {
-      if (firstErr.code === "auth/requires-recent-login") {
-        if (verificationId && otpCode) {
-          try {
-            const phoneCred = firebase.auth.PhoneAuthProvider.credential(verificationId, otpCode);
-            await targetUser.reauthenticateWithCredential(phoneCred);
-            await targetUser.reload();
-            await targetUser.updatePassword(newPass);
-            await _finaliseReset(auth, btn); return;
-          } catch (reAuthErr) {}
-        }
-      } else if (firstErr.code !== "auth/no-such-provider") throw firstErr;
-    }
-    const emailCred = firebase.auth.EmailAuthProvider.credential(email, newPass);
-    try {
-      await targetUser.linkWithCredential(emailCred);
-      await _finaliseReset(auth, btn);
-    } catch (linkErr) {
-      if (linkErr.code === "auth/provider-already-linked" || linkErr.code === "auth/credential-already-in-use") {
-        await targetUser.updatePassword(newPass);
-        await _finaliseReset(auth, btn);
-      } else if (linkErr.code === "auth/email-already-in-use") {
-        showError("resetPasswordError", "⚠️ Unable to update. Please contact moveeasyblr@gmail.com");
-        if (btn) { btn.disabled = false; btn.textContent = "Set New Password →"; }
-      } else throw linkErr;
-    }
-  } catch (err) {
-    if (btn) { btn.disabled = false; btn.textContent = "Set New Password →"; }
-    if (err.code === "auth/requires-recent-login") showError("resetPasswordError", "⚠️ Session timed out. Please go back and request a new OTP.");
-    else if (err.code === "auth/weak-password") showError("resetPasswordError", "⚠️ Password too weak. Use at least 6 characters.");
-    else if (err.code === "auth/too-many-requests") showError("resetPasswordError", "⚠️ Too many attempts. Please wait a few minutes.");
-    else showError("resetPasswordError", "⚠️ " + (err.code || err.message || "Something went wrong."));
-  }
-}
-
-async function _finaliseReset(auth, btn) {
-  window._resetVerifiedEmail = null; window._resetPhoneUser = null;
-  window._resetConfirmationVerificationId = null; window._resetOtpCode = null;
-  resetFlowPhone = ""; confirmationResult = null;
-  if (btn) { btn.disabled = false; btn.textContent = "Set New Password →"; }
-  setTimeout(() => { auth.signOut().catch(() => {}); }, 800);
-  showToast("✅ Password updated! Please login with your new password.");
-  closeAuthModal();
-  setTimeout(() => openAuthModal("login"), 500);
-}
-
-function _startOtpTimer() {
-  clearInterval(otpTimerInterval);
-  let seconds = 60;
-  const timerEl = document.getElementById("resetOtpTimer");
-  const resendBtn = document.getElementById("btnResendResetOtp");
-  if (resendBtn) resendBtn.disabled = true;
-  if (timerEl) timerEl.textContent = "Resend in 60s";
-  otpTimerInterval = setInterval(() => {
-    seconds--;
-    if (timerEl) timerEl.textContent = seconds > 0 ? `Resend in ${seconds}s` : "";
-    if (seconds <= 0) { clearInterval(otpTimerInterval); if (resendBtn) resendBtn.disabled = false; }
-  }, 1000);
-}
-
-function resendResetOTP() {
-  switchPanel("panelRecover");
-  document.getElementById("resetOtpInput").value = "";
-  showError("recoverError", "");
-  _clearResetRecaptcha();
-}
 
 function signOutUser() {
   waitForFirebase(() => {
