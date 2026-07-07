@@ -860,6 +860,7 @@ async function doLogin() {
       advisorUser = cred.user;
       buildShell();
     } catch (e) {
+      console.error('Advisor Auth Error:', e.code, e.message);
       const msgs = {
         "auth/wrong-password":            "⚠️ Incorrect password.",
         "auth/invalid-credential":        "⚠️ Incorrect email or password.",

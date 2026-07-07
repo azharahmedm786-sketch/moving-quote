@@ -353,7 +353,8 @@ function adminLogin() {
               err.textContent = "Access denied. Your account does not have admin permissions.";
             }
           })
-          .catch(() => {
+          .catch(e => {
+            console.error('Admin Auth Firestore Error:', e.code, e.message);
             if (ADMIN_EMAILS.includes(userEmail)) {
               clearAttempts();
               showShell(cred.user.displayName || "Admin");
@@ -365,6 +366,7 @@ function adminLogin() {
           });
       })
       .catch(e => {
+        console.error('Admin Auth Error:', e.code, e.message);
         recordFailedAttempt(); // ✅ Count failed attempt
         const d = getRateData();
         const remaining = MAX_TRIES - d.count;
