@@ -3399,10 +3399,88 @@ function toggleFaq(btn) {
   if (!isOpen) item.classList.add("open");
 }
 
+
+/* ============================================
+FIREBASE EMAIL ACTION HANDLER
+============================================ */
+async function handleFirebaseActionCode() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const mode = urlParams.get('mode');
+  const oobCode = urlParams.get('oobCode');
+
+  if (!mode || !oobCode) return;
+
+  waitForFirebase(async () => {
+    const auth = window._firebase.auth;
+    try {
+      if (mode === 'verifyEmail') {
+        await auth.applyActionCode(oobCode);
+        const user = auth.currentUser;
+        if (user) {
+          await window._firebase.db.collection('users').doc(user.uid).update({ emailVerified: true });
+        }
+        showToast("✅ Email verified successfully!");
+        // Clear the URL parameters
+        window.history.replaceState(null, '', window.location.pathname);
+      } else if (mode === 'resetPassword') {
+        const email = await auth.verifyPasswordResetCode(oobCode);
+        const modal = document.getElementById('newPasswordModal');
+        if (modal) {
+          document.getElementById('newPasswordEmailDisplay').textContent = email;
+          modal.style.display = 'flex';
+        }
+      }
+    } catch (err) {
+      console.error(err);
+      showToast("⚠️ Invalid or expired link. Please try again.");
+    }
+  });
+}
+
+async function submitNewPassword() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const oobCode = urlParams.get('oobCode');
+  const newPassword = document.getElementById('newPasswordInput').value;
+  const btn = document.getElementById('btnSubmitNewPassword');
+
+  if (!newPassword || newPassword.length < 6) {
+    showError("newPasswordError", "⚠️ Password must be at least 6 characters.");
+    return;
+  }
+
+  if (btn) { btn.disabled = true; btn.textContent = "Updating..."; }
+  showError("newPasswordError", "", "info");
+
+  waitForFirebase(async () => {
+    const auth = window._firebase.auth;
+    try {
+      await auth.confirmPasswordReset(oobCode, newPassword);
+      showError("newPasswordError", "✅ Password updated successfully! Please login.", "success");
+      setTimeout(() => {
+        closeNewPasswordModal();
+        openAuthModal();
+        switchPanel('panelLogin');
+        window.history.replaceState(null, '', window.location.pathname);
+      }, 3000);
+    } catch (err) {
+      console.error(err);
+      showError("newPasswordError", getAuthErrorMessage(err.code));
+    } finally {
+      if (btn) { btn.disabled = false; btn.textContent = "Update Password"; }
+    }
+  });
+}
+
+function closeNewPasswordModal() {
+  const modal = document.getElementById('newPasswordModal');
+  if (modal) modal.style.display = 'none';
+}
+
 /* ============================================
 PAGE LOAD
 ============================================ */
 document.addEventListener("DOMContentLoaded", () => {
+  handleFirebaseActionCode();
  setTimeout(() => {
     initGeolocationFeature();
 }, 1000);
