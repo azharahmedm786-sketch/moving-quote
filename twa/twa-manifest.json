@@ -1,6 +1,6 @@
 {
   "packageId": "in.packzen.app",
-  "host": "packzen.in",
+  "host": "packzenblr.in",
   "name": "PackZen Packers & Movers",
   "launcherName": "PackZen",
   "display": "standalone",
@@ -13,8 +13,8 @@
   "backgroundColor": "#050D1A",
   "enableNotifications": true,
   "startUrl": "/",
-  "iconUrl": "https://packzen.in/assets/logo/newllogo.png",
-  "maskableIconUrl": "https://packzen.in/assets/logo/newllogo.png",
+  "iconUrl": "https://packzenblr.in/assets/logo/newllogo.png",
+  "maskableIconUrl": "https://packzenblr.in/assets/logo/newllogo.png",
   "signingKey": {
     "path": "./android.keystore",
     "alias": "android"
@@ -23,7 +23,7 @@
   "appVersionCode": 2,
   "shortcuts": [],
   "generatorApp": "bubblewrap-cli",
-  "webManifestUrl": "https://packzen.in/manifest.json",
+  "webManifestUrl": "https://packzenblr.in/manifest.json",
   "fallbackType": "customtabs",
   "features": {
     "locationDelegation": {
