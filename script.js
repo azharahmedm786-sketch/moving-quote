@@ -1295,12 +1295,17 @@ async function startPayment() {
   if (!pickupField || !dropField) { showToast("Please enter pickup and drop location."); isProcessingPayment = false; if (payBtn) { payBtn.disabled = false; payBtn.innerText = "Pay Now"; } return; }
   if (!shiftDate) { showToast("Please select shifting date."); isProcessingPayment = false; if (payBtn) { payBtn.disabled = false; payBtn.innerText = "Pay Now"; } return; }
 
+  console.log("Total booking amount:", lastCalculatedTotal);
+  console.log("Calculated advance amount:", selectedPayment === "advance" ? payAmount : undefined);
+  console.log("Amount sent to Razorpay (Cloud Function payload in INR):", payAmount);
+
   try {
     const orderResponse = await fetch("https://asia-south1-packzen-e7539.cloudfunctions.net/createRazorpayOrder", {
       method: "POST", headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ amount: payAmount, customerName: name, phone: phone, moveType: selectedMoveType, pickup: pickupField, drop: dropField, date: shiftDate })
     });
     const orderData = await orderResponse.json();
+    console.log("Razorpay API response:", orderData);
     if (!orderData.success) { showToast("Failed to create payment order"); isProcessingPayment = false; if (payBtn) { payBtn.disabled = false; payBtn.innerText = "Pay Now"; } return; }
 
     const rzp = new Razorpay({
@@ -1363,6 +1368,7 @@ async function startPayment() {
       showToast("❌ Payment failed: " + r.error.description);
     });
   } catch (err) {
+    console.log("Caught exception:", err);
     isProcessingPayment = false;
     if (payBtn) { payBtn.disabled = false; payBtn.innerText = "Pay Now"; }
     showToast("Payment error: " + err.message);
