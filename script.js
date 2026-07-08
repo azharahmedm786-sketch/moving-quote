@@ -398,10 +398,10 @@ function renderFurnitureGrid(type) {
   const getPriceForDisplay = (itemId, catId) => {
     const isFree = FREE_CATS.includes(catId);
     // Read from v2 config if loaded, otherwise fall back
-    const v2Price = window.PackZenPricing?.config?.furniturePrices?.[itemId];
-    const price = (v2Price !== undefined) ? v2Price : (FURNITURE_PRICES[itemId] || 0);
-    if (isFree || price === 0) return "FREE";
-    return `+₹${price}`;
+    const v2Units = window.PackZenPricing?.config?.furnitureUnits?.[itemId];
+    const units = (v2Units !== undefined) ? v2Units : 0;
+    if (isFree || units === 0) return "FREE";
+    return `${units} Units`;
   };
 
   const itemCard = (item, catId) => {
