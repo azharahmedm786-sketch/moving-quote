@@ -1242,3 +1242,86 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 window.addEventListener("beforeunload", pzClearListeners);
+
+
+
+/* ============================================
+FIREBASE EMAIL ACTION HANDLER (PARTNER)
+============================================ */
+function handleFirebaseActionCode() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const mode = urlParams.get('mode');
+  const oobCode = urlParams.get('oobCode');
+
+  if (!mode || !oobCode) return;
+
+  // We need to wait for firebase auth to be ready
+  var checkFB = setInterval(function() {
+    if (window._firebase && window._firebase.auth) {
+      clearInterval(checkFB);
+      const auth = window._firebase.auth;
+
+      if (mode === 'verifyEmail') {
+        auth.applyActionCode(oobCode).then(function() {
+          const user = auth.currentUser;
+          if (user) {
+            window._firebase.db.collection('partners').doc(user.uid).update({ emailVerified: true }).catch(function(){});
+          }
+          alert("✅ Email verified successfully!");
+          window.history.replaceState(null, '', window.location.pathname);
+        }).catch(function(err) {
+          console.error(err);
+          alert("⚠️ Invalid or expired link. Please try again.");
+        });
+      } else if (mode === 'resetPassword') {
+        auth.verifyPasswordResetCode(oobCode).then(function(email) {
+          var resetUI = qs("#partnerNewPasswordUI");
+          var forgotForm = qs("#forgotForm");
+          if (resetUI && forgotForm) {
+            forgotForm.style.display = 'none';
+            qs("#newPasswordEmailDisplay").textContent = email;
+            resetUI.style.display = 'block';
+          }
+        }).catch(function(err) {
+          console.error(err);
+          alert("⚠️ Invalid or expired reset link. Please try again.");
+        });
+      }
+    }
+  }, 100);
+}
+
+function submitPartnerNewPassword() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const oobCode = urlParams.get('oobCode');
+  const newPassword = qs('#partnerNewPasswordInput').value;
+  const btn = qs('#btnSubmitPartnerNewPassword');
+  const errBox = qs('#newPasswordError');
+  const okBox = qs('#newPasswordSuccess');
+
+  if (errBox) errBox.classList.remove("show");
+  if (okBox) okBox.classList.remove("show");
+
+  if (!newPassword || newPassword.length < 6) {
+    if (errBox) { errBox.textContent = "⚠️ Password must be at least 6 characters."; errBox.classList.add("show"); }
+    return;
+  }
+
+  setBtnLoading(btn, true);
+
+  window._firebase.auth.confirmPasswordReset(oobCode, newPassword).then(function() {
+    setBtnLoading(btn, false);
+    if (okBox) { okBox.textContent = "✅ Password updated successfully! Redirecting to login..."; okBox.classList.add("show"); }
+    setTimeout(function() {
+      window.location.href = 'partner-login.html';
+    }, 3000);
+  }).catch(function(err) {
+    setBtnLoading(btn, false);
+    console.error(err);
+    if (errBox) { errBox.textContent = friendlyAuthError(err); errBox.classList.add("show"); }
+  });
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+  handleFirebaseActionCode();
+});
