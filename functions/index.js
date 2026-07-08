@@ -235,12 +235,13 @@ exports.createRazorpayOrder = functions
 
       try {
 
+        console.log("Request body received:", req.body);
         const { amount } = req.body;
          const safeAmount = Number(amount);
 
 if (
   !safeAmount ||
-  safeAmount < 500 ||
+  safeAmount <= 0 ||
   safeAmount > 100000
 ) {
   return res.status(400).json({
@@ -313,7 +314,7 @@ if (
   !bookingData.customerName ||
   !bookingData.phone ||
   !bookingData.total ||
-  bookingData.total < 500 ||
+  bookingData.total <= 0 ||
   bookingData.total > 100000
 ) {
   return res.status(400).json({
