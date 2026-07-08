@@ -12,9 +12,9 @@ This repository includes the setup for a Trusted Web Activity (TWA) for the Pack
 
 ## Output
 
--   `app-release-bundle.aab`: Android App Bundle for Play Store submission.
--   `app-release-signed.apk`: Signed APK for direct installation.
+- `app-release-bundle.aab`: Android App Bundle for Play Store submission.
+- `app-release-signed.apk`: Signed APK for direct installation.
 
 ## Digital Asset Links
 
-The `assetlinks.json` file is located in the `.well-known` directory. This needs to be deployed to `https://packzen.in/.well-known/assetlinks.json` to enable the TWA to remove the browser address bar.
+The `assetlinks.json` file is located in the `.well-known` directory. This needs to be deployed to `https://packzenblr.in/.well-known/assetlinks.json` to enable the TWA to remove the browser address bar.
