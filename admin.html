@@ -160,11 +160,59 @@
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-appcheck-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-appcheck-compat.js"></script>
 
-<script src="env-config.js"></script>
-<script src="firebase-config.js"></script>
+
+
 
 <script>
+async function initializePackZenConfig(callback) {
+  try {
+
+    // 1. Initialize Firebase with a minimal config or standard config without keys first
+    // Since App Check requires Firebase initialization, but we don't have the config yet,
+    // we use an undocumented workaround or fetch a pre-config for AppCheck.
+    // However, the standard way is: AppCheck requires the appId.
+    // We can initialize Firebase just with appId, then get the token, then fetch full config!
+    if (!firebase.apps.length) {
+      firebase.initializeApp({
+        appId: "1:270978358338:web:20827d29d23b654925e1db",
+        apiKey: "AIzaSyCNZdOeUlwlI9kwkzD05R1xEy8EyuP8VJo", // Public key needed for AppCheck
+        projectId: "packzen-e7539"
+      });
+    }
+    const appCheck = firebase.appCheck();
+    appCheck.activate("6LdPlaceholderSiteKey", true); // ReCAPTCHA v3 site key
+
+    const appCheckTokenResponse = await appCheck.getToken(true);
+    const appCheckToken = appCheckTokenResponse.token;
+
+    const res = await fetch("/api/config", { headers: { "X-Firebase-AppCheck": appCheckToken } });
+
+    if (!res.ok) return;
+    const data = await res.json();
+    window.ENV = window.ENV || {};
+    window.ENV.GOOGLE_MAPS_KEY = data.GOOGLE_MAPS_KEY;
+    window.ENV.RAZORPAY_KEY = data.RAZORPAY_KEY;
+    if (!firebase.apps.length) firebase.initializeApp(data.FIREBASE_CONFIG);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    const storage = firebase.storage ? firebase.storage() : null;
+    window._firebase = { auth, db, storage };
+    if (callback) callback();
+  } catch (err) {}
+}
+let isAppReady = false;
+const appReadyCallbacks = [];
+function onAppReady(cb) {
+  if (isAppReady) cb();
+  else appReadyCallbacks.push(cb);
+}
+initializePackZenConfig(() => {
+  isAppReady = true;
+  appReadyCallbacks.forEach(cb => cb());
+});
 /* ================================================================
    ✅ SECURITY CONSTANTS
    ================================================================ */
@@ -281,6 +329,7 @@ function waitFB(cb, n=0) {
    AUTO-LOGIN GUARD (checks if already signed in as admin on load)
    ================================================================ */
 document.addEventListener("DOMContentLoaded", () => {
+  onAppReady(() => {
   waitFB(() => {
     const { auth, db } = window._firebase;
     auth.onAuthStateChanged(async (user) => {
@@ -301,6 +350,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       }
     });
+  });
   });
 });
 

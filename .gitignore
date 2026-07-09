@@ -1,24 +1,15 @@
-# Environment files - NEVER COMMIT THESE!
-env-config.js
-.env
-*.local
-
-# Firebase
 .firebase/
-*.log
+.firebaserc
 firebase-debug.log
-
-# OS files
-.DS_Store
-Thumbs.db
-node_modules/ 
-functions/node_modules/ 
-twa/app/build/
-twa/.gradle/
-twa/build/
+firebase-debug.*.log
+node_modules/
+functions/node_modules/
 twa/node_modules/
-twa/android.keystore
-*.apk
 *.aab
-*.idsig
-venv/
+*.apk
+*.keystore
+serve.log
+
+functions/node_modules/
+serve.log
+functions/emulators.log

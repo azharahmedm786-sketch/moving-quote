@@ -786,8 +786,8 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
 <!-- Load your existing Firebase config — same file, same project -->
-<script src="env-config.js"></script>
-<script src="firebase-config.js"></script>
+
+
 
 <!-- Same pricing engine your customer booking flow uses. Not duplicated — loaded as-is. -->
 <script src="pricing-engine-v2.js"></script>
@@ -815,11 +815,11 @@ let activeSection = "overview";
 let unsubBookings, unsubCustomers, unsubDrivers;
 
 /* ════════════════════════════════════════════
-   FIREBASE INIT — wait for firebase-config.js
+   FIREBASE INIT — wait for configuration
    ════════════════════════════════════════════ */
 function waitFB(cb, n = 0) {
   if (window._firebase) { db = window._firebase.db; auth = window._firebase.auth; cb(); return; }
-  if (n > 40) { document.getElementById("loginErr").textContent = "⚠️ Firebase config not loaded. Check firebase-config.js"; return; }
+  if (n > 40) { document.getElementById("loginErr").textContent = "⚠️ Firebase config not loaded."; return; }
   setTimeout(() => waitFB(cb, n + 1), 200);
 }
 
