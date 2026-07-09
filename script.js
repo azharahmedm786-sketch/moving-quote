@@ -1,3 +1,56 @@
+async function initializePackZenConfig(callback) {
+  try {
+
+    if (!firebase.apps.length) {
+      firebase.initializeApp({
+        appId: "1:270978358338:web:20827d29d23b654925e1db",
+        apiKey: "AIzaSyCNZdOeUlwlI9kwkzD05R1xEy8EyuP8VJo",
+        projectId: "packzen-e7539"
+      });
+    }
+    const appCheck = firebase.appCheck();
+    appCheck.activate("6LdPlaceholderSiteKey", true);
+
+    const appCheckTokenResponse = await appCheck.getToken(true);
+    const appCheckToken = appCheckTokenResponse.token;
+
+    const res = await fetch('/api/config', {
+      method: 'GET',
+      headers: {
+        'X-Firebase-AppCheck': appCheckToken
+      }
+    });
+
+
+    if (!res.ok) {
+      console.error("❌ Failed to fetch secure config from /api/config");
+      return;
+    }
+
+    const data = await res.json();
+
+    // Populate ENV
+    window.ENV = window.ENV || {};
+    window.ENV.GOOGLE_MAPS_KEY = data.GOOGLE_MAPS_KEY;
+    window.ENV.RAZORPAY_KEY = data.RAZORPAY_KEY;
+
+    // Initialize Firebase if not already
+    if (!firebase.apps.length) {
+      firebase.initializeApp(data.FIREBASE_CONFIG);
+      console.log("✅ Firebase initialized securely via /api/config");
+    }
+
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    const storage = firebase.storage ? firebase.storage() : null;
+
+    window._firebase = { auth, db, storage };
+
+    if (callback) callback();
+  } catch (err) {
+    console.error("❌ Error initializing config:", err);
+  }
+}
 /* ============================================
 PackZen — script.js (FULLY FIXED)
 SECURITY HARDENED VERSION - May 2026
@@ -5,6 +58,30 @@ Pricing Engine: v2.0 (pricing-engine-v2.js)
 ============================================ */
 
 // ─── GLOBAL STATE ───────────────────────────────────
+// Configuration initialization deferred until securely fetched
+let isAppReady = false;
+const appReadyCallbacks = [];
+
+function onAppReady(cb) {
+  if (isAppReady) cb();
+  else appReadyCallbacks.push(cb);
+}
+
+// Immediately invoke secure config fetch
+initializePackZenConfig(() => {
+  isAppReady = true;
+  appReadyCallbacks.forEach(cb => cb());
+
+  // Load Google Maps dynamically once config is available
+  if (window.ENV && window.ENV.GOOGLE_MAPS_KEY) {
+    const s = document.createElement("script");
+    s.src = "https://maps.googleapis.com/maps/api/js?key=" + window.ENV.GOOGLE_MAPS_KEY + "&libraries=places&callback=initMap";
+    s.async = true;
+    s.defer = true;
+    document.head.appendChild(s);
+  }
+});
+
 let pickupPlace = null, dropPlace = null;
 let map = null, directionsService = null, directionsRenderer = null;
 let pickupMarker = null, dropMarker = null;
@@ -3480,10 +3557,12 @@ function closeNewPasswordModal() {
 PAGE LOAD
 ============================================ */
 document.addEventListener("DOMContentLoaded", () => {
-  handleFirebaseActionCode();
- setTimeout(() => {
-    initGeolocationFeature();
-}, 1000);
+  onAppReady(() => {
+    handleFirebaseActionCode();
+    setTimeout(() => {
+      initGeolocationFeature();
+    }, 1000);
+  });
 
   try { buildDateStrip(); } catch(e) { console.error("buildDateStrip failed:", e); }
 

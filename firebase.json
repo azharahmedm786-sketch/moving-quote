@@ -9,6 +9,10 @@
     ],
     "rewrites": [
       {
+        "source": "/api/config",
+        "function": "config"
+      },
+      {
         "source": "**",
         "destination": "/index.html"
       }
@@ -22,4 +26,3 @@
     "rules": "firestore.rules"
   }
 }
-
