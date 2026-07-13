@@ -234,6 +234,13 @@ function initPaymentOptions() {
 /* ============================================
 SECURITY HELPERS
 ============================================ */
+function sanitizeHTML(str) {
+  if (!str) return "";
+  const div = document.createElement("div");
+  div.textContent = str;
+  return div.innerHTML;
+}
+
 function escapeHTML(str) {
   if (!str) return "";
   return str
