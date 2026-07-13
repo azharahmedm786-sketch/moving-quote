@@ -234,13 +234,6 @@ function initPaymentOptions() {
 /* ============================================
 SECURITY HELPERS
 ============================================ */
-function sanitizeHTML(str) {
-  if (!str) return "";
-  const div = document.createElement("div");
-  div.textContent = str;
-  return div.innerHTML;
-}
-
 function escapeHTML(str) {
   if (!str) return "";
   return str
@@ -254,11 +247,6 @@ function escapeHTML(str) {
 function sanitizeInput(str) {
   if (!str || typeof str !== "string") return "";
   return str.trim().replace(/[<>"']/g, "");
-}
-
-function validatePhone(phone) {
-  const cleaned = String(phone).replace(/\D/g, "");
-  return cleaned.length === 10 ? cleaned : null;
 }
 
 function validateName(name) {
@@ -372,16 +360,6 @@ function changeFurnitureQty(id, delta) {
   input.value = newVal;
   const card = document.getElementById("card-" + id);
   if (card) card.classList.toggle("active", newVal > 0);
-  calculateQuote(true);
-}
-
-function syncFurnitureQty(id) {
-  const input = document.getElementById(id);
-  if (!input) return;
-  const val = Math.max(0, Math.min(20, parseInt(input.value) || 0));
-  input.value = val;
-  const card = document.getElementById("card-" + id);
-  if (card) card.classList.toggle("active", val > 0);
   calculateQuote(true);
 }
 

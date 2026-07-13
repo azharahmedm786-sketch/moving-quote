@@ -70,3 +70,41 @@ test("2BHK Move", {
   // Subtotal = 1500 + 250 + 1200 + 500 + 1200 + 1480 = 6130
   return Math.abs(r.breakdown.grandTotal - 6130) < 1;
 });
+
+// Case 3: Missing Vehicle Config
+test("Missing Vehicle Config", {
+  pickup: "A", drop: "B", km: 15,
+  houseValue: 2500,
+  vehicleHtmlValue: "0",
+  furniture: { bedCheck: 1, fridgeCheck: 1, wmCheck: 1 },
+  cartonQty: 5,
+  pickupFloor: 1, dropFloor: 1, liftAvailable: false,
+  packingService: true,
+  moveType: "home", extraHelpers: 0
+}, (r) => {
+  // Check if breakdown handles missing vehicleCfg gracefully with 0s for capacity
+  const isBaseFareCorrect = r.breakdown.baseFare === 1499; // PRICING_CONFIG.minimumFare
+  const isCapacityChargeZero = r.breakdown.capacityCharge === 0;
+  const isTotalUnitsZero = r.breakdown.capacityDetail.totalUnits === 0;
+  const isCapacityUsedZero = r.breakdown.capacityDetail.capacityUsed === 0;
+  const isSlabNone = r.breakdown.capacityDetail.slab === "None";
+
+  return isBaseFareCorrect && isCapacityChargeZero && isTotalUnitsZero && isCapacityUsedZero && isSlabNone;
+});
+
+// Case 4: Waiting Charge
+test("Waiting Charge Calculation", {
+  pickup: "A", drop: "B", km: 15,
+  houseValue: 2500,
+  vehicleHtmlValue: "200", // Tata Ace
+  furniture: { bedCheck: 1, fridgeCheck: 1, wmCheck: 1 },
+  cartonQty: 5,
+  pickupFloor: 1, dropFloor: 1, liftAvailable: false,
+  packingService: true,
+  moveType: "home", extraHelpers: 0,
+  waitingHours: 2
+}, (r) => {
+  // Check if waiting charge is calculated correctly
+  // PRICING_CONFIG.waiting.pricePerHour is 300, so 2 hours is 600
+  return r.breakdown.waitingCharge === 600;
+});
