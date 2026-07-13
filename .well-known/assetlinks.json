@@ -4,7 +4,8 @@
     "namespace": "android_app",
     "package_name": "in.packzen.app",
     "sha256_cert_fingerprints": [
-      "50:9D:1F:B5:51:0B:25:8F:B7:E1:E8:A6:FD:1D:DE:D3:06:37:45:12:05:46:91:40:60:B9:03:04:6A:82:9A:94"
+      "50:9D:1F:B5:51:0B:25:8F:B7:E1:E8:A6:FD:1D:DE:D3:06:37:45:12:05:46:91:40:60:B9:03:04:6A:82:9A:94",
+      "E1:DE:4F:DB:89:23:E6:0B:2A:05:E6:B9:B6:E8:82:AC:FA:C3:DC:78:67:E2:62:F3:31:D8:10:BF:56:17:76:79"
     ]
   }
 }]
