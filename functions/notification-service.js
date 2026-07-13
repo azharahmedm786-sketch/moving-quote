@@ -155,6 +155,8 @@ async function retryFailedNotifications() {
   if (snap.empty) return { retried: 0 };
 
   let retried = 0;
+  const promises = [];
+
   for (const doc of snap.docs) {
     const log = doc.data();
     const retries = log.retries || 0;
@@ -165,22 +167,28 @@ async function retryFailedNotifications() {
     // full context was preserved in the log's "context" field.
     if (!log.context) continue;
 
-    const result = await sendBrevoEmail({
-      toEmail: log.recipient,
-      toName: log.context.customerName || "",
-      subject: log.context.subject,
-      htmlContent: log.context.html
-    });
+    const retryPromise = (async () => {
+      const result = await sendBrevoEmail({
+        toEmail: log.recipient,
+        toName: log.context.customerName || "",
+        subject: log.context.subject,
+        htmlContent: log.context.html
+      });
 
-    await doc.ref.update({
-      status: result.success ? "sent" : "failed",
-      retries: retries + 1,
-      response: result.response ? JSON.stringify(result.response).slice(0, 1000) : null,
-      error: result.error || null,
-      lastAttempt: admin.firestore.FieldValue.serverTimestamp()
-    });
+      await doc.ref.update({
+        status: result.success ? "sent" : "failed",
+        retries: retries + 1,
+        response: result.response ? JSON.stringify(result.response).slice(0, 1000) : null,
+        error: result.error || null,
+        lastAttempt: admin.firestore.FieldValue.serverTimestamp()
+      });
+    })();
+
+    promises.push(retryPromise);
     retried++;
   }
+
+  await Promise.all(promises);
   return { retried };
 }
 
