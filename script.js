@@ -256,11 +256,6 @@ function sanitizeInput(str) {
   return str.trim().replace(/[<>"']/g, "");
 }
 
-function validatePhone(phone) {
-  const cleaned = String(phone).replace(/\D/g, "");
-  return cleaned.length === 10 ? cleaned : null;
-}
-
 function validateName(name) {
   if (!name || typeof name !== "string") return null;
   const cleaned = name.trim().replace(/[<>"']/g, "");
