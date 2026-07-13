@@ -98,15 +98,16 @@
   <link rel="stylesheet" href="mobile-fixes.css">
   <link rel="stylesheet" href="theme-dg.css">
   <link rel="stylesheet" href="desktop.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 
 <body class="app-body">
 <noscript>
   <div style="position:fixed;top:0;left:0;width:100%;height:100%;background:#0f172a;z-index:99999;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;padding:20px;text-align:center;">
-    <div style="font-size:3rem;">⚠️</div>
+    <div style="font-size:3rem;"><i data-lucide="triangle-alert"></i></div>
     <h1 style="color:#fff;font-size:1.5rem;">JavaScript Required</h1>
     <p style="color:#94a3b8;max-width:400px;">PackZen requires JavaScript to function. Please enable JavaScript in your browser settings.</p>
-    <a href="https://wa.me/919945095453" style="color:#22c55e;text-decoration:none;font-weight:600;">💬 Contact us on WhatsApp</a>
+    <a href="https://wa.me/919945095453" style="color:#22c55e;text-decoration:none;font-weight:600;"> Contact us on WhatsApp</a>
   </div>
 </noscript>
 
@@ -157,14 +158,14 @@
     </div>
   </div>
   <div class="dropdown-divider"></div>
-  <a href="#" onclick="openDashboard();closeUserMenu()"><span>📋</span> My Bookings</a>
-  <a href="#" onclick="openTrackingModal();closeUserMenu()"><span>📍</span> Track My Move</a>
-  <a href="#" onclick="openChatModal();closeUserMenu()"><span>💬</span> Chat with Driver</a>
-  <a href="#" onclick="openChecklist();closeUserMenu()"><span>✅</span> Moving Checklist</a>
-  <a href="#" onclick="openProfile();closeUserMenu()"><span>👤</span> Edit Profile</a>
-  <a href="admin.html" id="adminNavLink" style="display:none"><span>🔐</span> Admin Panel</a>
+  <a href="#" onclick="openDashboard();closeUserMenu()"><span><i data-lucide="clipboard-list"></i></span> My Bookings</a>
+  <a href="#" onclick="openTrackingModal();closeUserMenu()"><span><i data-lucide="map-pin"></i></span> Track My Move</a>
+  <a href="#" onclick="openChatModal();closeUserMenu()"><span><i data-lucide="message-circle"></i></span> Chat with Driver</a>
+  <a href="#" onclick="openChecklist();closeUserMenu()"><span><i data-lucide="badge-check"></i></span> Moving Checklist</a>
+  <a href="#" onclick="openProfile();closeUserMenu()"><span><i data-lucide="user-round"></i></span> Edit Profile</a>
+  <a href="admin.html" id="adminNavLink" style="display:none"><span><i data-lucide="lock"></i></span> Admin Panel</a>
   <div class="dropdown-divider"></div>
-  <a href="#" onclick="signOutUser()" class="dropdown-signout"><span>🚪</span> Sign Out</a>
+  <a href="#" onclick="signOutUser()" class="dropdown-signout"><span><i data-lucide="log-out"></i></span> Sign Out</a>
 </div>
 
 <!-- TRACK ORDER BANNER (keep existing ID) -->
@@ -173,24 +174,24 @@
     <div class="tob-top">
       <div class="tob-pulse"></div>
       <div class="tob-text">
-        <div class="tob-title">📦 Active Booking</div>
+        <div class="tob-title"><i data-lucide="package"></i> Active Booking</div>
         <div class="tob-id">ID: <strong id="tobBookingId">—</strong> · <span id="tobStatusLabel" class="tob-status-label">Confirmed</span></div>
       </div>
       <div class="tob-top-actions">
         <button class="tob-btn-track" onclick="openTrackingOrLogin()">Track →</button>
-        <button class="tob-dismiss" onclick="dismissTrackBanner()">✕</button>
+        <button class="tob-dismiss" onclick="dismissTrackBanner()"><i data-lucide="x"></i></button>
       </div>
     </div>
     <div class="tob-progress-bar"><div class="tob-progress-fill" id="tobProgressFill"></div></div>
     <div class="tob-steps">
-      <div class="tob-step active" id="tobs0"><div class="tob-step-dot"><span>✓</span></div><div class="tob-step-line"></div><div class="tob-step-label">Booked</div></div>
-      <div class="tob-step" id="tobs1"><div class="tob-step-dot"><span>🚛</span></div><div class="tob-step-line"></div><div class="tob-step-label">Assigned</div></div>
-      <div class="tob-step" id="tobs2"><div class="tob-step-dot"><span>📦</span></div><div class="tob-step-line"></div><div class="tob-step-label">Packing</div></div>
-      <div class="tob-step" id="tobs3"><div class="tob-step-dot"><span>🚚</span></div><div class="tob-step-line"></div><div class="tob-step-label">Transit</div></div>
-      <div class="tob-step" id="tobs4"><div class="tob-step-dot"><span>🎉</span></div><div class="tob-step-label">Delivered</div></div>
+      <div class="tob-step active" id="tobs0"><div class="tob-step-dot"><span><i data-lucide="check"></i></span></div><div class="tob-step-line"></div><div class="tob-step-label">Booked</div></div>
+      <div class="tob-step" id="tobs1"><div class="tob-step-dot"><span><i data-lucide="truck"></i></span></div><div class="tob-step-line"></div><div class="tob-step-label">Assigned</div></div>
+      <div class="tob-step" id="tobs2"><div class="tob-step-dot"><span><i data-lucide="package"></i></span></div><div class="tob-step-line"></div><div class="tob-step-label">Packing</div></div>
+      <div class="tob-step" id="tobs3"><div class="tob-step-dot"><span><i data-lucide="truck"></i></span></div><div class="tob-step-line"></div><div class="tob-step-label">Transit</div></div>
+      <div class="tob-step" id="tobs4"><div class="tob-step-dot"><span><i data-lucide="party-popper"></i></span></div><div class="tob-step-label">Delivered</div></div>
     </div>
     <div class="tob-driver" id="tobDriverRow" style="display:none;">
-      <span class="tob-driver-icon">🚚</span>
+      <span class="tob-driver-icon"><i data-lucide="truck"></i></span>
       <span id="tobDriverName">Driver assigned</span>
       <a id="tobDriverPhone" href="#" class="tob-driver-call">Call Driver</a>
     </div>
@@ -220,7 +221,7 @@
     Across Bangalore
 </h1>
         <p class="hero-location">
-    📍 Serving all areas across Bangalore
+    <i data-lucide="map-pin"></i> Serving all areas across Bangalore
 </p>
         <p class="hero-app-sub">
     Live GPS Tracking • Fully Insured • Zero Damage Guarantee
@@ -231,11 +232,11 @@
         </a>
       </div>
       <div class="hero-trust-chips">
-     <span class="trust-chip"><span>🛡️</span> Fully Insured</span>
+     <span class="trust-chip"><span><i data-lucide="shield-check"></i></span> Fully Insured</span>
 
-<span class="trust-chip"><span>📍</span> Live GPS</span>
+<span class="trust-chip"><span><i data-lucide="map-pin"></i></span> Live GPS</span>
 
-<span class="trust-chip"><span>✅</span> Zero Damage</span>
+<span class="trust-chip"><span><i data-lucide="badge-check"></i></span> Zero Damage</span>
       </div>
     </div>
 
@@ -244,19 +245,19 @@
       <div class="section-label">Quick Actions</div>
       <div class="quick-actions-grid">
         <button class="qa-card" onclick="openBookingSheet()">
-          <div class="qa-icon-wrap qa-book">📦</div>
+          <div class="qa-icon-wrap qa-book"><i data-lucide="package"></i></div>
           <span>Book Move</span>
         </button>
         <button class="qa-card" onclick="openTrackingOrLogin()">
-          <div class="qa-icon-wrap qa-track">📍</div>
+          <div class="qa-icon-wrap qa-track"><i data-lucide="map-pin"></i></div>
           <span>Track</span>
         </button>
         <a href="tel:9945095453" class="qa-card">
-          <div class="qa-icon-wrap qa-call">📞</div>
+          <div class="qa-icon-wrap qa-call"><i data-lucide="phone"></i></div>
           <span>Call Us</span>
         </a>
         <a href="https://wa.me/919945095453" class="qa-card" target="_blank" rel="noopener noreferrer">
-          <div class="qa-icon-wrap qa-wa">💬</div>
+          <div class="qa-icon-wrap qa-wa"><i data-lucide="message-circle"></i></div>
           <span>WhatsApp</span>
         </a>
       </div>
@@ -270,7 +271,7 @@
       </div>
       <div class="services-scroll" id="services">
         <div class="service-app-card" onclick="selectMoveTypeFromHome('home')">
-          <div class="sac-icon sac-home">🏠</div>
+          <div class="sac-icon sac-home"><i data-lucide="house"></i></div>
           <div class="sac-body">
             <div class="sac-title">Home Move</div>
             <div class="sac-sub">Apartment · Villa · PG</div>
@@ -278,21 +279,21 @@
           <div class="sac-badge">Popular</div>
         </div>
         <div class="service-app-card" onclick="selectMoveTypeFromHome('office')">
-          <div class="sac-icon sac-office">🏢</div>
+          <div class="sac-icon sac-office"><i data-lucide="building-2"></i></div>
           <div class="sac-body">
             <div class="sac-title">Office Shift</div>
             <div class="sac-sub">Minimal downtime</div>
           </div>
         </div>
         <div class="service-app-card" onclick="selectMoveTypeFromHome('single')">
-          <div class="sac-icon sac-single">📦</div>
+          <div class="sac-icon sac-single"><i data-lucide="package"></i></div>
           <div class="sac-body">
             <div class="sac-title">Single Item</div>
             <div class="sac-sub">Sofa · Fridge · Bike</div>
           </div>
         </div>
         <div class="service-app-card">
-          <div class="sac-icon sac-local">📍</div>
+          <div class="sac-icon sac-local"><i data-lucide="map-pin"></i></div>
           <div class="sac-body">
             <div class="sac-title">Local Shifting</div>
             <div class="sac-sub">Within Bangalore</div>
@@ -310,7 +311,7 @@
           <div class="offer-sub">10% off on bookings above ₹3,000</div>
           <button class="offer-btn" onclick="openBookingSheet()">Book Now →</button>
         </div>
-        <div class="offer-right">🚛</div>
+        <div class="offer-right"><i data-lucide="truck"></i></div>
       </div>
     </div>
 
@@ -319,33 +320,33 @@
       <div class="section-label">Trust & Safety</div>
       <div class="why-app-grid" id="why">
         <div class="why-app-card">
-          <div class="wac-icon">📄</div>
-          <div class="wac-title">✔ GST Ready</div>
+          <div class="wac-icon"><i data-lucide="file-text"></i></div>
+          <div class="wac-title"><i data-lucide="circle"></i> GST Ready</div>
           <div class="wac-sub">B2B invoices available</div>
         </div>
         <div class="why-app-card">
-          <div class="wac-icon">🛡️</div>
-          <div class="wac-title">✔ Insured Moving</div>
+          <div class="wac-icon"><i data-lucide="shield-check"></i></div>
+          <div class="wac-title"><i data-lucide="circle"></i> Insured Moving</div>
           <div class="wac-sub">Comprehensive coverage</div>
         </div>
         <div class="why-app-card">
-          <div class="wac-icon">👷</div>
-          <div class="wac-title">✔ Verified Drivers</div>
+          <div class="wac-icon"><i data-lucide="circle"></i></div>
+          <div class="wac-title"><i data-lucide="circle"></i> Verified Drivers</div>
           <div class="wac-sub">Background checked</div>
         </div>
         <div class="why-app-card">
-          <div class="wac-icon">💳</div>
-          <div class="wac-title">✔ Secure Payments</div>
+          <div class="wac-icon"><i data-lucide="credit-card"></i></div>
+          <div class="wac-title"><i data-lucide="circle"></i> Secure Payments</div>
           <div class="wac-sub">Bank-grade encryption</div>
         </div>
         <div class="why-app-card">
-          <div class="wac-icon">📍</div>
-          <div class="wac-title">✔ Live Tracking</div>
+          <div class="wac-icon"><i data-lucide="map-pin"></i></div>
+          <div class="wac-title"><i data-lucide="circle"></i> Live Tracking</div>
           <div class="wac-sub">Real-time GPS updates</div>
         </div>
         <div class="why-app-card">
-          <div class="wac-icon">📞</div>
-          <div class="wac-title">✔ 24×7 Support</div>
+          <div class="wac-icon"><i data-lucide="phone"></i></div>
+          <div class="wac-title"><i data-lucide="circle"></i> 24×7 Support</div>
           <div class="wac-sub">Always here to help</div>
         </div>
       </div>
@@ -366,7 +367,7 @@
           <div class="pricing-row"><span>Office Relocation</span><span class="price-val">Custom</span></div>
           <div class="pricing-row last"><span>Intercity</span><span class="price-val">By distance</span></div>
         </div>
-        <div class="pricing-note">💡 Final price depends on distance, floors, and inventory.</div>
+        <div class="pricing-note"><i data-lucide="lightbulb"></i> Final price depends on distance, floors, and inventory.</div>
         <button class="pricing-cta" onclick="openBookingSheet()">Get Exact Quote →</button>
       </div>
     </div>
@@ -381,7 +382,7 @@
             <div class="hiw-app-title">Get Instant Quote</div>
             <div class="hiw-app-sub">Enter pickup & drop — get price in seconds</div>
           </div>
-          <div class="hiw-app-icon">📋</div>
+          <div class="hiw-app-icon"><i data-lucide="clipboard-list"></i></div>
         </div>
         <div class="hiw-app-item">
           <div class="hiw-app-num">2</div>
@@ -389,7 +390,7 @@
             <div class="hiw-app-title">Confirm Booking</div>
             <div class="hiw-app-sub">Choose date, slot — confirmed in 30 min</div>
           </div>
-          <div class="hiw-app-icon">📅</div>
+          <div class="hiw-app-icon"><i data-lucide="calendar-days"></i></div>
         </div>
         <div class="hiw-app-item">
           <div class="hiw-app-num">3</div>
@@ -397,7 +398,7 @@
             <div class="hiw-app-title">Pack & Load</div>
             <div class="hiw-app-sub">Trained team, premium materials</div>
           </div>
-          <div class="hiw-app-icon">📦</div>
+          <div class="hiw-app-icon"><i data-lucide="package"></i></div>
         </div>
         <div class="hiw-app-item last">
           <div class="hiw-app-num">4</div>
@@ -405,7 +406,7 @@
             <div class="hiw-app-title">Safe Delivery</div>
             <div class="hiw-app-sub">Live tracking · On-time every time</div>
           </div>
-          <div class="hiw-app-icon">🎉</div>
+          <div class="hiw-app-icon"><i data-lucide="party-popper"></i></div>
         </div>
       </div>
     </div>
@@ -418,7 +419,7 @@
       </div>
       <div class="reviews-app-card">
         <div class="reviews-rating-row">
-          <div class="reviews-stars">★★★★★</div>
+          <div class="reviews-stars"><i data-lucide="star"></i><i data-lucide="star"></i><i data-lucide="star"></i><i data-lucide="star"></i><i data-lucide="star"></i></div>
           <div class="reviews-label">Trusted by Bangalore customers</div>
         </div>
         <a href="https://g.page/r/CR_hUMH7jJOvEBM/review" target="_blank" class="review-leave-btn">⭐ Leave a Google Review</a>
@@ -493,7 +494,7 @@
     <footer class="app-footer">
       <div class="app-footer-inner-desktop">
         <div class="app-footer-col">
-          <div class="app-footer-logo">📦 Pack<span>Zen</span></div>
+          <div class="app-footer-logo"><i data-lucide="package"></i> Pack<span>Zen</span></div>
           <p>Professional packers & movers in Bangalore. Transparent pricing, live tracking, and stress-free relocation.</p>
         </div>
 
@@ -521,10 +522,10 @@
         <div class="app-footer-col">
           <div class="app-footer-col-title">Contact</div>
           <div class="app-footer-contact">
-            <a href="https://wa.me/919945095453" target="_blank">💬 WhatsApp: +91 9945095453</a>
-            <a href="tel:9945095453">📞 Phone: +91 9945095453</a>
-            <a href="mailto:moveeasyblr@gmail.com">✉️ Email: moveeasyblr@gmail.com</a>
-            <span style="color: rgba(255,255,255,0.6); font-size: 0.85rem; margin-top: 4px;">🕒 Mon - Sun: 8:00 AM - 9:00 PM</span>
+            <a href="https://wa.me/919945095453" target="_blank"> WhatsApp: +91 9945095453</a>
+            <a href="tel:9945095453"><i data-lucide="phone"></i> Phone: +91 9945095453</a>
+            <a href="mailto:moveeasyblr@gmail.com"><i data-lucide="mail"></i> Email: moveeasyblr@gmail.com</a>
+            <span style="color: rgba(255,255,255,0.6); font-size: 0.85rem; margin-top: 4px;"><i data-lucide="circle"></i> Mon - Sun: 8:00 AM - 9:00 PM</span>
           </div>
         </div>
       </div>
@@ -533,7 +534,7 @@
         <div>© 2026 PackZen Packers &amp; Movers · HSR Layout, Bangalore</div>
         <div>Founded by <strong>Azhar Ahamed S</strong></div>
         <div>
-          <a href="https://instagram.com/packzenblr" target="_blank" rel="noopener noreferrer">📸 Instagram</a>
+          <a href="https://instagram.com/packzenblr" target="_blank" rel="noopener noreferrer"><i data-lucide="camera"></i> Instagram</a>
         </div>
       </div>
     </footer>
@@ -602,15 +603,15 @@
           <div class="step-progress-fill" id="progressBar" style="width:20%"></div>
         </div>
         <div class="step-indicators">
-          <div class="step-dot active" id="dot0"><span class="dot-icon">🏠</span><div class="dot-label">Type</div></div>
+          <div class="step-dot active" id="dot0"><span class="dot-icon"><i data-lucide="house"></i></span><div class="dot-label">Type</div></div>
           <div class="step-line" id="line0"></div>
-          <div class="step-dot" id="dot1"><span class="dot-icon">📍</span><div class="dot-label">Location</div></div>
+          <div class="step-dot" id="dot1"><span class="dot-icon"><i data-lucide="map-pin"></i></span><div class="dot-label">Location</div></div>
           <div class="step-line" id="line1"></div>
-          <div class="step-dot" id="dot2"><span class="dot-icon">🗓️</span><div class="dot-label">Details</div></div>
+          <div class="step-dot" id="dot2"><span class="dot-icon"><i data-lucide="circle"></i></span><div class="dot-label">Details</div></div>
           <div class="step-line" id="line2"></div>
-          <div class="step-dot" id="dot3"><span class="dot-icon">🛋️</span><div class="dot-label">Items</div></div>
+          <div class="step-dot" id="dot3"><span class="dot-icon"><i data-lucide="sofa"></i></span><div class="dot-label">Items</div></div>
           <div class="step-line" id="line3"></div>
-          <div class="step-dot" id="dot4"><span class="dot-icon">✅</span><div class="dot-label">Book</div></div>
+          <div class="step-dot" id="dot4"><span class="dot-icon"><i data-lucide="badge-check"></i></span><div class="dot-label">Book</div></div>
         </div>
       </div>
 
@@ -620,22 +621,22 @@
           <p class="step-hint">Tell us about your move so we can give the most accurate quote.</p>
           <div class="move-type-grid">
             <div class="move-type-card" onclick="selectMoveType(this,'home'); nextStep();">
-              <div class="mt-icon">🏠</div><div class="mt-label">Home Move</div><div class="mt-sub">Apartment · Villa · PG</div>
+              <div class="mt-icon"><i data-lucide="house"></i></div><div class="mt-label">Home Move</div><div class="mt-sub">Apartment · Villa · PG</div>
             </div>
             <div class="move-type-card" onclick="selectMoveType(this,'office'); nextStep();">
-              <div class="mt-icon">🏢</div><div class="mt-label">Office / Commercial</div><div class="mt-sub">Office · Shop · Warehouse</div>
+              <div class="mt-icon"><i data-lucide="building-2"></i></div><div class="mt-label">Office / Commercial</div><div class="mt-sub">Office · Shop · Warehouse</div>
             </div>
             <div class="move-type-card" onclick="selectMoveType(this,'single'); nextStep();">
-              <div class="mt-icon">📦</div><div class="mt-label">Single Item</div><div class="mt-sub">Sofa · Fridge · Bike</div>
+              <div class="mt-icon"><i data-lucide="package"></i></div><div class="mt-label">Single Item</div><div class="mt-sub">Sofa · Fridge · Bike</div>
             </div>
           </div>
           <div class="quote-trust-box">
             <h3>Why PackZen?</h3>
             <div class="trust-features">
-              <div class="trust-item"><span>🛡️</span><p>Fully Insured</p></div>
-              <div class="trust-item"><span>📍</span><p>Live Tracking</p></div>
-              <div class="trust-item"><span>✅</span><p>Zero Damage</p></div>
-              <div class="trust-item"><span>☎️</span><p>24/7 Support</p></div>
+              <div class="trust-item"><span><i data-lucide="shield-check"></i></span><p>Fully Insured</p></div>
+              <div class="trust-item"><span><i data-lucide="map-pin"></i></span><p>Live Tracking</p></div>
+              <div class="trust-item"><span><i data-lucide="badge-check"></i></span><p>Zero Damage</p></div>
+              <div class="trust-item"><span><i data-lucide="circle"></i></span><p>24/7 Support</p></div>
             </div>
             <div class="google-trust">⭐ Trusted by Bangalore customers</div>
           </div>
@@ -647,21 +648,21 @@
       <div class="form-step">
         <div class="step-body">
           <div class="field-group">
-            <label class="field-label"><span class="field-icon">📍</span> Pickup Location</label>
+            <label class="field-label"><span class="field-icon"><i data-lucide="map-pin"></i></span> Pickup Location</label>
             <input id="pickup" aria-label="Pickup address" aria-required="true" placeholder="Enter pickup address" class="field-input" autocomplete="off">
             <label class="toggle-row">
-              <span class="toggle-text">📱 Use my current location</span>
+              <span class="toggle-text"><i data-lucide="circle"></i> Use my current location</span>
               <label class="toggle"><input type="checkbox" id="useCurrentLocation"><span class="slider"></span></label>
             </label>
           </div>
           <div class="field-group">
-            <label class="field-label"><span class="field-icon">🏁</span> Drop Location</label>
+            <label class="field-label"><span class="field-icon"><i data-lucide="flag"></i></span> Drop Location</label>
             <input id="drop" aria-label="Drop address" aria-required="true" placeholder="Enter drop address" class="field-input" autocomplete="off">
           </div>
           <div id="map"></div>
           <div id="distanceInfo" class="distance-badge"></div>
           <div id="intercityBadge" class="intercity-badge" style="display:none">
-            <div class="ic-icon">🚛</div>
+            <div class="ic-icon"><i data-lucide="truck"></i></div>
             <div class="ic-info">
               <div class="ic-title">Intercity Move Detected — <span class="ic-km"></span></div>
               <div class="ic-sub">Fixed rate pricing applied · No per-km charge · Includes loading &amp; unloading</div>
@@ -678,10 +679,10 @@
       <div class="form-step">
         <div class="step-body">
           <div class="field-group">
-            <label class="field-label"><span class="field-icon">📅</span> Moving Date <span style="color:#dc2626">*</span></label>
+            <label class="field-label"><span class="field-icon"><i data-lucide="calendar-days"></i></span> Moving Date <span style="color:#dc2626">*</span></label>
             <div class="date-strip" id="dateStrip"></div>
             <div class="date-more-row">
-              <button type="button" class="date-more-btn" onclick="openCustomDate()">📆 Pick another date</button>
+              <button type="button" class="date-more-btn" onclick="openCustomDate()"><i data-lucide="circle"></i> Pick another date</button>
               <span class="date-selected-label" id="dateSelectedLabel"></span>
             </div>
             <input type="date" id="shiftDate" aria-label="Moving date" aria-required="true"
@@ -689,7 +690,7 @@
               onchange="onCustomDatePicked(this.value)">
           </div>
           <div class="field-group">
-            <label class="field-label"><span class="field-icon">🕐</span> Preferred Time Slot <span style="color:#dc2626">*</span></label>
+            <label class="field-label"><span class="field-icon"><i data-lucide="circle"></i></span> Preferred Time Slot <span style="color:#dc2626">*</span></label>
             <div class="time-slots-grid">
               <button type="button" class="time-slot-btn" onclick="selectTimeSlot(this,'07:00','7–9 AM','7:00 AM – 9:00 AM')"><span class="ts-label">7–9 AM</span></button>
               <button type="button" class="time-slot-btn" onclick="selectTimeSlot(this,'09:00','9–11 AM','9:00 AM – 11:00 AM')"><span class="ts-label">9–11 AM</span></button>
@@ -702,13 +703,13 @@
             <input type="hidden" id="shiftTimeLabel" value="">
           </div>
           <div class="field-group" id="sizeFieldGroup">
-            <label class="field-label" id="sizeSelectorLabel"><span class="field-icon">🏠</span> <span id="sizeLabelText">House Type</span></label>
+            <label class="field-label" id="sizeSelectorLabel"><span class="field-icon"><i data-lucide="house"></i></span> <span id="sizeLabelText">House Type</span></label>
             <div class="select-cards" id="houseCards"></div>
             <select id="house" class="field-input" style="display:none"><option value="">Select size</option></select>
           </div>
           <div class="field-row-2">
             <div class="field-group">
-              <label class="field-label"><span class="field-icon">🏗️</span> Pickup Floor</label>
+              <label class="field-label"><span class="field-icon"><i data-lucide="circle"></i></span> Pickup Floor</label>
               <select id="pickupFloor" class="field-input" onchange="calculateQuote(true)">
                 <option value="0">Ground / 1st (free)</option>
                 <option value="2">2nd – 4th (+₹500)</option>
@@ -717,7 +718,7 @@
               </select>
             </div>
             <div class="field-group">
-              <label class="field-label"><span class="field-icon">🏗️</span> Drop Floor</label>
+              <label class="field-label"><span class="field-icon"><i data-lucide="circle"></i></span> Drop Floor</label>
               <select id="dropFloor" class="field-input" onchange="calculateQuote(true)">
                 <option value="0">Ground / 1st (free)</option>
                 <option value="2">2nd – 4th (+₹500)</option>
@@ -728,15 +729,15 @@
           </div>
           <div class="field-group">
             <label class="toggle-row" style="margin:0">
-              <span class="toggle-text">🛗 Lift available at both locations <span style="color:#16a34a;font-size:.8rem">(50% off floor charges)</span></span>
+              <span class="toggle-text"><i data-lucide="circle"></i> Lift available at both locations <span style="color:#16a34a;font-size:.8rem">(50% off floor charges)</span></span>
               <label class="toggle"><input type="checkbox" id="liftAvailable" onchange="calculateQuote(true)"><span class="slider"></span></label>
             </label>
           </div>
           <div class="field-group" id="vehicleCardGroup">
-            <label class="field-label"><span class="field-icon">🚚</span> Vehicle Type</label>
+            <label class="field-label"><span class="field-icon"><i data-lucide="truck"></i></span> Vehicle Type</label>
             <div class="vehicle-cards" id="vehicleCards">
               <div class="vehicle-card" onclick="selectCard(this,'vehicle','200')">
-                <div class="vc-icon">🛻</div>
+                <div class="vc-icon"><i data-lucide="circle"></i></div>
                 <div class="vc-info">
                   <div class="vc-name">Tata Ace</div>
                   <div class="vc-sub">Ideal for single items & 1 RK</div>
@@ -744,7 +745,7 @@
                 </div>
               </div>
               <div class="vehicle-card" onclick="selectCard(this,'vehicle','2500')">
-                <div class="vc-icon">🚚</div>
+                <div class="vc-icon"><i data-lucide="truck"></i></div>
                 <div class="vc-info">
                   <div class="vc-name">14 ft Truck</div>
                   <div class="vc-sub">Ideal for 1–2 BHK</div>
@@ -752,7 +753,7 @@
                 </div>
               </div>
               <div class="vehicle-card" onclick="selectCard(this,'vehicle','4000')">
-                <div class="vc-icon">🚛</div>
+                <div class="vc-icon"><i data-lucide="truck"></i></div>
                 <div class="vc-info">
                   <div class="vc-name">17 ft Truck</div>
                   <div class="vc-sub">Ideal for 2–3 BHK</div>
@@ -760,7 +761,7 @@
                 </div>
               </div>
               <div class="vehicle-card" onclick="selectCard(this,'vehicle','5500')">
-                <div class="vc-icon">🚜</div>
+                <div class="vc-icon"><i data-lucide="circle"></i></div>
                 <div class="vc-info">
                   <div class="vc-name">22 ft Truck</div>
                   <div class="vc-sub">Ideal for 3+ BHK</div>
@@ -791,11 +792,11 @@
           <p class="step-hint">Select items you're moving. Kitchen & other items: <strong>free</strong>. Carton boxes: <strong>₹50 each</strong>.</p>
           <div class="furniture-grid"></div>
           <div class="photo-upload-section">
-            <label class="field-label"><span class="field-icon">📸</span> Upload Item Photos <span style="font-weight:400;color:var(--text-muted)">(optional)</span></label>
+            <label class="field-label"><span class="field-icon"><i data-lucide="camera"></i></span> Upload Item Photos <span style="font-weight:400;color:var(--text-muted)">(optional)</span></label>
             <div class="photo-upload-area" onclick="document.getElementById('itemPhotos').click()">
               <label class="photo-upload-label">
                 <input type="file" id="itemPhotos" multiple accept="image/*" onchange="previewPhotos(this)">
-                <div class="upload-icon">📷</div>
+                <div class="upload-icon"><i data-lucide="circle"></i></div>
                 <div><span class="upload-link">Tap to upload</span> photos of your items</div>
                 <div class="upload-sub">Helps driver prepare better</div>
               </label>
@@ -814,16 +815,16 @@
         <div class="step-body">
           <div class="field-row-2">
             <div class="field-group">
-              <label class="field-label"><span class="field-icon">👤</span> Your Name</label>
+              <label class="field-label"><span class="field-icon"><i data-lucide="user-round"></i></span> Your Name</label>
               <input id="custName" aria-label="Your full name" aria-required="true" placeholder="Full name" class="field-input">
             </div>
             <div class="field-group">
-              <label class="field-label"><span class="field-icon">📞</span> Phone Number</label>
+              <label class="field-label"><span class="field-icon"><i data-lucide="phone"></i></span> Phone Number</label>
               <input id="custPhone" aria-label="Mobile phone number" aria-required="true" placeholder="Mobile number" class="field-input" type="tel">
             </div>
           </div>
           <div class="field-group">
-            <label class="field-label"><span class="field-icon">✉️</span> Email Address</label>
+            <label class="field-label"><span class="field-icon"><i data-lucide="mail"></i></span> Email Address</label>
             <input id="custEmail" aria-label="Email address" aria-required="true" placeholder="Email address" class="field-input" type="email">
           </div>
           <div class="price-box">
@@ -831,19 +832,19 @@
               <div>
                 <div class="price-label">Your Estimate</div>
                 <div id="result" class="price-breakdown"></div>
-                <div class="discount-row" id="discountRow" style="display:none;">🏷️ Promo: <strong id="discountAmt"></strong></div>
+                <div class="discount-row" id="discountRow" style="display:none;"><i data-lucide="circle"></i> Promo: <strong id="discountAmt"></strong></div>
               </div>
               <div class="price-amount"><span id="livePrice">₹0</span></div>
             </div>
             <div class="advance-info">
-              💡 Advance: <strong><span id="advanceAmount">₹0</span></strong>
+              <i data-lucide="lightbulb"></i> Advance: <strong><span id="advanceAmount">₹0</span></strong>
               <span class="advance-note">· 10% now, rest on moving day</span>
             </div>
           </div>
 
           <div class="field-group" id="helperCardGroup">
             <label class="field-label">
-              <span class="field-icon">👷</span> Additional Helpers (Optional)
+              <span class="field-icon"><i data-lucide="circle"></i></span> Additional Helpers (Optional)
             </label>
             <select id="extraHelpers" class="field-input" onchange="calculateQuote(true)">
               <option value="0">No Extra Helper (Included)</option>
@@ -854,7 +855,7 @@
           </div>
 
           <div class="field-group">
-            <label class="field-label"><span class="field-icon">🏷️</span> Promo / Referral Code</label>
+            <label class="field-label"><span class="field-icon"><i data-lucide="circle"></i></span> Promo / Referral Code</label>
             <div class="promo-row">
               <input type="text" id="promoInput" class="promo-input" placeholder="ENTER CODE">
               <button class="btn-promo" onclick="applyPromoCode()">Apply</button>
@@ -862,19 +863,19 @@
             <div class="promo-msg" id="promoMsg"></div>
           </div>
           <div class="field-group">
-            <label class="field-label"><span class="field-icon">💳</span> Choose Payment</label>
+            <label class="field-label"><span class="field-icon"><i data-lucide="credit-card"></i></span> Choose Payment</label>
           </div>
           <div class="payment-opts">
             <div class="payment-opt" id="optAdvance" onclick="selectPayment('advance')">
-              <div class="po-icon">💰</div><div class="po-label">Advance</div>
+              <div class="po-icon"><i data-lucide="indian-rupee"></i></div><div class="po-label">Advance</div>
               <div class="po-amount" id="optAdvanceAmt">₹0</div><div class="po-note">10% now · rest on day</div>
             </div>
             <div class="payment-opt" id="optFull" onclick="selectPayment('full')">
-              <div class="po-icon">✅</div><div class="po-label">Pay Full</div>
+              <div class="po-icon"><i data-lucide="badge-check"></i></div><div class="po-label">Pay Full</div>
               <div class="po-amount" id="optFullAmt">₹0</div><div class="po-note">₹200 instant discount</div>
             </div>
             <div class="payment-opt selected" id="optAtDrop" onclick="selectPayment('at_drop')">
-              <div class="po-badge" style="background:#16a34a">✓ Active</div><div class="po-icon">🚚</div><div class="po-label">Pay Later</div>
+              <div class="po-badge" style="background:#16a34a"><i data-lucide="check"></i> Active</div><div class="po-icon"><i data-lucide="truck"></i></div><div class="po-label">Pay Later</div>
               <div class="po-amount" id="optAtDropAmt">₹0</div><div class="po-note">Cash on delivery</div>
             </div>
           </div>
@@ -883,17 +884,17 @@
             <span>I agree to the <a href="legal/terms.html" target="_blank" rel="noopener noreferrer">Terms &amp; Conditions</a> and <a href="legal/privacy.html" target="_blank" rel="noopener noreferrer">Privacy Policy</a></span>
           </label>
           <div class="book-actions">
-            <button id="btnPayOnline" class="btn-pay" style="display:none" onclick="startPayment()">💳 Pay Online</button>
-            <button id="dynamicBookingBtn" class="btn-pay" onclick="handleBookingAction()">📋 Confirm Booking · Pay on Delivery</button>
+            <button id="btnPayOnline" class="btn-pay" style="display:none" onclick="startPayment()"><i data-lucide="credit-card"></i> Pay Online</button>
+            <button id="dynamicBookingBtn" class="btn-pay" onclick="handleBookingAction()"><i data-lucide="clipboard-list"></i> Confirm Booking · Pay on Delivery</button>
           </div>
           <!-- BOOKING SUCCESS STATE -->
           <div id="bookingSuccessState" style="display:none;">
             <div class="booking-success-body">
-              <div class="bs-icon">🎉</div>
+              <div class="bs-icon"><i data-lucide="party-popper"></i></div>
               <div class="bs-title">Booking Confirmed!</div>
               <div class="bs-subtitle">Your move is scheduled. Track it live above.</div>
               <div class="bs-id">Booking ID: <strong id="bsBookingId">—</strong></div>
-              <button class="bs-track-btn" onclick="scrollToTrackBanner()">📦 Track My Booking ↑</button>
+              <button class="bs-track-btn" onclick="scrollToTrackBanner()"><i data-lucide="package"></i> Track My Booking ↑</button>
               <button class="bs-new-btn" onclick="startNewBooking()">+ Make Another Booking</button>
             </div>
           </div>
@@ -918,8 +919,8 @@
 <div id="authModal" class="modal-overlay" role="dialog" aria-modal="true" style="display:none;">
   <div class="modal-box auth-modal-box">
     <div class="auth-panel" id="panelLogin">
-      <button class="modal-x" onclick="closeAuthModal()">✕</button>
-      <div class="auth-logo">📦 PackZen</div>
+      <button class="modal-x" onclick="closeAuthModal()"><i data-lucide="x"></i></button>
+      <div class="auth-logo"><i data-lucide="package"></i> PackZen</div>
       <h2 class="auth-title">Welcome Back</h2>
       <p class="auth-sub">Login with your email and password</p>
       <label>Email</label>
@@ -929,7 +930,7 @@
       <div id="loginError" class="auth-error"></div>
       <button class="btn-auth" id="btnLogin" onclick="loginUser()">Login →</button>
       <div style="margin-top:15px;text-align:center;display:flex;flex-direction:column;gap:10px;">
-        <button onclick="signInWithGoogle()" class="btn-auth-outline" style="width:100%;">🔵 Continue with Google</button>
+        <button onclick="signInWithGoogle()" class="btn-auth-outline" style="width:100%;"><i data-lucide="circle"></i> Continue with Google</button>
         <button onclick="signInWithApple()" class="btn-auth-outline" style="width:100%;"> Continue with Apple</button>
       </div>
       <div class="auth-divider"><span>or</span></div>
@@ -938,8 +939,8 @@
     </div>
 
     <div class="auth-panel" id="panelSignup" style="display:none;">
-      <button class="modal-x" onclick="closeAuthModal()">✕</button>
-      <div class="auth-logo">📦 PackZen</div>
+      <button class="modal-x" onclick="closeAuthModal()"><i data-lucide="x"></i></button>
+      <div class="auth-logo"><i data-lucide="package"></i> PackZen</div>
       <h2 class="auth-title">Create Account</h2>
       <p class="auth-sub">Enter your details</p>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
@@ -960,8 +961,8 @@
     </div>
 
     <div class="auth-panel" id="panelRecover" style="display:none;">
-      <button class="modal-x" onclick="closeAuthModal()">✕</button>
-      <div class="auth-logo">🔑</div>
+      <button class="modal-x" onclick="closeAuthModal()"><i data-lucide="x"></i></button>
+      <div class="auth-logo"><i data-lucide="key"></i></div>
       <h2 class="auth-title">Reset Password</h2>
       <p class="auth-sub">Enter your email address to receive a password reset link.</p>
       <label>Email Address</label>
@@ -976,20 +977,20 @@
 <!-- DASHBOARD MODAL -->
 <div id="dashboardModal" class="modal-overlay" role="dialog" aria-modal="true" style="display:none;">
   <div class="modal-box dashboard-box">
-    <button class="modal-x" onclick="closeDashboard()">✕</button>
+    <button class="modal-x" onclick="closeDashboard()"><i data-lucide="x"></i></button>
     <div class="dashboard-header">
       <div class="dashboard-avatar" id="dashAvatar">U</div>
       <div><div class="dashboard-name" id="dashName">User</div><div class="dashboard-email" id="dashEmail"></div></div>
     </div>
     <div class="dash-tabs">
-      <button class="dash-tab active" onclick="switchDashTab('quotes',this)">📋 Quotes</button>
-      <button class="dash-tab" onclick="switchDashTab('bookings',this)">📦 Bookings</button>
-      <button class="dash-tab" onclick="switchDashTab('addresses',this)">📍 Addresses</button>
-      <button class="dash-tab" onclick="switchDashTab('invoices',this)">📄 Invoices</button>
+      <button class="dash-tab active" onclick="switchDashTab('quotes',this)"><i data-lucide="clipboard-list"></i> Quotes</button>
+      <button class="dash-tab" onclick="switchDashTab('bookings',this)"><i data-lucide="package"></i> Bookings</button>
+      <button class="dash-tab" onclick="switchDashTab('addresses',this)"><i data-lucide="map-pin"></i> Addresses</button>
+      <button class="dash-tab" onclick="switchDashTab('invoices',this)"><i data-lucide="file-text"></i> Invoices</button>
       <button class="dash-tab" onclick="switchDashTab('reviews',this)">⭐ Reviews</button>
-      <button class="dash-tab" onclick="switchDashTab('referral',this)">🎁 Referral</button>
-      <button class="dash-tab" onclick="switchDashTab('profile',this)">👤 Profile</button>
-      <button class="dash-tab" id="adminTabBtn" style="display:none;" onclick="switchDashTab('admin',this)">🛠 Admin</button>
+      <button class="dash-tab" onclick="switchDashTab('referral',this)"><i data-lucide="circle"></i> Referral</button>
+      <button class="dash-tab" onclick="switchDashTab('profile',this)"><i data-lucide="user-round"></i> Profile</button>
+      <button class="dash-tab" id="adminTabBtn" style="display:none;" onclick="switchDashTab('admin',this)"><i data-lucide="circle"></i> Admin</button>
     </div>
     <div class="dash-content" id="dashQuotes"><div id="quotesList" class="quotes-list"><div class="dash-empty">No saved quotes yet.</div></div></div>
     <div class="dash-content" id="dashBookings" style="display:none;"><div id="bookingsList" class="quotes-list"><div class="dash-empty">No bookings yet.</div></div></div>
@@ -1004,7 +1005,7 @@
     <div class="dash-content" id="dashReviews" style="display:none;"><div id="userReviewsList" class="quotes-list"><div class="dash-empty">You haven't submitted any reviews yet.</div></div></div>
     <div class="dash-content" id="dashReferral" style="display:none;">
       <div class="referral-box">
-        <div class="referral-title">🎁 Refer &amp; Earn</div>
+        <div class="referral-title"><i data-lucide="circle"></i> Refer &amp; Earn</div>
         <div class="referral-sub">Share your code. Your friend gets ₹500 off, you get ₹500 credit!</div>
         <div class="referral-code-row">
           <div class="referral-code-text" id="referralCodeText">LOADING</div>
@@ -1024,13 +1025,13 @@
       <input id="profileEmail" class="field-input" disabled>
       <label class="field-label">Phone</label>
       <input id="profilePhone" class="field-input" disabled>
-      <div class="notif-row"><span>📧 Email updates</span><label class="toggle"><input type="checkbox" id="prefEmail" onchange="savePreferences()"><span class="slider"></span></label></div>
-      <div class="notif-row"><span>📱 SMS updates</span><label class="toggle"><input type="checkbox" id="prefSMS" onchange="savePreferences()"><span class="slider"></span></label></div>
+      <div class="notif-row"><span><i data-lucide="mail"></i> Email updates</span><label class="toggle"><input type="checkbox" id="prefEmail" onchange="savePreferences()"><span class="slider"></span></label></div>
+      <div class="notif-row"><span><i data-lucide="circle"></i> SMS updates</span><label class="toggle"><input type="checkbox" id="prefSMS" onchange="savePreferences()"><span class="slider"></span></label></div>
       <button class="btn-auth" onclick="saveProfile()" style="margin-top:16px;">Save Profile</button>
       <div id="profileMsg" class="auth-error" style="margin-top:8px;"></div>
     </div>
     <div class="dash-content" id="dashAdmin" style="display:none;">
-      <h3 style="margin-bottom:16px;">🚚 Create New Driver</h3>
+      <h3 style="margin-bottom:16px;"><i data-lucide="truck"></i> Create New Driver</h3>
       <label class="field-label">Driver Name</label><input id="newDriverName" class="field-input" placeholder="Driver full name">
       <label class="field-label">Driver Email</label><input id="newDriverEmail" type="email" class="field-input" placeholder="driver@email.com">
       <label class="field-label">Driver Password</label><input id="newDriverPassword" type="password" class="field-input" placeholder="Strong password">
@@ -1044,12 +1045,12 @@
 <div id="cancelModal" class="modal-overlay" style="display:none;">
   <div class="modal-box action-modal">
     <div class="am-header cancel-header">
-      <div class="am-icon">✕</div>
+      <div class="am-icon"><i data-lucide="x"></i></div>
       <div><div class="am-title">Cancel Booking</div><div class="am-ref" id="cancelBookingRef"></div></div>
-      <button class="modal-close" onclick="closeCancelModal()">✕</button>
+      <button class="modal-close" onclick="closeCancelModal()"><i data-lucide="x"></i></button>
     </div>
     <div class="am-body">
-      <p class="am-warning">⚠️ Cancellations after driver assignment may incur a <strong>₹300 fee</strong>. Refunds processed in 5–7 business days.</p>
+      <p class="am-warning"><i data-lucide="triangle-alert"></i> Cancellations after driver assignment may incur a <strong>₹300 fee</strong>. Refunds processed in 5–7 business days.</p>
       <input type="hidden" id="cancelBookingDocId">
       <label class="field-label">Reason for cancellation <span style="color:#dc2626">*</span></label>
       <select id="cancelReason" class="field-input">
@@ -1073,9 +1074,9 @@
 <div id="rescheduleModal" class="modal-overlay" style="display:none;">
   <div class="modal-box action-modal">
     <div class="am-header reschedule-header">
-      <div class="am-icon">📅</div>
+      <div class="am-icon"><i data-lucide="calendar-days"></i></div>
       <div><div class="am-title">Reschedule Booking</div><div class="am-ref" id="rescheduleBookingRef"></div></div>
-      <button class="modal-close" onclick="closeRescheduleModal()">✕</button>
+      <button class="modal-close" onclick="closeRescheduleModal()"><i data-lucide="x"></i></button>
     </div>
     <div class="am-body">
       <input type="hidden" id="rescheduleDocId">
@@ -1098,16 +1099,16 @@
     <div class="am-header rate-header">
       <div class="am-icon" style="background:var(--gold-tint);color:var(--gold);">⭐</div>
       <div><div class="am-title">Rate Your Driver</div><div class="am-ref" id="rateBookingRef"></div></div>
-      <button class="modal-close" onclick="closeRateDriverModal()">✕</button>
+      <button class="modal-close" onclick="closeRateDriverModal()"><i data-lucide="x"></i></button>
     </div>
     <div class="am-body">
       <p style="text-align:center;margin-bottom:1rem;font-size:.9rem;">How was <strong id="rateDriverName">your driver</strong>?</p>
       <div class="star-row">
-        <span class="rate-star" onclick="selectDriverRating(1)">★</span>
-        <span class="rate-star" onclick="selectDriverRating(2)">★</span>
-        <span class="rate-star" onclick="selectDriverRating(3)">★</span>
-        <span class="rate-star" onclick="selectDriverRating(4)">★</span>
-        <span class="rate-star" onclick="selectDriverRating(5)">★</span>
+        <span class="rate-star" onclick="selectDriverRating(1)"><i data-lucide="star"></i></span>
+        <span class="rate-star" onclick="selectDriverRating(2)"><i data-lucide="star"></i></span>
+        <span class="rate-star" onclick="selectDriverRating(3)"><i data-lucide="star"></i></span>
+        <span class="rate-star" onclick="selectDriverRating(4)"><i data-lucide="star"></i></span>
+        <span class="rate-star" onclick="selectDriverRating(5)"><i data-lucide="star"></i></span>
       </div>
       <label class="field-label" style="margin-top:.8rem">Comments (optional)</label>
       <textarea id="ratingFeedback" class="field-input" rows="3" placeholder="What did you like or dislike?"></textarea>
@@ -1124,12 +1125,12 @@
 <div id="damageModal" class="modal-overlay" style="display:none;">
   <div class="modal-box action-modal">
     <div class="am-header" style="background:linear-gradient(135deg,#7c3aed,#6d28d9)">
-      <div class="am-icon" style="background:rgba(255,255,255,0.2);color:white;">🔧</div>
+      <div class="am-icon" style="background:rgba(255,255,255,0.2);color:white;"><i data-lucide="wrench"></i></div>
       <div><div class="am-title" style="color:white;">Report Damage / Claim</div><div class="am-ref" id="damageBookingRef" style="color:rgba(255,255,255,0.7);"></div></div>
-      <button class="modal-close" onclick="closeDamageModal()" style="background:rgba(255,255,255,0.2);color:white;">✕</button>
+      <button class="modal-close" onclick="closeDamageModal()" style="background:rgba(255,255,255,0.2);color:white;"><i data-lucide="x"></i></button>
     </div>
     <div class="am-body">
-      <div class="am-warning">⚠️ Claims must be reported within <strong>24 hours</strong> of delivery.</div>
+      <div class="am-warning"><i data-lucide="triangle-alert"></i> Claims must be reported within <strong>24 hours</strong> of delivery.</div>
       <label class="field-label" style="margin-top:.5rem">Type of Damage <span style="color:#dc2626">*</span></label>
       <select id="damageType" class="field-input" style="margin-bottom:.9rem">
         <option value="">Select damage type</option>
@@ -1144,7 +1145,7 @@
       <textarea id="damageDesc" class="field-input" rows="3" placeholder="Which item was damaged? How did it happen?" style="margin-bottom:.9rem"></textarea>
       <label class="field-label">Upload Photos (max 5)</label>
       <div class="damage-upload-area" onclick="document.getElementById('damagePhotosInput').click()">
-        <div style="font-size:1.5rem;margin-bottom:4px;">📸</div>
+        <div style="font-size:1.5rem;margin-bottom:4px;"><i data-lucide="camera"></i></div>
         <div style="font-size:.82rem;color:var(--text-muted);">Tap to upload damage photos</div>
       </div>
       <input type="file" id="damagePhotosInput" multiple accept="image/*" style="display:none" onchange="previewDamagePhotos(this)">
@@ -1175,26 +1176,26 @@
         class="modal-x"
         onclick="closeTrackingModal()"
         title="Close">
-        ✕
+        <i data-lucide="x"></i>
       </button>
 
     </div>
     <div class="tracking-header">
-      <div style="font-family: 'Space Grotesk',sans-serif;font-size:1.2rem;font-weight:800;color:var(--text);">📍 Track My Move</div>
+      <div style="font-family: 'Space Grotesk',sans-serif;font-size:1.2rem;font-weight:800;color:var(--text);"><i data-lucide="map-pin"></i> Track My Move</div>
       <div class="tracking-id" id="trackingBookingId">Booking #---</div>
     </div>
     <div class="tracking-status-bar">
-      <div class="ts-step"><div class="ts-dot done" id="ts0">✓</div><div class="ts-label">Booked</div></div>
-      <div class="ts-step"><div class="ts-dot" id="ts1">🚛</div><div class="ts-label">Assigned</div></div>
-      <div class="ts-step"><div class="ts-dot" id="ts2">📍</div><div class="ts-label">En Route</div></div>
-      <div class="ts-step"><div class="ts-dot" id="ts3">🏠</div><div class="ts-label">At Pickup</div></div>
-      <div class="ts-step"><div class="ts-dot" id="ts4">📦</div><div class="ts-label">Loading</div></div>
-      <div class="ts-step"><div class="ts-dot" id="ts5">🚚</div><div class="ts-label">Transit</div></div>
-      <div class="ts-step"><div class="ts-dot" id="ts6">🏁</div><div class="ts-label">At Drop</div></div>
-      <div class="ts-step"><div class="ts-dot" id="ts7">📥</div><div class="ts-label">Unloading</div></div>
-      <div class="ts-step"><div class="ts-dot" id="ts8">🎉</div><div class="ts-label">Completed</div></div>
+      <div class="ts-step"><div class="ts-dot done" id="ts0"><i data-lucide="check"></i></div><div class="ts-label">Booked</div></div>
+      <div class="ts-step"><div class="ts-dot" id="ts1"><i data-lucide="truck"></i></div><div class="ts-label">Assigned</div></div>
+      <div class="ts-step"><div class="ts-dot" id="ts2"><i data-lucide="map-pin"></i></div><div class="ts-label">En Route</div></div>
+      <div class="ts-step"><div class="ts-dot" id="ts3"><i data-lucide="house"></i></div><div class="ts-label">At Pickup</div></div>
+      <div class="ts-step"><div class="ts-dot" id="ts4"><i data-lucide="package"></i></div><div class="ts-label">Loading</div></div>
+      <div class="ts-step"><div class="ts-dot" id="ts5"><i data-lucide="truck"></i></div><div class="ts-label">Transit</div></div>
+      <div class="ts-step"><div class="ts-dot" id="ts6"><i data-lucide="flag"></i></div><div class="ts-label">At Drop</div></div>
+      <div class="ts-step"><div class="ts-dot" id="ts7"><i data-lucide="circle"></i></div><div class="ts-label">Unloading</div></div>
+      <div class="ts-step"><div class="ts-dot" id="ts8"><i data-lucide="party-popper"></i></div><div class="ts-label">Completed</div></div>
     </div>
-    <div class="tracking-map-area" id="trackingMapDiv"><span>📍 Driver location appears here once assigned</span></div>
+    <div class="tracking-map-area" id="trackingMapDiv"><span><i data-lucide="map-pin"></i> Driver location appears here once assigned</span></div>
     <div class="tracking-info">
       <div class="ti-row"><span class="ti-lbl">Status</span><span class="ti-val" id="trackStatus">Confirmed</span></div>
       <div class="ti-row"><span class="ti-lbl">Vehicle</span><span class="ti-val" id="trackVehicle">—</span></div>
@@ -1208,7 +1209,7 @@
       <div class="ti-row"><span class="ti-lbl">Last Updated</span><span class="ti-val" id="trackLastUpdated">—</span></div>
       <div class="ti-row" id="rowTrackCompletedAt" style="display:none;"><span class="ti-lbl">Completed</span><span class="ti-val" id="trackCompletedAt">—</span></div>
     </div>
-    <button class="btn-open-chat" onclick="closeTrackingModal();openChatModal()">💬 Chat with Driver</button>
+    <button class="btn-open-chat" onclick="closeTrackingModal();openChatModal()"><i data-lucide="message-circle"></i> Chat with Driver</button>
   </div>
 </div>
 
@@ -1216,12 +1217,12 @@
 <div id="chatModal" class="modal-overlay" style="display:none;">
   <div class="modal-box chat-box">
     <div class="chat-header">
-      <div class="chat-drv-avatar" id="chatDrvAvatar">🚚</div>
+      <div class="chat-drv-avatar" id="chatDrvAvatar"><i data-lucide="truck"></i></div>
       <div style="flex:1"><div class="chat-hdr-title" id="chatDrvName">Your Driver</div><div class="chat-hdr-sub" id="chatDrvStatus">Online</div></div>
-      <button class="chat-close-btn" onclick="closeChatModal()">✕</button>
+      <button class="chat-close-btn" onclick="closeChatModal()"><i data-lucide="x"></i></button>
     </div>
     <div class="chat-messages" id="chatMessages">
-      <div class="chat-empty-msg">💬 No messages yet.<br>Your driver will appear here once assigned.</div>
+      <div class="chat-empty-msg"><i data-lucide="message-circle"></i> No messages yet.<br>Your driver will appear here once assigned.</div>
     </div>
     <div class="chat-input-row">
       <input type="text" class="chat-text-input" id="chatInput" placeholder="Type a message..." onkeydown="if(event.key==='Enter')sendChatMessage()">
@@ -1235,8 +1236,8 @@
 <!-- CHECKLIST MODAL -->
 <div id="checklistModal" class="modal-overlay" style="display:none;">
   <div class="modal-box checklist-box">
-    <button class="modal-x" onclick="closeChecklist()">✕</button>
-    <div class="modal-icon">✅</div>
+    <button class="modal-x" onclick="closeChecklist()"><i data-lucide="x"></i></button>
+    <div class="modal-icon"><i data-lucide="badge-check"></i></div>
     <h2 class="modal-title">Moving Checklist</h2>
     <div class="cl-progress"><div class="cl-progress-bar" id="clProgressBar" style="width:0%"></div></div>
     <div class="cl-score">Completed: <strong id="clScore">0 / 0</strong> tasks</div>
@@ -1247,16 +1248,16 @@
 <!-- REVIEW MODAL -->
 <div id="reviewModal" class="modal-overlay" style="display:none;">
   <div class="modal-box review-modal-box">
-    <button class="modal-x" onclick="closeReviewModal()">✕</button>
+    <button class="modal-x" onclick="closeReviewModal()"><i data-lucide="x"></i></button>
     <div class="modal-icon">⭐</div>
     <h2 class="modal-title">Leave a Review</h2>
-    <p class="modal-sub">Your feedback helps us grow and serve Bangalore better. 🙏</p>
+    <p class="modal-sub">Your feedback helps us grow and serve Bangalore better. <i data-lucide="circle"></i></p>
     <div class="star-row" id="starRow">
-      <button class="star-btn" onclick="setRating(1)">★</button>
-      <button class="star-btn" onclick="setRating(2)">★</button>
-      <button class="star-btn" onclick="setRating(3)">★</button>
-      <button class="star-btn" onclick="setRating(4)">★</button>
-      <button class="star-btn" onclick="setRating(5)">★</button>
+      <button class="star-btn" onclick="setRating(1)"><i data-lucide="star"></i></button>
+      <button class="star-btn" onclick="setRating(2)"><i data-lucide="star"></i></button>
+      <button class="star-btn" onclick="setRating(3)"><i data-lucide="star"></i></button>
+      <button class="star-btn" onclick="setRating(4)"><i data-lucide="star"></i></button>
+      <button class="star-btn" onclick="setRating(5)"><i data-lucide="star"></i></button>
     </div>
     <label class="field-label">Your Review</label>
     <textarea id="reviewText" class="field-input" rows="4" placeholder="Tell us about your experience..." style="resize:vertical"></textarea>
@@ -1281,7 +1282,7 @@
         <div class="cc-title" id="ccTitle">Booking Confirmed!</div>
         <div class="cc-subtitle" id="ccSubtitle">We'll call you within 30 minutes</div>
       </div>
-      <button class="cc-close" onclick="closeModal()">✕</button>
+      <button class="cc-close" onclick="closeModal()"><i data-lucide="x"></i></button>
     </div>
     <div class="cc-id-strip">
       <div class="cc-id-left">
@@ -1294,15 +1295,15 @@
       </button>
     </div>
     <div class="cc-compact">
-      <div class="cc-compact-row"><span class="cc-compact-icon">📅</span><span class="cc-compact-val" id="ccDate">—</span></div>
+      <div class="cc-compact-row"><span class="cc-compact-icon"><i data-lucide="calendar-days"></i></span><span class="cc-compact-val" id="ccDate">—</span></div>
       <div class="cc-compact-row">
-        <span class="cc-compact-icon">📍</span>
+        <span class="cc-compact-icon"><i data-lucide="map-pin"></i></span>
         <span class="cc-compact-val" id="ccPickupShort">—</span>
         <span style="margin:0 .3rem;color:var(--text-muted)">→</span>
         <span class="cc-compact-val" id="ccDropShort">—</span>
       </div>
       <div class="cc-compact-row">
-        <span class="cc-compact-icon">💰</span>
+        <span class="cc-compact-icon"><i data-lucide="indian-rupee"></i></span>
         <span class="cc-compact-val cc-amount-inline" id="ccAmount">₹0</span>
         <span class="cc-compact-note" id="ccPriceNote">Pay on delivery</span>
       </div>
@@ -1315,11 +1316,11 @@
         <div class="cc-loc"><div class="cc-loc-dot drop"></div><div class="cc-loc-text" id="ccDrop">—</div></div>
       </div>
       <div class="cc-meta-grid">
-        <div class="cc-meta-item"><div class="cc-meta-icon">👤</div><div><div class="cc-meta-label">Customer</div><div class="cc-meta-val" id="ccName">—</div></div></div>
-        <div class="cc-meta-item"><div class="cc-meta-icon">📞</div><div><div class="cc-meta-label">Phone</div><div class="cc-meta-val" id="ccPhone">—</div></div></div>
-        <div class="cc-meta-item"><div class="cc-meta-icon">🏠</div><div><div class="cc-meta-label">House Type</div><div class="cc-meta-val" id="ccHouse">—</div></div></div>
-        <div class="cc-meta-item"><div class="cc-meta-icon">🚛</div><div><div class="cc-meta-label">Vehicle</div><div class="cc-meta-val" id="ccVehicle">—</div></div></div>
-        <div class="cc-meta-item"><div class="cc-meta-icon">💳</div><div><div class="cc-meta-label">Payment</div><div class="cc-meta-val" id="ccPayment">—</div></div></div>
+        <div class="cc-meta-item"><div class="cc-meta-icon"><i data-lucide="user-round"></i></div><div><div class="cc-meta-label">Customer</div><div class="cc-meta-val" id="ccName">—</div></div></div>
+        <div class="cc-meta-item"><div class="cc-meta-icon"><i data-lucide="phone"></i></div><div><div class="cc-meta-label">Phone</div><div class="cc-meta-val" id="ccPhone">—</div></div></div>
+        <div class="cc-meta-item"><div class="cc-meta-icon"><i data-lucide="house"></i></div><div><div class="cc-meta-label">House Type</div><div class="cc-meta-val" id="ccHouse">—</div></div></div>
+        <div class="cc-meta-item"><div class="cc-meta-icon"><i data-lucide="truck"></i></div><div><div class="cc-meta-label">Vehicle</div><div class="cc-meta-val" id="ccVehicle">—</div></div></div>
+        <div class="cc-meta-item"><div class="cc-meta-icon"><i data-lucide="credit-card"></i></div><div><div class="cc-meta-label">Payment</div><div class="cc-meta-val" id="ccPayment">—</div></div></div>
       </div>
     </div>
     <div class="cc-actions">
@@ -1335,7 +1336,7 @@
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
         Email
       </button>
-      <button class="cc-btn-close-action" onclick="closeModal()">✕ Close</button>
+      <button class="cc-btn-close-action" onclick="closeModal()"><i data-lucide="x"></i> Close</button>
     </div>
   </div>
 </div>
@@ -1344,8 +1345,8 @@
 <!-- NEW PASSWORD MODAL -->
 <div id="newPasswordModal" class="modal-overlay" style="display:none; align-items:center; justify-content:center; z-index:99999;">
   <div class="auth-panel" style="display:flex; flex-direction:column; position:relative; max-width:400px; width:90%; background:var(--panel-bg, #fff);">
-    <button class="modal-x" onclick="closeNewPasswordModal()">✕</button>
-    <div class="auth-logo">🔑</div>
+    <button class="modal-x" onclick="closeNewPasswordModal()"><i data-lucide="x"></i></button>
+    <div class="auth-logo"><i data-lucide="key"></i></div>
     <h2 class="auth-title">Create New Password</h2>
     <p class="auth-sub">Set a new password for <strong id="newPasswordEmailDisplay"></strong>.</p>
     <label>New Password</label>

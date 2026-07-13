@@ -223,6 +223,7 @@
       .refund-table td, .refund-table th { padding: 0.5rem 0.6rem; }
     }
   </style>
+  <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
 
@@ -234,14 +235,14 @@
     </a>
     <div class="nav-links">
       <a href="../index.html">← Back to Home</a>
-      <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Toggle theme">🌙</button>
+      <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Toggle theme"><i data-lucide="moon"></i></button>
     </div>
   </div>
 </nav>
 
 <!-- HERO -->
 <div class="legal-hero">
-  <h1>📄 Privacy Policy</h1>
+  <h1><i data-lucide="file-text"></i> Privacy Policy</h1>
   <p>Last updated: February 2026 &nbsp;·&nbsp; PackZen Packers & Movers, Bangalore</p>
 </div>
 
@@ -256,7 +257,7 @@
 PRIVACY POLICY
   ═══════════════════════════════════════ -->
   <div class="legal-section active" style="display:block" id="legal-privacy">
-    <span class="legal-updated">📅 Effective: 1 February 2026</span>
+    <span class="legal-updated"><i data-lucide="calendar-days"></i> Effective: 1 February 2026</span>
     <h2>Privacy Policy</h2>
     <p>PackZen respects your privacy. This policy explains what data we collect, how we use it, and your rights over it. We comply with India's Information Technology Act, 2000 and the Digital Personal Data Protection Act, 2023.</p>
 
@@ -291,7 +292,7 @@ PRIVACY POLICY
     </ul>
 
     <div class="success-box">
-      ✅ <strong>We never sell your data</strong> to third parties. We never share your data with advertisers.
+      <i data-lucide="badge-check"></i> <strong>We never sell your data</strong> to third parties. We never share your data with advertisers.
     </div>
 
     <h3>3. Data Sharing</h3>
@@ -341,9 +342,9 @@ PRIVACY POLICY
     <h3>9. Contact for Privacy</h3>
     <p>For any privacy-related concerns, data requests, or to report a data breach:</p>
     <ul>
-      <li>📧 Email: <a href="mailto:support@packzenblr.in" style="color:#2563eb">support@packzenblr.in</a></li>
-      <li>💬 WhatsApp: <a href="https://wa.me/919945095453" style="color:#2563eb">+91 99450 95453</a></li>
-      <li>📍 Address: HSR Layout, Bangalore — 560102, Karnataka, India</li>
+      <li><i data-lucide="mail"></i> Email: <a href="mailto:support@packzenblr.in" style="color:#2563eb">support@packzenblr.in</a></li>
+      <li> WhatsApp: <a href="https://wa.me/919945095453" style="color:#2563eb">+91 99450 95453</a></li>
+      <li><i data-lucide="map-pin"></i> Address: HSR Layout, Bangalore — 560102, Karnataka, India</li>
     </ul>
 
     <div class="contact-card">
@@ -352,8 +353,8 @@ PRIVACY POLICY
         <p>We take data protection seriously and respond within 24 hours</p>
       </div>
       <div class="contact-card-btns">
-        <a href="mailto:support@packzenblr.in" class="btn-wa" style="background:#0057ff">📧 Email Us</a>
-        <a href="https://wa.me/919945095453" class="btn-tel">💬 WhatsApp</a>
+        <a href="mailto:support@packzenblr.in" class="btn-wa" style="background:#0057ff"><i data-lucide="mail"></i> Email Us</a>
+        <a href="https://wa.me/919945095453" class="btn-tel"> WhatsApp</a>
       </div>
     </div>
 </div>
@@ -362,13 +363,13 @@ PRIVACY POLICY
 <footer class="footer">
   <div class="footer-inner">
     <div class="footer-brand">
-      <div class="footer-logo">📦 Pack<span>Zen</span></div>
+      <div class="footer-logo"><i data-lucide="package"></i> Pack<span>Zen</span></div>
       <p>Bangalore's trusted packers & movers. Safe, reliable, affordable.</p>
     </div>
     <div class="footer-info">
-      <div class="footer-detail">📍 HSR Layout, Bangalore</div>
-      <div class="footer-detail">📞 <a href="tel:9945095453">9945095453</a></div>
-      <div class="footer-detail">💬 <a href="https://wa.me/919945095453">WhatsApp Us</a></div>
+      <div class="footer-detail"><i data-lucide="map-pin"></i> HSR Layout, Bangalore</div>
+      <div class="footer-detail"><i data-lucide="phone"></i> <a href="tel:9945095453">9945095453</a></div>
+      <div class="footer-detail"> <a href="https://wa.me/919945095453">WhatsApp Us</a></div>
     </div>
   </div>
   <div class="footer-bottom">
@@ -381,11 +382,11 @@ PRIVACY POLICY
   function toggleTheme() {
     const isDark = document.body.classList.toggle("dark-mode");
     localStorage.setItem("packzen-theme", isDark ? "dark" : "light");
-    document.getElementById("themeToggle").textContent = isDark ? "☀️" : "🌙";
+    document.getElementById("themeToggle").textContent = isDark ? "" : "";
   }
   if (localStorage.getItem("packzen-theme") === "dark") {
     document.body.classList.add("dark-mode");
-    document.getElementById("themeToggle").textContent = "☀️";
+    document.getElementById("themeToggle").textContent = "";
   }
 
   </script>

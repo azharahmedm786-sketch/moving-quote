@@ -175,7 +175,7 @@
   border-color: var(--green-600); background: var(--green-50);
   box-shadow: 0 0 0 3px rgba(34,197,94,0.12);
 }
-.vt-chip.selected::after { content: '✓'; margin-left: auto; color: var(--green-600); font-weight: 800; }
+.vt-chip.selected::after { content: '<i data-lucide="check"></i>'; margin-left: auto; color: var(--green-600); font-weight: 800; }
 .vt-icon { font-size: 1.2rem; }
 
 /* Service area chips */
@@ -242,6 +242,7 @@
 .pw-strength.strong { background: var(--green-500); width: 100%; }
 .pw-strength-label  { font-size: 0.68rem; color: var(--text-muted); margin-top: 3px; }
 </style>
+  <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body class="app-body partner-body">
 
@@ -294,20 +295,20 @@
   <div class="reg-step active" id="regStep1">
     <div class="reg-card">
       <div class="reg-card-header">
-        <div class="reg-card-icon">🔐</div>
+        <div class="reg-card-icon"><i data-lucide="lock"></i></div>
         <div class="reg-card-title">Create Your Account</div>
         <div class="reg-card-sub">Your login credentials for the PackZen Partner Portal.</div>
       </div>
       <div class="reg-card-body">
 
         <div class="field-group">
-          <label class="field-label" for="regEmail"><span class="field-icon">✉️</span> Email Address <span aria-hidden="true" style="color:#dc2626">*</span></label>
+          <label class="field-label" for="regEmail"><span class="field-icon"><i data-lucide="mail"></i></span> Email Address <span aria-hidden="true" style="color:#dc2626">*</span></label>
           <input type="email" id="regEmail" class="field-input" placeholder="you@example.com" autocomplete="email" required>
           <div class="field-error" id="errEmail">Please enter a valid email address.</div>
         </div>
 
         <div class="field-group">
-          <label class="field-label" for="regPassword"><span class="field-icon">🔒</span> Password <span aria-hidden="true" style="color:#dc2626">*</span></label>
+          <label class="field-label" for="regPassword"><span class="field-icon"><i data-lucide="circle"></i></span> Password <span aria-hidden="true" style="color:#dc2626">*</span></label>
           <input type="password" id="regPassword" class="field-input" placeholder="Min. 8 characters" autocomplete="new-password" required oninput="checkPasswordStrength(this.value)">
           <div class="pw-strength" id="pwStrengthBar" style="width:0;background:transparent"></div>
           <div class="pw-strength-label" id="pwStrengthLabel"></div>
@@ -315,7 +316,7 @@
         </div>
 
         <div class="field-group">
-          <label class="field-label" for="regConfirmPassword"><span class="field-icon">🔒</span> Confirm Password <span aria-hidden="true" style="color:#dc2626">*</span></label>
+          <label class="field-label" for="regConfirmPassword"><span class="field-icon"><i data-lucide="circle"></i></span> Confirm Password <span aria-hidden="true" style="color:#dc2626">*</span></label>
           <input type="password" id="regConfirmPassword" class="field-input" placeholder="Re-enter password" autocomplete="new-password" required>
           <div class="field-error" id="errConfirmPassword">Passwords do not match.</div>
         </div>
@@ -340,32 +341,32 @@
   <div class="reg-step" id="regStep2">
     <div class="reg-card">
       <div class="reg-card-header">
-        <div class="reg-card-icon">🏢</div>
+        <div class="reg-card-icon"><i data-lucide="building-2"></i></div>
         <div class="reg-card-title">Business Information</div>
         <div class="reg-card-sub">Tell us about your moving business.</div>
       </div>
       <div class="reg-card-body">
 
         <div class="field-group">
-          <label class="field-label" for="bizName"><span class="field-icon">🏢</span> Business / Brand Name <span aria-hidden="true" style="color:#dc2626">*</span></label>
+          <label class="field-label" for="bizName"><span class="field-icon"><i data-lucide="building-2"></i></span> Business / Brand Name <span aria-hidden="true" style="color:#dc2626">*</span></label>
           <input type="text" id="bizName" class="field-input" placeholder="e.g. Ravi Movers" autocomplete="organization" required>
           <div class="field-error" id="errBizName">Please enter your business name.</div>
         </div>
 
         <div class="field-group">
-          <label class="field-label"><span class="field-icon">🚚</span> Business Type <span aria-hidden="true" style="color:#dc2626">*</span></label>
+          <label class="field-label"><span class="field-icon"><i data-lucide="truck"></i></span> Business Type <span aria-hidden="true" style="color:#dc2626">*</span></label>
           <div class="vehicle-type-grid" id="bizTypeGrid">
-            <div class="vt-chip" data-value="packers_movers" onclick="selectBizType(this)"><span class="vt-icon">🏢</span> Packers & Movers</div>
-            <div class="vt-chip" data-value="individual_mover" onclick="selectBizType(this)"><span class="vt-icon">🧑‍🔧</span> Individual Mover</div>
-            <div class="vt-chip" data-value="vehicle_owner" onclick="selectBizType(this)"><span class="vt-icon">🚛</span> Vehicle Owner</div>
-            <div class="vt-chip" data-value="loading_team" onclick="selectBizType(this)"><span class="vt-icon">👷</span> Loading Team</div>
+            <div class="vt-chip" data-value="packers_movers" onclick="selectBizType(this)"><span class="vt-icon"><i data-lucide="building-2"></i></span> Packers & Movers</div>
+            <div class="vt-chip" data-value="individual_mover" onclick="selectBizType(this)"><span class="vt-icon">🧑‍<i data-lucide="wrench"></i></span> Individual Mover</div>
+            <div class="vt-chip" data-value="vehicle_owner" onclick="selectBizType(this)"><span class="vt-icon"><i data-lucide="truck"></i></span> Vehicle Owner</div>
+            <div class="vt-chip" data-value="loading_team" onclick="selectBizType(this)"><span class="vt-icon"><i data-lucide="circle"></i></span> Loading Team</div>
           </div>
           <input type="hidden" id="bizType">
           <div class="field-error" id="errBizType">Please select a business type.</div>
         </div>
 
         <div class="field-group">
-          <label class="field-label" for="bizYears"><span class="field-icon">📅</span> Years in Business</label>
+          <label class="field-label" for="bizYears"><span class="field-icon"><i data-lucide="calendar-days"></i></span> Years in Business</label>
           <select id="bizYears" class="field-input">
             <option value="">Select experience</option>
             <option value="0">Less than 1 year</option>
@@ -377,7 +378,7 @@
         </div>
 
         <div class="field-group">
-          <label class="field-label"><span class="field-icon">📍</span> Service Areas <span aria-hidden="true" style="color:#dc2626">*</span></label>
+          <label class="field-label"><span class="field-icon"><i data-lucide="map-pin"></i></span> Service Areas <span aria-hidden="true" style="color:#dc2626">*</span></label>
           <div class="area-select-wrap" id="areaChipsWrap">
             <div class="area-select-chip" data-area="HSR Layout"        onclick="toggleArea(this)">HSR Layout</div>
             <div class="area-select-chip" data-area="Koramangala"       onclick="toggleArea(this)">Koramangala</div>
@@ -409,7 +410,7 @@
   <div class="reg-step" id="regStep3">
     <div class="reg-card">
       <div class="reg-card-header">
-        <div class="reg-card-icon">👤</div>
+        <div class="reg-card-icon"><i data-lucide="user-round"></i></div>
         <div class="reg-card-title">Owner Details</div>
         <div class="reg-card-sub">Your personal information as the account holder.</div>
       </div>
@@ -428,7 +429,7 @@
         <div class="field-error" id="errOwnerName">Please enter your full name.</div>
 
         <div class="field-group">
-          <label class="field-label" for="ownerPhone"><span class="field-icon">📞</span> Mobile Number <span aria-hidden="true" style="color:#dc2626">*</span></label>
+          <label class="field-label" for="ownerPhone"><span class="field-icon"><i data-lucide="phone"></i></span> Mobile Number <span aria-hidden="true" style="color:#dc2626">*</span></label>
           <div class="phone-row">
             <span class="phone-prefix">+91</span>
             <input type="tel" id="ownerPhone" class="field-input" style="flex:1" placeholder="10-digit mobile" maxlength="10" inputmode="numeric" autocomplete="tel" required>
@@ -437,18 +438,18 @@
         </div>
 
         <div class="field-group">
-          <label class="field-label" for="ownerDob"><span class="field-icon">🎂</span> Date of Birth</label>
+          <label class="field-label" for="ownerDob"><span class="field-icon"><i data-lucide="circle"></i></span> Date of Birth</label>
           <input type="date" id="ownerDob" class="field-input" max="">
         </div>
 
         <div class="field-group">
-          <label class="field-label" for="ownerAddress"><span class="field-icon">🏠</span> Residential Address <span aria-hidden="true" style="color:#dc2626">*</span></label>
+          <label class="field-label" for="ownerAddress"><span class="field-icon"><i data-lucide="house"></i></span> Residential Address <span aria-hidden="true" style="color:#dc2626">*</span></label>
           <textarea id="ownerAddress" class="field-input" rows="3" placeholder="Door no., Street, Area, City, PIN" style="resize:vertical" required></textarea>
           <div class="field-error" id="errOwnerAddress">Please enter your address.</div>
         </div>
 
         <div class="field-group">
-          <label class="field-label" for="ownerPincode"><span class="field-icon">📮</span> PIN Code</label>
+          <label class="field-label" for="ownerPincode"><span class="field-icon"><i data-lucide="circle"></i></span> PIN Code</label>
           <input type="text" id="ownerPincode" class="field-input" placeholder="560001" maxlength="6" inputmode="numeric">
         </div>
 
@@ -462,28 +463,28 @@
   <div class="reg-step" id="regStep4">
     <div class="reg-card">
       <div class="reg-card-header">
-        <div class="reg-card-icon">🚚</div>
+        <div class="reg-card-icon"><i data-lucide="truck"></i></div>
         <div class="reg-card-title">Vehicle Information</div>
         <div class="reg-card-sub">Tell us about the vehicles you operate with.</div>
       </div>
       <div class="reg-card-body">
 
         <div class="field-group">
-          <label class="field-label"><span class="field-icon">🚛</span> Primary Vehicle Type <span aria-hidden="true" style="color:#dc2626">*</span></label>
+          <label class="field-label"><span class="field-icon"><i data-lucide="truck"></i></span> Primary Vehicle Type <span aria-hidden="true" style="color:#dc2626">*</span></label>
           <div class="vehicle-type-grid">
-            <div class="vt-chip" data-value="tata_ace"    onclick="selectVehicleType(this)"><span class="vt-icon">🛻</span> Tata Ace</div>
-            <div class="vt-chip" data-value="mini_truck"  onclick="selectVehicleType(this)"><span class="vt-icon">🚐</span> Mini Truck</div>
-            <div class="vt-chip" data-value="14ft_truck"  onclick="selectVehicleType(this)"><span class="vt-icon">🚚</span> 14 ft Truck</div>
-            <div class="vt-chip" data-value="17ft_truck"  onclick="selectVehicleType(this)"><span class="vt-icon">🚛</span> 17 ft Truck</div>
-            <div class="vt-chip" data-value="22ft_truck"  onclick="selectVehicleType(this)"><span class="vt-icon">🚜</span> 22 ft Truck</div>
-            <div class="vt-chip" data-value="tempo"       onclick="selectVehicleType(this)"><span class="vt-icon">🚌</span> Tempo</div>
+            <div class="vt-chip" data-value="tata_ace"    onclick="selectVehicleType(this)"><span class="vt-icon"><i data-lucide="circle"></i></span> Tata Ace</div>
+            <div class="vt-chip" data-value="mini_truck"  onclick="selectVehicleType(this)"><span class="vt-icon"><i data-lucide="circle"></i></span> Mini Truck</div>
+            <div class="vt-chip" data-value="14ft_truck"  onclick="selectVehicleType(this)"><span class="vt-icon"><i data-lucide="truck"></i></span> 14 ft Truck</div>
+            <div class="vt-chip" data-value="17ft_truck"  onclick="selectVehicleType(this)"><span class="vt-icon"><i data-lucide="truck"></i></span> 17 ft Truck</div>
+            <div class="vt-chip" data-value="22ft_truck"  onclick="selectVehicleType(this)"><span class="vt-icon"><i data-lucide="circle"></i></span> 22 ft Truck</div>
+            <div class="vt-chip" data-value="tempo"       onclick="selectVehicleType(this)"><span class="vt-icon"><i data-lucide="circle"></i></span> Tempo</div>
           </div>
           <input type="hidden" id="vehicleType">
           <div class="field-error" id="errVehicleType">Please select a vehicle type.</div>
         </div>
 
         <div class="field-group">
-          <label class="field-label" for="vehicleMake"><span class="field-icon">🏭</span> Vehicle Make / Model</label>
+          <label class="field-label" for="vehicleMake"><span class="field-icon"><i data-lucide="factory"></i></span> Vehicle Make / Model</label>
           <input type="text" id="vehicleMake" class="field-input" placeholder="e.g. Tata Motors Ace CNG">
         </div>
 
@@ -505,12 +506,12 @@
         </div>
 
         <div class="field-group">
-          <label class="field-label" for="vehicleRegNo"><span class="field-icon">📋</span> Vehicle Registration Number <span aria-hidden="true" style="color:#dc2626">*</span></label>
+          <label class="field-label" for="vehicleRegNo"><span class="field-icon"><i data-lucide="clipboard-list"></i></span> Vehicle Registration Number <span aria-hidden="true" style="color:#dc2626">*</span></label>
           <input type="text" id="vehicleRegNo" class="field-input" placeholder="KA 01 AB 1234" style="text-transform:uppercase" required>
           <div class="field-error" id="errVehicleReg">Please enter the vehicle registration number.</div>
         </div>
 
-        <p class="field-hint">📸 You will upload the RC and insurance documents in the next step.</p>
+        <p class="field-hint"><i data-lucide="camera"></i> You will upload the RC and insurance documents in the next step.</p>
 
       </div>
     </div>
@@ -522,7 +523,7 @@
   <div class="reg-step" id="regStep5">
     <div class="reg-card">
       <div class="reg-card-header">
-        <div class="reg-card-icon">📄</div>
+        <div class="reg-card-icon"><i data-lucide="file-text"></i></div>
         <div class="reg-card-title">KYC & Documents</div>
         <div class="reg-card-sub">Upload clear photos — JPG or PDF, max 5 MB each.</div>
       </div>
@@ -535,13 +536,13 @@
         </div>
 
         <div class="field-group">
-          <label class="field-label"><span class="field-icon">📄</span> Aadhaar Photo / PDF <span aria-hidden="true" style="color:#dc2626">*</span></label>
+          <label class="field-label"><span class="field-icon"><i data-lucide="file-text"></i></span> Aadhaar Photo / PDF <span aria-hidden="true" style="color:#dc2626">*</span></label>
           <div class="upload-zone" id="uzAadhaar">
             <input type="file" accept="image/*,application/pdf" id="fileAadhaar" onchange="handleFileSelect('fileAadhaar','uzAadhaar','docAadhaarName')">
-            <div class="uz-icon">📷</div>
+            <div class="uz-icon"><i data-lucide="circle"></i></div>
             <div class="uz-label">Tap to upload Aadhaar</div>
             <div class="uz-sub">Front &amp; back together · Max 5 MB</div>
-            <div class="uz-status" id="docAadhaarName">✓ Uploaded</div>
+            <div class="uz-status" id="docAadhaarName"><i data-lucide="check"></i> Uploaded</div>
           </div>
           <div class="field-error" id="errDocAadhaar">Please upload your Aadhaar document.</div>
         </div>
@@ -553,37 +554,37 @@
         </div>
 
         <div class="field-group">
-          <label class="field-label"><span class="field-icon">📄</span> PAN Card Photo <span aria-hidden="true" style="color:#dc2626">*</span></label>
+          <label class="field-label"><span class="field-icon"><i data-lucide="file-text"></i></span> PAN Card Photo <span aria-hidden="true" style="color:#dc2626">*</span></label>
           <div class="upload-zone" id="uzPan">
             <input type="file" accept="image/*,application/pdf" id="filePan" onchange="handleFileSelect('filePan','uzPan','docPanName')">
-            <div class="uz-icon">📷</div>
+            <div class="uz-icon"><i data-lucide="circle"></i></div>
             <div class="uz-label">Tap to upload PAN Card</div>
             <div class="uz-sub">Clear photo · Max 5 MB</div>
-            <div class="uz-status" id="docPanName">✓ Uploaded</div>
+            <div class="uz-status" id="docPanName"><i data-lucide="check"></i> Uploaded</div>
           </div>
           <div class="field-error" id="errDocPan">Please upload your PAN card.</div>
         </div>
 
         <div class="field-group">
-          <label class="field-label"><span class="field-icon">🚚</span> Vehicle RC (Registration Certificate) <span aria-hidden="true" style="color:#dc2626">*</span></label>
+          <label class="field-label"><span class="field-icon"><i data-lucide="truck"></i></span> Vehicle RC (Registration Certificate) <span aria-hidden="true" style="color:#dc2626">*</span></label>
           <div class="upload-zone" id="uzRC">
             <input type="file" accept="image/*,application/pdf" id="fileRC" onchange="handleFileSelect('fileRC','uzRC','docRCName')">
-            <div class="uz-icon">📷</div>
+            <div class="uz-icon"><i data-lucide="circle"></i></div>
             <div class="uz-label">Tap to upload Vehicle RC</div>
             <div class="uz-sub">Both sides · Max 5 MB</div>
-            <div class="uz-status" id="docRCName">✓ Uploaded</div>
+            <div class="uz-status" id="docRCName"><i data-lucide="check"></i> Uploaded</div>
           </div>
           <div class="field-error" id="errDocRC">Please upload the vehicle RC.</div>
         </div>
 
         <div class="field-group">
-          <label class="field-label"><span class="field-icon">🛡️</span> Vehicle Insurance <span aria-hidden="true" style="color:#dc2626">*</span></label>
+          <label class="field-label"><span class="field-icon"><i data-lucide="shield-check"></i></span> Vehicle Insurance <span aria-hidden="true" style="color:#dc2626">*</span></label>
           <div class="upload-zone" id="uzInsurance">
             <input type="file" accept="image/*,application/pdf" id="fileInsurance" onchange="handleFileSelect('fileInsurance','uzInsurance','docInsuranceName')">
-            <div class="uz-icon">📷</div>
+            <div class="uz-icon"><i data-lucide="circle"></i></div>
             <div class="uz-label">Tap to upload Insurance</div>
             <div class="uz-sub">Valid policy · Max 5 MB</div>
-            <div class="uz-status" id="docInsuranceName">✓ Uploaded</div>
+            <div class="uz-status" id="docInsuranceName"><i data-lucide="check"></i> Uploaded</div>
           </div>
           <div class="field-error" id="errDocInsurance">Please upload the vehicle insurance.</div>
         </div>
@@ -592,10 +593,10 @@
           <label class="field-label"><span class="field-icon">🤳</span> Profile / Business Photo</label>
           <div class="upload-zone" id="uzProfile">
             <input type="file" accept="image/*" id="fileProfile" onchange="handleFileSelect('fileProfile','uzProfile','docProfileName')">
-            <div class="uz-icon">📷</div>
+            <div class="uz-icon"><i data-lucide="circle"></i></div>
             <div class="uz-label">Tap to upload Profile Photo</div>
             <div class="uz-sub">Optional · Max 5 MB</div>
-            <div class="uz-status" id="docProfileName">✓ Uploaded</div>
+            <div class="uz-status" id="docProfileName"><i data-lucide="check"></i> Uploaded</div>
           </div>
         </div>
 
@@ -609,39 +610,39 @@
   <div class="reg-step" id="regStep6">
     <div class="reg-card">
       <div class="reg-card-header">
-        <div class="reg-card-icon">🏦</div>
+        <div class="reg-card-icon"><i data-lucide="circle"></i></div>
         <div class="reg-card-title">Bank & Payment Details</div>
         <div class="reg-card-sub">For receiving your weekly payouts directly.</div>
       </div>
       <div class="reg-card-body">
 
         <div class="field-group">
-          <label class="field-label" for="bankName"><span class="field-icon">🏦</span> Bank Name <span aria-hidden="true" style="color:#dc2626">*</span></label>
+          <label class="field-label" for="bankName"><span class="field-icon"><i data-lucide="circle"></i></span> Bank Name <span aria-hidden="true" style="color:#dc2626">*</span></label>
           <input type="text" id="bankName" class="field-input" placeholder="e.g. State Bank of India" required>
           <div class="field-error" id="errBankName">Please enter your bank name.</div>
         </div>
 
         <div class="field-group">
-          <label class="field-label" for="bankAccountName"><span class="field-icon">👤</span> Account Holder Name <span aria-hidden="true" style="color:#dc2626">*</span></label>
+          <label class="field-label" for="bankAccountName"><span class="field-icon"><i data-lucide="user-round"></i></span> Account Holder Name <span aria-hidden="true" style="color:#dc2626">*</span></label>
           <input type="text" id="bankAccountName" class="field-input" placeholder="As printed on passbook" required>
           <div class="field-error" id="errBankAccountName">Please enter the account holder name.</div>
         </div>
 
         <div class="field-group">
-          <label class="field-label" for="bankAccountNo"><span class="field-icon">🔢</span> Account Number <span aria-hidden="true" style="color:#dc2626">*</span></label>
+          <label class="field-label" for="bankAccountNo"><span class="field-icon"><i data-lucide="circle"></i></span> Account Number <span aria-hidden="true" style="color:#dc2626">*</span></label>
           <input type="text" id="bankAccountNo" class="field-input" placeholder="XXXXXXXXXXXXXX" inputmode="numeric" required>
           <div class="field-error" id="errBankAccountNo">Please enter a valid account number.</div>
         </div>
 
         <div class="field-group">
-          <label class="field-label" for="bankIfsc"><span class="field-icon">🏷️</span> IFSC Code <span aria-hidden="true" style="color:#dc2626">*</span></label>
+          <label class="field-label" for="bankIfsc"><span class="field-icon"><i data-lucide="circle"></i></span> IFSC Code <span aria-hidden="true" style="color:#dc2626">*</span></label>
           <input type="text" id="bankIfsc" class="field-input" placeholder="SBIN0001234" maxlength="11" style="text-transform:uppercase" required oninput="this.value=this.value.toUpperCase()">
           <div class="field-hint">11-character code on your cheque or passbook.</div>
           <div class="field-error" id="errBankIfsc">Please enter a valid 11-character IFSC code.</div>
         </div>
 
         <div class="field-group">
-          <label class="field-label" for="bankUpi"><span class="field-icon">📲</span> UPI ID</label>
+          <label class="field-label" for="bankUpi"><span class="field-icon"><i data-lucide="circle"></i></span> UPI ID</label>
           <input type="text" id="bankUpi" class="field-input" placeholder="yourname@upi (optional)">
         </div>
 
@@ -655,7 +656,7 @@
   <div class="reg-step" id="regStep7">
     <div class="reg-card">
       <div class="reg-card-header">
-        <div class="reg-card-icon">✅</div>
+        <div class="reg-card-icon"><i data-lucide="badge-check"></i></div>
         <div class="reg-card-title">Review & Submit</div>
         <div class="reg-card-sub">Check your details and agree to our terms to submit.</div>
       </div>
@@ -862,7 +863,7 @@ function handleFileSelect(inputId, zoneId, statusId) {
     return;
   }
   uploadedFiles[inputId] = file;
-  if (status) { status.textContent = '✓ ' + file.name.substring(0, 28); }
+  if (status) { status.textContent = ' ' + file.name.substring(0, 28); }
   if (zone)   { zone.classList.add('uploaded'); }
 }
 
@@ -985,7 +986,7 @@ function updateProgressUI() {
 
   document.getElementById('regBtnBack').style.display = regCurrentStep > 1 ? '' : 'none';
   const btn = document.getElementById('regBtnNext');
-  btn.textContent = regCurrentStep === REG_TOTAL_STEPS ? '🚀 Submit Application' : 'Continue ›';
+  btn.textContent = regCurrentStep === REG_TOTAL_STEPS ? ' Submit Application' : 'Continue ›';
 }
 
 function goToStep(n) {
@@ -1170,7 +1171,7 @@ async function submitRegistration() {
 
     } catch (err) {
       nextBtn.disabled = false;
-      nextBtn.textContent = '🚀 Submit Application';
+      nextBtn.textContent = ' Submit Application';
       submitBox.style.display = 'none';
 
       const msg = {

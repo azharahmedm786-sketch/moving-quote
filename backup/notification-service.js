@@ -30,7 +30,7 @@ async function logNotification({ bookingRef, channel, recipient, status, provide
       createdAt: admin.firestore.FieldValue.serverTimestamp()
     });
   } catch (e) {
-    console.error("⚠️ Failed to write notificationLogs entry:", e.message);
+    console.error(" Failed to write notificationLogs entry:", e.message);
   }
 }
 

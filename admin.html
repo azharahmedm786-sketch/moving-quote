@@ -5,7 +5,7 @@
   <title>PackZen Admin</title>
   <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 
-  <!-- ✅ FIX 1: Block Google from indexing the admin page -->
+  <!-- <i data-lucide="badge-check"></i> FIX 1: Block Google from indexing the admin page -->
   <meta name="robots" content="noindex, nofollow, noarchive"/>
 
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -29,7 +29,7 @@
     .auth-err{font-size:.85rem;color:#e53e3e;margin-top:10px;min-height:18px}
     .lockout-banner{background:rgba(220,38,38,.1);border:1px solid rgba(220,38,38,.3);border-radius:10px;padding:10px 14px;font-size:.84rem;color:#dc2626;margin-top:12px;display:none}
 
-    /* ✅ FIX 2: Shell is NOT in the DOM at load — injected only after auth passes */
+    /* <i data-lucide="badge-check"></i> FIX 2: Shell is NOT in the DOM at load — injected only after auth passes */
     .admin-shell{display:none}
     .admin-shell.active{display:flex;min-height:100vh}
     .sidebar{width:240px;background:var(--dark);display:flex;flex-direction:column;padding:24px 0;flex-shrink:0;position:fixed;top:0;left:0;bottom:0;z-index:100;overflow-y:auto}
@@ -51,7 +51,7 @@
     .theme-btn{background:var(--surface);border:1.5px solid var(--border);color:var(--text);width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;transition:transform .3s}
     .theme-btn:hover{transform:rotate(20deg)}
     .admin-badge{background:rgba(0,87,255,.1);color:var(--primary);font-size:.75rem;font-weight:700;padding:4px 12px;border-radius:20px;border:1px solid rgba(0,87,255,.2)}
-    /* ✅ FIX 3: Session timer display */
+    /* <i data-lucide="badge-check"></i> FIX 3: Session timer display */
     .session-timer{font-size:.75rem;color:var(--text-muted);padding:4px 10px;border:1px solid var(--border);border-radius:20px;}
     .session-timer.warn{color:#d97706;border-color:#d97706}
     .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-bottom:22px}
@@ -130,29 +130,30 @@
       .topbar-right{width:100%;justify-content:space-between}
     }
   </style>
+  <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
 
 <!-- LOGIN SCREEN -->
 <div class="admin-login" id="adminLogin">
   <div class="login-card">
-    <div class="login-logo">📦 PackZen <span style="color:var(--text-muted);font-size:.9rem;font-weight:500;">Admin</span></div>
+    <div class="login-logo"><i data-lucide="package"></i> PackZen <span style="color:var(--text-muted);font-size:.9rem;font-weight:500;">Admin</span></div>
     <p class="login-sub">Restricted — admin access only</p>
 
-    <!-- ✅ FIX: autocomplete off prevents browser from suggesting admin credentials to non-admins -->
+    <!-- <i data-lucide="badge-check"></i> FIX: autocomplete off prevents browser from suggesting admin credentials to non-admins -->
     <label class="field-label">Email</label>
     <input id="adminEmail" type="email" class="field-input" placeholder="admin@packzen.com" autocomplete="off">
     <label class="field-label">Password</label>
     <input id="adminPass" type="password" class="field-input" placeholder="Password" autocomplete="off">
 
     <div id="adminErr" class="auth-err"></div>
-    <div class="lockout-banner" id="lockoutBanner">🔒 Too many failed attempts. Please wait <span id="lockoutTimer">30</span>s before trying again.</div>
+    <div class="lockout-banner" id="lockoutBanner"><i data-lucide="circle"></i> Too many failed attempts. Please wait <span id="lockoutTimer">30</span>s before trying again.</div>
 
     <button class="btn-auth" id="loginBtn" onclick="adminLogin()">Login to Dashboard →</button>
   </div>
 </div>
 
-<!-- ✅ FIX 2: Admin shell is EMPTY until auth passes — injected by buildShell() -->
+<!-- <i data-lucide="badge-check"></i> FIX 2: Admin shell is EMPTY until auth passes — injected by buildShell() -->
 <div class="admin-shell" id="adminShell"></div>
 
 <div class="toast" id="adminToast"></div>
@@ -166,7 +167,7 @@
 
 <script>
 /* ================================================================
-   ✅ SECURITY CONSTANTS
+   <i data-lucide="badge-check"></i> SECURITY CONSTANTS
    ================================================================ */
 const ADMIN_EMAILS = [
   "admin@packzen.com",
@@ -175,7 +176,7 @@ const ADMIN_EMAILS = [
   "moveeasyblr@gmail.com"
 ];
 
-/* ✅ FIX 3: Brute-force rate limiter
+/* <i data-lucide="badge-check"></i> FIX 3: Brute-force rate limiter
    Max 3 failed attempts → 30s lockout, stored in sessionStorage
    so it resets on tab close but persists within the session. */
 const RATE_KEY   = "pz_admin_attempts";
@@ -233,7 +234,7 @@ function startLockoutTimer() {
 // Resume lockout if page was refreshed during lockout window
 if (isLockedOut()) startLockoutTimer();
 
-/* ✅ FIX 4: Session timeout — 2 hours
+/* <i data-lucide="badge-check"></i> FIX 4: Session timeout — 2 hours
    Stored in sessionStorage so it resets on tab close. */
 const SESSION_KEY      = "pz_admin_session_start";
 const SESSION_LIMIT_MS = 2 * 60 * 60 * 1000; // 2 hours
@@ -308,7 +309,7 @@ document.addEventListener("DOMContentLoaded", () => {
    LOGIN — WITH RATE LIMITING
    ================================================================ */
 function adminLogin() {
-  // ✅ Block if locked out
+  // <i data-lucide="badge-check"></i> Block if locked out
   if (isLockedOut()) { startLockoutTimer(); return; }
 
   const email = document.getElementById("adminEmail").value.trim().toLowerCase();
@@ -345,11 +346,11 @@ function adminLogin() {
                   }
                 } catch(e) { console.warn("Could not set admin role:", e.message); }
               }
-              clearAttempts(); // ✅ Reset attempts on successful login
+              clearAttempts(); // <i data-lucide="badge-check"></i> Reset attempts on successful login
               showShell(name);
             } else {
               auth.signOut(); adminUser = null;
-              recordFailedAttempt(); // ✅ Count as failed — wrong role
+              recordFailedAttempt(); // <i data-lucide="badge-check"></i> Count as failed — wrong role
               err.textContent = "Access denied. Your account does not have admin permissions.";
             }
           })
@@ -367,7 +368,7 @@ function adminLogin() {
       })
       .catch(e => {
         console.error('Admin Auth Error:', e.code, e.message);
-        recordFailedAttempt(); // ✅ Count failed attempt
+        recordFailedAttempt(); // <i data-lucide="badge-check"></i> Count failed attempt
         const d = getRateData();
         const remaining = MAX_TRIES - d.count;
         if      (e.code === "auth/wrong-password" || e.code === "auth/invalid-credential")
@@ -392,7 +393,7 @@ function adminSignOut() {
   if (sessionInterval) clearInterval(sessionInterval);
   try { sessionStorage.removeItem(SESSION_KEY); } catch(e) {}
   waitFB(() => window._firebase.auth.signOut().then(() => {
-    // ✅ FIX: Clear the shell HTML on sign out — no admin UI left in DOM
+    // <i data-lucide="badge-check"></i> FIX: Clear the shell HTML on sign out — no admin UI left in DOM
     const shell = document.getElementById("adminShell");
     if (shell) { shell.classList.remove("active"); shell.innerHTML = ""; }
     document.getElementById("adminLogin").style.display = "flex";
@@ -401,29 +402,29 @@ function adminSignOut() {
 }
 
 /* ================================================================
-   ✅ FIX 2 — BUILD SHELL: Admin HTML injected ONLY after auth passes
+   <i data-lucide="badge-check"></i> FIX 2 — BUILD SHELL: Admin HTML injected ONLY after auth passes
    The browser never receives admin UI HTML for unauthenticated visits.
    ================================================================ */
 function buildShell(adminName) {
   const shell = document.getElementById("adminShell");
   shell.innerHTML = `
   <aside class="sidebar">
-    <div class="sidebar-logo"><span>📦 Pack<b>Zen</b></span><br><small style="color:rgba(255,255,255,.35);font-size:.72rem;">Admin Panel</small></div>
+    <div class="sidebar-logo"><span><i data-lucide="package"></i> Pack<b>Zen</b></span><br><small style="color:rgba(255,255,255,.35);font-size:.72rem;">Admin Panel</small></div>
     <div class="sb-role">Main</div>
-    <div class="nav-item active" onclick="showSection('overview',this)"><span class="ni">📊</span> Overview</div>
-    <div class="nav-item" onclick="showSection('bookings',this)"><span class="ni">📦</span> Bookings</div>
-    <div class="nav-item" onclick="showSection('drivers',this)"><span class="ni">🚚</span> Drivers</div>
+    <div class="nav-item active" onclick="showSection('overview',this)"><span class="ni"><i data-lucide="circle"></i></span> Overview</div>
+    <div class="nav-item" onclick="showSection('bookings',this)"><span class="ni"><i data-lucide="package"></i></span> Bookings</div>
+    <div class="nav-item" onclick="showSection('drivers',this)"><span class="ni"><i data-lucide="truck"></i></span> Drivers</div>
     <div class="sb-role">Manage</div>
-    <div class="nav-item" onclick="showSection('customers',this)"><span class="ni">👥</span> Customers</div>
+    <div class="nav-item" onclick="showSection('customers',this)"><span class="ni"><i data-lucide="circle"></i></span> Customers</div>
     <div class="nav-item" onclick="showSection('reviews',this)"><span class="ni">⭐</span> Reviews</div>
-    <div class="nav-item" onclick="showSection('cancels',this)"><span class="ni">✕</span> Cancellations</div>
-    <div class="nav-item" onclick="showSection('claims',this)"><span class="ni">🔧</span> Damage Claims</div>
-    <div class="nav-item" onclick="showSection('promos',this)"><span class="ni">🏷️</span> Promo Codes</div>
-    <div class="nav-item" onclick="showSection('broadcast',this)"><span class="ni">📢</span> Broadcast</div>
-    <div class="nav-item" onclick="showSection('deletion',this)"><span class="ni">🗑️</span> Deletion Requests</div>
-    <div class="nav-item" onclick="showSection('analytics',this)"><span class="ni">📈</span> Analytics</div>
+    <div class="nav-item" onclick="showSection('cancels',this)"><span class="ni"><i data-lucide="x"></i></span> Cancellations</div>
+    <div class="nav-item" onclick="showSection('claims',this)"><span class="ni"><i data-lucide="wrench"></i></span> Damage Claims</div>
+    <div class="nav-item" onclick="showSection('promos',this)"><span class="ni"><i data-lucide="circle"></i></span> Promo Codes</div>
+    <div class="nav-item" onclick="showSection('broadcast',this)"><span class="ni"><i data-lucide="circle"></i></span> Broadcast</div>
+    <div class="nav-item" onclick="showSection('deletion',this)"><span class="ni"><i data-lucide="circle"></i></span> Deletion Requests</div>
+    <div class="nav-item" onclick="showSection('analytics',this)"><span class="ni"><i data-lucide="circle"></i></span> Analytics</div>
     <div class="sidebar-bottom">
-      <button class="btn-signout" onclick="adminSignOut()">🚪 Sign Out</button>
+      <button class="btn-signout" onclick="adminSignOut()"><i data-lucide="log-out"></i> Sign Out</button>
     </div>
   </aside>
   <main class="admin-main">
@@ -431,8 +432,8 @@ function buildShell(adminName) {
       <h1 id="sectionTitle">Overview</h1>
       <div class="topbar-right">
         <span class="session-timer" id="sessionTimerDisplay">Session: 120m</span>
-        <button class="theme-btn" onclick="toggleAdminTheme()">🌙</button>
-        <div class="admin-badge">🔐 Admin</div>
+        <button class="theme-btn" onclick="toggleAdminTheme()"><i data-lucide="moon"></i></button>
+        <div class="admin-badge"><i data-lucide="lock"></i> Admin</div>
         <span style="font-size:.83rem;color:var(--text-muted);font-weight:500;" id="adminNameDisplay">${adminName}</span>
       </div>
     </div>
@@ -447,8 +448,8 @@ function buildShell(adminName) {
         <div class="stat-card"><div class="sc-lbl">Driver Status</div><div class="sc-val" id="statDrivers" style="color:#7c3aed">0/0</div><div class="sc-sub">Online/Total</div></div>
       </div>
       <div class="chart-row">
-        <div class="chart-card"><h3>📈 Monthly Bookings</h3><canvas id="bookingsChart" height="160"></canvas></div>
-        <div class="chart-card"><h3>💰 Monthly Revenue (₹)</h3><canvas id="revenueChart" height="160"></canvas></div>
+        <div class="chart-card"><h3><i data-lucide="circle"></i> Monthly Bookings</h3><canvas id="bookingsChart" height="160"></canvas></div>
+        <div class="chart-card"><h3><i data-lucide="indian-rupee"></i> Monthly Revenue (₹)</h3><canvas id="revenueChart" height="160"></canvas></div>
       </div>
       <div class="table-card">
         <div class="table-hdr"><div class="table-title">Recent Activity</div></div>
@@ -467,8 +468,8 @@ function buildShell(adminName) {
       </div>
 
       <div class="chart-row">
-        <div class="chart-card"><h3>📈 Booking Trends</h3><canvas id="analyticsTrendsChart" height="160"></canvas></div>
-        <div class="chart-card"><h3>📍 Popular Routes</h3><canvas id="analyticsRoutesChart" height="160"></canvas></div>
+        <div class="chart-card"><h3><i data-lucide="circle"></i> Booking Trends</h3><canvas id="analyticsTrendsChart" height="160"></canvas></div>
+        <div class="chart-card"><h3><i data-lucide="map-pin"></i> Popular Routes</h3><canvas id="analyticsRoutesChart" height="160"></canvas></div>
       </div>
 
       <div class="table-card">
@@ -507,7 +508,7 @@ function buildShell(adminName) {
     <!-- DRIVERS -->
     <div class="section" id="sectionDrivers">
       <div class="table-card" style="margin-bottom:20px;">
-        <div class="table-hdr"><div class="table-title">🚚 Create New Driver Account</div></div>
+        <div class="table-hdr"><div class="table-title"><i data-lucide="truck"></i> Create New Driver Account</div></div>
         <div style="padding:20px;">
           <div class="driver-form-grid">
             <div>
@@ -526,10 +527,10 @@ function buildShell(adminName) {
               <label class="field-label" style="margin-top:0">Vehicle Type</label>
               <select id="newDriverVehicle">
                 <option value="">Select vehicle</option>
-                <option value="Tata Ace">🛻 Tata Ace (Small)</option>
-                <option value="14 ft Truck">🚚 14 ft Truck (Medium)</option>
-                <option value="17 ft Truck">🚛 17 ft Truck (Large)</option>
-                <option value="22 ft Truck">🚜 22 ft Truck (XL)</option>
+                <option value="Tata Ace"><i data-lucide="circle"></i> Tata Ace (Small)</option>
+                <option value="14 ft Truck"><i data-lucide="truck"></i> 14 ft Truck (Medium)</option>
+                <option value="17 ft Truck"><i data-lucide="truck"></i> 17 ft Truck (Large)</option>
+                <option value="22 ft Truck"><i data-lucide="circle"></i> 22 ft Truck (XL)</option>
               </select>
             </div>
             <div>
@@ -537,7 +538,7 @@ function buildShell(adminName) {
               <input id="newDriverPassword" type="password" placeholder="Min 6 characters" autocomplete="new-password">
             </div>
             <div class="driver-form-actions">
-              <button class="btn-primary-sm" onclick="adminCreateDriver()" style="width:100%;padding:12px;font-size:.9rem;">✅ Create Driver Account</button>
+              <button class="btn-primary-sm" onclick="adminCreateDriver()" style="width:100%;padding:12px;font-size:.9rem;"><i data-lucide="badge-check"></i> Create Driver Account</button>
             </div>
           </div>
           <div id="adminDriverMsg"></div>
@@ -585,8 +586,8 @@ function buildShell(adminName) {
     <div class="section" id="sectionCancels">
       <div class="table-card">
         <div class="table-hdr">
-          <div class="table-title">✕ Cancellation Requests</div>
-          <button class="btn-export" onclick="loadCancelRequests()">🔄 Refresh</button>
+          <div class="table-title"><i data-lucide="x"></i> Cancellation Requests</div>
+          <button class="btn-export" onclick="loadCancelRequests()"><i data-lucide="circle"></i> Refresh</button>
         </div>
         <table><thead><tr><th>Booking Ref</th><th>Customer</th><th>Reason</th><th>Requested</th><th>Status</th><th>Action</th></tr></thead>
         <tbody id="cancelsTable"><tr class="empty-row"><td colspan="6">Loading...</td></tr></tbody></table>
@@ -596,8 +597,8 @@ function buildShell(adminName) {
     <div class="section" id="sectionClaims">
       <div class="table-card">
         <div class="table-hdr">
-          <div class="table-title">🔧 Damage Claims</div>
-          <button class="btn-export" onclick="loadDamageClaims()">🔄 Refresh</button>
+          <div class="table-title"><i data-lucide="wrench"></i> Damage Claims</div>
+          <button class="btn-export" onclick="loadDamageClaims()"><i data-lucide="circle"></i> Refresh</button>
         </div>
         <table>
           <thead><tr><th>Claim ID</th><th>Booking</th><th>Type</th><th>Description</th><th>Photos</th><th>Date</th><th>Status</th><th>Action</th></tr></thead>
@@ -607,8 +608,8 @@ function buildShell(adminName) {
       <div id="claimDetailPanel" style="display:none;margin-top:1.5rem;">
         <div class="table-card">
           <div class="table-hdr">
-            <div class="table-title">📋 Claim Detail</div>
-            <button onclick="document.getElementById('claimDetailPanel').style.display='none'" style="background:none;border:none;font-size:1.2rem;cursor:pointer;color:var(--text-muted)">✕</button>
+            <div class="table-title"><i data-lucide="clipboard-list"></i> Claim Detail</div>
+            <button onclick="document.getElementById('claimDetailPanel').style.display='none'" style="background:none;border:none;font-size:1.2rem;cursor:pointer;color:var(--text-muted)"><i data-lucide="x"></i></button>
           </div>
           <div style="padding:1rem">
             <div id="claimDetailContent"></div>
@@ -617,9 +618,9 @@ function buildShell(adminName) {
               <textarea id="claimResponseText" rows="3" style="width:100%;padding:.6rem;border:1.5px solid var(--border);border-radius:10px;background:var(--surface2);color:var(--text);font-size:.85rem;box-sizing:border-box" placeholder="Describe your resolution..."></textarea>
             </div>
             <div style="display:flex;gap:.7rem;margin-top:.8rem;flex-wrap:wrap">
-              <button onclick="resolveDamageClaim('approved')" style="padding:.55rem 1.1rem;background:#16a34a;color:white;border:none;border-radius:10px;cursor:pointer;font-weight:700;font-size:.82rem">✅ Approve Claim</button>
-              <button onclick="resolveDamageClaim('rejected')" style="padding:.55rem 1.1rem;background:#dc2626;color:white;border:none;border-radius:10px;cursor:pointer;font-weight:700;font-size:.82rem">❌ Reject Claim</button>
-              <button onclick="resolveDamageClaim('investigating')" style="padding:.55rem 1.1rem;background:#d97706;color:white;border:none;border-radius:10px;cursor:pointer;font-weight:700;font-size:.82rem">🔍 Mark Investigating</button>
+              <button onclick="resolveDamageClaim('approved')" style="padding:.55rem 1.1rem;background:#16a34a;color:white;border:none;border-radius:10px;cursor:pointer;font-weight:700;font-size:.82rem"><i data-lucide="badge-check"></i> Approve Claim</button>
+              <button onclick="resolveDamageClaim('rejected')" style="padding:.55rem 1.1rem;background:#dc2626;color:white;border:none;border-radius:10px;cursor:pointer;font-weight:700;font-size:.82rem"><i data-lucide="x"></i> Reject Claim</button>
+              <button onclick="resolveDamageClaim('investigating')" style="padding:.55rem 1.1rem;background:#d97706;color:white;border:none;border-radius:10px;cursor:pointer;font-weight:700;font-size:.82rem"><i data-lucide="circle"></i> Mark Investigating</button>
             </div>
           </div>
         </div>
@@ -629,8 +630,8 @@ function buildShell(adminName) {
     <div class="section" id="sectionDeletion">
       <div class="table-card">
         <div class="table-hdr">
-          <div class="table-title">🗑️ Account Deletion Requests</div>
-          <button class="btn-export" onclick="loadDeletionRequests()">🔄 Refresh</button>
+          <div class="table-title"><i data-lucide="circle"></i> Account Deletion Requests</div>
+          <button class="btn-export" onclick="loadDeletionRequests()"><i data-lucide="circle"></i> Refresh</button>
         </div>
         <table>
           <thead>
@@ -653,7 +654,7 @@ function buildShell(adminName) {
     <!-- BROADCAST -->
     <div class="section" id="sectionBroadcast">
       <div class="table-card">
-        <div class="table-hdr"><div class="table-title">📢 Broadcast Message to Customers</div></div>
+        <div class="table-hdr"><div class="table-title"><i data-lucide="circle"></i> Broadcast Message to Customers</div></div>
         <div style="padding:20px;">
           <label class="field-label" style="margin-top:0">Message</label>
           <textarea class="bulk-textarea" id="broadcastMsg" placeholder="Type your message to all customers..."></textarea>
@@ -662,7 +663,7 @@ function buildShell(adminName) {
             <label style="display:flex;align-items:center;gap:6px;font-size:.88rem;cursor:pointer;"><input type="checkbox" id="sendWA" checked> WhatsApp</label>
             <label style="display:flex;align-items:center;gap:6px;font-size:.88rem;cursor:pointer;"><input type="checkbox" id="sendEmail"> Email (Firestore log)</label>
           </div>
-          <button class="btn-primary-sm" onclick="sendBroadcast()">📤 Send Broadcast</button>
+          <button class="btn-primary-sm" onclick="sendBroadcast()"><i data-lucide="circle"></i> Send Broadcast</button>
           <div id="broadcastResult" style="margin-top:12px;font-size:.85rem;color:var(--accent);"></div>
         </div>
       </div>
@@ -676,13 +677,13 @@ function buildShell(adminName) {
   <!-- ASSIGN MODAL -->
   <div class="assign-overlay" id="assignModal" style="display:none;">
     <div class="assign-box">
-      <div class="assign-title">🚚 Assign Driver to Booking</div>
+      <div class="assign-title"><i data-lucide="truck"></i> Assign Driver to Booking</div>
       <div class="assign-info" id="assignInfo">Loading...</div>
       <label class="field-label">Select Driver</label>
       <select class="field-input" id="assignSelect"><option value="">-- Select a driver --</option></select>
       <div class="btn-row">
         <button class="btn-cancel" onclick="closeAssignModal()">Cancel</button>
-        <button class="btn-confirm" onclick="confirmAssign()">Assign ✓</button>
+        <button class="btn-confirm" onclick="confirmAssign()">Assign <i data-lucide="check"></i></button>
       </div>
     </div>
   </div>`;
@@ -790,27 +791,27 @@ let filteredBookings = [];
 
 function showShell(name) {
   document.getElementById("adminLogin").style.display = "none";
-  buildShell(name); // ✅ Inject admin HTML now — not before
+  buildShell(name); // <i data-lucide="badge-check"></i> Inject admin HTML now — not before
   const shell = document.getElementById("adminShell");
   shell.classList.add("active");
   // Apply saved theme
   if (localStorage.getItem("packzen-theme") === "dark") {
     document.body.classList.add("dark");
-    setTimeout(() => { const b = document.querySelector(".theme-btn"); if(b) b.textContent="☀️"; }, 100);
+    setTimeout(() => { const b = document.querySelector(".theme-btn"); if(b) b.textContent=""; }, 100);
   }
-  startSessionTimer(); // ✅ Start 2-hour session countdown
+  startSessionTimer(); // <i data-lucide="badge-check"></i> Start 2-hour session countdown
   loadAll();
 }
 
 function requireAdmin(cb) {
-  if (!adminUser) { toast("⚠️ Not logged in as admin."); return; }
+  if (!adminUser) { toast("<i data-lucide="triangle-alert"></i> Not logged in as admin."); return; }
   cb();
 }
 
 /* ── THEME ── */
 function toggleAdminTheme() {
   document.body.classList.toggle("dark");
-  document.querySelector(".theme-btn").textContent = document.body.classList.contains("dark") ? "☀️" : "🌙";
+  document.querySelector(".theme-btn").textContent = document.body.classList.contains("dark") ? "" : "";
   localStorage.setItem("packzen-theme", document.body.classList.contains("dark") ? "dark" : "light");
 }
 
@@ -927,7 +928,7 @@ function renderOverview() {
       <td><span class="badge badge-${b.status||"pending"}">${cap(b.status||"pending")}</span></td>
       <td><button class="btn-sm btn-assign"
 onclick="openAssignModal('${b.id}')">
-🚚 ${b.driverUid ? "Change Driver" : "Assign Driver"}
+<i data-lucide="truck"></i> ${b.driverUid ? "Change Driver" : "Assign Driver"}
 </button>
 </td>
     </tr>`).join("");
@@ -942,7 +943,7 @@ function renderBookingsTable(list) {
     <tr>
       <td>
         <code style="font-size:.75rem;color:var(--primary)">${b.bookingRef||("#"+b.id.slice(-6).toUpperCase())}</code>
-        ${b.source==="whatsapp"?'<span class="badge" style="background:rgba(37,211,102,.12);color:#25D366;margin-left:4px">💬 WA</span>':b.paymentType==="pay_later"?'<span class="badge" style="background:rgba(251,191,36,.12);color:#d97706;margin-left:4px">📋 Later</span>':''}
+        ${b.source==="whatsapp"?'<span class="badge" style="background:rgba(37,211,102,.12);color:#25D366;margin-left:4px"><i data-lucide="message-circle"></i> WA</span>':b.paymentType==="pay_later"?'<span class="badge" style="background:rgba(251,191,36,.12);color:#d97706;margin-left:4px"><i data-lucide="clipboard-list"></i> Later</span>':''}
       </td>
       <td>${b.customerName||"—"}</td>
       <td>${b.phone||"—"}</td>
@@ -956,17 +957,17 @@ function renderBookingsTable(list) {
       </td>
       <td>${b.driverName||'<span style="color:var(--text-muted);font-size:.78rem">Unassigned</span>'}</td>
 <td style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
-  <button class="btn-sm" onclick="viewBooking('${b.id}')">👁 View</button>
+  <button class="btn-sm" onclick="viewBooking('${b.id}')"><i data-lucide="circle"></i> View</button>
 
 <button class="btn-sm btn-assign"
 onclick="openAssignModal('${b.id}')">
-🚚 ${b.driverUid ? "Change" : "Assign"}
+<i data-lucide="truck"></i> ${b.driverUid ? "Change" : "Assign"}
 </button>
 
   <button class="btn-sm"
           style="background:rgba(220,38,38,.1);color:#dc2626;"
           onclick="deleteBooking('${b.id}','${b.bookingRef||b.id.slice(-6).toUpperCase()}')">
-    🗑 Delete
+    <i data-lucide="circle"></i> Delete
   </button>
 </td>
 </tr>
@@ -986,7 +987,7 @@ line-height:1.8;
 ">
 
   <h3 style="margin-bottom:15px;color:#2563eb;">
-📦 Booking Details
+<i data-lucide="package"></i> Booking Details
 </h3>
 
 <b>Booking Ref:</b> ${b.bookingRef || "-"}<br><br>
@@ -1033,34 +1034,34 @@ ${b.createdAt?.toDate ? b.createdAt.toDate().toLocaleString("en-IN") : "-"}
 
 <button class="btn-sm btn-assign"
 onclick="openAssignModal('${b.id}')">
-🚚 ${b.driverUid ? "Change Driver" : "Assign Driver"}
+<i data-lucide="truck"></i> ${b.driverUid ? "Change Driver" : "Assign Driver"}
 </button>
 
 <button class="btn-sm"
 style="background:#16a34a;color:white;margin-left:8px;"
 onclick="updateStatus('${b.id}','delivered')">
-✅ Mark Delivered
+<i data-lucide="badge-check"></i> Mark Delivered
 </button>
 ${b.driverPhone ? `
 <a href="tel:${b.driverPhone}"
 class="btn-sm"
 style="background:#2563eb;color:white;margin-left:8px;text-decoration:none;">
-📞 Call Driver
+<i data-lucide="phone"></i> Call Driver
 </a>
 ` : ""}
 ${b.phone ? `
 <a href="tel:${b.phone}"
 class="btn-sm"
 style="background:#7c3aed;color:white;margin-left:8px;text-decoration:none;">
-📱 Call Customer
+<i data-lucide="circle"></i> Call Customer
 </a>
 ` : ""}
 
 <button class="btn-sm" style="background:#0ea5e9;color:white;margin-left:8px;" onclick="downloadInvoice('${b.id}')">
-  📄 Invoice
+  <i data-lucide="file-text"></i> Invoice
 </button>
 <button class="btn-sm" style="background:#f59e0b;color:white;margin-left:8px;" onclick="emailInvoice('${b.id}')">
-  ✉️ Email
+  <i data-lucide="mail"></i> Email
 </button>
 </div>
 
@@ -1090,16 +1091,16 @@ function filterBookings(q) {
 function updateStatus(id, status) {
   requireAdmin(() => {
     window._firebase.db.collection("bookings").doc(id).update({ status })
-      .then(() => toast("✅ Status → " + cap(status)))
-      .catch(e => toast("❌ " + e.message));
+      .then(() => toast("<i data-lucide="badge-check"></i> Status → " + cap(status)))
+      .catch(e => toast("<i data-lucide="x"></i> " + e.message));
   });
 }
 function deleteBooking(id, ref) {
   requireAdmin(() => {
-    if (!confirm(`⚠️ Permanently delete booking #${ref}?\n\nThis cannot be undone.`)) return;
+    if (!confirm(` Permanently delete booking #${ref}?\n\nThis cannot be undone.`)) return;
     window._firebase.db.collection("bookings").doc(id).delete()
-      .then(() => toast("🗑️ Booking #" + ref + " deleted"))
-      .catch(e => toast("❌ " + e.message));
+      .then(() => toast("<i data-lucide="circle"></i> Booking #" + ref + " deleted"))
+      .catch(e => toast("<i data-lucide="x"></i> " + e.message));
   });
 }
 function exportCSV() {
@@ -1114,7 +1115,7 @@ function exportCSV() {
   a.href = "data:text/csv;charset=utf-8," + encodeURIComponent(csv);
   a.download = "PackZen-Bookings-" + new Date().toLocaleDateString("en-IN").replace(/\//g,"-") + ".csv";
   a.click();
-  toast("📁 CSV downloaded!");
+  toast("<i data-lucide="circle"></i> CSV downloaded!");
 }
  
 function viewBooking(id) {
@@ -1140,10 +1141,10 @@ function renderDrivers() {
         <div>
           <div class="driver-name">${d.name||"Driver"}</div>
           <div class="driver-meta"><span class="online-dot ${d.isOnline?"on":"off"}"></span>${d.isOnline?"Online":"Offline"} &nbsp;·&nbsp; ${d.email}${d.vehicle?` &nbsp;·&nbsp; ${d.vehicle}`:""}</div>
-          <div class="driver-meta" style="margin-top:3px">📞 ${d.phone||"—"} &nbsp;·&nbsp; Active job: <strong>${d.currentBooking?"#"+d.currentBooking.slice(-6).toUpperCase():"None"}</strong>${d.rating?` &nbsp;·&nbsp; ⭐ ${d.rating}`:""}</div>
+          <div class="driver-meta" style="margin-top:3px"><i data-lucide="phone"></i> ${d.phone||"—"} &nbsp;·&nbsp; Active job: <strong>${d.currentBooking?"#"+d.currentBooking.slice(-6).toUpperCase():"None"}</strong>${d.rating?` &nbsp;·&nbsp; ⭐ ${d.rating}`:""}</div>
         </div>
       </div>
-      <span class="badge ${d.isOnline?"badge-delivered":"badge-pending"}">${d.isOnline?"🟢 Active":"⚫ Offline"}</span>
+      <span class="badge ${d.isOnline?"badge-delivered":"badge-pending"}">${d.isOnline?"🟢 Active":"<i data-lucide="circle"></i> Offline"}</span>
     </div>`).join("");
 }
 
@@ -1169,7 +1170,7 @@ function renderReviews() {
   tbody.innerHTML = allReviews.map(r => `
     <tr>
       <td>${r.name||"—"}</td>
-      <td style="color:#f59e0b">${"★".repeat(r.rating||0)}</td>
+      <td style="color:#f59e0b">${"<i data-lucide="star"></i>".repeat(r.rating||0)}</td>
       <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${r.text||""}</td>
       <td>${r.date||"—"}</td>
       <td><span class="badge ${r.status==="approved"?"badge-delivered":"badge-pending"}">${cap(r.status||"pending")}</span></td>
@@ -1180,8 +1181,8 @@ function renderReviews() {
     </tr>`).join("");
   updateStats();
 }
-function approveReview(id) { requireAdmin(() => window._firebase.db.collection("reviews").doc(id).update({ status:"approved" }).then(()=>toast("✅ Review approved!")).catch(e=>toast("❌ "+e.message))); }
-function deleteReview(id) { requireAdmin(() => { if(!confirm("Delete this review?")) return; window._firebase.db.collection("reviews").doc(id).delete().then(()=>toast("🗑️ Review deleted")).catch(e=>toast("❌ "+e.message)); }); }
+function approveReview(id) { requireAdmin(() => window._firebase.db.collection("reviews").doc(id).update({ status:"approved" }).then(()=>toast("<i data-lucide="badge-check"></i> Review approved!")).catch(e=>toast("<i data-lucide="x"></i> "+e.message))); }
+function deleteReview(id) { requireAdmin(() => { if(!confirm("Delete this review?")) return; window._firebase.db.collection("reviews").doc(id).delete().then(()=>toast(" Review deleted")).catch(e=>toast(" "+e.message)); }); }
 
 /* ── PROMOS ── */
 function createPromo() {
@@ -1190,14 +1191,14 @@ function createPromo() {
     const type=document.getElementById("promoType").value;
     const value=Number(document.getElementById("promoValue").value);
     const max=Number(document.getElementById("promoMax").value)||999;
-    if (!code||!value) { toast("⚠️ Fill in code & value"); return; }
+    if (!code||!value) { toast("<i data-lucide="triangle-alert"></i> Fill in code & value"); return; }
     window._firebase.db.collection("promos").doc(code).set({ code, type, value, max, used:0, active:true, createdAt:firebase.firestore.FieldValue.serverTimestamp() })
-      .then(()=>{ toast("✅ Promo created: "+code); document.getElementById("promoCode").value=""; document.getElementById("promoValue").value=""; })
-      .catch(e=>toast("❌ "+e.message));
+      .then(()=>{ toast("<i data-lucide="badge-check"></i> Promo created: "+code); document.getElementById("promoCode").value=""; document.getElementById("promoValue").value=""; })
+      .catch(e=>toast("<i data-lucide="x"></i> "+e.message));
   });
 }
-function togglePromo(id, active) { requireAdmin(()=>window._firebase.db.collection("promos").doc(id).update({active}).then(()=>toast(active?"✅ Promo activated":"⏸ Promo paused"))); }
-function deletePromo(id) { requireAdmin(()=>{ if(!confirm("Delete promo?"))return; window._firebase.db.collection("promos").doc(id).delete().then(()=>toast("🗑️ Promo deleted")); }); }
+function togglePromo(id, active) { requireAdmin(()=>window._firebase.db.collection("promos").doc(id).update({active}).then(()=>toast(active?"<i data-lucide="badge-check"></i> Promo activated":"⏸ Promo paused"))); }
+function deletePromo(id) { requireAdmin(()=>{ if(!confirm("Delete promo?"))return; window._firebase.db.collection("promos").doc(id).delete().then(()=>toast(" Promo deleted")); }); }
 function renderPromos() {
   const tbody = document.getElementById("promosTable");
   if (!tbody) return;
@@ -1221,14 +1222,14 @@ async function sendBroadcast() {
     const msg=document.getElementById("broadcastMsg").value.trim();
     const viaWA=document.getElementById("sendWA").checked;
     const viaEmail=document.getElementById("sendEmail").checked;
-    if (!msg) { toast("⚠️ Type a message first"); return; }
+    if (!msg) { toast("<i data-lucide="triangle-alert"></i> Type a message first"); return; }
     const result=document.getElementById("broadcastResult");
     result.textContent="⏳ Sending...";
     if (viaWA) window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`,"_blank");
     await window._firebase.db.collection("broadcasts").add({ message:msg, via:[viaWA?"WhatsApp":"",viaEmail?"Email":""].filter(Boolean).join(", "), recipients:allCustomers.length, createdAt:firebase.firestore.FieldValue.serverTimestamp() });
-    result.textContent=`✅ Broadcast sent to ${allCustomers.length} customers!`;
+    result.textContent=` Broadcast sent to ${allCustomers.length} customers!`;
     document.getElementById("broadcastMsg").value="";
-    toast("📢 Broadcast sent!");
+    toast("<i data-lucide="circle"></i> Broadcast sent!");
   });
 }
 
@@ -1253,13 +1254,13 @@ function populateAssignSelect() {
 function confirmAssign() {
   requireAdmin(() => {
     const driverUid = document.getElementById("assignSelect").value;
-    if (!driverUid) { toast("⚠️ Select a driver"); return; }
+    if (!driverUid) { toast("<i data-lucide="triangle-alert"></i> Select a driver"); return; }
     const driver = allDrivers.find(d => d.id === driverUid);
     const db = window._firebase.db;
     db.collection("bookings").doc(assigningId).update({ driverUid, driverName:driver?.name||"Driver", driverPhone:driver?.phone||"", status:"assigned" })
       .then(()=>db.collection("users").doc(driverUid).update({ currentBooking:assigningId }))
-      .then(()=>{ toast("✅ Driver assigned!"); closeAssignModal(); })
-      .catch(e=>toast("❌ "+e.message));
+      .then(()=>{ toast("<i data-lucide="badge-check"></i> Driver assigned!"); closeAssignModal(); })
+      .catch(e=>toast("<i data-lucide="x"></i> "+e.message));
   });
 }
 
@@ -1321,7 +1322,7 @@ async function loadDeletionRequests() {
                      <button class="btn-action" style="background:#dc2626;color:white;margin-left:4px" onclick="updateDeletionStatus('${reqId}', 'Rejected')">Reject</button>`;
       }
 
-      actions += `<button class="btn-action" style="background:#ef4444;color:white;margin-left:4px;opacity:0.8" onclick="deleteDeletionRequest('${reqId}')">🗑️</button>`;
+      actions += `<button class="btn-action" style="background:#ef4444;color:white;margin-left:4px;opacity:0.8" onclick="deleteDeletionRequest('${reqId}')"><i data-lucide="circle"></i></button>`;
 
       return `<tr>
         <td style="font-family:'Space Grotesk',sans-serif;font-weight:600;">${reqId}</td>
@@ -1341,7 +1342,7 @@ async function loadDeletionRequests() {
 async function viewDeletionRequest(reqId) {
   try {
     const doc = await window._firebase.db.collection("accountDeletionRequests").doc(reqId).get();
-    if (!doc.exists) return toast("⚠️ Request not found.");
+    if (!doc.exists) return toast("<i data-lucide="triangle-alert"></i> Request not found.");
     const data = doc.data();
 
     const details = `
@@ -1376,7 +1377,7 @@ async function viewDeletionRequest(reqId) {
 
   } catch (err) {
     console.error("View error:", err);
-    toast("❌ Failed to load request details.");
+    toast("<i data-lucide="x"></i> Failed to load request details.");
   }
 }
 
@@ -1389,11 +1390,11 @@ async function updateDeletionStatus(reqId, newStatus) {
       processedAt: firebase.firestore.FieldValue.serverTimestamp(),
       processedBy: processedBy
     });
-    toast(`✅ Request marked as ${newStatus}`);
+    toast(`<i data-lucide="badge-check"></i> Request marked as ${newStatus}`);
     loadDeletionRequests();
   } catch (err) {
     console.error("Update error:", err);
-    toast("❌ Failed to update request status.");
+    toast("<i data-lucide="x"></i> Failed to update request status.");
   }
 }
 
@@ -1401,11 +1402,11 @@ async function deleteDeletionRequest(reqId) {
   if (!confirm("Are you sure you want to permanently delete this request record?")) return;
   try {
     await window._firebase.db.collection("accountDeletionRequests").doc(reqId).delete();
-    toast("🗑️ Request deleted");
+    toast("<i data-lucide="circle"></i> Request deleted");
     loadDeletionRequests();
   } catch (err) {
     console.error("Delete error:", err);
-    toast("❌ Failed to delete request.");
+    toast("<i data-lucide="x"></i> Failed to delete request.");
   }
 }
 
@@ -1469,7 +1470,7 @@ async function resolveDamageClaim(newStatus) {
   resolvedBy: adminUser?.uid || "admin"
 });
 
-toast("✅ Claim marked as " + newStatus);
+toast("<i data-lucide="badge-check"></i> Claim marked as " + newStatus);
     document.getElementById("claimDetailPanel").style.display = "none";
     loadDamageClaims();
   } catch(e) { alert("Error: " + e.message); }
@@ -1489,7 +1490,7 @@ async function loadCancelRequests() {
       return `<tr>
         <td>${c.bookingDocId||"—"}</td><td>${c.customerUid?.slice(0,8)||"—"}</td>
         <td>${c.reason||"—"}</td><td>${date}</td>
-        <td><span style="color:${c.resolved?'#16a34a':'#dc2626'}">${c.resolved?"✅ Resolved":"⏳ Pending"}</span></td>
+        <td><span style="color:${c.resolved?'#16a34a':'#dc2626'}">${c.resolved?"<i data-lucide="badge-check"></i> Resolved":"⏳ Pending"}</span></td>
         <td><button onclick="resolveCancelRequest('${d.id}')" style="padding:.3rem .7rem;background:#2563eb;color:white;border:none;border-radius:8px;cursor:pointer;font-size:.75rem">Mark Resolved</button></td>
       </tr>`;
     }).join("");
@@ -1498,7 +1499,7 @@ async function loadCancelRequests() {
 async function resolveCancelRequest(docId) {
   if (!window._firebase) return;
   await window._firebase.db.collection("cancelRequests").doc(docId).update({ resolved:true });
-  toast("✅ Marked as resolved");
+  toast("<i data-lucide="badge-check"></i> Marked as resolved");
   loadCancelRequests();
 }
 
@@ -1511,10 +1512,10 @@ async function adminCreateDriver() {
   const password = (document.getElementById("newDriverPassword")||{}).value||"";
   const msgEl    = document.getElementById("adminDriverMsg");
   const setMsg   = (text, ok) => { if(msgEl){ msgEl.textContent=text; msgEl.style.color=ok?"#16a34a":"#e53e3e"; } };
-  if (!name.trim()) return setMsg("⚠️ Please enter the driver's full name.", false);
-  if (!email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) return setMsg("⚠️ Please enter a valid email address.", false);
-  if (phone.trim() && phone.trim().length!==10) return setMsg("⚠️ Phone must be 10 digits (or leave it blank).", false);
-  if (password.length < 6) return setMsg("⚠️ Password must be at least 6 characters.", false);
+  if (!name.trim()) return setMsg("<i data-lucide="triangle-alert"></i> Please enter the driver's full name.", false);
+  if (!email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) return setMsg("<i data-lucide="triangle-alert"></i> Please enter a valid email address.", false);
+  if (phone.trim() && phone.trim().length!==10) return setMsg("<i data-lucide="triangle-alert"></i> Phone must be 10 digits (or leave it blank).", false);
+  if (password.length < 6) return setMsg("<i data-lucide="triangle-alert"></i> Password must be at least 6 characters.", false);
   setMsg("⏳ Creating driver account...", true);
   const btn = document.querySelector('[onclick="adminCreateDriver()"]');
   if (btn) { btn.disabled=true; btn.textContent="Creating..."; }
@@ -1527,17 +1528,17 @@ async function adminCreateDriver() {
     await secondaryAuth.signOut();
     await secondaryApp.delete();
     await db.collection("users").doc(driverUid).set({ name:name.trim(), email:email.trim(), phone:phone.trim()?"+91"+phone.trim():"", vehicle:vehicle||"", role:"driver", isOnline:false, rating:0, totalMoves:0, createdBy:adminUser?adminUser.uid:"admin", createdAt:firebase.firestore.FieldValue.serverTimestamp() });
-    setMsg('✅ Driver "'+name.trim()+'" created! They can now log in at driver.html', true);
-    toast("✅ Driver account created for "+name.trim());
+    setMsg('<i data-lucide="badge-check"></i> Driver "'+name.trim()+'" created! They can now log in at driver.html', true);
+    toast("<i data-lucide="badge-check"></i> Driver account created for "+name.trim());
     ["newDriverName","newDriverEmail","newDriverPhone","newDriverVehicle","newDriverPassword"].forEach(id=>{const el=document.getElementById(id);if(el)el.value="";});
     loadDrivers();
   } catch(err) {
-    if      (err.code==="auth/email-already-in-use") setMsg("⚠️ A driver with this email already exists.", false);
-    else if (err.code==="auth/invalid-email")        setMsg("⚠️ Invalid email address format.", false);
-    else if (err.code==="auth/weak-password")        setMsg("⚠️ Password is too weak. Use at least 6 characters.", false);
-    else setMsg("⚠️ "+(err.message||"Failed to create driver."), false);
+    if      (err.code==="auth/email-already-in-use") setMsg("<i data-lucide="triangle-alert"></i> A driver with this email already exists.", false);
+    else if (err.code==="auth/invalid-email")        setMsg("<i data-lucide="triangle-alert"></i> Invalid email address format.", false);
+    else if (err.code==="auth/weak-password")        setMsg("<i data-lucide="triangle-alert"></i> Password is too weak. Use at least 6 characters.", false);
+    else setMsg("<i data-lucide="triangle-alert"></i> "+(err.message||"Failed to create driver."), false);
   } finally {
-    if (btn) { btn.disabled=false; btn.textContent="✅ Create Driver Account"; }
+    if (btn) { btn.disabled=false; btn.textContent=" Create Driver Account"; }
   }
 }
 
@@ -1549,17 +1550,17 @@ function cap(s) { return s ? s.charAt(0).toUpperCase()+s.slice(1) : ""; }
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
 <script>
 async function downloadInvoice(docId) {
-  if (typeof window.jspdf === "undefined") { toast("⚠️ PDF library loading..."); return; }
-  if (!window._firebase) { toast("⚠️ Firebase not initialized."); return; }
+  if (typeof window.jspdf === "undefined") { toast("<i data-lucide="triangle-alert"></i> PDF library loading..."); return; }
+  if (!window._firebase) { toast("<i data-lucide="triangle-alert"></i> Firebase not initialized."); return; }
 
   let targetId = docId;
-  if (!targetId) { toast("⚠️ No booking found."); return; }
+  if (!targetId) { toast("<i data-lucide="triangle-alert"></i> No booking found."); return; }
 
   toast("⏳ Generating Invoice...");
 
   try {
     const docSnap = await window._firebase.db.collection("bookings").doc(targetId).get();
-    if (!docSnap.exists) { toast("⚠️ Booking not found."); return; }
+    if (!docSnap.exists) { toast("<i data-lucide="triangle-alert"></i> Booking not found."); return; }
 
     const b = docSnap.data();
     const { jsPDF } = window.jspdf;
@@ -1751,26 +1752,26 @@ async function downloadInvoice(docId) {
     doc.text("Support: 9945095453", 150, pageHeight - 7);
 
     doc.save(`PackZen-Invoice-${b.bookingRef || targetId}.pdf`);
-    toast("✅ Invoice downloaded successfully!");
+    toast("<i data-lucide="badge-check"></i> Invoice downloaded successfully!");
 
   } catch (error) {
     console.error("Error generating invoice:", error);
-    toast("❌ Error generating invoice.");
+    toast("<i data-lucide="x"></i> Error generating invoice.");
   }
 }
 
 async function emailInvoice(docId) {
-  if (typeof emailjs === "undefined") { toast("⚠️ Email service not ready."); return; }
-  if (!window._firebase) { toast("⚠️ Firebase not initialized."); return; }
+  if (typeof emailjs === "undefined") { toast("<i data-lucide="triangle-alert"></i> Email service not ready."); return; }
+  if (!window._firebase) { toast("<i data-lucide="triangle-alert"></i> Firebase not initialized."); return; }
 
   let targetId = docId;
-  if (!targetId) { toast("⚠️ No booking found."); return; }
+  if (!targetId) { toast("<i data-lucide="triangle-alert"></i> No booking found."); return; }
 
   toast("⏳ Sending Email...");
 
   try {
     const docSnap = await window._firebase.db.collection("bookings").doc(targetId).get();
-    if (!docSnap.exists) { toast("⚠️ Booking not found."); return; }
+    if (!docSnap.exists) { toast("<i data-lucide="triangle-alert"></i> Booking not found."); return; }
 
     const b = docSnap.data();
 
@@ -1781,7 +1782,7 @@ async function emailInvoice(docId) {
       if(userSnap.exists && userSnap.data().email) {
         recipientEmail = userSnap.data().email;
       } else {
-        toast("⚠️ No email address found for this customer.");
+        toast("<i data-lucide="triangle-alert"></i> No email address found for this customer.");
         return;
       }
     }
@@ -1797,17 +1798,27 @@ async function emailInvoice(docId) {
       amount: b.total || 0,
       message: "Your invoice has been generated. You can download the PDF from your PackZen dashboard."
     }).then(() => {
-      toast("✅ Invoice emailed successfully!");
+      toast("<i data-lucide="badge-check"></i> Invoice emailed successfully!");
     }).catch((err) => {
       console.error("Email failed:", err);
-      toast("❌ Failed to send email.");
+      toast("<i data-lucide="x"></i> Failed to send email.");
     });
 
   } catch (err) {
      console.error("Error fetching for email:", err);
-     toast("❌ Error sending email.");
+     toast("<i data-lucide="x"></i> Error sending email.");
   }
 }
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  if (typeof lucide !== "undefined") {
+    lucide.createIcons();
+    const observer = new MutationObserver(() => lucide.createIcons());
+    observer.observe(document.body, { childList: true, subtree: true });
+  }
+});
 </script>
 
 </body>

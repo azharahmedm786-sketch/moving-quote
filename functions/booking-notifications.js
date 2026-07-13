@@ -18,7 +18,7 @@ async function sendBookingConfirmationEmail({ bookingRef, customerName, customer
     const result = await sendCustomerEmail("booking_confirmed", customerEmail, {
       bookingRef, customerName, pickup, drop, date, total, paymentStatus
     });
-    console.log(`📧 Booking confirmation email → ${customerEmail}: ${result.success ? "SENT" : "FAILED (" + result.error + ")"}`);
+    console.log(` Booking confirmation email → ${customerEmail}: ${result.success ? "SENT" : "FAILED (" + result.error + ")"}`);
     return result;
   } catch (e) {
     console.error("sendBookingConfirmationEmail unexpected error:", e.message);
@@ -35,7 +35,7 @@ async function sendDriverAssignedEmail({ bookingRef, customerName, customerEmail
     const result = await sendCustomerEmail("driver_assigned", customerEmail, {
       bookingRef, customerName, driverName, driverPhone, pickup, drop, date
     });
-    console.log(`📧 Driver assigned email → ${customerEmail}: ${result.success ? "SENT" : "FAILED (" + result.error + ")"}`);
+    console.log(` Driver assigned email → ${customerEmail}: ${result.success ? "SENT" : "FAILED (" + result.error + ")"}`);
     return result;
   } catch (e) {
     console.error("sendDriverAssignedEmail unexpected error:", e.message);
@@ -52,7 +52,7 @@ async function sendMoveReminderEmail({ bookingRef, customerName, customerEmail, 
     const result = await sendCustomerEmail("booking_reminder", customerEmail, {
       bookingRef, customerName, pickup, drop, date, timeSlot
     });
-    console.log(`📧 Move reminder email → ${customerEmail}: ${result.success ? "SENT" : "FAILED (" + result.error + ")"}`);
+    console.log(` Move reminder email → ${customerEmail}: ${result.success ? "SENT" : "FAILED (" + result.error + ")"}`);
     return result;
   } catch (e) {
     console.error("sendMoveReminderEmail unexpected error:", e.message);
@@ -69,7 +69,7 @@ async function sendBookingCompletedEmail({ bookingRef, customerName, customerEma
     const result = await sendCustomerEmail("booking_completed", customerEmail, {
       bookingRef, customerName, pickup, drop, date, total
     });
-    console.log(`📧 Booking completed email → ${customerEmail}: ${result.success ? "SENT" : "FAILED (" + result.error + ")"}`);
+    console.log(` Booking completed email → ${customerEmail}: ${result.success ? "SENT" : "FAILED (" + result.error + ")"}`);
     return result;
   } catch (e) {
     console.error("sendBookingCompletedEmail unexpected error:", e.message);
@@ -86,7 +86,7 @@ async function sendReviewRequestEmail({ bookingRef, customerName, customerEmail,
     const result = await sendCustomerEmail("feedback_request", customerEmail, {
       bookingRef, customerName, pickup, drop, date
     });
-    console.log(`📧 Review request email → ${customerEmail}: ${result.success ? "SENT" : "FAILED (" + result.error + ")"}`);
+    console.log(` Review request email → ${customerEmail}: ${result.success ? "SENT" : "FAILED (" + result.error + ")"}`);
     return result;
   } catch (e) {
     console.error("sendReviewRequestEmail unexpected error:", e.message);

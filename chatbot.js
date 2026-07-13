@@ -183,7 +183,7 @@
           <div class="pzs-hdr-title">PackZen Support</div>
           <div class="pzs-hdr-sub">Packers & Movers · Bengaluru</div>
         </div>
-        <button class="pzs-hdr-close" id="pzs-close">✕</button>
+        <button class="pzs-hdr-close" id="pzs-close"><i data-lucide=x></i></button>
       </div>
       <div class="pzs-body" id="pzs-body">
         <div class="pzs-typing" id="pzs-typing"><span></span><span></span><span></span></div>
@@ -246,14 +246,14 @@
   /* ── HOME ── */
   async function showHome() {
     mode = 'home';
-    await botSay("Hello! Welcome to PackZen Packers & Movers. 👋\n\nHow can we help you today?", 900);
+    await botSay("Hello! Welcome to PackZen Packers & Movers. <i data-lucide=circle></i>\n\nHow can we help you today?", 900);
     const c = document.createElement('div');
     c.className = 'pzs-cards';
     [
-      { action:'booking', icon:'📦', title:'Book a Move',      sub:'Schedule your packing & moving' },
-      { action:'quote',   icon:'💰', title:'Get a Quote',      sub:'Estimate your moving cost'       },
-      { action:'faq',     icon:'❓', title:'Ask a Question',   sub:'Services, payment, areas & more' },
-      { action:'call',    icon:'📞', title:'Call Us',          sub:'Speak to our team directly'      },
+      { action:'booking', icon:'<i data-lucide=package></i>', title:'Book a Move',      sub:'Schedule your packing & moving' },
+      { action:'quote',   icon:'<i data-lucide=indian-rupee></i>', title:'Get a Quote',      sub:'Estimate your moving cost'       },
+      { action:'faq',     icon:'<i data-lucide=circle></i>', title:'Ask a Question',   sub:'Services, payment, areas & more' },
+      { action:'call',    icon:'<i data-lucide=phone></i>', title:'Call Us',          sub:'Speak to our team directly'      },
     ].forEach(({ action, icon, title, sub }) => {
       const btn = document.createElement('button');
       btn.className = 'pzs-card';
@@ -275,7 +275,7 @@
       await botSay("Here are some common questions. Tap one or type your question below.", 600);
       showFaqList();
     } else if (action === 'call') {
-      await botSay(["You can call us at:", "📞  9945095453\n\nAvailable 7 days a week, 7 AM – 8 PM."], 600);
+      await botSay(["You can call us at:", "<i data-lucide=phone></i>  9945095453\n\nAvailable 7 days a week, 7 AM – 8 PM."], 600);
       showBackChips();
     }
   }
@@ -362,14 +362,14 @@
 
   async function showSummary() {
     await botSay("Here's your booking request. Please review the details.", 700);
-    const icons = { name:'👤', phone:'📱', from:'📍', to:'🏁', date:'📅', size:'🏠' };
+    const icons = { name:'<i data-lucide=user-round></i>', phone:'<i data-lucide=circle></i>', from:'<i data-lucide=map-pin></i>', to:'<i data-lucide=flag></i>', date:'<i data-lucide=calendar-days></i>', size:'<i data-lucide=house></i>' };
     const labels = { name:'Name', phone:'Phone', from:'Pickup', to:'Drop', date:'Date', size:'Size' };
     const sum = document.createElement('div');
     sum.className = 'pzs-sum';
     sum.innerHTML = `<div class="pzs-sum-hdr">Booking Request</div>` +
       STEPS.map(s => `<div class="pzs-sum-row"><div class="pzs-sum-k">${icons[s.key]} ${labels[s.key]}</div><div class="pzs-sum-v">${booking[s.key] || '—'}</div></div>`).join('');
     const waText = encodeURIComponent(
-      `🚚 *New Booking — PackZen*\n\n👤 ${booking.name||'—'}\n📱 ${booking.phone||'—'}\n📍 From: ${booking.from||'—'}\n🏁 To: ${booking.to||'—'}\n📅 Date: ${booking.date||'—'}\n🏠 Size: ${booking.size||'—'}\n\n_Via packzenblr.in_`
+      `<i data-lucide=truck></i> *New Booking — PackZen*\n\n<i data-lucide=user-round></i> ${booking.name||'—'}\n<i data-lucide=circle></i> ${booking.phone||'—'}\n<i data-lucide=map-pin></i> From: ${booking.from||'—'}\n<i data-lucide=flag></i> To: ${booking.to||'—'}\n<i data-lucide=calendar-days></i> Date: ${booking.date||'—'}\n<i data-lucide=house></i> Size: ${booking.size||'—'}\n\n_Via packzenblr.in_`
     );
     const wa = document.createElement('a');
     wa.href = `https://wa.me/${WA_NUMBER}?text=${waText}`;
@@ -377,7 +377,7 @@
     wa.innerHTML = `<svg viewBox="0 0 24 24" fill="#fff"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg> Confirm on WhatsApp`;
     sum.appendChild(wa);
     addEl(sum);
-    await botSay("Tap 'Confirm on WhatsApp' — our team will call you back within minutes! 🎉", 900);
+    await botSay("Tap 'Confirm on WhatsApp' — our team will call you back within minutes! <i data-lucide=party-popper></i>", 900);
     step = 0; mode = 'home';
     setTimeout(() => {
       const chips = makeChips(['Book Another Move','Main Menu']);
@@ -422,7 +422,7 @@
   }
 
   function showBackChips() {
-    const chips = makeChips(['📦 Book a Move','❓ More Questions','🏠 Main Menu']);
+    const chips = makeChips(['<i data-lucide=package></i> Book a Move','<i data-lucide=circle></i> More Questions','<i data-lucide=house></i> Main Menu']);
     chips.addEventListener('click', e => {
       const c = e.target.closest('.pzs-chip'); if(!c) return;
       chips.remove(); addUserGrp(c.textContent);
@@ -449,11 +449,11 @@
       await botSay("I'll collect your details for an accurate quote.",600); return showFormStep();
     }
     if (t.match(/\b(call|phone|number|contact)\b/)) {
-      await botSay(["📞  9945095453","Available 7 AM – 8 PM, 7 days a week."],600); return showBackChips();
+      await botSay(["<i data-lucide=phone></i>  9945095453","Available 7 AM – 8 PM, 7 days a week."],600); return showBackChips();
     }
     const faq = FAQS.find(f => f.q.toLowerCase().split(/\W+/).some(w => w.length>3 && t.includes(w)));
     if (faq) { await botSay(faq.a,700); return showBackChips(); }
-    await botSay("I'm not sure about that, but our team can help right away!\n\n📞  9945095453",700);
+    await botSay("I'm not sure about that, but our team can help right away!\n\n<i data-lucide=phone></i>  9945095453",700);
     showBackChips();
   }
 

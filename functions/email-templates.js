@@ -67,8 +67,8 @@ function renderShell({ headerEmoji, headerTitle, headerSubtitle, bodyHtml, ctaLa
         <tr>
           <td style="background:${BRAND.darkBg};padding:22px 32px;text-align:center;">
             <div style="font-size:13px;color:#94a3b8;margin-bottom:10px;">Need help? We're here for you.</div>
-            <div style="font-size:13px;color:#e2e8f4;margin-bottom:4px;">📧 <a href="mailto:${BRAND.supportEmail}" style="color:#e2e8f4;">${BRAND.supportEmail}</a></div>
-            <div style="font-size:13px;color:#e2e8f4;margin-bottom:12px;">📞 <a href="tel:${BRAND.supportPhone.replace(/\s/g,"")}" style="color:#e2e8f4;">${BRAND.supportPhone}</a></div>
+            <div style="font-size:13px;color:#e2e8f4;margin-bottom:4px;"><i data-lucide=mail></i> <a href="mailto:${BRAND.supportEmail}" style="color:#e2e8f4;">${BRAND.supportEmail}</a></div>
+            <div style="font-size:13px;color:#e2e8f4;margin-bottom:12px;"><i data-lucide=phone></i> <a href="tel:${BRAND.supportPhone.replace(/\s/g,"")}" style="color:#e2e8f4;">${BRAND.supportPhone}</a></div>
             <div style="font-size:12px;color:#64748b;">
               <a href="${BRAND.website}" style="color:#64748b;text-decoration:none;">packzenblr.in</a> ·
               <a href="${BRAND.instagram}" style="color:#64748b;text-decoration:none;">Instagram</a>
@@ -110,7 +110,7 @@ function bookingConfirmed(d) {
   return {
     subject: `Booking Confirmed — ${d.bookingRef} | PackZen`,
     html: renderShell({
-      headerEmoji: "🎉",
+      headerEmoji: "<i data-lucide=party-popper></i>",
       headerTitle: "Booking Confirmed!",
       headerSubtitle: "We're all set for your move",
       bodyHtml: `<p>Hi ${esc(d.customerName)},</p>
@@ -128,7 +128,7 @@ function paymentSuccessful(d) {
   return {
     subject: `Payment Received — ${d.bookingRef} | PackZen`,
     html: renderShell({
-      headerEmoji: "💳",
+      headerEmoji: "<i data-lucide=credit-card></i>",
       headerTitle: "Payment Successful",
       headerSubtitle: "Your payment has been received",
       bodyHtml: `<p>Hi ${esc(d.customerName)},</p>
@@ -146,7 +146,7 @@ function driverAssigned(d) {
   return {
     subject: `Driver Assigned — ${d.bookingRef} | PackZen`,
     html: renderShell({
-      headerEmoji: "🚛",
+      headerEmoji: "<i data-lucide=truck></i>",
       headerTitle: "Driver Assigned",
       headerSubtitle: "Your moving team is on the way",
       bodyHtml: `<p>Hi ${esc(d.customerName)},</p>
@@ -163,7 +163,7 @@ function driverArriving(d) {
   return {
     subject: `Your Driver is Arriving Soon — ${d.bookingRef} | PackZen`,
     html: renderShell({
-      headerEmoji: "📍",
+      headerEmoji: "<i data-lucide=map-pin></i>",
       headerTitle: "Driver Arriving Soon",
       headerSubtitle: "Get ready for your move",
       bodyHtml: `<p>Hi ${esc(d.customerName)},</p>
@@ -198,7 +198,7 @@ function bookingCompleted(d) {
   return {
     subject: `Move Completed — ${d.bookingRef} | PackZen`,
     html: renderShell({
-      headerEmoji: "✅",
+      headerEmoji: "<i data-lucide=badge-check></i>",
       headerTitle: "Move Completed!",
       headerSubtitle: "Hope everything went smoothly",
       bodyHtml: `<p>Hi ${esc(d.customerName)},</p>
@@ -216,7 +216,7 @@ function bookingCancelled(d) {
   return {
     subject: `Booking Cancelled — ${d.bookingRef} | PackZen`,
     html: renderShell({
-      headerEmoji: "❌",
+      headerEmoji: "<i data-lucide=x></i>",
       headerTitle: "Booking Cancelled",
       headerSubtitle: "Your booking has been cancelled",
       bodyHtml: `<p>Hi ${esc(d.customerName)},</p>
@@ -234,7 +234,7 @@ function bookingRescheduled(d) {
   return {
     subject: `Booking Rescheduled — ${d.bookingRef} | PackZen`,
     html: renderShell({
-      headerEmoji: "📅",
+      headerEmoji: "<i data-lucide=calendar-days></i>",
       headerTitle: "Booking Rescheduled",
       headerSubtitle: "Your new move date is confirmed",
       bodyHtml: `<p>Hi ${esc(d.customerName)},</p>
@@ -251,7 +251,7 @@ function refundProcessed(d) {
   return {
     subject: `Refund Processed — ${d.bookingRef} | PackZen`,
     html: renderShell({
-      headerEmoji: "💰",
+      headerEmoji: "<i data-lucide=indian-rupee></i>",
       headerTitle: "Refund Processed",
       headerSubtitle: "Your refund is on its way",
       bodyHtml: `<p>Hi ${esc(d.customerName)},</p>

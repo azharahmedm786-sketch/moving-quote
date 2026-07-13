@@ -16,7 +16,7 @@ function showToast(msg, dur) {
     t.className = "toast-msg";
     document.body.appendChild(t);
   }
-  t.textContent = msg;
+  t.innerHTML = msg;
   t.classList.add("show");
   clearTimeout(t._hideTimer);
   t._hideTimer = setTimeout(function () { t.classList.remove("show"); }, dur);
@@ -109,7 +109,7 @@ function requirePartner(onReady) {
         })
         .catch(function (err) {
           console.error(err);
-          showToast("⚠️ Couldn't load your account. Please try again.");
+          showToast("<i data-lucide=triangle-alert></i> Couldn't load your account. Please try again.");
         });
     });
   });
@@ -206,9 +206,9 @@ function toggleOnlineStatus() {
       PZ.partner.online = newVal;
       qsa("#topbarOnlineToggle, #settingsOnlineToggle").forEach(function (b) { if (b) b.classList.toggle("on", newVal); });
       var lbl = qs("#onlineLabel"); if (lbl) lbl.textContent = newVal ? "Online" : "Offline";
-      showToast(newVal ? "🟢 You're online — receiving bookings" : "⚪ You're offline");
+      showToast(newVal ? "🟢 You're online — receiving bookings" : "<i data-lucide=circle></i> You're offline");
     })
-    .catch(function () { showToast("⚠️ Couldn't update status"); });
+    .catch(function () { showToast("<i data-lucide=triangle-alert></i> Couldn't update status"); });
 }
 
 function doLogout() {
@@ -297,7 +297,7 @@ function initLoginPage() {
       var f = qs("#loginPassword");
       var show = f.type === "password";
       f.type = show ? "text" : "password";
-      this.textContent = show ? "🙈" : "👁";
+      this.textContent = show ? "" : "";
     });
   });
 }
@@ -352,12 +352,12 @@ function initRegistrationStatusPage() {
 
   function paint(status, reason) {
     if (status === "approved") {
-      icon.textContent = "✅"; title.textContent = "You're Approved!";
+      icon.textContent = ""; title.textContent = "You're Approved!";
       sub.textContent = "Your PackZen Partner account is active. You can now access your dashboard and start receiving bookings.";
       qs("#statusPrimaryBtn").href = "partner-dashboard.html";
       qs("#statusPrimaryBtn").textContent = "Go to Dashboard";
     } else if (status === "rejected") {
-      icon.textContent = "❌"; title.textContent = "Application Not Approved";
+      icon.textContent = ""; title.textContent = "Application Not Approved";
       sub.textContent = "Unfortunately your partner application wasn't approved this time.";
       if (reason) { reasonBox.textContent = "Reason: " + reason; reasonBox.style.display = "block"; }
       qs("#statusPrimaryBtn").href = "https://wa.me/919945095453"; qs("#statusPrimaryBtn").target = "_blank";
@@ -399,12 +399,12 @@ function initDashboardPage() {
   requirePartner(function (partner) {
     var name = (partner.ownerName || partner.businessName || "Partner").split(" ")[0];
     qs("#portalContent").innerHTML =
-      '<h1 style="font-size:1.2rem;font-weight:800;margin:0 0 4px;">Welcome back, ' + pzEsc(name) + ' 👋</h1>' +
+      '<h1 style="font-size:1.2rem;font-weight:800;margin:0 0 4px;">Welcome back, ' + pzEsc(name) + ' <i data-lucide=circle></i></h1>' +
       '<p style="color:var(--text-muted);font-size:0.86rem;margin:0 0 18px;">Here\'s how your business is doing today.</p>' +
       '<div class="pstat-grid">' +
-        '<div class="pstat-card"><div class="pstat-icon blue">📦</div><div class="pstat-value" id="statTotalJobs">' + (partner.totalJobs || 0) + '</div><div class="pstat-label">Total Jobs</div></div>' +
-        '<div class="pstat-card"><div class="pstat-icon green">✅</div><div class="pstat-value" id="statCompletedJobs">' + (partner.completedJobs || 0) + '</div><div class="pstat-label">Completed</div></div>' +
-        '<div class="pstat-card"><div class="pstat-icon amber">💰</div><div class="pstat-value" id="statEarnings">' + pzMoney(partner.totalEarnings || 0) + '</div><div class="pstat-label">Total Earnings</div></div>' +
+        '<div class="pstat-card"><div class="pstat-icon blue"><i data-lucide=package></i></div><div class="pstat-value" id="statTotalJobs">' + (partner.totalJobs || 0) + '</div><div class="pstat-label">Total Jobs</div></div>' +
+        '<div class="pstat-card"><div class="pstat-icon green"><i data-lucide=badge-check></i></div><div class="pstat-value" id="statCompletedJobs">' + (partner.completedJobs || 0) + '</div><div class="pstat-label">Completed</div></div>' +
+        '<div class="pstat-card"><div class="pstat-icon amber"><i data-lucide=indian-rupee></i></div><div class="pstat-value" id="statEarnings">' + pzMoney(partner.totalEarnings || 0) + '</div><div class="pstat-label">Total Earnings</div></div>' +
         '<div class="pstat-card"><div class="pstat-icon purple">⭐</div><div class="pstat-value" id="statRating">' + (partner.rating ? partner.rating.toFixed(1) : "New") + '</div><div class="pstat-label">Rating</div></div>' +
       '</div>' +
       '<div class="psection-head"><h2>Recent Bookings <span id="newRequestsBadge" class="pstatus-pill pstatus-offered" style="display:none;margin-left:6px"></span></h2><a href="partner-bookings.html">View all →</a></div>' +
@@ -418,7 +418,7 @@ function initDashboardPage() {
       .limit(5)
       .onSnapshot(function (snap) {
         if (snap.empty) {
-          listEl.innerHTML = emptyStateHtml("📦", "No bookings yet", "New booking requests will appear here.");
+          listEl.innerHTML = emptyStateHtml("<i data-lucide=package></i>", "No bookings yet", "New booking requests will appear here.");
           return;
         }
         listEl.innerHTML = snap.docs.map(bookingCardHtml).join("");
@@ -459,8 +459,8 @@ function bookingCardHtml(doc) {
     '<span class="pstatus-pill pstatus-' + status + '">' + statusLabel(status) + '</span></div>' +
     '<div class="pbk-route">' + pzEsc(pickup) + ' → ' + pzEsc(drop) + '</div>' +
     '<div class="pbk-meta">' +
-      '<span>📅 ' + pzDate(b.movingDate || b.createdAt) + '</span>' +
-      '<span>🚚 ' + pzEsc(b.vehicleType || "Vehicle") + '</span>' +
+      '<span><i data-lucide=calendar-days></i> ' + pzDate(b.movingDate || b.createdAt) + '</span>' +
+      '<span><i data-lucide=truck></i> ' + pzEsc(b.vehicleType || "Vehicle") + '</span>' +
       '<span class="pbk-fare">' + pzMoney(b.partnerEarnings || b.fare || 0) + '</span>' +
     '</div></div>';
 }
@@ -520,7 +520,7 @@ function loadBookingsTab(tab) {
     .limit(50)
     .onSnapshot(function (snap) {
       if (snap.empty) {
-        listEl.innerHTML = emptyStateHtml("📦", "Nothing here", "Bookings in this category will show up here.");
+        listEl.innerHTML = emptyStateHtml("<i data-lucide=package></i>", "Nothing here", "Bookings in this category will show up here.");
         return;
       }
       listEl.innerHTML = snap.docs.map(function (doc) { return bookingCardHtmlWithActions(doc, tab); }).join("");
@@ -563,8 +563,8 @@ function attachQuickActions(container) {
 function updateBookingStatus(bookingId, newStatus, extra) {
   var payload = Object.assign({ partnerStatus: newStatus }, extra || {});
   return window._firebase.db.collection("bookings").doc(bookingId).update(payload)
-    .then(function () { showToast("✅ Booking " + statusLabel(newStatus).toLowerCase()); })
-    .catch(function (err) { console.error(err); showToast("⚠️ Couldn't update booking"); });
+    .then(function () { showToast("<i data-lucide=badge-check></i> Booking " + statusLabel(newStatus).toLowerCase()); })
+    .catch(function (err) { console.error(err); showToast(" Couldn't update booking"); });
 }
 
 /* ===================================================================
@@ -583,7 +583,7 @@ function initBookingDetailsPage() {
         renderBookingDetails(doc);
       }, function (err) {
         console.error(err);
-        showToast("⚠️ Couldn't load booking");
+        showToast("<i data-lucide=triangle-alert></i> Couldn't load booking");
       });
     pzTrackUnsub(unsub);
   });
@@ -611,7 +611,7 @@ function renderBookingDetails(doc) {
         actionsHtml = '<button class="pz-btn pz-btn-primary btn-block" id="dtlNextBtn" data-next="' + nextStatus + '">Mark as ' + statusLabel(nextStatus) + '</button>';
       }
     } else if (status === "completed") {
-      actionsHtml = '<div class="pempty-sub" style="text-align:center;padding:8px 0;">✅ Job completed</div>';
+      actionsHtml = '<div class="pempty-sub" style="text-align:center;padding:8px 0;"><i data-lucide=badge-check></i> Job completed</div>';
     } else {
       actionsHtml = '<div class="pempty-sub" style="text-align:center;padding:8px 0;">This booking is ' + statusLabel(status).toLowerCase() + '.</div>';
     }
@@ -634,7 +634,7 @@ function renderBookingDetails(doc) {
         '<div class="pdetail-kv"><div class="pdetail-kv-label">You Earn</div><div class="pdetail-kv-value">' + pzMoney(b.partnerEarnings || 0) + '</div></div>' +
       '</div>' +
     '</div>' +
-    (b.customerPhone ? '<a href="tel:' + b.customerPhone + '" class="pz-btn pz-btn-outline btn-block" style="margin-bottom:16px">📞 Call Customer</a>' : "") +
+    (b.customerPhone ? '<a href="tel:' + b.customerPhone + '" class="pz-btn pz-btn-outline btn-block" style="margin-bottom:16px"><i data-lucide=phone></i> Call Customer</a>' : "") +
     '<div class="pform-card"><h3>Job Status</h3>' + timelineHtml(status) + '</div>' +
     '<div id="otpSection"></div>' +
     '<div style="margin-top:16px">' + actionsHtml + '</div>';
@@ -663,7 +663,7 @@ function timelineHtml(currentStatus) {
   if (currentStatus === "rejected" || currentStatus === "cancelled") idx = -2;
   return '<ul class="ptimeline">' + STATUS_FLOW.map(function (s, i) {
     var done = idx >= i;
-    return '<li class="' + (done ? "done" : "") + '"><div class="ptl-dot">' + (done ? "✓" : "") + '</div><div><div class="ptl-title">' + statusLabel(s) + '</div></div></li>';
+    return '<li class="' + (done ? "done" : "") + '"><div class="ptl-dot">' + (done ? "<i data-lucide=check></i>" : "") + '</div><div><div class="ptl-title">' + statusLabel(s) + '</div></div></li>';
   }).join("") + '</ul>';
 }
 
@@ -736,13 +736,13 @@ function initProfilePage() {
         '<h3>KYC Documents <span id="kycStatusBadge" class="kyc-badge ' + (verified ? "verified" : "pending") + '">' + (verified ? "Verified" : "Pending Review") + '</span></h3>' +
         '<div class="pform-row two-col">' +
           '<div><label class="field-label">Aadhaar Card</label>' +
-            '<label class="upload-box"><input type="file" id="aadhaarUpload" accept="image/*,.pdf"><div class="upload-box-icon">📄</div><div class="upload-box-text">Upload Aadhaar</div><div class="upload-box-sub">JPG, PNG or PDF, max 5MB</div></label>' +
+            '<label class="upload-box"><input type="file" id="aadhaarUpload" accept="image/*,.pdf"><div class="upload-box-icon"><i data-lucide=file-text></i></div><div class="upload-box-text">Upload Aadhaar</div><div class="upload-box-sub">JPG, PNG or PDF, max 5MB</div></label>' +
             '<div class="upload-progress" id="aadhaarUploadProgress"><div class="upload-progress-bar"></div></div>' +
-            '<div class="upload-preview" id="aadhaarPreview" style="display:' + (partner.aadhaarUrl ? "flex" : "none") + '">✅ Aadhaar on file</div></div>' +
+            '<div class="upload-preview" id="aadhaarPreview" style="display:' + (partner.aadhaarUrl ? "flex" : "none") + '"><i data-lucide=badge-check></i> Aadhaar on file</div></div>' +
           '<div><label class="field-label">PAN Card</label>' +
-            '<label class="upload-box"><input type="file" id="panUpload" accept="image/*,.pdf"><div class="upload-box-icon">📄</div><div class="upload-box-text">Upload PAN</div><div class="upload-box-sub">JPG, PNG or PDF, max 5MB</div></label>' +
+            '<label class="upload-box"><input type="file" id="panUpload" accept="image/*,.pdf"><div class="upload-box-icon"><i data-lucide=file-text></i></div><div class="upload-box-text">Upload PAN</div><div class="upload-box-sub">JPG, PNG or PDF, max 5MB</div></label>' +
             '<div class="upload-progress" id="panUploadProgress"><div class="upload-progress-bar"></div></div>' +
-            '<div class="upload-preview" id="panPreview" style="display:' + (partner.panUrl ? "flex" : "none") + '">✅ PAN on file</div></div>' +
+            '<div class="upload-preview" id="panPreview" style="display:' + (partner.panUrl ? "flex" : "none") + '"><i data-lucide=badge-check></i> PAN on file</div></div>' +
         '</div>' +
       '</div>';
 
@@ -765,11 +765,11 @@ function initProfilePage() {
         updatedAt: firebase.firestore.FieldValue.serverTimestamp()
       }).then(function () {
         setBtnLoading(btn, false);
-        showToast("✅ Profile updated");
+        showToast("<i data-lucide=badge-check></i> Profile updated");
       }).catch(function (err) {
         setBtnLoading(btn, false);
         console.error(err);
-        showToast("⚠️ Couldn't save changes");
+        showToast("<i data-lucide=triangle-alert></i> Couldn't save changes");
       });
     });
 
@@ -784,7 +784,7 @@ function setupDocUpload(inputId, field, previewId) {
   input.addEventListener("change", function () {
     var file = input.files[0];
     if (!file) return;
-    if (file.size > 5 * 1024 * 1024) { showToast("⚠️ File must be under 5MB"); return; }
+    if (file.size > 5 * 1024 * 1024) { showToast("<i data-lucide=triangle-alert></i> File must be under 5MB"); return; }
     var progressWrap = qs("#" + inputId + "Progress");
     var bar = progressWrap ? qs(".upload-progress-bar", progressWrap) : null;
     if (progressWrap) progressWrap.classList.add("show");
@@ -796,14 +796,14 @@ function setupDocUpload(inputId, field, previewId) {
       if (bar) bar.style.width = pct + "%";
     }, function (err) {
       console.error(err);
-      showToast("⚠️ Upload failed");
+      showToast("<i data-lucide=triangle-alert></i> Upload failed");
     }, function () {
       task.snapshot.ref.getDownloadURL().then(function (url) {
         var update = {}; update[field] = url;
         window._firebase.db.collection("partners").doc(PZ.uid).update(update).then(function () {
-          showToast("✅ Document uploaded");
+          showToast("<i data-lucide=badge-check></i> Document uploaded");
           var preview = qs("#" + previewId);
-          if (preview) { preview.style.display = "flex"; preview.innerHTML = "✅ " + file.name + " uploaded"; }
+          if (preview) { preview.style.display = "flex"; preview.innerHTML = "<i data-lucide=badge-check></i> " + file.name + " uploaded"; }
           if (progressWrap) progressWrap.classList.remove("show");
         });
       });
@@ -832,7 +832,7 @@ function initWalletPage() {
     var unsub = window._firebase.db.collection("partners").doc(PZ.uid).collection("transactions")
       .orderBy("createdAt", "desc").limit(50)
       .onSnapshot(function (snap) {
-        if (snap.empty) { listEl.innerHTML = emptyStateHtml("💳", "No transactions yet", "Your earnings and payouts will show up here."); return; }
+        if (snap.empty) { listEl.innerHTML = emptyStateHtml("<i data-lucide=credit-card></i>", "No transactions yet", "Your earnings and payouts will show up here."); return; }
         listEl.innerHTML = snap.docs.map(function (doc) {
           var t = doc.data();
           var isCredit = t.type === "credit";
@@ -859,11 +859,11 @@ function initNotificationsPage() {
     var unsub = window._firebase.db.collection("partners").doc(PZ.uid).collection("notifications")
       .orderBy("createdAt", "desc").limit(50)
       .onSnapshot(function (snap) {
-        if (snap.empty) { listEl.innerHTML = emptyStateHtml("🔔", "No notifications", "Booking updates and alerts will appear here."); return; }
+        if (snap.empty) { listEl.innerHTML = emptyStateHtml("<i data-lucide=bell></i>", "No notifications", "Booking updates and alerts will appear here."); return; }
         listEl.innerHTML = snap.docs.map(function (doc) {
           var n = doc.data();
           return '<div class="notif-item ' + (n.read ? "" : "unread") + '" data-id="' + doc.id + '">' +
-            '<div class="notif-icon">🔔</div><div style="flex:1"><div class="notif-title">' + pzEsc(n.title || "Update") + '</div>' +
+            '<div class="notif-icon"><i data-lucide=bell></i></div><div style="flex:1"><div class="notif-title">' + pzEsc(n.title || "Update") + '</div>' +
             '<div class="notif-msg">' + pzEsc(n.message || "") + '</div><div class="notif-time">' + pzDate(n.createdAt) + ' · ' + pzTime(n.createdAt) + '</div></div></div>';
         }).join("");
         qsa(".notif-item", listEl).forEach(function (el) {
@@ -897,7 +897,7 @@ function initSettingsPage() {
           '<div class="pform-actions"><button type="submit" class="pz-btn pz-btn-primary" id="changePasswordBtn"><span class="btn-label">Update Password</span></button></div>' +
         '</form>' +
       '</div>' +
-      '<div class="pform-card"><a href="#" class="danger-link" id="logoutBtn">🚪 Log Out</a></div>';
+      '<div class="pform-card"><a href="#" class="danger-link" id="logoutBtn"><i data-lucide=log-out></i> Log Out</a></div>';
 
     var onlineBtn = qs("#settingsOnlineToggle");
     onlineBtn.classList.toggle("on", !!partner.online);
@@ -955,7 +955,7 @@ function initDriversPage() {
       '<div id="driversList"><div class="pskeleton pskel-card"></div><div class="pskeleton pskel-card"></div></div>' +
       '<div class="modal-overlay" id="driverModal" style="display:none">' +
         '<div class="modal-box">' +
-          '<button class="modal-x" id="driverModalClose">✕</button>' +
+          '<button class="modal-x" id="driverModalClose"><i data-lucide=x></i></button>' +
           '<h2 class="modal-title" id="driverModalTitle">Add Driver</h2>' +
           '<form id="driverForm">' +
             '<input type="hidden" id="driverId">' +
@@ -981,13 +981,13 @@ function loadDrivers() {
   var unsub = window._firebase.db.collection("partners").doc(PZ.uid).collection("drivers")
     .orderBy("addedAt", "desc")
     .onSnapshot(function (snap) {
-      if (snap.empty) { listEl.innerHTML = emptyStateHtml("👷", "No drivers added", "Add your team's drivers to assign them to jobs."); return; }
+      if (snap.empty) { listEl.innerHTML = emptyStateHtml("<i data-lucide=circle></i>", "No drivers added", "Add your team's drivers to assign them to jobs."); return; }
       listEl.innerHTML = snap.docs.map(function (doc) {
         var d = doc.data();
-        return '<div class="plist-item"><div class="plist-avatar">👤</div><div class="plist-info">' +
+        return '<div class="plist-item"><div class="plist-avatar"><i data-lucide=user-round></i></div><div class="plist-info">' +
           '<div class="plist-name">' + pzEsc(d.name) + '</div><div class="plist-sub">' + pzEsc(d.phone) + ' · License ' + pzEsc(d.licenseNumber || "—") + '</div></div>' +
-          '<button class="plist-menu-btn edit-driver-btn" data-id="' + doc.id + '">✏️</button>' +
-          '<button class="plist-menu-btn delete-driver-btn" data-id="' + doc.id + '">🗑️</button></div>';
+          '<button class="plist-menu-btn edit-driver-btn" data-id="' + doc.id + '"><i data-lucide=circle></i></button>' +
+          '<button class="plist-menu-btn delete-driver-btn" data-id="' + doc.id + '"><i data-lucide=circle></i></button></div>';
       }).join("");
       qsa(".edit-driver-btn", listEl).forEach(function (btn) {
         btn.addEventListener("click", function () {
@@ -1025,19 +1025,19 @@ function saveDriver(e) {
     licenseNumber: qs("#driverLicense").value.trim(),
     status: "active"
   };
-  if (!payload.name || !payload.phone) { showToast("⚠️ Name and phone are required"); return; }
+  if (!payload.name || !payload.phone) { showToast("<i data-lucide=triangle-alert></i> Name and phone are required"); return; }
   var btn = qs("#driverSaveBtn");
   setBtnLoading(btn, true);
   var col = window._firebase.db.collection("partners").doc(PZ.uid).collection("drivers");
   var promise = id ? col.doc(id).update(payload) : col.add(Object.assign({}, payload, { addedAt: firebase.firestore.FieldValue.serverTimestamp() }));
   promise.then(function () {
     setBtnLoading(btn, false);
-    showToast(id ? "✅ Driver updated" : "✅ Driver added");
+    showToast(id ? "<i data-lucide=badge-check></i> Driver updated" : "<i data-lucide=badge-check></i> Driver added");
     closeDriverModal();
   }).catch(function (err) {
     setBtnLoading(btn, false);
     console.error(err);
-    showToast("⚠️ Couldn't save driver");
+    showToast("<i data-lucide=triangle-alert></i> Couldn't save driver");
   });
 }
 
@@ -1051,7 +1051,7 @@ function initVehiclesPage() {
       '<div id="vehiclesList"><div class="pskeleton pskel-card"></div><div class="pskeleton pskel-card"></div></div>' +
       '<div class="modal-overlay" id="vehicleModal" style="display:none">' +
         '<div class="modal-box">' +
-          '<button class="modal-x" id="vehicleModalClose">✕</button>' +
+          '<button class="modal-x" id="vehicleModalClose"><i data-lucide=x></i></button>' +
           '<h2 class="modal-title" id="vehicleModalTitle">Add Vehicle</h2>' +
           '<form id="vehicleForm">' +
             '<input type="hidden" id="vehicleId">' +
@@ -1061,7 +1061,7 @@ function initVehiclesPage() {
               '<div><label class="field-label">Vehicle Number</label><input id="vehicleNumber" class="field-input" placeholder="KA 01 AB 1234" required></div>' +
               '<div><label class="field-label">Load Capacity</label><input id="vehicleCapacity" class="field-input" placeholder="e.g. 750 kg"></div>' +
               '<div><label class="field-label">RC Document</label>' +
-                '<label class="upload-box"><input type="file" id="vehicleRcUpload" accept="image/*,.pdf"><div class="upload-box-icon">📄</div><div class="upload-box-text">Upload RC</div><div class="upload-box-sub">JPG, PNG or PDF, max 5MB</div></label></div>' +
+                '<label class="upload-box"><input type="file" id="vehicleRcUpload" accept="image/*,.pdf"><div class="upload-box-icon"><i data-lucide=file-text></i></div><div class="upload-box-text">Upload RC</div><div class="upload-box-sub">JPG, PNG or PDF, max 5MB</div></label></div>' +
             '</div>' +
             '<div class="pform-actions"><button type="submit" class="pz-btn pz-btn-primary btn-block" id="vehicleSaveBtn"><span class="btn-label">Save Vehicle</span></button></div>' +
           '</form>' +
@@ -1075,20 +1075,20 @@ function initVehiclesPage() {
   });
 }
 
-var VEHICLE_ICONS = { "Mini Truck": "🚚", "Tata Ace": "🚐", "Tempo": "🚛", "Pickup": "🛻" };
+var VEHICLE_ICONS = { "Mini Truck": "<i data-lucide=truck></i>", "Tata Ace": "<i data-lucide=circle></i>", "Tempo": "<i data-lucide=truck></i>", "Pickup": "<i data-lucide=circle></i>" };
 
 function loadVehicles() {
   var listEl = qs("#vehiclesList");
   var unsub = window._firebase.db.collection("partners").doc(PZ.uid).collection("vehicles")
     .orderBy("addedAt", "desc")
     .onSnapshot(function (snap) {
-      if (snap.empty) { listEl.innerHTML = emptyStateHtml("🚚", "No vehicles added", "Add a vehicle to start receiving matching bookings."); return; }
+      if (snap.empty) { listEl.innerHTML = emptyStateHtml("<i data-lucide=truck></i>", "No vehicles added", "Add a vehicle to start receiving matching bookings."); return; }
       listEl.innerHTML = snap.docs.map(function (doc) {
         var v = doc.data();
-        return '<div class="plist-item"><div class="plist-avatar">' + (VEHICLE_ICONS[v.type] || "🚚") + '</div><div class="plist-info">' +
+        return '<div class="plist-item"><div class="plist-avatar">' + (VEHICLE_ICONS[v.type] || "<i data-lucide=truck></i>") + '</div><div class="plist-info">' +
           '<div class="plist-name">' + pzEsc(v.type) + ' · ' + pzEsc(v.number) + '</div><div class="plist-sub">Capacity: ' + pzEsc(v.capacity || "—") + '</div></div>' +
-          '<button class="plist-menu-btn edit-vehicle-btn" data-id="' + doc.id + '">✏️</button>' +
-          '<button class="plist-menu-btn delete-vehicle-btn" data-id="' + doc.id + '">🗑️</button></div>';
+          '<button class="plist-menu-btn edit-vehicle-btn" data-id="' + doc.id + '"><i data-lucide=circle></i></button>' +
+          '<button class="plist-menu-btn delete-vehicle-btn" data-id="' + doc.id + '"><i data-lucide=circle></i></button></div>';
       }).join("");
       qsa(".edit-vehicle-btn", listEl).forEach(function (btn) {
         btn.addEventListener("click", function () {
@@ -1126,7 +1126,7 @@ function saveVehicle(e) {
     capacity: qs("#vehicleCapacity").value.trim(),
     status: "active"
   };
-  if (!payload.number) { showToast("⚠️ Vehicle number is required"); return; }
+  if (!payload.number) { showToast("<i data-lucide=triangle-alert></i> Vehicle number is required"); return; }
   var btn = qs("#vehicleSaveBtn");
   setBtnLoading(btn, true);
   var col = window._firebase.db.collection("partners").doc(PZ.uid).collection("vehicles");
@@ -1141,12 +1141,12 @@ function saveVehicle(e) {
     }
   }).then(function () {
     setBtnLoading(btn, false);
-    showToast(id ? "✅ Vehicle updated" : "✅ Vehicle added");
+    showToast(id ? "<i data-lucide=badge-check></i> Vehicle updated" : "<i data-lucide=badge-check></i> Vehicle added");
     closeVehicleModal();
   }).catch(function (err) {
     setBtnLoading(btn, false);
     console.error(err);
-    showToast("⚠️ Couldn't save vehicle");
+    showToast("<i data-lucide=triangle-alert></i> Couldn't save vehicle");
   });
 }
 
@@ -1157,10 +1157,10 @@ function initSupportPage() {
   requirePartner(function () {
     qs("#portalContent").innerHTML =
       '<div class="support-quick-grid">' +
-        '<a href="https://wa.me/919945095453" target="_blank" rel="noopener" class="support-quick-card"><div class="support-quick-icon">💬</div><div class="support-quick-label">WhatsApp</div></a>' +
-        '<a href="tel:+919945095453" class="support-quick-card"><div class="support-quick-icon">📞</div><div class="support-quick-label">Call Us</div></a>' +
-        '<a href="mailto:moveeasyblr@gmail.com" class="support-quick-card"><div class="support-quick-icon">✉️</div><div class="support-quick-label">Email</div></a>' +
-        '<a href="#supportForm" class="support-quick-card"><div class="support-quick-icon">📝</div><div class="support-quick-label">Raise Ticket</div></a>' +
+        '<a href="https://wa.me/919945095453" target="_blank" rel="noopener" class="support-quick-card"><div class="support-quick-icon"></div><div class="support-quick-label">WhatsApp</div></a>' +
+        '<a href="tel:+919945095453" class="support-quick-card"><div class="support-quick-icon"><i data-lucide=phone></i></div><div class="support-quick-label">Call Us</div></a>' +
+        '<a href="mailto:moveeasyblr@gmail.com" class="support-quick-card"><div class="support-quick-icon"><i data-lucide=mail></i></div><div class="support-quick-label">Email</div></a>' +
+        '<a href="#supportForm" class="support-quick-card"><div class="support-quick-icon"><i data-lucide=circle></i></div><div class="support-quick-label">Raise Ticket</div></a>' +
       '</div>' +
       '<div class="pform-card">' +
         '<h3>Raise a Support Request</h3>' +
@@ -1178,7 +1178,7 @@ function initSupportPage() {
       e.preventDefault();
       var subject = qs("#ticketSubject").value.trim();
       var message = qs("#ticketMessage").value.trim();
-      if (!subject || !message) { showToast("⚠️ Please fill in all fields"); return; }
+      if (!subject || !message) { showToast("<i data-lucide=triangle-alert></i> Please fill in all fields"); return; }
       var btn = qs("#ticketSubmitBtn");
       setBtnLoading(btn, true);
       window._firebase.db.collection("supportTickets").add({
@@ -1190,12 +1190,12 @@ function initSupportPage() {
         createdAt: firebase.firestore.FieldValue.serverTimestamp()
       }).then(function () {
         setBtnLoading(btn, false);
-        showToast("✅ Support request submitted");
+        showToast("<i data-lucide=badge-check></i> Support request submitted");
         qs("#supportForm").reset();
       }).catch(function (err) {
         setBtnLoading(btn, false);
         console.error(err);
-        showToast("⚠️ Couldn't submit request");
+        showToast("<i data-lucide=triangle-alert></i> Couldn't submit request");
       });
     });
   });
@@ -1267,11 +1267,11 @@ function handleFirebaseActionCode() {
           if (user) {
             window._firebase.db.collection('partners').doc(user.uid).update({ emailVerified: true }).catch(function(){});
           }
-          alert("✅ Email verified successfully!");
+          alert(" Email verified successfully!");
           window.history.replaceState(null, '', window.location.pathname);
         }).catch(function(err) {
           console.error(err);
-          alert("⚠️ Invalid or expired link. Please try again.");
+          alert(" Invalid or expired link. Please try again.");
         });
       } else if (mode === 'resetPassword') {
         auth.verifyPasswordResetCode(oobCode).then(function(email) {
@@ -1284,7 +1284,7 @@ function handleFirebaseActionCode() {
           }
         }).catch(function(err) {
           console.error(err);
-          alert("⚠️ Invalid or expired reset link. Please try again.");
+          alert(" Invalid or expired reset link. Please try again.");
         });
       }
     }
@@ -1303,7 +1303,7 @@ function submitPartnerNewPassword() {
   if (okBox) okBox.classList.remove("show");
 
   if (!newPassword || newPassword.length < 6) {
-    if (errBox) { errBox.textContent = "⚠️ Password must be at least 6 characters."; errBox.classList.add("show"); }
+    if (errBox) { errBox.textContent = " Password must be at least 6 characters."; errBox.classList.add("show"); }
     return;
   }
 
@@ -1311,7 +1311,7 @@ function submitPartnerNewPassword() {
 
   window._firebase.auth.confirmPasswordReset(oobCode, newPassword).then(function() {
     setBtnLoading(btn, false);
-    if (okBox) { okBox.textContent = "✅ Password updated successfully! Redirecting to login..."; okBox.classList.add("show"); }
+    if (okBox) { okBox.textContent = " Password updated successfully! Redirecting to login..."; okBox.classList.add("show"); }
     setTimeout(function() {
       window.location.href = 'partner-login.html';
     }, 3000);
@@ -1324,4 +1324,13 @@ function submitPartnerNewPassword() {
 
 document.addEventListener("DOMContentLoaded", function() {
   handleFirebaseActionCode();
+});
+
+// PackZen Icons Initialization via Mutation Observer
+document.addEventListener('DOMContentLoaded', () => {
+  if (typeof lucide !== 'undefined') {
+    lucide.createIcons();
+    const observer = new MutationObserver(() => lucide.createIcons());
+    observer.observe(document.body, { childList: true, subtree: true });
+  }
 });
