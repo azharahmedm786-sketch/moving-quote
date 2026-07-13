@@ -91,3 +91,20 @@ test("Missing Vehicle Config", {
 
   return isBaseFareCorrect && isCapacityChargeZero && isTotalUnitsZero && isCapacityUsedZero && isSlabNone;
 });
+
+// Case 4: Waiting Charge
+test("Waiting Charge Calculation", {
+  pickup: "A", drop: "B", km: 15,
+  houseValue: 2500,
+  vehicleHtmlValue: "200", // Tata Ace
+  furniture: { bedCheck: 1, fridgeCheck: 1, wmCheck: 1 },
+  cartonQty: 5,
+  pickupFloor: 1, dropFloor: 1, liftAvailable: false,
+  packingService: true,
+  moveType: "home", extraHelpers: 0,
+  waitingHours: 2
+}, (r) => {
+  // Check if waiting charge is calculated correctly
+  // PRICING_CONFIG.waiting.pricePerHour is 300, so 2 hours is 600
+  return r.breakdown.waitingCharge === 600;
+});
