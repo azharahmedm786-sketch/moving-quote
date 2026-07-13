@@ -2008,7 +2008,12 @@ function nbCalc() {
 
   } catch (error) {
     console.error("Quote calculation error:", error);
-    document.getElementById("nbSummaryLines").innerHTML = `<div class="nb-err">${error.message}</div>`;
+    const summaryLinesEl = document.getElementById("nbSummaryLines");
+    summaryLinesEl.innerHTML = "";
+    const errDiv = document.createElement("div");
+    errDiv.className = "nb-err";
+    errDiv.textContent = error.message;
+    summaryLinesEl.appendChild(errDiv);
   }
 }
 
