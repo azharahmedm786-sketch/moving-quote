@@ -69,16 +69,18 @@ exports.sendBookingReminders = functions
 
       if (snap.empty) return null;
 
-      for (const doc of snap.docs) {
+      const promises = snap.docs.map(async (doc) => {
         const b = doc.data();
-        if (b.reminderSent === true) continue; // idempotency guard
+        if (b.reminderSent === true) return; // idempotency guard
 
         const email = await getCustomerEmail(b);
         if (email) {
           await sendCustomerEmail("booking_reminder", email, bookingToTemplateData(b));
         }
         await doc.ref.update({ reminderSent: true, reminderSentAt: admin.firestore.FieldValue.serverTimestamp() });
-      }
+      });
+
+      await Promise.all(promises);
     } catch (e) {
       console.error("sendBookingReminders error:", e.message);
     }
@@ -104,20 +106,22 @@ exports.sendFeedbackRequests = functions
 
       if (snap.empty) return null;
 
-      for (const doc of snap.docs) {
+      const promises = snap.docs.map(async (doc) => {
         const b = doc.data();
-        if (b.feedbackRequestSent === true) continue;
+        if (b.feedbackRequestSent === true) return;
         // Only send once the move has been delivered for 24h+.
         // Use createdAt as a fallback if no deliveredAt timestamp exists.
         const deliveredRef = b.deliveredAt || b.createdAt;
-        if (!deliveredRef || deliveredRef.toMillis() > cutoff.toMillis()) continue;
+        if (!deliveredRef || deliveredRef.toMillis() > cutoff.toMillis()) return;
 
         const email = await getCustomerEmail(b);
         if (email) {
           await sendCustomerEmail("feedback_request", email, bookingToTemplateData(b));
         }
         await doc.ref.update({ feedbackRequestSent: true, feedbackRequestSentAt: admin.firestore.FieldValue.serverTimestamp() });
-      }
+      });
+
+      await Promise.all(promises);
     } catch (e) {
       console.error("sendFeedbackRequests error:", e.message);
     }
