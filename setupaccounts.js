@@ -33,7 +33,7 @@
       { code: "SAVE10",     type: "percent", value: 10,  max: 100, active: true },
       { code: "FIRST500",   type: "flat",    value: 500, max: 50,  active: true },
     ];
-    for (const p of promos) {
+    await Promise.all(promos.map(async (p) => {
       const doc = await db.collection("promos").doc(p.code).get();
       if (!doc.exists) {
         await db.collection("promos").doc(p.code).set({ ...p, used: 0, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
@@ -41,7 +41,7 @@
       } else {
         console.log("ℹ️ Promo exists:", p.code);
       }
-    }
+    }));
   }
 
   // Create accounts
