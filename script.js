@@ -375,16 +375,6 @@ function changeFurnitureQty(id, delta) {
   calculateQuote(true);
 }
 
-function syncFurnitureQty(id) {
-  const input = document.getElementById(id);
-  if (!input) return;
-  const val = Math.max(0, Math.min(20, parseInt(input.value) || 0));
-  input.value = val;
-  const card = document.getElementById("card-" + id);
-  if (card) card.classList.toggle("active", val > 0);
-  calculateQuote(true);
-}
-
 /* ============================================
 FURNITURE GRID RENDERER
 ============================================ */
