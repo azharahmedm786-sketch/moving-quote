@@ -117,8 +117,7 @@ async function sendAdminEmail(subjectPrefix, bodyLines, bookingRef) {
     <p style="color:#94a3b8;font-size:12px;margin-top:16px;">PackZen Admin Notification System</p>
   </div>`;
 
-  const results = [];
-  for (const email of adminEmails) {
+  const promises = adminEmails.map(async (email) => {
     const result = await sendBrevoEmail({
       toEmail: email,
       toName: "PackZen Admin",
@@ -134,8 +133,10 @@ async function sendAdminEmail(subjectPrefix, bodyLines, bookingRef) {
       response: result.response,
       error: result.error
     });
-    results.push(result);
-  }
+    return result;
+  });
+
+  const results = await Promise.all(promises);
   return results;
 }
 
