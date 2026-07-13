@@ -1,0 +1,9 @@
+window.ENV = {
+  GOOGLE_MAPS_KEY: "YOUR_GOOGLE_MAPS_KEY",
+
+  // Firebase Auth key
+  FIREBASE_AUTH_KEY: "YOUR_FIREBASE_AUTH_KEY",
+
+  // Razorpay Public Key
+  RAZORPAY_KEY: "YOUR_RAZORPAY_KEY"
+};
