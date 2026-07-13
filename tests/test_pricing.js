@@ -91,3 +91,26 @@ test("Missing Vehicle Config", {
 
   return isBaseFareCorrect && isCapacityChargeZero && isTotalUnitsZero && isCapacityUsedZero && isSlabNone;
 });
+
+// Case 4: Long Carry Charge
+test("Long Carry Charge", {
+  pickup: "A", drop: "B", km: 15,
+  houseValue: 2500, // 1RK
+  vehicleHtmlValue: "200", // Tata Ace
+  furniture: { bedCheck: 1, fridgeCheck: 1, wmCheck: 1 }, // 8 + 8 + 6 = 22 units
+  cartonQty: 5, // 5 units
+  pickupFloor: 1, dropFloor: 1, liftAvailable: false,
+  packingService: true,
+  moveType: "home", extraHelpers: 0,
+  longCarryDistance: 50 // New parameter for testing long carry
+}, (r) => {
+  // Same base calculations as Case 1
+  // Tata Ace (40 cap), units: 27 -> 67.5% -> Three Quarter Load
+  // Base: 1000, Extra km: 5 * 25 = 125, Capacity: 600, Floor: 2 * 200 = 400
+  // Labour: 1 * 400 = 400, Packing: 27 * 20 = 540
+  // Long Carry: 50 * 10 = 500
+  // Subtotal = 1000 + 125 + 600 + 400 + 400 + 540 + 500 = 3565
+  const isLongCarryCorrect = r.breakdown.longCarryCharge === 500;
+  const isGrandTotalCorrect = Math.abs(r.breakdown.grandTotal - 3565) < 1;
+  return isLongCarryCorrect && isGrandTotalCorrect;
+});
