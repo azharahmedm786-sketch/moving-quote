@@ -255,6 +255,12 @@ function validateName(name) {
   return cleaned.length >= 2 ? cleaned : null;
 }
 
+function validatePhone(phone) {
+  const cleaned = String(phone).replace(/\D/g, "");
+  return cleaned.length === 10 ? cleaned : null;
+}
+
+
 /* ============================================
 RATE LIMITING
 ============================================ */
