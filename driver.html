@@ -179,14 +179,15 @@
 
     @media(max-width:480px){.driver-app{padding:14px}}
   </style>
+  <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
 
 <!-- LOGIN -->
 <div class="driver-login" id="driverLogin">
   <div class="login-card">
-    <div class="login-logo">📦 PackZen</div>
-    <div class="login-role">🚚 Driver Portal</div>
+    <div class="login-logo"><i data-lucide="package"></i> PackZen</div>
+    <div class="login-role"><i data-lucide="truck"></i> Driver Portal</div>
     <label class="field-label">Email</label>
     <input id="drvEmail" type="email" class="field-input" placeholder="driver@packzen.com">
     <label class="field-label">Password</label>
@@ -210,16 +211,16 @@
       </div>
     </div>
     <div class="header-actions">
-      <button class="theme-btn" onclick="toggleDriverTheme()">🌙</button>
+      <button class="theme-btn" onclick="toggleDriverTheme()"><i data-lucide="moon"></i></button>
       <button class="btn-signout-sm" onclick="driverSignOut()">Sign Out</button>
     </div>
   </div>
 
   <!-- BOTTOM NAV -->
   <nav class="bottom-nav" id="bottomNav">
-    <button class="bn-item active" onclick="switchTab('job',this)"><span class="bn-icon">📦</span>Current Job</button>
-    <button class="bn-item" onclick="switchTab('history',this)"><span class="bn-icon">📋</span>History</button>
-    <button class="bn-item" onclick="switchTab('earnings',this)"><span class="bn-icon">💰</span>Earnings</button>
+    <button class="bn-item active" onclick="switchTab('job',this)"><span class="bn-icon"><i data-lucide="package"></i></span>Current Job</button>
+    <button class="bn-item" onclick="switchTab('history',this)"><span class="bn-icon"><i data-lucide="clipboard-list"></i></span>History</button>
+    <button class="bn-item" onclick="switchTab('earnings',this)"><span class="bn-icon"><i data-lucide="indian-rupee"></i></span>Earnings</button>
   </nav>
 
   <!-- TAB: CURRENT JOB -->
@@ -239,7 +240,7 @@
 
   <!-- TODAY'S JOBS -->
   <div id="todayJobsSection" style="display:none;margin-bottom:16px;">
-    <div style="font-family: 'Space Grotesk',sans-serif;font-size:1.1rem;font-weight:800;color:var(--text);margin-bottom:10px">📅 Today's Jobs</div>
+    <div style="font-family: 'Space Grotesk',sans-serif;font-size:1.1rem;font-weight:800;color:var(--text);margin-bottom:10px"><i data-lucide="calendar-days"></i> Today's Jobs</div>
     <div id="todayJobsList" style="display:flex;flex-direction:column;gap:12px;"></div>
   </div>
 
@@ -252,20 +253,20 @@
   <!-- CURRENT BOOKING -->
   <div class="booking-card" id="bookingCard">
     <div class="booking-header">
-      <div class="booking-title">📦 Current Assignment</div>
+      <div class="booking-title"><i data-lucide="package"></i> Current Assignment</div>
       <div class="booking-id" id="bkId">—</div>
     </div>
-    <div class="info-row"><span class="info-icon">👤</span><div class="info-text"><span class="lbl">Customer</span><span id="bkCustomer">—</span></div></div>
-    <div class="info-row"><span class="info-icon">📞</span><div class="info-text"><span class="lbl">Phone</span><a id="bkPhone" href="#" style="color:var(--primary);font-weight:600">—</a></div></div>
-    <div class="info-row"><span class="info-icon">📍</span><div class="info-text"><span class="lbl">Pickup</span><span id="bkPickup">—</span></div></div>
-    <div class="info-row"><span class="info-icon">🏁</span><div class="info-text"><span class="lbl">Drop</span><span id="bkDrop">—</span></div></div>
-    <div class="info-row"><span class="info-icon">📅</span><div class="info-text"><span class="lbl">Date</span><span id="bkDate">—</span></div></div>
+    <div class="info-row"><span class="info-icon"><i data-lucide="user-round"></i></span><div class="info-text"><span class="lbl">Customer</span><span id="bkCustomer">—</span></div></div>
+    <div class="info-row"><span class="info-icon"><i data-lucide="phone"></i></span><div class="info-text"><span class="lbl">Phone</span><a id="bkPhone" href="#" style="color:var(--primary);font-weight:600">—</a></div></div>
+    <div class="info-row"><span class="info-icon"><i data-lucide="map-pin"></i></span><div class="info-text"><span class="lbl">Pickup</span><span id="bkPickup">—</span></div></div>
+    <div class="info-row"><span class="info-icon"><i data-lucide="flag"></i></span><div class="info-text"><span class="lbl">Drop</span><span id="bkDrop">—</span></div></div>
+    <div class="info-row"><span class="info-icon"><i data-lucide="calendar-days"></i></span><div class="info-text"><span class="lbl">Date</span><span id="bkDate">—</span></div></div>
     <div class="divider"></div>
     <div class="booking-amount">
       <div><div class="ba-lbl">Total Amount</div><div class="ba-val" id="bkAmount">₹0</div></div>
       <div style="display:flex;gap:8px">
-        <a id="bkCall" href="#" style="background:var(--primary);color:#fff;padding:8px 14px;border-radius:30px;text-decoration:none;font-size:.82rem;font-weight:700;box-shadow:0 4px 12px rgba(0,87,255,.2)">📞 Call</a>
-        <a id="bkNavigate" href="#" target="_blank" style="background:var(--accent);color:#fff;padding:8px 14px;border-radius:30px;text-decoration:none;font-size:.82rem;font-weight:700;box-shadow:0 4px 12px rgba(0,201,110,.2)">🗺️ Nav</a>
+        <a id="bkCall" href="#" style="background:var(--primary);color:#fff;padding:8px 14px;border-radius:30px;text-decoration:none;font-size:.82rem;font-weight:700;box-shadow:0 4px 12px rgba(0,87,255,.2)"><i data-lucide="phone"></i> Call</a>
+        <a id="bkNavigate" href="#" target="_blank" style="background:var(--accent);color:#fff;padding:8px 14px;border-radius:30px;text-decoration:none;font-size:.82rem;font-weight:700;box-shadow:0 4px 12px rgba(0,201,110,.2)"><i data-lucide="circle"></i> Nav</a>
       </div>
     </div>
 
@@ -293,7 +294,7 @@
 
   <!-- NO BOOKING STATE -->
   <div class="booking-card no-booking" id="noBookingCard" style="display:none">
-    <div style="font-size:3rem;margin-bottom:12px">🚗</div>
+    <div style="font-size:3rem;margin-bottom:12px"><i data-lucide="circle"></i></div>
     <div style="font-family: 'Space Grotesk',sans-serif;font-weight:800;color:var(--text);margin-bottom:6px">No Active Booking</div>
     <div style="font-size:.85rem;color:var(--text-muted)">Go online and wait for the admin to assign a job.</div>
   </div>
@@ -308,15 +309,15 @@
       <p style="font-size:.78rem;color:var(--text-muted);margin-bottom:12px">Ask the customer for the 4-digit OTP to complete delivery.</p>
       <input type="text" id="deliveryOtpInput" inputmode="numeric" maxlength="4" style="width:100%;padding:12px;text-align:center;font-size:1.5rem;font-weight:800;letter-spacing:12px;border:1.5px solid var(--border);border-radius:10px;outline:none;background:var(--surface);color:var(--text);margin-bottom:12px" placeholder="••••">
       <div id="otpError" style="font-size:.8rem;color:#e53e3e;margin-bottom:12px;display:none;text-align:center;font-weight:600"></div>
-      <button class="btn-update" style="background:var(--accent);box-shadow:0 5px 16px rgba(0,201,110,.3)" onclick="verifyDeliveryOtp()">Confirm Delivery ✓</button>
+      <button class="btn-update" style="background:var(--accent);box-shadow:0 5px 16px rgba(0,201,110,.3)" onclick="verifyDeliveryOtp()">Confirm Delivery <i data-lucide="check"></i></button>
       <button class="btn-update" style="background:transparent;color:var(--text-muted);box-shadow:none;margin-top:4px;padding:8px" onclick="cancelOtpEntry()">Cancel</button>
     </div>
   </div>
 
   <!-- LIVE LOCATION MAP -->
   <div class="map-card">
-    <h3>📡 Your Live Location</h3>
-    <div id="driverMapDiv"><div style="height:200px;display:flex;align-items:center;justify-content:center;color:var(--text-muted);font-size:.85rem">📍 Map loads when online</div></div>
+    <h3><i data-lucide="circle"></i> Your Live Location</h3>
+    <div id="driverMapDiv"><div style="height:200px;display:flex;align-items:center;justify-content:center;color:var(--text-muted);font-size:.85rem"><i data-lucide="map-pin"></i> Map loads when online</div></div>
     <div class="location-info"><span class="loc-dot"></span><span id="locationText">Location not sharing</span></div>
   </div>
 
@@ -324,7 +325,7 @@
   <div class="chat-card" id="chatCard">
     <div class="chat-hdr">
       <div>
-        <div class="chat-hdr-title">💬 Chat with Customer</div>
+        <div class="chat-hdr-title"><i data-lucide="message-circle"></i> Chat with Customer</div>
         <div class="chat-hdr-sub" id="chatCustomerName">No active booking</div>
       </div>
     </div>
@@ -337,7 +338,7 @@
 
   <!-- DELIVERY PHOTOS -->
   <div class="photo-card" id="photoCard">
-    <h3>📸 Proof of Delivery Photos</h3>
+    <h3><i data-lucide="camera"></i> Proof of Delivery Photos</h3>
     <div class="photo-upload-area" onclick="document.getElementById('deliveryPhotos').click()">
       <label class="photo-upload-lbl">
         <input type="file" id="deliveryPhotos" multiple accept="image/*" onchange="previewDeliveryPhotos(this)">
@@ -345,20 +346,20 @@
       </label>
     </div>
     <div class="delivery-thumbs" id="deliveryThumbs"></div>
-    <button class="btn-upload-photos" onclick="saveDeliveryPhotos()">📤 Save & Upload Photos</button>
+    <button class="btn-upload-photos" onclick="saveDeliveryPhotos()"><i data-lucide="circle"></i> Save & Upload Photos</button>
   </div>
 
   </div><!-- end tabJob -->
 
   <!-- TAB: HISTORY -->
   <div class="drv-tab" id="tabHistory">
-    <div style="font-family: 'Space Grotesk',sans-serif;font-size:1.1rem;font-weight:800;color:var(--text);margin-bottom:16px">📋 Completed Jobs</div>
+    <div style="font-family: 'Space Grotesk',sans-serif;font-size:1.1rem;font-weight:800;color:var(--text);margin-bottom:16px"><i data-lucide="clipboard-list"></i> Completed Jobs</div>
     <div id="historyList"><div class="hist-empty">⏳ Loading history...</div></div>
   </div>
 
   <!-- TAB: EARNINGS -->
   <div class="drv-tab" id="tabEarnings">
-    <div style="font-family: 'Space Grotesk',sans-serif;font-size:1.1rem;font-weight:800;color:var(--text);margin-bottom:16px">💰 My Earnings</div>
+    <div style="font-family: 'Space Grotesk',sans-serif;font-size:1.1rem;font-weight:800;color:var(--text);margin-bottom:16px"><i data-lucide="indian-rupee"></i> My Earnings</div>
 
     <!-- Period Filter -->
     <div class="earn-period">
@@ -406,15 +407,15 @@
 <script>
   function loadDriverMaps() {
     if (!window.ENV || !window.ENV.GOOGLE_MAPS_KEY) {
-      console.error('❌ Google Maps key not found in env-config.js');
+      console.error(' Google Maps key not found in env-config.js');
       return;
     }
     const script = document.createElement('script');
     script.src = 'https://maps.googleapis.com/maps/api/js?key=' + window.ENV.GOOGLE_MAPS_KEY;
     script.async = true;
     script.defer = true;
-    script.onload = () => console.log('✅ Driver Maps loaded');
-    script.onerror = () => console.error('❌ Driver Maps failed to load');
+    script.onload = () => console.log(' Driver Maps loaded');
+    script.onerror = () => console.error(' Driver Maps failed to load');
     document.head.appendChild(script);
   }
   loadDriverMaps();
@@ -426,10 +427,10 @@ let chatListener = null, bookingListener = null;
 let selectedDeliveryPhotos = [];
 
 const STATUS_STEPS = [
-  { key: "assigned", icon: "🚛", name: "Job Assigned",    desc: "You've been assigned to this booking" },
-  { key: "packing",  icon: "📦", name: "Packing Started", desc: "Items are being packed at pickup" },
-  { key: "transit",  icon: "🚚", name: "In Transit",      desc: "Moving items to destination" },
-  { key: "delivered",icon: "🎉", name: "Delivered",       desc: "Items delivered. Job complete!" }
+  { key: "assigned", icon: "<i data-lucide="truck"></i>", name: "Job Assigned",    desc: "You've been assigned to this booking" },
+  { key: "packing",  icon: "<i data-lucide="package"></i>", name: "Packing Started", desc: "Items are being packed at pickup" },
+  { key: "transit",  icon: "<i data-lucide="truck"></i>", name: "In Transit",      desc: "Moving items to destination" },
+  { key: "delivered",icon: "<i data-lucide="party-popper"></i>", name: "Delivered",       desc: "Items delivered. Job complete!" }
 ];
 
 function waitFB(cb, n=0) {
@@ -447,12 +448,12 @@ function toast(msg, dur=3000) {
 /* THEME */
 function toggleDriverTheme() {
   document.body.classList.toggle("dark");
-  document.querySelector(".theme-btn").textContent = document.body.classList.contains("dark") ? "☀️" : "🌙";
+  document.querySelector(".theme-btn").textContent = document.body.classList.contains("dark") ? "" : "";
   localStorage.setItem("packzen-theme", document.body.classList.contains("dark") ? "dark" : "light");
 }
 if (localStorage.getItem("packzen-theme") === "dark") {
   document.body.classList.add("dark");
-  setTimeout(() => { const b = document.querySelector(".theme-btn"); if(b) b.textContent = "☀️"; }, 100);
+  setTimeout(() => { const b = document.querySelector(".theme-btn"); if(b) b.textContent = ""; }, 100);
 }
 
 /* LOGIN */
@@ -632,9 +633,9 @@ function renderAssignedJobHtml(b, hasActiveJob) {
         <div style="font-family:'Space Grotesk',sans-serif;font-weight:800;font-size:.95rem;color:var(--text)">#${b.id.slice(-6).toUpperCase()}</div>
         <div style="font-size:.75rem;color:var(--text-muted);background:var(--surface2);padding:3px 8px;border-radius:12px;border:1px solid var(--border)">${b.date || "—"}</div>
       </div>
-      <div style="font-size:.85rem;color:var(--text);margin-bottom:6px">👤 ${b.customerName || "—"}</div>
-      <div style="font-size:.8rem;color:var(--text-muted);margin-bottom:4px">📍 ${b.pickup || "—"}</div>
-      <div style="font-size:.8rem;color:var(--text-muted);margin-bottom:12px">🏁 ${b.drop || "—"}</div>
+      <div style="font-size:.85rem;color:var(--text);margin-bottom:6px"><i data-lucide="user-round"></i> ${b.customerName || "—"}</div>
+      <div style="font-size:.8rem;color:var(--text-muted);margin-bottom:4px"><i data-lucide="map-pin"></i> ${b.pickup || "—"}</div>
+      <div style="font-size:.8rem;color:var(--text-muted);margin-bottom:12px"><i data-lucide="flag"></i> ${b.drop || "—"}</div>
       <div style="display:flex;justify-content:space-between;align-items:center">
         <div style="font-family:'Space Grotesk',sans-serif;font-weight:800;color:var(--primary);font-size:1.1rem">₹${(b.total || 0).toLocaleString()}</div>
         <button ${btnAttr}>▶ Start Job</button>
@@ -646,8 +647,8 @@ function renderAssignedJobHtml(b, hasActiveJob) {
 function startAssignedJob(bookingId) {
   if (!confirm("Are you sure you want to start this job?")) return;
   window._firebase.db.collection("bookings").doc(bookingId).update({ status: "packing" })
-    .then(() => toast("🚀 Job started!"))
-    .catch(e => toast("❌ Error: " + e.message));
+    .then(() => toast("<i data-lucide="rocket"></i> Job started!"))
+    .catch(e => toast("<i data-lucide="x"></i> Error: " + e.message));
 }
 
 function showBookingUI(b) {
@@ -691,11 +692,11 @@ function showBookingUI(b) {
 
   if (paidFull) {
     banner.className = "collect-banner paid-full";
-    collectLabel.textContent  = "✅ Fully Paid — Nothing to Collect";
+    collectLabel.textContent  = " Fully Paid — Nothing to Collect";
     collectAmount.textContent = "₹0";
   } else {
     banner.className = "collect-banner";
-    collectLabel.textContent  = "💵 Collect on Delivery";
+    collectLabel.textContent  = " Collect on Delivery";
     collectAmount.textContent = "₹" + due.toLocaleString();
   }
 }
@@ -708,7 +709,7 @@ function buildStatusSteps(currentStatus) {
   container.innerHTML = STATUS_STEPS.map((step, i) => {
     let cls = "status-step";
     let check = "";
-    if (i < currentIdx)  { cls += " done"; check = '<span class="step-check">✓</span>'; }
+    if (i < currentIdx)  { cls += " done"; check = '<span class="step-check"><i data-lucide="check"></i></span>'; }
     if (i === currentIdx) cls += " active";
     return `<div class="${cls}">
       <div class="step-icon">${i === currentIdx ? "▶" : step.icon}</div>
@@ -725,7 +726,7 @@ function buildStatusSteps(currentStatus) {
     btn.textContent = `Mark as "${STATUS_STEPS[nextIdx].name}" →`;
   } else {
     btn.disabled = true;
-    btn.textContent = "✅ Job Completed!";
+    btn.textContent = " Job Completed!";
   }
 }
 
@@ -759,9 +760,9 @@ function updateJobStatus() {
     .then(() => {
       currentBookingData.status = nextStatus;
       buildStatusSteps(nextStatus);
-      toast("✅ Status updated: " + nextStatus);
+      toast("<i data-lucide="badge-check"></i> Status updated: " + nextStatus);
     })
-    .catch(e => toast("❌ Error: " + e.message));
+    .catch(e => toast("<i data-lucide="x"></i> Error: " + e.message));
 }
 
 function verifyDeliveryOtp() {
@@ -788,13 +789,13 @@ function verifyDeliveryOtp() {
     .then(() => {
       currentBookingData.status = "delivered";
       buildStatusSteps("delivered");
-      toast("✅ Status updated: delivered");
+      toast("<i data-lucide="badge-check"></i> Status updated: delivered");
       document.getElementById("photoCard").style.display = "block";
-      toast("🎉 Job delivered! Upload proof photos.", 4000);
+      toast("<i data-lucide="party-popper"></i> Job delivered! Upload proof photos.", 4000);
       document.getElementById("btnUpdateStatus").style.display = "block";
     })
     .catch(e => {
-      toast("❌ Error: " + e.message);
+      toast("<i data-lucide="x"></i> Error: " + e.message);
       document.getElementById("btnUpdateStatus").style.display = "block";
     });
 }
@@ -806,7 +807,7 @@ function cancelOtpEntry() {
 
 /* LOCATION SHARING */
 function startLocationSharing() {
-  if (!navigator.geolocation) { toast("⚠️ Geolocation not supported"); return; }
+  if (!navigator.geolocation) { toast("<i data-lucide="triangle-alert"></i> Geolocation not supported"); return; }
   shareLocation();
   locationInterval = setInterval(shareLocation, 15000);
   initDriverMap();
@@ -874,7 +875,7 @@ function drvSendMsg() {
   const input = document.getElementById("drvChatInput");
   const text  = input.value.trim();
   if (!text) return;
-  if (!currentBookingId) { toast("⚠️ No active booking"); return; }
+  if (!currentBookingId) { toast("<i data-lucide="triangle-alert"></i> No active booking"); return; }
   input.value = "";
   window._firebase.db.collection("chats").doc(currentBookingId).collection("messages").add({
     text, senderUid: driverUser?.uid, senderName: driverUser?.displayName || "Driver",
@@ -900,15 +901,15 @@ function previewDeliveryPhotos(input) {
 }
 
 function saveDeliveryPhotos() {
-  if (!currentBookingId || !selectedDeliveryPhotos.length) { toast("⚠️ Take photos first"); return; }
+  if (!currentBookingId || !selectedDeliveryPhotos.length) { toast("<i data-lucide="triangle-alert"></i> Take photos first"); return; }
   window._firebase.db.collection("bookings").doc(currentBookingId).update({
     deliveryPhotos: selectedDeliveryPhotos.slice(0, 5),
     deliveryUploadedAt: firebase.firestore.FieldValue.serverTimestamp()
   }).then(() => {
-    toast("✅ Delivery photos saved!");
+    toast("<i data-lucide="badge-check"></i> Delivery photos saved!");
     document.getElementById("deliveryThumbs").innerHTML = "";
     selectedDeliveryPhotos = [];
-  }).catch(e => toast("❌ Upload failed: " + e.message));
+  }).catch(e => toast("<i data-lucide="x"></i> Upload failed: " + e.message));
 }
 
 /* ============================================
@@ -948,7 +949,7 @@ function loadHistory() {
       renderHistory(allCompletedBookings);
     })
     .catch(e => {
-      list.innerHTML = '<div class="hist-empty">❌ Failed to load history</div>';
+      list.innerHTML = '<div class="hist-empty"><i data-lucide="x"></i> Failed to load history</div>';
       console.error(e);
     });
 }
@@ -956,7 +957,7 @@ function loadHistory() {
 function renderHistory(bookings) {
   const list = document.getElementById("historyList");
   if (!bookings.length) {
-    list.innerHTML = '<div class="hist-empty">📭 No completed jobs yet.<br>Complete your first delivery to see history here.</div>';
+    list.innerHTML = '<div class="hist-empty"><i data-lucide="circle"></i> No completed jobs yet.<br>Complete your first delivery to see history here.</div>';
     return;
   }
   list.innerHTML = bookings.map(b => {
@@ -971,16 +972,16 @@ function renderHistory(bookings) {
       <div class="hist-card">
         <div class="hist-header">
           <div class="hist-id">${b.bookingRef || ("#" + b.id.slice(-6).toUpperCase())}</div>
-          <div class="hist-badge">✅ Delivered</div>
+          <div class="hist-badge"><i data-lucide="badge-check"></i> Delivered</div>
         </div>
-        <div class="hist-route">📍 ${pickup}<br>🏁 ${drop}</div>
+        <div class="hist-route"><i data-lucide="map-pin"></i> ${pickup}<br><i data-lucide="flag"></i> ${drop}</div>
         <div style="display:flex;gap:8px;margin:8px 0;flex-wrap:wrap">
-          <span style="background:rgba(0,201,110,.1);color:var(--accent);font-size:.75rem;font-weight:700;padding:3px 10px;border-radius:20px">💚 Received ₹${paid.toLocaleString()}</span>
-          ${!paidFull ? `<span style="background:rgba(249,115,22,.1);color:#f97316;font-size:.75rem;font-weight:700;padding:3px 10px;border-radius:20px">🔶 Collected ₹${due.toLocaleString()}</span>` : '<span style="background:rgba(0,201,110,.1);color:var(--accent);font-size:.75rem;font-weight:700;padding:3px 10px;border-radius:20px">✅ Fully Paid</span>'}
+          <span style="background:rgba(0,201,110,.1);color:var(--accent);font-size:.75rem;font-weight:700;padding:3px 10px;border-radius:20px"><i data-lucide="circle"></i> Received ₹${paid.toLocaleString()}</span>
+          ${!paidFull ? `<span style="background:rgba(249,115,22,.1);color:#f97316;font-size:.75rem;font-weight:700;padding:3px 10px;border-radius:20px"><i data-lucide="circle"></i> Collected ₹${due.toLocaleString()}</span>` : '<span style="background:rgba(0,201,110,.1);color:var(--accent);font-size:.75rem;font-weight:700;padding:3px 10px;border-radius:20px"><i data-lucide="badge-check"></i> Fully Paid</span>'}
         </div>
         <div class="hist-footer">
           <div class="hist-amount">Total: ₹${total.toLocaleString()}</div>
-          <div class="hist-date">📅 ${date}</div>
+          <div class="hist-date"><i data-lucide="calendar-days"></i> ${date}</div>
         </div>
       </div>`;
   }).join("");
@@ -1053,7 +1054,7 @@ function loadEarnings(period) {
 
       // Render breakdown
       if (!bookings.length) {
-        list.innerHTML = '<div class="hist-empty">📭 No earnings for this period.</div>';
+        list.innerHTML = '<div class="hist-empty"><i data-lucide="circle"></i> No earnings for this period.</div>';
         return;
       }
       list.innerHTML = bookings.map(b => {
@@ -1070,7 +1071,7 @@ function loadEarnings(period) {
               <div class="hist-id">${b.bookingRef || ("#" + b.id.slice(-6).toUpperCase())}</div>
               <div class="hist-date">${date}</div>
             </div>
-            <div class="hist-route">📍 ${pickup} → 🏁 ${drop}</div>
+            <div class="hist-route"><i data-lucide="map-pin"></i> ${pickup} → <i data-lucide="flag"></i> ${drop}</div>
             <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin:8px 0">
               <div style="background:var(--surface2);border-radius:8px;padding:6px 8px;text-align:center">
                 <div style="font-size:.65rem;color:var(--text-muted);font-weight:600">TOTAL</div>
@@ -1089,7 +1090,7 @@ function loadEarnings(period) {
       }).join("");
     })
     .catch(e => {
-      list.innerHTML = '<div class="hist-empty">❌ Failed to load earnings</div>';
+      list.innerHTML = '<div class="hist-empty"><i data-lucide="x"></i> Failed to load earnings</div>';
       console.error(e);
     });
 }

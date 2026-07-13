@@ -19,10 +19,10 @@
         referralCredits: 0,
         createdAt: firebase.firestore.FieldValue.serverTimestamp()
       });
-      console.log(`✅ ${role.toUpperCase()} created: ${email}`);
+      console.log(` ${role.toUpperCase()} created: ${email}`);
     } catch (e) {
       if (e.code === "auth/email-already-in-use") console.log(`ℹ️ ${email} already exists (OK)`);
-      else console.error(`❌ Failed ${email}:`, e.message);
+      else console.error(` Failed ${email}:`, e.message);
     }
   }
 
@@ -37,7 +37,7 @@
       const doc = await db.collection("promos").doc(p.code).get();
       if (!doc.exists) {
         await db.collection("promos").doc(p.code).set({ ...p, used: 0, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
-        console.log("✅ Promo created:", p.code);
+        console.log(" Promo created:", p.code);
       } else {
         console.log("ℹ️ Promo exists:", p.code);
       }
@@ -50,7 +50,7 @@
   await seedPromos();
   await auth.signOut();
 
-  console.log("\n🎉 Setup complete!");
+  console.log("\n Setup complete!");
   console.log("─────────────────────────────");
   console.log("Admin:  admin@packzen.com / Admin@123");
   console.log("Driver: driver@packzen.com / Driver@123");

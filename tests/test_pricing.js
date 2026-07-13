@@ -13,14 +13,14 @@ eval(code);
 function test(name, input, expectedFn) {
   const result = window.PackZenPricing.calculateQuote(input);
   if (!result.valid) {
-    console.error(`❌ ${name} failed. Errors:`, result.errors);
+    console.error(` ${name} failed. Errors:`, result.errors);
     return;
   }
   const pass = expectedFn(result);
   if (pass) {
-    console.log(`✅ ${name} passed.`);
+    console.log(` ${name} passed.`);
   } else {
-    console.error(`❌ ${name} failed. Result:`, JSON.stringify(result.breakdown, null, 2));
+    console.error(` ${name} failed. Result:`, JSON.stringify(result.breakdown, null, 2));
   }
 }
 

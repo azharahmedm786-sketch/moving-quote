@@ -56,15 +56,15 @@
      ====================================================================== */
   var KB = {
     greeting:
-      "Hi there! 👋 I'm the PackZen Assistant.\nPack Smart. Move Calm. — ask me about pricing, vehicles, booking, or service areas, and I'll help right away.",
+      "Hi there! <i data-lucide=circle></i> I'm the PackZen Assistant.\nPack Smart. Move Calm. — ask me about pricing, vehicles, booking, or service areas, and I'll help right away.",
 
     menu: [
-      { label: "💰 Pricing & Rates", intent: "pricing" },
-      { label: "🚚 Vehicle Options", intent: "vehicles" },
-      { label: "📋 How Booking Works", intent: "booking_steps" },
-      { label: "📍 Service Areas", intent: "service_area" },
-      { label: "💬 Talk to Support", intent: "human" },
-      { label: "📅 Book Now", intent: "book_now" },
+      { label: "<i data-lucide=indian-rupee></i> Pricing & Rates", intent: "pricing" },
+      { label: "<i data-lucide=truck></i> Vehicle Options", intent: "vehicles" },
+      { label: "<i data-lucide=clipboard-list></i> How Booking Works", intent: "booking_steps" },
+      { label: "<i data-lucide=map-pin></i> Service Areas", intent: "service_area" },
+      { label: "<i data-lucide=message-circle></i> Talk to Support", intent: "human" },
+      { label: "<i data-lucide=calendar-days></i> Book Now", intent: "book_now" },
     ],
 
     intents: {
@@ -75,7 +75,7 @@
           "cheap", "budget", "amount",
         ],
        reply:
-  "🏠 PackZen Pricing Guide\n\n" +
+  "<i data-lucide=house></i> PackZen Pricing Guide\n\n" +
   "• 1 RK — ₹2,500 onwards\n" +
   "• 1 BHK — ₹4,500 onwards\n" +
   "• 2 BHK — ₹6,500 onwards\n" +
@@ -83,15 +83,15 @@
   "• 4 BHK — ₹10,500 onwards\n" +
   "• Villa — ₹13,500 onwards\n\n" +
   "Final cost depends on:\n" +
-  "✅ Distance\n" +
-  "✅ Furniture quantity\n" +
-  "✅ Floor charges\n" +
-  "✅ Lift availability\n" +
-  "✅ Local or Intercity move\n\n" +
-  "🏢 Floor Charges:\n" +
+  "<i data-lucide=badge-check></i> Distance\n" +
+  "<i data-lucide=badge-check></i> Furniture quantity\n" +
+  "<i data-lucide=badge-check></i> Floor charges\n" +
+  "<i data-lucide=badge-check></i> Lift availability\n" +
+  "<i data-lucide=badge-check></i> Local or Intercity move\n\n" +
+  "<i data-lucide=building-2></i> Floor Charges:\n" +
 "• With Lift: Lower handling charges apply\n" +
 "• Without Lift: Additional floor charges apply\n\n" +
-  "🚚 Intercity pricing is calculated based on distance, house size and vehicle requirements.\n\n" +
+  "<i data-lucide=truck></i> Intercity pricing is calculated based on distance, house size and vehicle requirements.\n\n" +
   "Use our Instant Quote form to get an exact price instantly.",
          cta: { type: "book", label: "Get My Instant Quote" },
         followUp: ["vehicles", "booking_steps", "human"],
@@ -104,10 +104,10 @@
         ],
         reply:
           "We match the vehicle to your home size so you never overpay:\n\n" +
-          "🚐 Mini Truck (Tata Ace, open) — best for 1 RK / 1 BHK, ~750 kg load\n" +
-          "🚛 Tempo 14ft (covered) — best for 2 BHK, ~1.5 ton load\n" +
-          "🚚 Tempo 17ft (covered) — best for 3 BHK, ~2.5 ton load\n" +
-          "🛻 Container Truck 19–22ft — best for 4+ BHK / villas, ~4–7 ton load\n\n" +
+          "<i data-lucide=circle></i> Mini Truck (Tata Ace, open) — best for 1 RK / 1 BHK, ~750 kg load\n" +
+          "<i data-lucide=truck></i> Tempo 14ft (covered) — best for 2 BHK, ~1.5 ton load\n" +
+          "<i data-lucide=truck></i> Tempo 17ft (covered) — best for 3 BHK, ~2.5 ton load\n" +
+          "<i data-lucide=circle></i> Container Truck 19–22ft — best for 4+ BHK / villas, ~4–7 ton load\n\n" +
           "All covered vehicles protect your belongings from weather during transit. The quote form auto-suggests the right vehicle once you enter your BHK.",
         cta: { type: "book", label: "Get Vehicle Recommendation" },
         followUp: ["pricing", "booking_steps"],
@@ -153,9 +153,9 @@
         ],
         reply:
           "Of course — I can connect you with our support team.\n\n" +
-          "📞 " + CONFIG.supportPhone + "\n" +
-          "✉️ " + CONFIG.supportEmail + "\n" +
-          "🕒 " + CONFIG.supportHours + "\n\n" +
+          "<i data-lucide=phone></i> " + CONFIG.supportPhone + "\n" +
+          "<i data-lucide=mail></i> " + CONFIG.supportEmail + "\n" +
+          "<i data-lucide=circle></i> " + CONFIG.supportHours + "\n\n" +
           "Or share your name and phone number below and we'll reach out to you directly on WhatsApp.",
         showLeadForm: true,
         followUp: [],
@@ -171,13 +171,13 @@
 
       thanks: {
         keywords: ["thank", "thanks", "thank you", "thx", "appreciate"],
-        reply: "You're very welcome! 😊 Anything else I can help with — pricing, vehicles, or booking?",
+        reply: "You're very welcome! <i data-lucide=circle></i> Anything else I can help with — pricing, vehicles, or booking?",
         followUp: ["pricing", "vehicles", "booking_steps"],
       },
 
       greeting_intent: {
         keywords: ["hi", "hello", "hey", "good morning", "good evening", "good afternoon"],
-        reply: "Hello! 👋 How can I help with your move today?",
+        reply: "Hello! <i data-lucide=circle></i> How can I help with your move today?",
         followUp: [],
       },
 
@@ -240,7 +240,7 @@
     root.innerHTML =
       '<div class="pz-chat-teaser" id="pzTeaser" role="button" tabindex="0">' +
       "Need help with your move? Chat with us!" +
-      '<button class="pz-teaser-dismiss" id="pzTeaserDismiss" aria-label="Dismiss">✕</button>' +
+      '<button class="pz-teaser-dismiss" id="pzTeaserDismiss" aria-label="Dismiss"><i data-lucide=x></i></button>' +
       "</div>" +
       '<div class="pz-chat-window" id="pzChatWindow" role="dialog" aria-modal="false" aria-label="PackZen chat assistant">' +
       '  <div class="pz-chat-header">' +
