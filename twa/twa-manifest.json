@@ -16,11 +16,11 @@
   "iconUrl": "https://packzenblr.in/assets/logo/newllogo.png",
   "maskableIconUrl": "https://packzenblr.in/assets/logo/newllogo.png",
   "signingKey": {
-    "path": "./android.keystore",
+    "path": "./release.keystore",
     "alias": "android"
   },
-  "appVersionName": "packzen123",
-  "appVersionCode": 2,
+  "appVersionName": "1.0.5",
+  "appVersionCode": 8,
   "shortcuts": [],
   "generatorApp": "bubblewrap-cli",
   "webManifestUrl": "https://packzenblr.in/manifest.json",
@@ -42,5 +42,5 @@
   "additionalTrustedOrigins": [],
   "retainedBundles": [],
   "displayOverride": [],
-  "appVersion": "packzen123"
+  "appVersion": "1.0.5"
 }
