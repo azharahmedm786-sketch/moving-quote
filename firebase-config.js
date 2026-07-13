@@ -6,11 +6,11 @@ on top of v9.6.1 already loaded in HTML, causing conflicts)
 (function initFirebase() {
   try {
     if (!window.ENV) {
-      console.error("❌ env-config.js not loaded! Make sure it's included before firebase-config.js");
+      console.error(" env-config.js not loaded! Make sure it's included before firebase-config.js");
       return;
     }
     if (!window.ENV.FIREBASE_AUTH_KEY) {
-      console.error("❌ FIREBASE_AUTH_KEY not found in env-config.js!");
+      console.error(" FIREBASE_AUTH_KEY not found in env-config.js!");
       return;
     }
 
@@ -24,7 +24,7 @@ on top of v9.6.1 already loaded in HTML, causing conflicts)
         appId: "1:270978358338:web:20827d29d23b654925e1db",
         measurementId: "G-9JXKP58GP3"
       });
-      console.log("✅ Firebase initialized with Auth API key");
+      console.log(" Firebase initialized with Auth API key");
     }
 
     const auth = firebase.auth();
@@ -33,8 +33,8 @@ on top of v9.6.1 already loaded in HTML, causing conflicts)
 
     // Make Firebase globally accessible
     window._firebase = { auth, db, storage };
-    console.log("✅ PackZen Firebase ready!");
+    console.log(" PackZen Firebase ready!");
   } catch (e) {
-    console.error("❌ Firebase init failed:", e);
+    console.error(" Firebase init failed:", e);
   }
 })();

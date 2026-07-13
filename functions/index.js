@@ -49,14 +49,14 @@ exports.sendSMS = functions
     try {
     
       const result = await sendMsg91SMS(authKey, senderId, mobile, message);
-      console.log(`✅ SMS sent to ${mobile}:`, result);
+      console.log(` SMS sent to ${mobile}:`, result);
       await docRef.update({
         status: "sent",
         sentAt: admin.firestore.FieldValue.serverTimestamp(),
         response: JSON.stringify(result).slice(0, 500)
       });
     } catch (err) {
-      console.error(`❌ SMS failed to ${mobile}:`, err.message);
+      console.error(` SMS failed to ${mobile}:`, err.message);
       const retries = (data.retries || 0) + 1;
       await docRef.update({
         status: retries >= 3 ? "failed" : "pending",  // retry up to 3 times
@@ -146,14 +146,14 @@ exports.sendWhatsApp = functions
     try {
       // Placeholder for WhatsApp API (e.g. MSG91 WhatsApp, Meta API, etc.)
       // Since no specific WhatsApp API is provided, we simulate a successful send.
-      console.log(`✅ WhatsApp sent to ${mobile}:`, message);
+      console.log(` WhatsApp sent to ${mobile}:`, message);
       await docRef.update({
         status: "sent",
         sentAt: admin.firestore.FieldValue.serverTimestamp(),
         response: JSON.stringify({ success: true, dummy: true }).slice(0, 500)
       });
     } catch (err) {
-      console.error(`❌ WhatsApp failed to ${mobile}:`, err.message);
+      console.error(` WhatsApp failed to ${mobile}:`, err.message);
       const retries = (data.retries || 0) + 1;
       await docRef.update({
         status: retries >= 3 ? "failed" : "pending",  // retry up to 3 times
@@ -389,7 +389,7 @@ console.log("BOOKING DATA:", bookingData);
        }).catch(err => console.error("Booking confirmation email error (non-blocking):", err.message));
 
 console.log("BOOKING CREATED SUCCESSFULLY");
-      console.log("✅ Payment verified:", razorpay_payment_id);
+      console.log(" Payment verified:", razorpay_payment_id);
 
       return res.status(200).json({
         success: true,

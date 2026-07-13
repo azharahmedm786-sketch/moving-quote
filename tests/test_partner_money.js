@@ -47,7 +47,7 @@ function testPzMoney() {
   assert.strictEqual(pzMoney(1234.5), "₹1,235", "Should round float (half up usually based on environment, but JS engine-dependent)");
   assert.strictEqual(pzMoney(1234.2), "₹1,234", "Should round down float");
 
-  console.log("✅ pzMoney tests passed!");
+  console.log(" pzMoney tests passed!");
 }
 
 testPzMoney();

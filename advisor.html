@@ -753,14 +753,15 @@
     .nb-err { color: var(--red); font-size: .76rem; margin-top: 8px; min-height: 16px; font-weight: 600; }
     @media (max-width: 900px) { .nb-grid { grid-template-columns: 1fr; } .nb-summary { position: static; } }
   </style>
+  <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
 
 <!-- LOGIN -->
 <div class="login-wrap" id="loginWrap">
   <div class="login-card">
-    <div class="login-badge">🔐 Restricted Access</div>
-    <div class="login-logo">📦 PackZen</div>
+    <div class="login-badge"><i data-lucide="lock"></i> Restricted Access</div>
+    <div class="login-logo"><i data-lucide="package"></i> PackZen</div>
     <div class="login-tagline">Advisor Dashboard</div>
     <label class="field-label">Email Address</label>
     <input id="adEmail" type="email" class="field-input" placeholder="your@packzenblr.in" autocomplete="off"
@@ -819,7 +820,7 @@ let unsubBookings, unsubCustomers, unsubDrivers;
    ════════════════════════════════════════════ */
 function waitFB(cb, n = 0) {
   if (window._firebase) { db = window._firebase.db; auth = window._firebase.auth; cb(); return; }
-  if (n > 40) { document.getElementById("loginErr").textContent = "⚠️ Firebase config not loaded. Check firebase-config.js"; return; }
+  if (n > 40) { document.getElementById("loginErr").textContent = " Firebase config not loaded. Check firebase-config.js"; return; }
   setTimeout(() => waitFB(cb, n + 1), 200);
 }
 
@@ -845,7 +846,7 @@ async function doLogin() {
   const err   = document.getElementById("loginErr");
   const btn   = document.getElementById("loginBtn");
   err.textContent = "";
-  if (!email || !pass) { err.textContent = "⚠️ Please enter email and password."; return; }
+  if (!email || !pass) { err.textContent = " Please enter email and password."; return; }
   btn.disabled = true; btn.textContent = "Signing in...";
   waitFB(async () => {
     try {
@@ -853,7 +854,7 @@ async function doLogin() {
       const ok   = await isAdvisor(cred.user);
       if (!ok) {
         await auth.signOut();
-        err.textContent = "⚠️ Access denied. Your account does not have advisor permissions.";
+        err.textContent = " Access denied. Your account does not have advisor permissions.";
         btn.disabled = false; btn.textContent = "Access Dashboard →";
         return;
       }
@@ -862,13 +863,13 @@ async function doLogin() {
     } catch (e) {
       console.error('Advisor Auth Error:', e.code, e.message);
       const msgs = {
-        "auth/wrong-password":            "⚠️ Incorrect password.",
-        "auth/invalid-credential":        "⚠️ Incorrect email or password.",
-        "auth/user-not-found":            "⚠️ No account found for this email.",
-        "auth/invalid-email":             "⚠️ Invalid email address.",
-        "auth/too-many-requests":         "⚠️ Too many attempts. Please wait.",
+        "auth/wrong-password":            "<i data-lucide="triangle-alert"></i> Incorrect password.",
+        "auth/invalid-credential":        "<i data-lucide="triangle-alert"></i> Incorrect email or password.",
+        "auth/user-not-found":            "<i data-lucide="triangle-alert"></i> No account found for this email.",
+        "auth/invalid-email":             "<i data-lucide="triangle-alert"></i> Invalid email address.",
+        "auth/too-many-requests":         "<i data-lucide="triangle-alert"></i> Too many attempts. Please wait.",
       };
-      err.textContent = msgs[e.code] || ("⚠️ " + e.message);
+      err.textContent = msgs[e.code] || (" " + e.message);
       btn.disabled = false; btn.textContent = "Access Dashboard →";
     }
   });
@@ -895,17 +896,17 @@ function buildShell() {
   shell.innerHTML = `
   <aside class="sidebar">
     <div class="sb-logo">
-      <div class="sb-logo-text">📦 PackZen</div>
+      <div class="sb-logo-text"><i data-lucide="package"></i> PackZen</div>
       <div class="sb-logo-sub">Advisor Console</div>
     </div>
     <div class="sb-section">Analytics</div>
-    <div class="nav-item active" onclick="showSection('overview',this)"><span class="nav-icon">📊</span> Overview</div>
-    <div class="nav-item" onclick="showSection('revenue',this)"><span class="nav-icon">💰</span> Revenue</div>
+    <div class="nav-item active" onclick="showSection('overview',this)"><span class="nav-icon"><i data-lucide="circle"></i></span> Overview</div>
+    <div class="nav-item" onclick="showSection('revenue',this)"><span class="nav-icon"><i data-lucide="indian-rupee"></i></span> Revenue</div>
     <div class="sb-section">Operations</div>
-    <div class="nav-item" onclick="showSection('newbooking',this)"><span class="nav-icon">➕</span> New Booking</div>
-    <div class="nav-item" onclick="showSection('bookings',this)"><span class="nav-icon">📦</span> All Bookings</div>
-    <div class="nav-item" onclick="showSection('customers',this)"><span class="nav-icon">👥</span> Customers</div>
-    <div class="nav-item" onclick="showSection('drivers',this)"><span class="nav-icon">🚚</span> Drivers</div>
+    <div class="nav-item" onclick="showSection('newbooking',this)"><span class="nav-icon"><i data-lucide="circle"></i></span> New Booking</div>
+    <div class="nav-item" onclick="showSection('bookings',this)"><span class="nav-icon"><i data-lucide="package"></i></span> All Bookings</div>
+    <div class="nav-item" onclick="showSection('customers',this)"><span class="nav-icon"><i data-lucide="circle"></i></span> Customers</div>
+    <div class="nav-item" onclick="showSection('drivers',this)"><span class="nav-icon"><i data-lucide="truck"></i></span> Drivers</div>
     <div class="sb-bottom">
       <div class="advisor-chip">
         <div class="advisor-avatar">${initLetter}</div>
@@ -931,19 +932,19 @@ function buildShell() {
     <div class="section active" id="secOverview">
       <div class="stats-grid">
         <div class="stat-card gold">
-          <div class="stat-icon">📦</div>
+          <div class="stat-icon"><i data-lucide="package"></i></div>
           <div class="stat-label">Total Bookings</div>
           <div class="stat-value" id="stTotal">—</div>
           <div class="stat-sub">All time</div>
         </div>
         <div class="stat-card green">
-          <div class="stat-icon">💰</div>
+          <div class="stat-icon"><i data-lucide="indian-rupee"></i></div>
           <div class="stat-label">Total Revenue</div>
           <div class="stat-value" id="stRevenue" style="font-size:1.2rem">—</div>
           <div class="stat-sub">Sum of all bookings</div>
         </div>
         <div class="stat-card blue">
-          <div class="stat-icon">✅</div>
+          <div class="stat-icon"><i data-lucide="badge-check"></i></div>
           <div class="stat-label">Delivered</div>
           <div class="stat-value" id="stDelivered">—</div>
           <div class="stat-sub">Completed moves</div>
@@ -955,13 +956,13 @@ function buildShell() {
           <div class="stat-sub">Ongoing moves</div>
         </div>
         <div class="stat-card">
-          <div class="stat-icon">👥</div>
+          <div class="stat-icon"><i data-lucide="circle"></i></div>
           <div class="stat-label">Customers</div>
           <div class="stat-value" id="stCustomers">—</div>
           <div class="stat-sub">Registered users</div>
         </div>
         <div class="stat-card">
-          <div class="stat-icon">🚚</div>
+          <div class="stat-icon"><i data-lucide="truck"></i></div>
           <div class="stat-label">Drivers</div>
           <div class="stat-value" id="stDrivers">—</div>
           <div class="stat-sub">Active fleet</div>
@@ -1002,15 +1003,15 @@ function buildShell() {
     <div class="section" id="secRevenue">
       <div class="kpi-row">
         <div class="kpi-card">
-          <div class="kpi-icon-wrap gold">💰</div>
+          <div class="kpi-icon-wrap gold"><i data-lucide="indian-rupee"></i></div>
           <div><div class="kpi-label">Total Revenue</div><div class="kpi-value" id="kpiRevTotal">—</div></div>
         </div>
         <div class="kpi-card">
-          <div class="kpi-icon-wrap green">✅</div>
+          <div class="kpi-icon-wrap green"><i data-lucide="badge-check"></i></div>
           <div><div class="kpi-label">Avg. Booking Value</div><div class="kpi-value" id="kpiAvg">—</div></div>
         </div>
         <div class="kpi-card">
-          <div class="kpi-icon-wrap blue">📅</div>
+          <div class="kpi-icon-wrap blue"><i data-lucide="calendar-days"></i></div>
           <div><div class="kpi-label">This Month</div><div class="kpi-value" id="kpiThisMonth">—</div></div>
         </div>
       </div>
@@ -1036,7 +1037,7 @@ function buildShell() {
     <!-- NEW BOOKING -->
     <div class="section" id="secNewbooking">
       <div class="nb-draft-banner" id="nbDraftBanner" style="display:none">
-        <span>📝 You have an unsaved draft booking from earlier.</span>
+        <span><i data-lucide="circle"></i> You have an unsaved draft booking from earlier.</span>
         <div style="display:flex;gap:8px">
           <button class="nb-restore" onclick="nbRestoreDraft()">Restore</button>
           <button class="nb-discard" onclick="nbDiscardDraft()">Discard</button>
@@ -1047,7 +1048,7 @@ function buildShell() {
         <div class="nb-form-col">
 
           <div class="nb-card">
-            <h3>👤 Customer Details</h3>
+            <h3><i data-lucide="user-round"></i> Customer Details</h3>
             <div class="nb-row">
               <div class="nb-field"><label>Full Name *</label><input id="nbName" placeholder="Customer name" oninput="nbSaveDraft()"></div>
               <div class="nb-field"><label>Phone *</label><input id="nbPhone" type="tel" maxlength="10" placeholder="10-digit mobile" oninput="nbSaveDraft()"></div>
@@ -1067,11 +1068,11 @@ function buildShell() {
           </div>
 
           <div class="nb-card">
-            <h3>📦 Move Type</h3>
+            <h3><i data-lucide="package"></i> Move Type</h3>
             <div class="nb-type-grid" id="nbTypeGrid">
-              <div class="nb-type-card" data-type="home" onclick="nbSelectMoveType('home')">🏠<br>Home</div>
-              <div class="nb-type-card" data-type="office" onclick="nbSelectMoveType('office')">🏢<br>Office</div>
-              <div class="nb-type-card" data-type="single" onclick="nbSelectMoveType('single')">📦<br>Single Item</div>
+              <div class="nb-type-card" data-type="home" onclick="nbSelectMoveType('home')"><i data-lucide="house"></i><br>Home</div>
+              <div class="nb-type-card" data-type="office" onclick="nbSelectMoveType('office')"><i data-lucide="building-2"></i><br>Office</div>
+              <div class="nb-type-card" data-type="single" onclick="nbSelectMoveType('single')"><i data-lucide="package"></i><br>Single Item</div>
             </div>
             <div style="margin-top:16px">
               <label style="display:block;font-size:.68rem;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px" id="nbSizeLabel">House Type</label>
@@ -1080,7 +1081,7 @@ function buildShell() {
           </div>
 
           <div class="nb-card">
-            <h3>📍 Pickup &amp; Drop</h3>
+            <h3><i data-lucide="map-pin"></i> Pickup &amp; Drop</h3>
             <div class="nb-field" style="margin-bottom:12px"><label>Pickup Address *</label><input id="nbPickup" placeholder="Enter pickup address" autocomplete="off"></div>
             <div class="nb-field"><label>Drop Address *</label><input id="nbDrop" placeholder="Enter drop address" autocomplete="off"></div>
             <div id="nbMap" class="nb-map"></div>
@@ -1088,7 +1089,7 @@ function buildShell() {
           </div>
 
           <div class="nb-card">
-            <h3>🗓️ Schedule</h3>
+            <h3><i data-lucide="circle"></i> Schedule</h3>
             <div class="nb-row">
               <div class="nb-field"><label>Moving Date *</label><input id="nbDate" type="date" onchange="nbSaveDraft();nbCalc();"></div>
               <div class="nb-field"><label>Preferred Time *</label>
@@ -1106,12 +1107,12 @@ function buildShell() {
           </div>
 
           <div class="nb-card" id="nbVehicleCard">
-            <h3>🚚 Vehicle</h3>
+            <h3><i data-lucide="truck"></i> Vehicle</h3>
             <div class="nb-vehicle-grid" id="nbVehicleGrid"><span style="font-size:.78rem;color:var(--muted2)">Select a move type first</span></div>
           </div>
 
           <div class="nb-card">
-            <h3>🏗️ Floors, Access &amp; Add-on Services</h3>
+            <h3><i data-lucide="circle"></i> Floors, Access &amp; Add-on Services</h3>
             <div class="nb-row">
               <div class="nb-field"><label>Pickup Floor</label>
                 <select id="nbPickupFloor" onchange="nbCalc()">
@@ -1124,17 +1125,17 @@ function buildShell() {
                 </select>
               </div>
             </div>
-            <div class="nb-toggle-row"><span>🛗 Lift available (50% off floor charge)</span><label class="nb-switch"><input type="checkbox" id="nbLift" onchange="nbCalc()"><span class="sldr"></span></label></div>
-            <div class="nb-toggle-row"><span>📦 Packing service</span><label class="nb-switch"><input type="checkbox" id="nbPacking" onchange="nbCalc()"><span class="sldr"></span></label></div>
-            <div class="nb-toggle-row"><span>📤 Unpacking service</span><label class="nb-switch"><input type="checkbox" id="nbUnpacking"><span class="sldr"></span></label></div>
-            <div class="nb-toggle-row"><span>🔧 Dismantling</span><label class="nb-switch"><input type="checkbox" id="nbDismantle"><span class="sldr"></span></label></div>
-            <div class="nb-toggle-row"><span>🔩 Assembly</span><label class="nb-switch"><input type="checkbox" id="nbAssembly"><span class="sldr"></span></label></div>
-            <div class="nb-toggle-row"><span>🏬 Storage needed</span><label class="nb-switch"><input type="checkbox" id="nbStorage"><span class="sldr"></span></label></div>
-            <div class="nb-toggle-row"><span>🛡️ Insurance (included on every move)</span><label class="nb-switch"><input type="checkbox" id="nbInsurance" checked disabled><span class="sldr"></span></label></div>
+            <div class="nb-toggle-row"><span><i data-lucide="circle"></i> Lift available (50% off floor charge)</span><label class="nb-switch"><input type="checkbox" id="nbLift" onchange="nbCalc()"><span class="sldr"></span></label></div>
+            <div class="nb-toggle-row"><span><i data-lucide="package"></i> Packing service</span><label class="nb-switch"><input type="checkbox" id="nbPacking" onchange="nbCalc()"><span class="sldr"></span></label></div>
+            <div class="nb-toggle-row"><span><i data-lucide="circle"></i> Unpacking service</span><label class="nb-switch"><input type="checkbox" id="nbUnpacking"><span class="sldr"></span></label></div>
+            <div class="nb-toggle-row"><span><i data-lucide="wrench"></i> Dismantling</span><label class="nb-switch"><input type="checkbox" id="nbDismantle"><span class="sldr"></span></label></div>
+            <div class="nb-toggle-row"><span><i data-lucide="circle"></i> Assembly</span><label class="nb-switch"><input type="checkbox" id="nbAssembly"><span class="sldr"></span></label></div>
+            <div class="nb-toggle-row"><span><i data-lucide="store"></i> Storage needed</span><label class="nb-switch"><input type="checkbox" id="nbStorage"><span class="sldr"></span></label></div>
+            <div class="nb-toggle-row"><span><i data-lucide="shield-check"></i> Insurance (included on every move)</span><label class="nb-switch"><input type="checkbox" id="nbInsurance" checked disabled><span class="sldr"></span></label></div>
           </div>
 
           <div class="nb-card">
-            <h3>🛋️ Items &amp; Cartons</h3>
+            <h3><i data-lucide="sofa"></i> Items &amp; Cartons</h3>
             <div class="nb-furniture-grid" id="nbFurnitureGrid"></div>
             <div class="nb-row" style="margin-top:14px">
               <div class="nb-field"><label>Carton Boxes</label>
@@ -1151,7 +1152,7 @@ function buildShell() {
           </div>
 
           <div class="nb-card">
-            <h3>⚙️ Booking Operations</h3>
+            <h3><i data-lucide="circle"></i> Booking Operations</h3>
             <div class="nb-row">
               <div class="nb-field"><label>Booking Status</label>
                 <select id="nbStatus">
@@ -1166,7 +1167,7 @@ function buildShell() {
 
         <div class="nb-form-col">
           <div class="nb-summary">
-            <h3 style="font-family:var(--mono);color:var(--gold);font-size:.8rem;text-transform:uppercase;margin-bottom:12px;letter-spacing:.05em">💰 Live Quote</h3>
+            <h3 style="font-family:var(--mono);color:var(--gold);font-size:.8rem;text-transform:uppercase;margin-bottom:12px;letter-spacing:.05em"><i data-lucide="indian-rupee"></i> Live Quote</h3>
             <div id="nbSummaryLines"><div class="nb-summary-line"><span>Enter move details to see price</span></div></div>
             <div class="nb-summary-total" id="nbTotalDisplay">₹0</div>
 
@@ -1189,12 +1190,12 @@ function buildShell() {
             </div>
 
             <div class="nb-toggle-row" style="margin-top:6px">
-              <span>💵 Payment already collected?</span>
+              <span><i data-lucide="circle"></i> Payment already collected?</span>
               <label class="nb-switch"><input type="checkbox" id="nbPaidToggle"><span class="sldr"></span></label>
             </div>
 
             <div class="nb-err" id="nbFormErr"></div>
-            <button class="nb-btn-save" id="nbSaveBtn" onclick="nbSaveBooking()">✅ Create Booking</button>
+            <button class="nb-btn-save" id="nbSaveBtn" onclick="nbSaveBooking()"><i data-lucide="badge-check"></i> Create Booking</button>
             <div style="font-size:.68rem;color:var(--muted);margin-top:8px;text-align:center">Draft auto-saves as you type</div>
           </div>
         </div>
@@ -1254,7 +1255,7 @@ function buildShell() {
     <div class="section" id="secDrivers">
       <div class="stats-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:20px">
         <div class="stat-card">
-          <div class="stat-icon">🚚</div>
+          <div class="stat-icon"><i data-lucide="truck"></i></div>
           <div class="stat-label">Total Drivers</div>
           <div class="stat-value" id="drvTotal">—</div>
         </div>
@@ -1264,7 +1265,7 @@ function buildShell() {
           <div class="stat-value" id="drvOnline">—</div>
         </div>
         <div class="stat-card">
-          <div class="stat-icon">📦</div>
+          <div class="stat-icon"><i data-lucide="package"></i></div>
           <div class="stat-label">On a Job</div>
           <div class="stat-value" id="drvOnJob">—</div>
         </div>
@@ -1307,7 +1308,7 @@ function loadAll() {
       renderBookingsTable(allBookings);
       renderCharts();
       renderRevenue();
-    }, err => toast("⚠️ Bookings: " + err.message));
+    }, err => toast("<i data-lucide="triangle-alert"></i> Bookings: " + err.message));
 
   // Customers
   unsubCustomers = db.collection("users").where("role","==","customer")
@@ -1498,9 +1499,9 @@ function renderDrivers() {
       <td style="font-size:.78rem;color:var(--muted)">${d.email||"—"}</td>
       <td><a href="tel:${d.phone}" class="phone-link">${d.phone||"—"}</a></td>
       <td style="font-size:.8rem">${d.vehicle||"—"}</td>
-      <td><span class="badge ${d.isOnline?"badge-delivered":"badge-cancelled"}">${d.isOnline?"🟢 Online":"⚫ Offline"}</span></td>
+      <td><span class="badge ${d.isOnline?"badge-delivered":"badge-cancelled"}">${d.isOnline?"🟢 Online":"<i data-lucide="circle"></i> Offline"}</span></td>
       <td style="font-size:.78rem">${d.currentBooking ? `<span class="booking-ref">${d.currentBooking.slice(-6).toUpperCase()}</span>` : '<span style="color:var(--muted2)">Free</span>'}</td>
-      <td>${d.rating ? `<span style="color:#fbbf24;font-weight:700">★ ${d.rating}</span>` : "—"}</td>
+      <td>${d.rating ? `<span style="color:#fbbf24;font-weight:700"><i data-lucide="star"></i> ${d.rating}</span>` : "—"}</td>
       <td class="amount">${d.totalMoves || 0}</td>
     </tr>`).join("");
 }
@@ -1636,7 +1637,7 @@ function renderRevenue() {
     revenueTypeChart = new Chart(ctx3, {
       type: "bar",
       data: {
-        labels: ["🏠 Home Move", "🏢 Office Shift", "📦 Single Item", "Other"],
+        labels: ["<i data-lucide="house"></i> Home Move", "<i data-lucide="building-2"></i> Office Shift", "<i data-lucide="package"></i> Single Item", "Other"],
         datasets: [{
           data: [typeRev.home, typeRev.office, typeRev.single, typeRev.other],
           backgroundColor: ["rgba(245,166,35,.5)","rgba(61,156,245,.5)","rgba(0,209,122,.5)","rgba(155,114,245,.5)"],
@@ -1725,7 +1726,7 @@ function downloadCSV(rows, name) {
   a.href    = "data:text/csv;charset=utf-8," + encodeURIComponent(csv);
   a.download = `${name}-${new Date().toLocaleDateString("en-IN").replace(/\//g,"-")}.csv`;
   a.click();
-  toast("📥 CSV downloaded");
+  toast("<i data-lucide="circle"></i> CSV downloaded");
 }
 
 /* ════════════════════════════════════════════
@@ -1864,10 +1865,10 @@ function nbSelectMoveType(type) {
     sizeGrid.innerHTML = "";
     vehicleCard.style.display = "block";
     vehicleGrid.innerHTML = `
-      <div class="nb-vehicle-btn" onclick="nbSelectVehicle('2 Wheeler')">🏍️ 2 Wheeler</div>
-      <div class="nb-vehicle-btn" onclick="nbSelectVehicle('3 Wheeler')">🛺 3 Wheeler</div>
-      <div class="nb-vehicle-btn" onclick="nbSelectVehicle('Tata Ace')">🚚 Tata Ace</div>
-      <div class="nb-vehicle-btn" onclick="nbSelectVehicle('Pickup 8ft')">🚛 Pickup 8ft</div>
+      <div class="nb-vehicle-btn" onclick="nbSelectVehicle('2 Wheeler')"><i data-lucide="bike"></i> 2 Wheeler</div>
+      <div class="nb-vehicle-btn" onclick="nbSelectVehicle('3 Wheeler')"><i data-lucide="circle"></i> 3 Wheeler</div>
+      <div class="nb-vehicle-btn" onclick="nbSelectVehicle('Tata Ace')"><i data-lucide="truck"></i> Tata Ace</div>
+      <div class="nb-vehicle-btn" onclick="nbSelectVehicle('Pickup 8ft')"><i data-lucide="truck"></i> Pickup 8ft</div>
     `;
   }
 
@@ -2095,20 +2096,20 @@ async function nbSaveBooking() {
       toast(`Booking created! Ref: ${bookingRef}`);
       localStorage.removeItem("pz_nb_draft");
       btn.disabled = false;
-      btn.textContent = "✅ Create Booking";
+      btn.textContent = " Create Booking";
       setTimeout(() => { showSection("bookings"); }, 1500);
     }, (error) => {
       console.error("Save failed:", error);
       errEl.textContent = `Error: ${error.message}`;
       btn.disabled = false;
-      btn.textContent = "✅ Create Booking";
+      btn.textContent = " Create Booking";
     });
 
   } catch (error) {
     console.error("Save failed:", error);
     errEl.textContent = `Error: ${error.message}`;
     btn.disabled = false;
-    btn.textContent = "✅ Create Booking";
+    btn.textContent = " Create Booking";
   }
 }
 

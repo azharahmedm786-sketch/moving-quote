@@ -35,34 +35,34 @@ let isIntercityMove = false;
 const MOVE_TYPE_CONFIG = {
   home: {
     sizeLabel: "House Type",
-    icon: "🏠",
+    icon: "<i data-lucide=house></i>",
     sizes: [
-      { icon: "🏠", label: "1 RK", sub: "Studio", value: "2500" },
-      { icon: "🏡", label: "1 BHK", sub: "Small", value: "4500" },
-      { icon: "🏘️", label: "2 BHK", sub: "Medium", value: "6500" },
-      { icon: "🏰", label: "3 BHK", sub: "Large", value: "8500" },
-      { icon: "🏯", label: "4 BHK", sub: "X-Large", value: "10500" },
-      { icon: "🌇", label: "Villa", sub: "Premium", value: "13500" }
+      { icon: "<i data-lucide=house></i>", label: "1 RK", sub: "Studio", value: "2500" },
+      { icon: "<i data-lucide=home></i>", label: "1 BHK", sub: "Small", value: "4500" },
+      { icon: "<i data-lucide=home></i>", label: "2 BHK", sub: "Medium", value: "6500" },
+      { icon: "<i data-lucide=castle></i>", label: "3 BHK", sub: "Large", value: "8500" },
+      { icon: "<i data-lucide=castle></i>", label: "4 BHK", sub: "X-Large", value: "10500" },
+      { icon: "<i data-lucide=building></i>", label: "Villa", sub: "Premium", value: "13500" }
     ]
   },
   office: {
     sizeLabel: "Office Size",
-    icon: "🏢",
+    icon: "<i data-lucide=building-2></i>",
     sizes: [
-      { icon: "💼", label: "Cabin", sub: "1–5 desks", value: "6500" },
-      { icon: "🏢", label: "Small", sub: "5–15 desks", value: "10500" },
-      { icon: "🏬", label: "Medium", sub: "15–30 desks", value: "16500" },
-      { icon: "🏭", label: "Large", sub: "30+ desks", value: "25500" }
+      { icon: "<i data-lucide=briefcase></i>", label: "Cabin", sub: "1–5 desks", value: "6500" },
+      { icon: "<i data-lucide=building-2></i>", label: "Small", sub: "5–15 desks", value: "10500" },
+      { icon: "<i data-lucide=store></i>", label: "Medium", sub: "15–30 desks", value: "16500" },
+      { icon: "<i data-lucide=factory></i>", label: "Large", sub: "30+ desks", value: "25500" }
     ]
   },
   single: {
     sizeLabel: "Item Type",
-    icon: "📦",
+    icon: "<i data-lucide=package></i>",
     sizes: [
-      { icon: "🛋️", label: "Furniture", sub: "Sofa, bed…", value: "0" },
+      { icon: "<i data-lucide=sofa></i>", label: "Furniture", sub: "Sofa, bed…", value: "0" },
       { icon: "🧊", label: "Appliance", sub: "Fridge, AC…", value: "0" },
-      { icon: "🏍️", label: "Bike/Cycle", sub: "Two-wheeler", value: "500" },
-      { icon: "📦", label: "Boxes", sub: "Cartons", value: "0" }
+      { icon: "<i data-lucide=bike></i>", label: "Bike/Cycle", sub: "Two-wheeler", value: "500" },
+      { icon: "<i data-lucide=package></i>", label: "Boxes", sub: "Cartons", value: "0" }
     ]
   }
 };
@@ -120,95 +120,95 @@ const FURNITURE_CATEGORIES = {
   home: [
     {
       id: "cat-living",
-      icon: "🛋️",
+      icon: "<i data-lucide=sofa></i>",
       label: "Living Room",
       items: [
-        { id: "sofaCheck", emoji: "🛋️", name: "Sofa" },
-        { id: "sofaCumBedCheck", emoji: "🛋️", name: "Sofa Cum Bed" },
+        { id: "sofaCheck", emoji: "<i data-lucide=sofa></i>", name: "Sofa" },
+        { id: "sofaCumBedCheck", emoji: "<i data-lucide=sofa></i>", name: "Sofa Cum Bed" },
         { id: "reclinerCheck", emoji: "🪑", name: "Recliner" },
-        { id: "tvCheck", emoji: "📺", name: "TV" },
-        { id: "tvUnitCheck", emoji: "🗄️", name: "TV Unit" },
-        { id: "coffeeCheck", emoji: "☕", name: "Coffee Table" },
+        { id: "tvCheck", emoji: "<i data-lucide=tv></i>", name: "TV" },
+        { id: "tvUnitCheck", emoji: "<i data-lucide=circle></i>", name: "TV Unit" },
+        { id: "coffeeCheck", emoji: "<i data-lucide=circle></i>", name: "Coffee Table" },
         { id: "centerTableCheck", emoji: "🪵", name: "Center Table" },
-        { id: "bookshelfCheck", emoji: "📚", name: "Bookshelf" },
+        { id: "bookshelfCheck", emoji: "<i data-lucide=circle></i>", name: "Bookshelf" },
         { id: "showcaseCheck", emoji: "🪟", name: "Showcase" },
-        { id: "shoeRackCheck", emoji: "👞", name: "Shoe Rack" },
-        { id: "acCheck", emoji: "❄️", name: "AC Unit" }
+        { id: "shoeRackCheck", emoji: "<i data-lucide=circle></i>", name: "Shoe Rack" },
+        { id: "acCheck", emoji: "<i data-lucide=circle></i>", name: "AC Unit" }
       ]
     },
  {
   id: "cat-bedroom",
-  icon: "🛏️",
+  icon: "<i data-lucide=circle></i>",
   label: "Bedroom",
   items: [
-  { id: "bedCheck", emoji: "🛏️", name: "Bed" },
-  { id: "mattressCheck", emoji: "🛌", name: "Mattress" },
-  { id: "wardrobeCheck", emoji: "🚪", name: "Wardrobe" },
+  { id: "bedCheck", emoji: "<i data-lucide=circle></i>", name: "Bed" },
+  { id: "mattressCheck", emoji: "<i data-lucide=circle></i>", name: "Mattress" },
+  { id: "wardrobeCheck", emoji: "<i data-lucide=log-out></i>", name: "Wardrobe" },
   { id: "dressingCheck", emoji: "🪞", name: "Dressing Table" },
-  { id: "sideTableCheck", emoji: "🗄️", name: "Side Table" },
-  { id: "studyTableCheck", emoji: "💻", name: "Study Table" }
+  { id: "sideTableCheck", emoji: "<i data-lucide=circle></i>", name: "Side Table" },
+  { id: "studyTableCheck", emoji: "<i data-lucide=circle></i>", name: "Study Table" }
 ]
     },
 {
   id: "cat-kitchen",
-  icon: "🍳",
+  icon: "<i data-lucide=circle></i>",
   label: "Kitchen",
   items: [
     { id: "fridgeCheck", emoji: "🧊", name: "Fridge" },
     { id: "wmCheck", emoji: "🧺", name: "Washing Machine" },
-    { id: "dishwasherCheck", emoji: "🍽️", name: "Dishwasher" },
-    { id: "microwaveCheck", emoji: "📟", name: "Microwave" },
-    { id: "ovenCheck", emoji: "🔥", name: "Oven / OTG" },
-    { id: "chimneyCheck", emoji: "🌬️", name: "Kitchen Chimney" },
-    { id: "diningCheck", emoji: "🍽️", name: "Dining Table" },
-    { id: "waterPurifierCheck", emoji: "💧", name: "Water Purifier" }
+    { id: "dishwasherCheck", emoji: "<i data-lucide=circle></i>", name: "Dishwasher" },
+    { id: "microwaveCheck", emoji: "<i data-lucide=circle></i>", name: "Microwave" },
+    { id: "ovenCheck", emoji: "<i data-lucide=circle></i>", name: "Oven / OTG" },
+    { id: "chimneyCheck", emoji: "<i data-lucide=circle></i>", name: "Kitchen Chimney" },
+    { id: "diningCheck", emoji: "<i data-lucide=circle></i>", name: "Dining Table" },
+    { id: "waterPurifierCheck", emoji: "<i data-lucide=circle></i>", name: "Water Purifier" }
   ]
     },
  {
   id: "cat-other",
-  icon: "📦",
+  icon: "<i data-lucide=package></i>",
   label: "Other Items",
   items: [
-    { id: "bikeCheck", emoji: "🏍️", name: "Bike/Scooter" },
-    { id: "cycleCheck", emoji: "🚲", name: "Cycle" },
+    { id: "bikeCheck", emoji: "<i data-lucide=bike></i>", name: "Bike/Scooter" },
+    { id: "cycleCheck", emoji: "<i data-lucide=circle></i>", name: "Cycle" },
     { id: "plantCheck", emoji: "🪴", name: "Large Plants" },
-    { id: "gymCheck", emoji: "🏋️", name: "Gym Equipment" },
-    { id: "treadmillCheck", emoji: "🏃", name: "Treadmill" },
-    { id: "aquariumCheck", emoji: "🐟", name: "Aquarium" }
+    { id: "gymCheck", emoji: "<i data-lucide=circle></i>", name: "Gym Equipment" },
+    { id: "treadmillCheck", emoji: "<i data-lucide=circle></i>", name: "Treadmill" },
+    { id: "aquariumCheck", emoji: "<i data-lucide=circle></i>", name: "Aquarium" }
   ]
 },
   ],
   office: [
     {
-      id: "cat-office", icon: "💼", label: "Office Furniture",
+      id: "cat-office", icon: "<i data-lucide=briefcase></i>", label: "Office Furniture",
       items: [
-        { id: "deskCheck", emoji: "🖥️", name: "Office Desk" },
+        { id: "deskCheck", emoji: "<i data-lucide=circle></i>", name: "Office Desk" },
         { id: "chairCheck", emoji: "🪑", name: "Chair" },
-        { id: "cabinetCheck", emoji: "🗄️", name: "Filing Cabinet" },
-        { id: "serverCheck", emoji: "🖥️", name: "Server/PC" },
-        { id: "printerCheck", emoji: "🖨️", name: "Printer" },
+        { id: "cabinetCheck", emoji: "<i data-lucide=circle></i>", name: "Filing Cabinet" },
+        { id: "serverCheck", emoji: "<i data-lucide=circle></i>", name: "Server/PC" },
+        { id: "printerCheck", emoji: "<i data-lucide=circle></i>", name: "Printer" },
         { id: "confCheck", emoji: "🤝", name: "Conf. Table" },
-        { id: "whiteboardCheck", emoji: "📝", name: "Whiteboard" }
+        { id: "whiteboardCheck", emoji: "<i data-lucide=circle></i>", name: "Whiteboard" }
       ]
     }
   ],
   single: [
     {
-      id: "cat-single", icon: "📦", label: "Single Items",
+      id: "cat-single", icon: "<i data-lucide=package></i>", label: "Single Items",
      items: [
-  { id: "sofaCheck", emoji: "🛋️", name: "Sofa" },
-  { id: "sofaCumBedCheck", emoji: "🛋️", name: "Sofa Cum Bed" },
+  { id: "sofaCheck", emoji: "<i data-lucide=sofa></i>", name: "Sofa" },
+  { id: "sofaCumBedCheck", emoji: "<i data-lucide=sofa></i>", name: "Sofa Cum Bed" },
   { id: "reclinerCheck", emoji: "🪑", name: "Recliner" },
-  { id: "bedCheck", emoji: "🛏️", name: "Bed" },
-  { id: "mattressCheck", emoji: "🛌", name: "Mattress" },
-  { id: "wardrobeCheck", emoji: "🚪", name: "Wardrobe" },
+  { id: "bedCheck", emoji: "<i data-lucide=circle></i>", name: "Bed" },
+  { id: "mattressCheck", emoji: "<i data-lucide=circle></i>", name: "Mattress" },
+  { id: "wardrobeCheck", emoji: "<i data-lucide=log-out></i>", name: "Wardrobe" },
   { id: "fridgeCheck", emoji: "🧊", name: "Fridge" },
   { id: "wmCheck", emoji: "🧺", name: "Washing Machine" },
-  { id: "tvCheck", emoji: "📺", name: "TV" },
-  { id: "microwaveCheck", emoji: "📟", name: "Microwave" },
-  { id: "bikeCheck", emoji: "🏍️", name: "Bike/Scooter" },
-  { id: "cycleCheck", emoji: "🚲", name: "Cycle" },
-  { id: "acCheck", emoji: "❄️", name: "AC Unit" }
+  { id: "tvCheck", emoji: "<i data-lucide=tv></i>", name: "TV" },
+  { id: "microwaveCheck", emoji: "<i data-lucide=circle></i>", name: "Microwave" },
+  { id: "bikeCheck", emoji: "<i data-lucide=bike></i>", name: "Bike/Scooter" },
+  { id: "cycleCheck", emoji: "<i data-lucide=circle></i>", name: "Cycle" },
+  { id: "acCheck", emoji: "<i data-lucide=circle></i>", name: "AC Unit" }
 ]
     }
   ]
@@ -287,7 +287,7 @@ function showToast(msg, dur = 3000) {
     t.className = "toast-msg";
     document.body.appendChild(t);
   }
-  t.textContent = msg;
+  t.innerHTML = msg;
   t.classList.add("show");
   clearTimeout(t._hideTimer);
   t._hideTimer = setTimeout(() => t.classList.remove("show"), dur);
@@ -411,13 +411,13 @@ function renderFurnitureGrid(type) {
 
   const cartonSection = `<div class="fc-category" data-cat-id="cat-carton">
     <div class="fc-category-header" data-toggle-cat="cat-carton">
-      <span class="fc-cat-icon">📦</span>
+      <span class="fc-cat-icon"><i data-lucide=package></i></span>
       <span class="fc-cat-label">Carton Boxes</span>
       <span class="fc-cat-arrow" id="arrow-cat-carton">▾</span>
     </div>
     <div class="fc-category-items" id="cat-carton" style="display:flex">
       <div class="carton-box-row">
-        <span class="carton-label">📦 How many carton boxes?</span>
+        <span class="carton-label"><i data-lucide=package></i> How many carton boxes?</span>
         <div class="carton-qty-wrap">
           <button class="qty-btn" data-carton-action="minus">−</button>
           <input type="number" id="cartonQty" value="0" min="0" max="50" class="fc-qty" onchange="calculateQuote(true)">
@@ -519,7 +519,7 @@ function recommendVehicle(moveType, sizeLabel) {
     }
   });
 
-  showToast("🚚 Recommended vehicle selected automatically.");
+  showToast("<i data-lucide=truck></i> Recommended vehicle selected automatically.");
 }
 /* ============================================
 MULTI-STEP FORM
@@ -582,19 +582,19 @@ function showStep(n) {
 
 function nextStep() {
   if (currentStep === 0 && !document.getElementById("moveType")?.value) {
-    showToast("👆 Please select your move type"); return;
+    showToast("<i data-lucide=circle></i> Please select your move type"); return;
   }
   if (currentStep === 1) {
-    if (!document.getElementById("pickup")?.value.trim()) { showToast("📍 Please enter a pickup location"); return; }
-    if (!pickupPlace || !pickupPlace.geometry) { showToast("⚠️ Please select pickup address from dropdown"); return; }
-    if (!document.getElementById("drop")?.value.trim()) { showToast("🏁 Please enter a drop location"); return; }
-    if (!dropPlace || !dropPlace.geometry) { showToast("⚠️ Please select drop address from dropdown"); return; }
+    if (!document.getElementById("pickup")?.value.trim()) { showToast("<i data-lucide=map-pin></i> Please enter a pickup location"); return; }
+    if (!pickupPlace || !pickupPlace.geometry) { showToast("<i data-lucide=triangle-alert></i> Please select pickup address from dropdown"); return; }
+    if (!document.getElementById("drop")?.value.trim()) { showToast("<i data-lucide=flag></i> Please enter a drop location"); return; }
+    if (!dropPlace || !dropPlace.geometry) { showToast("<i data-lucide=triangle-alert></i> Please select drop address from dropdown"); return; }
   }
   if (currentStep === 2) {
-    if (!document.getElementById("shiftDate")?.value) { showToast("📅 Please select a moving date"); return; }
-    if (!document.getElementById("shiftTime")?.value) { showToast("🕐 Please select a time slot"); return; }
-    if (!document.getElementById("house")?.value) { showToast("🏠 Please select your house type"); return; }
-    if (!isIntercityMove && !document.getElementById("vehicle")?.value) { showToast("🚚 Please select a vehicle type"); return; }
+    if (!document.getElementById("shiftDate")?.value) { showToast("<i data-lucide=calendar-days></i> Please select a moving date"); return; }
+    if (!document.getElementById("shiftTime")?.value) { showToast("<i data-lucide=circle></i> Please select a time slot"); return; }
+    if (!document.getElementById("house")?.value) { showToast("<i data-lucide=house></i> Please select your house type"); return; }
+    if (!isIntercityMove && !document.getElementById("vehicle")?.value) { showToast("<i data-lucide=truck></i> Please select a vehicle type"); return; }
   }
   if (currentStep < getSteps().length - 1) { currentStep++; showStep(currentStep); }
 }
@@ -652,7 +652,7 @@ function selectDateCard(card, dateObj) {
   const days = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
   const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
   if (label) {
-    label.textContent = `✅ ${days[dateObj.getDay()]}, ${dateObj.getDate()} ${months[dateObj.getMonth()]}`;
+    label.textContent = ` ${days[dateObj.getDay()]}, ${dateObj.getDate()} ${months[dateObj.getMonth()]}`;
     label.className = "date-selected-label has-date";
   }
   calculateQuote(true);
@@ -678,7 +678,7 @@ function onCustomDatePicked(val) {
   const today = new Date(); today.setHours(0,0,0,0);
   const tomorrow = new Date(today);
   tomorrow.setDate(today.getDate() + 1);
-  if (d < tomorrow) { showToast("⚠️ Please select tomorrow or a future date."); return; }
+  if (d < tomorrow) { showToast("<i data-lucide=triangle-alert></i> Please select tomorrow or a future date."); return; }
   document.querySelectorAll(".date-card").forEach(c => c.classList.remove("selected"));
   const match = document.querySelector(`.date-card[data-date="${val}"]`);
   if (match) match.classList.add("selected");
@@ -686,7 +686,7 @@ function onCustomDatePicked(val) {
   const days = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
   const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
   if (label) {
-    label.textContent = `✅ ${days[d.getDay()]}, ${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
+    label.textContent = ` ${days[d.getDay()]}, ${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
     label.className = "date-selected-label has-date";
   }
   calculateQuote(true);
@@ -740,7 +740,7 @@ setTimeout(() => {
     getCurrentLocationAutomatically();
 }, 1000);
 
-console.log("✅ Map initialized");
+console.log(" Map initialized");
 };
 
 function initAutocomplete() {
@@ -756,13 +756,13 @@ function initAutocomplete() {
 
   pickupAuto.addListener("place_changed", () => {
     const place = pickupAuto.getPlace();
-    if (!place.geometry) { showToast("⚠️ Please select pickup address from dropdown"); pickupInput.value = ""; pickupPlace = null; return; }
+    if (!place.geometry) { showToast("<i data-lucide=triangle-alert></i> Please select pickup address from dropdown"); pickupInput.value = ""; pickupPlace = null; return; }
     pickupPlace = place; showLocation("pickup"); calculateQuote(true);
   });
 
   dropAuto.addListener("place_changed", () => {
     const place = dropAuto.getPlace();
-    if (!place.geometry) { showToast("⚠️ Please select drop address from dropdown"); dropInput.value = ""; dropPlace = null; return; }
+    if (!place.geometry) { showToast("<i data-lucide=triangle-alert></i> Please select drop address from dropdown"); dropInput.value = ""; dropPlace = null; return; }
     dropPlace = place; showLocation("drop"); calculateQuote(true);
   });
 }
@@ -904,12 +904,12 @@ async function handleCurrentLocationToggle() {
   const toggle = document.getElementById("useCurrentLocation");
   if (!toggle || !toggle.checked) return;
   if (isLocating) { showToast("⏳ Already locating..."); return; }
-  if (!isGoogleMapsReady()) { showToast("⚠️ Maps not ready yet."); toggle.checked = false; return; }
+  if (!isGoogleMapsReady()) { showToast("<i data-lucide=triangle-alert></i> Maps not ready yet."); toggle.checked = false; return; }
   isLocating = true;
   const toggleLabel = toggle.closest('.toggle-row')?.querySelector('.toggle-text');
-  const originalText = toggleLabel?.textContent || "📱 Use my current location";
-  if (toggleLabel) toggleLabel.textContent = "📍 Locating...";
-  showToast("📍 Getting your current location...");
+  const originalText = toggleLabel?.textContent || " Use my current location";
+  if (toggleLabel) toggleLabel.textContent = " Locating...";
+  showToast("<i data-lucide=map-pin></i> Getting your current location...");
 
   try {
     const coords = await getCurrentLocation();
@@ -926,10 +926,10 @@ async function handleCurrentLocationToggle() {
       pickupPlace = result;
       showLocation("pickup");
       calculateQuote(true);
-      showToast(`✅ Location set: ${result.formatted_address.split(",")[0]}`);
+      showToast(`<i data-lucide=badge-check></i> Location set: ${result.formatted_address.split(",")[0]}`);
     }
   } catch (err) {
-    showToast("⚠️ " + err.message);
+    showToast("<i data-lucide=triangle-alert></i> " + err.message);
     toggle.checked = false;
   } finally {
     isLocating = false;
@@ -978,7 +978,7 @@ async function getCurrentLocationAutomatically() {
 
                     calculateQuote(true);
 
-                    showToast("📍 Current location detected");
+                    showToast("<i data-lucide=map-pin></i> Current location detected");
 
                 }
 
@@ -1019,13 +1019,13 @@ function calculateQuote(auto = false) {
   const drop = document.getElementById("drop");
 
   if (!pickup?.value || !drop?.value) {
-    if (!auto) showToast("📍 Please enter pickup & drop locations.");
+    if (!auto) showToast("<i data-lucide=map-pin></i> Please enter pickup & drop locations.");
     return;
   }
 
   // Guard: v2 engine must be loaded
   if (!window.PackZenPricing) {
-    if (!auto) showToast("⚠️ Pricing engine not ready. Please try again.");
+    if (!auto) showToast("<i data-lucide=triangle-alert></i> Pricing engine not ready. Please try again.");
     return;
   }
 
@@ -1066,7 +1066,7 @@ function calculateQuote(auto = false) {
     } else if (quote && !quote.valid) {
       // Engine returned errors — show first one
       if (!auto && quote.errors && quote.errors.length > 0) {
-        showToast("⚠️ " + quote.errors[0]);
+        showToast("<i data-lucide=triangle-alert></i> " + quote.errors[0]);
       }
     }
   }
@@ -1154,9 +1154,9 @@ function updatePriceDisplay() {
 function syncPayOnlineButton(total, advanceAmt, fullAmt) {
   const btn = document.getElementById("btnPayOnline");
   if (!btn) return;
-  if (selectedPayment === "advance") btn.innerHTML = `💳 Pay Advance ₹${advanceAmt.toLocaleString("en-IN")}`;
-  else if (selectedPayment === "full") btn.innerHTML = `💳 Pay Full ₹${fullAmt.toLocaleString("en-IN")} (Save ₹${window.PackZenPricing?.config?.payment?.fullPaymentDiscount || 200})`;
-  else btn.innerHTML = `💳 Pay Online`;
+  if (selectedPayment === "advance") btn.innerHTML = `<i data-lucide=credit-card></i> Pay Advance ₹${advanceAmt.toLocaleString("en-IN")}`;
+  else if (selectedPayment === "full") btn.innerHTML = `<i data-lucide=credit-card></i> Pay Full ₹${fullAmt.toLocaleString("en-IN")} (Save ₹${window.PackZenPricing?.config?.payment?.fullPaymentDiscount || 200})`;
+  else btn.innerHTML = `<i data-lucide=credit-card></i> Pay Online`;
   btn.style.display = (selectedPayment === "at_drop") ? "none" : "";
 }
 
@@ -1189,10 +1189,10 @@ function selectPayment(type) {
   const confirmBtn = document.getElementById("dynamicBookingBtn");
 
   if (type === "advance") {
-    if (payBtn) { payBtn.style.display = ""; payBtn.innerHTML = `💰 Pay Advance ₹${advanceAmt.toLocaleString("en-IN")}`; }
+    if (payBtn) { payBtn.style.display = ""; payBtn.innerHTML = `<i data-lucide=indian-rupee></i> Pay Advance ₹${advanceAmt.toLocaleString("en-IN")}`; }
     if (confirmBtn) confirmBtn.style.display = "none";
   } else if (type === "full") {
-    if (payBtn) { payBtn.style.display = ""; payBtn.innerHTML = `✅ Pay Full ₹${fullAmt.toLocaleString("en-IN")}`; }
+    if (payBtn) { payBtn.style.display = ""; payBtn.innerHTML = `<i data-lucide=badge-check></i> Pay Full ₹${fullAmt.toLocaleString("en-IN")}`; }
     if (confirmBtn) confirmBtn.style.display = "none";
   } else {
     if (payBtn) payBtn.style.display = "none";
@@ -1247,17 +1247,17 @@ async function startPayment() {
   const payBtn = document.getElementById("btnPayOnline");
   if (payBtn) { payBtn.disabled = true; payBtn.innerText = "Processing..."; }
 
-  if (!currentUser) { showToast("👋 Please login to book."); openAuthModal("login"); isProcessingPayment = false; if (payBtn) { payBtn.disabled = false; payBtn.innerText = "Pay Now"; } return; }
-  if (!document.getElementById("tncAccepted")?.checked) { showToast("⚠️ Please accept the Terms & Conditions."); isProcessingPayment = false; if (payBtn) { payBtn.disabled = false; payBtn.innerText = "Pay Now"; } return; }
+  if (!currentUser) { showToast("<i data-lucide=circle></i> Please login to book."); openAuthModal("login"); isProcessingPayment = false; if (payBtn) { payBtn.disabled = false; payBtn.innerText = "Pay Now"; } return; }
+  if (!document.getElementById("tncAccepted")?.checked) { showToast("<i data-lucide=triangle-alert></i> Please accept the Terms & Conditions."); isProcessingPayment = false; if (payBtn) { payBtn.disabled = false; payBtn.innerText = "Pay Now"; } return; }
 
   const name = document.getElementById("custName")?.value?.trim();
   const phone = document.getElementById("custPhone")?.value?.trim();
   const email = document.getElementById("custEmail")?.value?.trim();
-  if (!name) { showToast("⚠️ Please enter your name."); isProcessingPayment = false; if (payBtn) { payBtn.disabled = false; payBtn.innerText = "Pay Now"; } return; }
-  if (!phone || !/^\d{10}$/.test(phone)) { showToast("⚠️ Please enter a valid 10-digit phone number."); isProcessingPayment = false; if (payBtn) { payBtn.disabled = false; payBtn.innerText = "Pay Now"; } return; }
-  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showToast("⚠️ Please enter a valid email address."); isProcessingPayment = false; if (payBtn) { payBtn.disabled = false; payBtn.innerText = "Pay Now"; } return; }
-  if (lastCalculatedTotal === 0) { showToast("⚠️ Price not calculated yet."); isProcessingPayment = false; if (payBtn) { payBtn.disabled = false; payBtn.innerText = "Pay Now"; } return; }
-  if (!RAZORPAY_KEY) { showToast("⚠️ Payment not configured."); isProcessingPayment = false; if (payBtn) { payBtn.disabled = false; payBtn.innerText = "Pay Now"; } return; }
+  if (!name) { showToast("<i data-lucide=triangle-alert></i> Please enter your name."); isProcessingPayment = false; if (payBtn) { payBtn.disabled = false; payBtn.innerText = "Pay Now"; } return; }
+  if (!phone || !/^\d{10}$/.test(phone)) { showToast("<i data-lucide=triangle-alert></i> Please enter a valid 10-digit phone number."); isProcessingPayment = false; if (payBtn) { payBtn.disabled = false; payBtn.innerText = "Pay Now"; } return; }
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showToast("<i data-lucide=triangle-alert></i> Please enter a valid email address."); isProcessingPayment = false; if (payBtn) { payBtn.disabled = false; payBtn.innerText = "Pay Now"; } return; }
+  if (lastCalculatedTotal === 0) { showToast("<i data-lucide=triangle-alert></i> Price not calculated yet."); isProcessingPayment = false; if (payBtn) { payBtn.disabled = false; payBtn.innerText = "Pay Now"; } return; }
+  if (!RAZORPAY_KEY) { showToast("<i data-lucide=triangle-alert></i> Payment not configured."); isProcessingPayment = false; if (payBtn) { payBtn.disabled = false; payBtn.innerText = "Pay Now"; } return; }
 
   if (selectedPayment === "at_drop") { bookWithoutPayment(); isProcessingPayment = false; if (payBtn) { payBtn.disabled = false; payBtn.innerText = "Pay Now"; } return; }
 
@@ -1309,7 +1309,7 @@ async function startPayment() {
           if (!verifyData.success) { showToast("Payment verification failed"); return; }
           isProcessingPayment = false;
           if (payBtn) { payBtn.disabled = false; payBtn.innerText = "Pay Now"; }
-          showToast("✅ Payment successful!");
+          showToast("<i data-lucide=badge-check></i> Payment successful!");
           showConfirmationCard({
             bookingRef: verifyData.bookingRef || paymentReceiptId,
             name: name, phone: phone, pickup: pickupField, drop: dropField, date: shiftDate,
@@ -1324,7 +1324,7 @@ async function startPayment() {
           console.error("Verify error:", err);
           isProcessingPayment = false;
           if (payBtn) { payBtn.disabled = false; payBtn.innerText = "Pay Now"; }
-          showToast("✅ Payment received! Booking confirmed.");
+          showToast("<i data-lucide=badge-check></i> Payment received! Booking confirmed.");
           showConfirmationCard({
             bookingRef: paymentReceiptId,
             name: name, phone: phone, pickup: pickupField, drop: dropField, date: shiftDate,
@@ -1343,7 +1343,7 @@ async function startPayment() {
     rzp.on("payment.failed", r => {
       isProcessingPayment = false;
       if (payBtn) { payBtn.disabled = false; payBtn.innerText = "Pay Now"; }
-      showToast("❌ Payment failed: " + r.error.description);
+      showToast("<i data-lucide=x></i> Payment failed: " + r.error.description);
     });
   } catch (err) {
     console.log("Caught exception:", err);
@@ -1405,7 +1405,7 @@ function onPaymentSuccess(response, name, phone, email, paid, total) {
       subscribeToBookingNotifications(docId);
     }, (err) => {
       console.error("BOOKING SAVE FAILED:", err);
-      showToast("❌ Booking save failed: " + err.message);
+      showToast("<i data-lucide=x></i> Booking save failed: " + err.message);
     });
   }
 }
@@ -1454,9 +1454,9 @@ NOTIFY OWNER
 ============================================ */
 function notifyOwner(bookingRef, name, phone, pickup, drop, date, total, paymentType, source) {
   const payLbl = paymentType === "pay_later" ? "Cash on delivery" : paymentType === "full" ? "Paid Full" : "Advance Paid";
-  const emoji = source === "whatsapp" ? "💬" : source === "payment" ? "💳" : "📋";
-  const msg = `${emoji} New Booking Alert — PackZen 🚚\n\nID: ${bookingRef}\nName: ${name}\nPhone: +91 ${phone}\nPickup: ${pickup}\nDrop: ${drop}\nDate: ${date || "To be confirmed"}\nAmount: ₹${Number(total).toLocaleString("en-IN")}\nPayment: ${payLbl}`;
-  console.log("📲 Owner notification:", msg);
+  const emoji = source === "whatsapp" ? "<i data-lucide=message-circle></i>" : source === "payment" ? "<i data-lucide=credit-card></i>" : "<i data-lucide=clipboard-list></i>";
+  const msg = `${emoji} New Booking Alert — PackZen <i data-lucide=truck></i>\n\nID: ${bookingRef}\nName: ${name}\nPhone: +91 ${phone}\nPickup: ${pickup}\nDrop: ${drop}\nDate: ${date || "To be confirmed"}\nAmount: ₹${Number(total).toLocaleString("en-IN")}\nPayment: ${payLbl}`;
+  console.log(" Owner notification:", msg);
   try {
     fetch("https://n8n-production-e685.up.railway.app/webhook/owner-notification", {
       method: "POST", headers: { "Content-Type": "application/json" },
@@ -1470,8 +1470,8 @@ BOOK WITHOUT PAYMENT
 ============================================ */
 function bookWithoutPayment() {
   const activeUser = currentUser || window._firebase?.auth?.currentUser;
-  if (!activeUser) { showToast("👋 Please login to book."); openAuthModal("login"); return; }
-  if (!document.getElementById("tncAccepted")?.checked) { showToast("⚠️ Please accept the Terms & Conditions to continue."); return; }
+  if (!activeUser) { showToast("<i data-lucide=circle></i> Please login to book."); openAuthModal("login"); return; }
+  if (!document.getElementById("tncAccepted")?.checked) { showToast("<i data-lucide=triangle-alert></i> Please accept the Terms & Conditions to continue."); return; }
 
   const nameEl = document.getElementById("custName");
   const phoneEl = document.getElementById("custPhone");
@@ -1482,11 +1482,11 @@ function bookWithoutPayment() {
   if (!name) { nameEl.style.borderColor = "#e53e3e"; nameEl.focus(); return; }
   if (!phone || phone.length < 10) { phoneEl.style.borderColor = "#e53e3e"; phoneEl.focus(); return; }
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { emailEl.style.borderColor = "#e53e3e"; emailEl.focus(); return; }
-  if (lastCalculatedTotal === 0) { showToast("⚠️ Price not calculated yet."); return; }
-  if (!window._firebase) { showToast("⚠️ Service not ready. Try again."); return; }
+  if (lastCalculatedTotal === 0) { showToast("<i data-lucide=triangle-alert></i> Price not calculated yet."); return; }
+  if (!window._firebase) { showToast("<i data-lucide=triangle-alert></i> Service not ready. Try again."); return; }
 
   const date = document.getElementById("shiftDate")?.value || "";
-  if (!date) { showToast("📅 Please select a moving date."); return; }
+  if (!date) { showToast("<i data-lucide=calendar-days></i> Please select a moving date."); return; }
 
   const pickupVal = document.getElementById("pickup")?.value || "";
   const dropVal = document.getElementById("drop")?.value || "";
@@ -1537,7 +1537,7 @@ function bookWithoutPayment() {
 
     if (btn) {
       btn.disabled = false;
-      btn.textContent = "📋 Confirm Booking · Pay on Delivery";
+      btn.textContent = " Confirm Booking · Pay on Delivery";
     }
 
     showConfirmationCard({
@@ -1556,15 +1556,15 @@ function bookWithoutPayment() {
       showInvoice: false
     });
 
-    showToast("✅ Booking saved! ID: " + bookingRef);
+    showToast("<i data-lucide=badge-check></i> Booking saved! ID: " + bookingRef);
   })
   .catch((err) => {
     console.error("BOOKING SAVE FAILED:", err);
     if (btn) {
       btn.disabled = false;
-      btn.textContent = "📋 Confirm Booking · Pay on Delivery";
+      btn.textContent = " Confirm Booking · Pay on Delivery";
     }
-    showToast("❌ Booking failed: " + err.message);
+    showToast("<i data-lucide=x></i> Booking failed: " + err.message);
   });
 }
 
@@ -1700,7 +1700,7 @@ function startBannerTracking() {
 
 function updateTrackBanner(b) {
   const statusOrder = ["confirmed","assigned","packing","transit","delivered"];
-  const statusLabels = { confirmed:"Confirmed", assigned:"Driver Assigned", packing:"Packing Started", transit:"In Transit 🚚", delivered:"Delivered ✅" };
+  const statusLabels = { confirmed:"Confirmed", assigned:"Driver Assigned", packing:"Packing Started", transit:"In Transit <i data-lucide=truck></i>", delivered:"Delivered <i data-lucide=badge-check></i>" };
   const idx = statusOrder.indexOf(b.status || "confirmed");
   if (b.status === "delivered" || b.status === "cancelled") {
     localStorage.removeItem("packzen_active_booking");
@@ -1721,14 +1721,14 @@ function updateTrackBanner(b) {
   if (b.driverName && driverRow) {
     document.getElementById("tobDriverName").textContent = "Driver: " + b.driverName;
     const phoneEl = document.getElementById("tobDriverPhone");
-    if (b.driverPhone) { phoneEl.href = "tel:" + b.driverPhone; phoneEl.textContent = "📞 Call Driver"; }
+    if (b.driverPhone) { phoneEl.href = "tel:" + b.driverPhone; phoneEl.textContent = " Call Driver"; }
     driverRow.style.display = "flex";
   }
   const banner = document.getElementById("trackOrderBanner");
   if (b.status === "delivered" && banner) {
     banner.style.background = "linear-gradient(135deg,#15803d,#16a34a)";
     const title = banner.querySelector(".tob-title");
-    if (title) title.textContent = "🎉 Your Move is Complete!";
+    if (title) title.textContent = " Your Move is Complete!";
   }
 }
 
@@ -1769,7 +1769,7 @@ function dismissTrackBanner() {
 }
 
 function openTrackingOrLogin() {
-  if (!currentUser) { showToast("💡 Create an account to track your booking!"); openAuthModal("login"); return; }
+  if (!currentUser) { showToast("<i data-lucide=lightbulb></i> Create an account to track your booking!"); openAuthModal("login"); return; }
   openTrackingModal();
 }
 
@@ -1785,7 +1785,7 @@ function showConfirmationCard(data) {
   const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val || "—"; };
 
   set("bookingIdDisplay", bookingRef);
-  set("ccTitle", "Booking Confirmed! 🎉");
+  set("ccTitle", "Booking Confirmed! <i data-lucide=party-popper></i>");
   set("ccSubtitle", "We'll call you within 30 minutes");
   set("ccName", name);
   set("ccPhone", phone);
@@ -1910,13 +1910,13 @@ function updateTrackingUI(b) {
   }
 
   const order = ["confirmed","assigned","en_route","arrived","loading","transit","delivered","unloading","completed"];
-  const icons = ["✓","🚛","📍","🏠","📦","🚚","🏁","📥","🎉"];
+  const icons = ["<i data-lucide=check></i>","<i data-lucide=truck></i>","<i data-lucide=map-pin></i>","<i data-lucide=house></i>","<i data-lucide=package></i>","<i data-lucide=truck></i>","<i data-lucide=flag></i>","<i data-lucide=circle></i>","<i data-lucide=party-popper></i>"];
   const idx = order.indexOf(b.status || "confirmed");
   order.forEach((s, i) => {
     const dot = document.getElementById("ts" + i);
     if (!dot) return;
     dot.className = "ts-dot";
-    if (i < idx) { dot.classList.add("done"); dot.textContent = "✓"; }
+    if (i < idx) { dot.classList.add("done"); dot.textContent = ""; }
     if (i === idx) { dot.classList.add("active"); dot.textContent = icons[i]; }
     if (i > idx) dot.textContent = icons[i];
   });
@@ -1985,7 +1985,7 @@ function listenChatMessages() {
     .collection("messages").orderBy("time","asc")
     .onSnapshot(snap => {
       const container = document.getElementById("chatMessages");
-      if (snap.empty) { container.innerHTML = 'No messages yet. Say hello! 👋'; return; }
+      if (snap.empty) { container.innerHTML = 'No messages yet. Say hello! <i data-lucide=circle></i>'; return; }
       container.innerHTML = "";
       snap.forEach(d => {
         const msg = d.data();
@@ -2032,7 +2032,7 @@ function buildChecklist() {
     html += `<div class="cl-category">${cat}</div>`;
     items.forEach((item, i) => {
       const key = cat + i, done = saved[key];
-      html += `<div class="cl-item ${done?'done':''}" data-check-key="${key}" role="button" tabindex="0"><div class="cl-check">${done?'✓':''}</div><div class="cl-text">${item}</div></div>`;
+      html += `<div class="cl-item ${done?'done':''}" data-check-key="${key}" role="button" tabindex="0"><div class="cl-check">${done?'<i data-lucide=check></i>':''}</div><div class="cl-text">${item}</div></div>`;
     });
   });
   container.innerHTML = html;
@@ -2047,7 +2047,7 @@ function toggleChecklist(key, el) {
   saved[key] = !saved[key];
   localStorage.setItem("packzen-checklist", JSON.stringify(saved));
   el.classList.toggle("done");
-  el.querySelector(".cl-check").textContent = el.classList.contains("done") ? "✓" : "";
+  el.querySelector(".cl-check").textContent = el.classList.contains("done") ? "" : "";
   updateChecklistProgress();
 }
 
@@ -2077,7 +2077,7 @@ function setRating(n) {
 
 async function submitReview() {
   if (!checkRateLimit("review_" + (currentUser?.uid || "anon"), 2, 3600000)) {
-    showError("reviewMsg", "⚠️ You can only submit 2 reviews per hour."); return;
+    showError("reviewMsg", "<i data-lucide=triangle-alert></i> You can only submit 2 reviews per hour."); return;
   }
   const text = document.getElementById("reviewText").value.trim();
   const name = document.getElementById("reviewName").value.trim();
@@ -2090,7 +2090,7 @@ async function submitReview() {
         text, name, rating: currentRating, uid: currentUser?.uid || null, email: currentUser?.email || null,
         status: "approved", date: new Date().toLocaleDateString("en-IN"), createdAt: firebase.firestore.FieldValue.serverTimestamp()
       });
-      closeReviewModal(); showToast("🌟 Thank you for your review!"); loadReviewsPublic();
+      closeReviewModal(); showToast("<i data-lucide=circle></i> Thank you for your review!"); loadReviewsPublic();
     } catch(e) { showError("reviewMsg", "Error submitting: " + e.message); }
   });
 }
@@ -2106,7 +2106,7 @@ async function loadReviewsPublic() {
       let html = "";
       snap.forEach(d => {
         const r = d.data();
-        html += `<div class="review-card"><div class="review-stars">${"★".repeat(r.rating)}${"☆".repeat(5-r.rating)}</div><p class="review-text">"${escapeHTML(r.text)}"</p><div class="review-author"><div class="review-avatar">${escapeHTML(r.name).charAt(0).toUpperCase()}</div><div><div class="review-name">${escapeHTML(r.name)}</div><div class="review-meta">${escapeHTML(r.date) || ""}</div></div></div></div>`;
+        html += `<div class="review-card"><div class="review-stars">${"<i data-lucide=star></i>".repeat(r.rating)}${"<i data-lucide=star></i>".repeat(5-r.rating)}</div><p class="review-text">"${escapeHTML(r.text)}"</p><div class="review-author"><div class="review-avatar">${escapeHTML(r.name).charAt(0).toUpperCase()}</div><div><div class="review-name">${escapeHTML(r.name)}</div><div class="review-meta">${escapeHTML(r.date) || ""}</div></div></div></div>`;
       });
       if (grid) grid.innerHTML = html;
     } catch(e) {}
@@ -2214,28 +2214,28 @@ function showError(id, msg, type = "error") {
 
 function getAuthErrorMessage(code) {
   const map = {
-    "auth/user-not-found": "⚠️ No account found. Please sign up first.",
-    "auth/wrong-password": "⚠️ Incorrect password. Please try again.",
-    "auth/invalid-credential": "⚠️ Incorrect details. Please try again.",
-    "auth/invalid-login-credentials": "⚠️ Incorrect details. Please try again.",
-    "auth/email-already-in-use": "⚠️ This email is already registered.",
-    "auth/weak-password": "⚠️ Password too weak. Use at least 6 characters.",
-    "auth/network-request-failed": "⚠️ Network error. Check your connection.",
-    "auth/too-many-requests": "⚠️ Too many attempts. Please wait a few minutes.",
-    "auth/invalid-phone-number": "⚠️ Invalid phone number.",
-    "auth/session-expired": "⚠️ OTP expired. Please request a new one.",
-    "auth/invalid-verification-code": "⚠️ Incorrect OTP. Please try again.",
-    "auth/quota-exceeded": "⚠️ SMS quota exceeded. Try again later.",
-    "auth/credential-already-in-use": "⚠️ This phone number is already linked to another account.",
+    "auth/user-not-found": "<i data-lucide=triangle-alert></i> No account found. Please sign up first.",
+    "auth/wrong-password": "<i data-lucide=triangle-alert></i> Incorrect password. Please try again.",
+    "auth/invalid-credential": "<i data-lucide=triangle-alert></i> Incorrect details. Please try again.",
+    "auth/invalid-login-credentials": "<i data-lucide=triangle-alert></i> Incorrect details. Please try again.",
+    "auth/email-already-in-use": "<i data-lucide=triangle-alert></i> This email is already registered.",
+    "auth/weak-password": "<i data-lucide=triangle-alert></i> Password too weak. Use at least 6 characters.",
+    "auth/network-request-failed": "<i data-lucide=triangle-alert></i> Network error. Check your connection.",
+    "auth/too-many-requests": "<i data-lucide=triangle-alert></i> Too many attempts. Please wait a few minutes.",
+    "auth/invalid-phone-number": "<i data-lucide=triangle-alert></i> Invalid phone number.",
+    "auth/session-expired": "<i data-lucide=triangle-alert></i> OTP expired. Please request a new one.",
+    "auth/invalid-verification-code": "<i data-lucide=triangle-alert></i> Incorrect OTP. Please try again.",
+    "auth/quota-exceeded": "<i data-lucide=triangle-alert></i> SMS quota exceeded. Try again later.",
+    "auth/credential-already-in-use": "<i data-lucide=triangle-alert></i> This phone number is already linked to another account.",
   };
-  return map[code] || ("⚠️ " + (code || "Something went wrong. Please try again."));
+  return map[code] || ("<i data-lucide=triangle-alert></i> " + (code || "Something went wrong. Please try again."));
 }
 
 /* ═══════════════════════════════════════════════
 SIGN UP FLOW
 ═══════════════════════════════════════════════ */
 async function signupUser() {
-  if (!checkRateLimit("signup_otp", 3, 300000)) { showError("signupError", "⚠️ Too many OTP requests. Please try again later."); return; }
+  if (!checkRateLimit("signup_otp", 3, 300000)) { showError("signupError", "<i data-lucide=triangle-alert></i> Too many OTP requests. Please try again later."); return; }
   const firstName = document.getElementById("signupFirstName").value.trim();
   const lastName = document.getElementById("signupLastName").value.trim();
   const phone = document.getElementById("signupPhone").value.trim();
@@ -2243,11 +2243,11 @@ async function signupUser() {
   const password = document.getElementById("signupPassword").value;
   const referral = document.getElementById("signupReferral")?.value.trim().toUpperCase() || "";
 
-  if (!firstName) return showError("signupError", "⚠️ Please enter your first name.");
-  if (!lastName) return showError("signupError", "⚠️ Please enter your last name.");
-  if (!/^\d{10}$/.test(phone)) return showError("signupError", "⚠️ Please enter a valid 10-digit mobile number.");
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return showError("signupError", "⚠️ Please enter a valid email address.");
-  if (password.length < 6) return showError("signupError", "⚠️ Password must be at least 6 characters.");
+  if (!firstName) return showError("signupError", "<i data-lucide=triangle-alert></i> Please enter your first name.");
+  if (!lastName) return showError("signupError", "<i data-lucide=triangle-alert></i> Please enter your last name.");
+  if (!/^\d{10}$/.test(phone)) return showError("signupError", "<i data-lucide=triangle-alert></i> Please enter a valid 10-digit mobile number.");
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return showError("signupError", "<i data-lucide=triangle-alert></i> Please enter a valid email address.");
+  if (password.length < 6) return showError("signupError", "<i data-lucide=triangle-alert></i> Password must be at least 6 characters.");
 
   const fullName = firstName + " " + lastName;
   const btn = document.getElementById("btnSignup");
@@ -2283,11 +2283,11 @@ async function signupUser() {
       if (referral) await processReferral(referral, newUser.uid);
 
       closeAuthModal();
-      showToast(`👋 Welcome to PackZen, ${firstName}! Please verify your email.`);
+      showToast(`<i data-lucide=circle></i> Welcome to PackZen, ${firstName}! Please verify your email.`);
     } catch (err) {
       console.error("Signup error:", err);
-      if (err.code === "auth/email-already-in-use") showError("signupError", "⚠️ This email is already registered. Please login.");
-      else if (err.code === "auth/weak-password") showError("signupError", "⚠️ Password too weak. Use at least 6 characters.");
+      if (err.code === "auth/email-already-in-use") showError("signupError", "<i data-lucide=triangle-alert></i> This email is already registered. Please login.");
+      else if (err.code === "auth/weak-password") showError("signupError", "<i data-lucide=triangle-alert></i> Password too weak. Use at least 6 characters.");
       else showError("signupError", getAuthErrorMessage(err.code));
     } finally {
       if (btn) { btn.disabled = false; btn.textContent = "Create Account →"; }
@@ -2301,7 +2301,7 @@ LOGIN
 async function loginUser() {
   const email = document.getElementById("loginEmail").value.trim();
   const pass = document.getElementById("loginPassword").value;
-  if (!email || !pass) return showError("loginError", "⚠️ Enter email and password");
+  if (!email || !pass) return showError("loginError", "<i data-lucide=triangle-alert></i> Enter email and password");
 
   const btn = document.getElementById("btnLogin");
   if (btn) { btn.disabled = true; btn.textContent = "Signing in..."; }
@@ -2312,10 +2312,10 @@ async function loginUser() {
       const cred = await auth.signInWithEmailAndPassword(email, pass);
       await db.collection("users").doc(cred.user.uid).update({ lastLoginAt: firebase.firestore.FieldValue.serverTimestamp() }).catch(()=>{});
       closeAuthModal();
-      showToast("✅ Login successful");
+      showToast("<i data-lucide=badge-check></i> Login successful");
     } catch (err) {
       console.error('Customer Auth Error:', err.code, err.message);
-      showError("loginError", "⚠️ Incorrect email or password");
+      showError("loginError", "<i data-lucide=triangle-alert></i> Incorrect email or password");
     }
     finally { if (btn) { btn.disabled = false; btn.textContent = "Login →"; } }
   });
@@ -2355,11 +2355,11 @@ window.signInWithGoogle = async function () {
       await _handleOAuthUser(result.user, db, 'google');
       closeAuthModal();
       const name = (result.user.displayName || result.user.email?.split("@")[0] || "User").split(" ")[0];
-      showToast(`👋 Welcome, ${name}!`);
+      showToast(`<i data-lucide=circle></i> Welcome, ${name}!`);
     } catch (err) {
-      if (err.code === "auth/popup-blocked") showError("loginError", "⚠️ Popup blocked — please allow popups for this site and try again.");
+      if (err.code === "auth/popup-blocked") showError("loginError", "<i data-lucide=triangle-alert></i> Popup blocked — please allow popups for this site and try again.");
       else if (err.code === "auth/popup-closed-by-user" || err.code === "auth/cancelled-popup-request") {}
-      else if (err.code === "auth/unauthorized-domain") showError("loginError", "⚠️ Domain not authorized. Add it in Firebase Console → Authentication → Authorized Domains.");
+      else if (err.code === "auth/unauthorized-domain") showError("loginError", "<i data-lucide=triangle-alert></i> Domain not authorized. Add it in Firebase Console → Authentication → Authorized Domains.");
       else showError("loginError", getAuthErrorMessage(err.code));
     }
   });
@@ -2376,11 +2376,11 @@ window.signInWithApple = async function () {
       await _handleOAuthUser(result.user, db, 'apple');
       closeAuthModal();
       const name = (result.user.displayName || result.user.email?.split("@")[0] || "User").split(" ")[0];
-      showToast(`👋 Welcome, ${name}!`);
+      showToast(`<i data-lucide=circle></i> Welcome, ${name}!`);
     } catch (err) {
-      if (err.code === "auth/popup-blocked") showError("loginError", "⚠️ Popup blocked — please allow popups for this site and try again.");
+      if (err.code === "auth/popup-blocked") showError("loginError", "<i data-lucide=triangle-alert></i> Popup blocked — please allow popups for this site and try again.");
       else if (err.code === "auth/popup-closed-by-user" || err.code === "auth/cancelled-popup-request") {}
-      else if (err.code === "auth/unauthorized-domain") showError("loginError", "⚠️ Domain not authorized.");
+      else if (err.code === "auth/unauthorized-domain") showError("loginError", "<i data-lucide=triangle-alert></i> Domain not authorized.");
       else showError("loginError", getAuthErrorMessage(err.code));
     }
   });
@@ -2391,7 +2391,7 @@ PASSWORD RESET FLOW
 ═══════════════════════════════════════════════ */
 async function sendResetEmail() {
   const email = document.getElementById("resetEmail").value.trim();
-  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return showError("recoverError", "⚠️ Please enter a valid email address.");
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return showError("recoverError", "<i data-lucide=triangle-alert></i> Please enter a valid email address.");
 
   const btn = document.getElementById("btnSendResetEmail");
   if (btn) { btn.disabled = true; btn.textContent = "Sending..."; }
@@ -2401,11 +2401,11 @@ async function sendResetEmail() {
     const { auth } = window._firebase;
     try {
       await auth.sendPasswordResetEmail(email);
-      showError("recoverError", "✅ Reset link sent! Check your inbox.", "success");
+      showError("recoverError", "<i data-lucide=badge-check></i> Reset link sent! Check your inbox.", "success");
       setTimeout(() => switchPanel('panelLogin'), 3000);
     } catch (err) {
       console.error(err);
-      if (err.code === "auth/user-not-found") showError("recoverError", "⚠️ No account found with this email.");
+      if (err.code === "auth/user-not-found") showError("recoverError", "<i data-lucide=triangle-alert></i> No account found with this email.");
       else showError("recoverError", getAuthErrorMessage(err.code));
     } finally {
       if (btn) { btn.disabled = false; btn.textContent = "Send Reset Link →"; }
@@ -2416,7 +2416,7 @@ async function sendResetEmail() {
 function signOutUser() {
   waitForFirebase(() => {
     window._firebase.auth.signOut().then(() => {
-      currentUser = null; closeUserMenu(); showToast("👋 Signed out successfully.");
+      currentUser = null; closeUserMenu(); showToast("<i data-lucide=circle></i> Signed out successfully.");
     });
   });
 }
@@ -2461,13 +2461,13 @@ async function loadQuotes() {
   container.innerHTML = "⏳ Loading your quotes...";
   try {
     const snapshot = await db.collection("quotes").where("uid", "==", currentUser.uid).orderBy("createdAt", "desc").get();
-    if (snapshot.empty) { container.innerHTML = `<div style="opacity:0.7;text-align:center;padding:20px;">No quotes found yet 🚚</div>`; return; }
+    if (snapshot.empty) { container.innerHTML = `<div style="opacity:0.7;text-align:center;padding:20px;">No quotes found yet <i data-lucide=truck></i></div>`; return; }
     container.innerHTML = "";
     snapshot.forEach(doc => {
       const data = doc.data();
       container.innerHTML += `<div style="padding:12px;margin-bottom:12px;border:1px solid #333;border-radius:10px;background:#0f172a;"></div>`;
     });
-  } catch (error) { container.innerHTML = "❌ Failed to load quotes"; }
+  } catch (error) { container.innerHTML = "<i data-lucide=x></i> Failed to load quotes"; }
 }
 
 /* ============================================
@@ -2489,7 +2489,7 @@ async function loadReferralData() {
 
 function copyReferralCode() {
   const code = document.getElementById("referralCodeText").textContent;
-  navigator.clipboard.writeText(code).then(() => showToast("✅ Referral code copied!"));
+  navigator.clipboard.writeText(code).then(() => showToast("<i data-lucide=badge-check></i> Referral code copied!"));
 }
 
 /* ============================================
@@ -2507,7 +2507,7 @@ async function applyPromoCode() {
         const refSnap = await db.collection("users").where("referralCode","==",code).get();
         if (!refSnap.empty && currentUser && refSnap.docs[0].id !== currentUser.uid) {
           promoDiscount = window.PackZenPricing?.config?.discounts?.referralAmount || 100;
-          msgEl.textContent = "🎉 Referral code applied! ₹" + promoDiscount + " discount.";
+          msgEl.textContent = " Referral code applied! ₹" + promoDiscount + " discount.";
           msgEl.className = "promo-msg promo-success";
           // Re-run v2 engine with updated promoDiscount
           if (window._lastCalculatedKm) {
@@ -2527,7 +2527,7 @@ async function applyPromoCode() {
       const rawDiscount = promo.type === "percent" ? Math.round(baseTotal * promo.value / 100) : promo.value;
       promoDiscount = Math.min(rawDiscount, Math.floor(baseTotal * maxFraction));
 
-      msgEl.textContent = `🎉 Code applied! ₹${promoDiscount} off.`;
+      msgEl.textContent = ` Code applied! ₹${promoDiscount} off.`;
       msgEl.className = "promo-msg promo-success";
 
       // Re-run v2 engine with updated promoDiscount so it incorporates the discount
@@ -2611,7 +2611,7 @@ function loadUserQuotes() {
       if (snap.empty) { list.innerHTML = 'No saved quotes yet.'; return; }
       list.innerHTML = snap.docs.map(d => {
         const q = d.data();
-        return `<div class="quote-item"><div class="qi-route">📍 ${q.pickup||"?"} → 🏁 ${q.drop||"?"}</div><div class="qi-details"><span>${q.house||"—"}</span><span>${q.vehicle||"—"}</span><span class="qi-price">₹${(q.total||0).toLocaleString("en-IN")}</span></div><div class="qi-date">${q.date||""}</div></div>`;
+        return `<div class="quote-item"><div class="qi-route"><i data-lucide=map-pin></i> ${q.pickup||"?"} → <i data-lucide=flag></i> ${q.drop||"?"}</div><div class="qi-details"><span>${q.house||"—"}</span><span>${q.vehicle||"—"}</span><span class="qi-price">₹${(q.total||0).toLocaleString("en-IN")}</span></div><div class="qi-date">${q.date||""}</div></div>`;
       }).join("");
     }).catch(() => {});
 }
@@ -2625,22 +2625,22 @@ function loadUserBookings() {
       if (!list) return;
       if (snap.empty) { list.innerHTML = 'No bookings yet.'; return; }
       const statusColors = {confirmed:"#0057ff",assigned:"#7c3aed",packing:"#0ea5e9",transit:"#f97316",delivered:"#16a34a",cancelled:"#dc2626"};
-      const statusIcons = {confirmed:"📋",assigned:"🚛",packing:"📦",transit:"🚚",delivered:"✅",cancelled:"❌"};
+      const statusIcons = {confirmed:"<i data-lucide=clipboard-list></i>",assigned:"<i data-lucide=truck></i>",packing:"<i data-lucide=package></i>",transit:"<i data-lucide=truck></i>",delivered:"<i data-lucide=badge-check></i>",cancelled:"<i data-lucide=x></i>"};
       list.innerHTML = snap.docs.map(d => {
         const b = d.data(), id = d.id;
         const color = statusColors[b.status] || "#5a6a8a";
-        const icon = statusIcons[b.status] || "📋";
+        const icon = statusIcons[b.status] || "<i data-lucide=clipboard-list></i>";
         const canCancel = !["packing","transit","delivered","cancelled"].includes(b.status);
         const canReschedule = !["transit","delivered","cancelled"].includes(b.status);
         const canRate = b.status === "delivered" && !b.driverRating;
         const canClaim = b.status === "delivered" && !b.damageClaimed;
         return `<div class="bk-card"> <div class="bk-card-top"><div class="bk-route">${escapeHTML((b.pickup||"?").split(",")[0])} → ${escapeHTML((b.drop||"?").split(",")[0])}</div><div class="bk-status" style="color:${color}">${icon} ${escapeHTML(capitalize(b.status||"confirmed"))}</div></div> <div class="bk-meta"><span>₹${(b.total||0).toLocaleString("en-IN")}</span><span>${escapeHTML(b.date)||"Date TBD"}</span><span style="font-size:.72rem;color:#5a6a8a">${escapeHTML(b.bookingRef)||""}</span></div> ${canCancel||canReschedule||canRate||canClaim?`
-${canReschedule?`<button class="bk-btn reschedule" data-action="reschedule" data-id="${id}" data-ref="${b.bookingRef||id}" data-date="${b.date||""}">📅 Reschedule</button>`:""}
-${canCancel?`<button class="bk-btn cancel" data-action="cancel" data-id="${id}" data-ref="${b.bookingRef||id}" data-status="${b.status||""}">✕ Cancel</button>`:""}
+${canReschedule?`<button class="bk-btn reschedule" data-action="reschedule" data-id="${id}" data-ref="${b.bookingRef||id}" data-date="${b.date||""}"><i data-lucide=calendar-days></i> Reschedule</button>`:""}
+${canCancel?`<button class="bk-btn cancel" data-action="cancel" data-id="${id}" data-ref="${b.bookingRef||id}" data-status="${b.status||""}"><i data-lucide=x></i> Cancel</button>`:""}
 ${canRate?`<button class="bk-btn rate" data-action="rate" data-id="${id}" data-ref="${b.bookingRef||id}" data-driver="${b.driverName||""}">⭐ Rate Driver</button>`:""}
-${canClaim?`<button class="bk-btn claim" data-action="claim" data-id="${id}" data-ref="${b.bookingRef||id}">🔧 Report Damage</button>`:""}
-<button class="bk-btn invoice" onclick="downloadInvoice('${id}')" style="background:#0ea5e9;color:white;border:none;">📄 Invoice</button>
-<button class="bk-btn email" onclick="emailInvoice('${id}')" style="background:#0284c7;color:white;border:none;">✉️ Email</button>
+${canClaim?`<button class="bk-btn claim" data-action="claim" data-id="${id}" data-ref="${b.bookingRef||id}"><i data-lucide=wrench></i> Report Damage</button>`:""}
+<button class="bk-btn invoice" onclick="downloadInvoice('${id}')" style="background:#0ea5e9;color:white;border:none;"><i data-lucide=file-text></i> Invoice</button>
+<button class="bk-btn email" onclick="emailInvoice('${id}')" style="background:#0284c7;color:white;border:none;"><i data-lucide=mail></i> Email</button>
 
 `:""} </div>`;
       }).join("");
@@ -2678,7 +2678,7 @@ function loadUserAddresses() {
       list.innerHTML = snap.docs.map(d => {
         const addr = d.data();
         return `<div class="quote-item" style="display:flex;justify-content:space-between;align-items:center;">
-                  <div>📍 ${escapeHTML(addr.address)}</div>
+                  <div><i data-lucide=map-pin></i> ${escapeHTML(addr.address)}</div>
                   <button class="btn-auth" style="background:#dc2626;padding:4px 8px;font-size:0.75rem;min-height:unset;" onclick="deleteAddress('${d.id}')">Delete</button>
                 </div>`;
       }).join("");
@@ -2689,13 +2689,13 @@ function addNewAddress() {
   if (!currentUser || !window._firebase) return;
   const input = document.getElementById("newAddressInput");
   const address = input?.value.trim();
-  if (!address) { showToast("⚠️ Please enter an address."); return; }
+  if (!address) { showToast("<i data-lucide=triangle-alert></i> Please enter an address."); return; }
   window._firebase.db.collection("users").doc(currentUser.uid).collection("addresses").add({ address, createdAt: firebase.firestore.FieldValue.serverTimestamp() })
     .then(() => {
       input.value = "";
-      showToast("✅ Address added!");
+      showToast("<i data-lucide=badge-check></i> Address added!");
       loadUserAddresses();
-    }).catch(err => { console.error("Error adding address:", err); showToast("❌ Failed to add address."); });
+    }).catch(err => { console.error("Error adding address:", err); showToast(" Failed to add address."); });
 }
 
 function deleteAddress(id) {
@@ -2703,9 +2703,9 @@ function deleteAddress(id) {
   if (!confirm("Are you sure you want to delete this address?")) return;
   window._firebase.db.collection("users").doc(currentUser.uid).collection("addresses").doc(id).delete()
     .then(() => {
-      showToast("✅ Address deleted!");
+      showToast("<i data-lucide=badge-check></i> Address deleted!");
       loadUserAddresses();
-    }).catch(err => { console.error("Error deleting address:", err); showToast("❌ Failed to delete address."); });
+    }).catch(err => { console.error("Error deleting address:", err); showToast(" Failed to delete address."); });
 }
 
 function loadUserInvoices() {
@@ -2733,8 +2733,8 @@ function loadUserInvoices() {
 }
 
 function downloadInvoice(bookingId) {
-  showToast("📄 Generating invoice... (Simulation)");
-  setTimeout(() => showToast("✅ Invoice downloaded!"), 1500);
+  showToast("<i data-lucide=file-text></i> Generating invoice... (Simulation)");
+  setTimeout(() => showToast("<i data-lucide=badge-check></i> Invoice downloaded!"), 1500);
 }
 
 function loadUserReviews() {
@@ -2750,7 +2750,7 @@ function loadUserReviews() {
       list.innerHTML = snap.docs.map(d => {
         const r = d.data();
         return `<div class="quote-item">
-                  <div style="color:var(--gold-500);font-size:1.1rem;margin-bottom:4px;">${"★".repeat(r.rating || 5)}${"☆".repeat(5 - (r.rating || 5))}</div>
+                  <div style="color:var(--gold-500);font-size:1.1rem;margin-bottom:4px;">${"<i data-lucide=star></i>".repeat(r.rating || 5)}${"<i data-lucide=star></i>".repeat(5 - (r.rating || 5))}</div>
                   <div style="font-size:0.9rem;">"${escapeHTML(r.text || "")}"</div>
                   <div style="font-size:0.75rem;color:var(--text-muted);margin-top:4px;">Status: ${escapeHTML(r.status || "pending")}</div>
                 </div>`;
@@ -2779,7 +2779,7 @@ function saveProfile() {
   window._firebase.db.collection("users").doc(currentUser.uid).update({ name })
     .then(() => {
       currentUser.updateProfile({ displayName: name });
-      if (msgEl) { msgEl.textContent = "✅ Profile saved!"; msgEl.style.color = "#16a34a"; }
+      if (msgEl) { msgEl.textContent = " Profile saved!"; msgEl.style.color = "#16a34a"; }
       updateNavForUser(currentUser);
     }).catch(e => { if (msgEl) { msgEl.textContent = "Error: " + e.message; msgEl.style.color = "#dc2626"; } });
 }
@@ -2802,7 +2802,7 @@ async function openProfile() {
 CANCEL / RESCHEDULE / RATE / DAMAGE
 ============================================ */
 function openCancelModal(bookingDocId, bookingRef, status) {
-  if (["packing","transit","delivered"].includes(status)) { showToast("❌ Cannot cancel after packing has started."); return; }
+  if (["packing","transit","delivered"].includes(status)) { showToast("<i data-lucide=x></i> Cannot cancel after packing has started."); return; }
   document.getElementById("cancelBookingDocId").value = bookingDocId;
   document.getElementById("cancelBookingRef").textContent = bookingRef || bookingDocId;
   document.getElementById("cancelReason").value = "";
@@ -2813,7 +2813,7 @@ function closeCancelModal() { document.getElementById("cancelModal").style.displ
 async function confirmCancellation() {
   const docId = document.getElementById("cancelBookingDocId").value;
   const reason = document.getElementById("cancelReason").value.trim();
-  if (!reason) { showToast("⚠️ Please select a cancellation reason."); return; }
+  if (!reason) { showToast("<i data-lucide=triangle-alert></i> Please select a cancellation reason."); return; }
   if (!currentUser || !window._firebase) return;
   const btn = document.getElementById("btnConfirmCancel");
   if (btn) { btn.textContent = "Cancelling..."; btn.disabled = true; }
@@ -2825,9 +2825,9 @@ async function confirmCancellation() {
       const cb = cancelledDoc.data();
       queueSMS(cb.phone || "", "cancelled", { name: cb.customerName || "", bookingRef: cb.bookingRef || docId });
     }
-    closeCancelModal(); showToast("✅ Booking cancelled. Refund (if any) in 5–7 business days."); loadUserBookings();
+    closeCancelModal(); showToast("<i data-lucide=badge-check></i> Booking cancelled. Refund (if any) in 5–7 business days."); loadUserBookings();
     if (currentBookingId === docId) { dismissTrackBanner(); localStorage.removeItem("packzen_active_booking"); }
-  } catch(e) { showToast("❌ Error: " + e.message); }
+  } catch(e) { showToast("<i data-lucide=x></i> Error: " + e.message); }
   finally { if (btn) { btn.textContent = "Yes, Cancel Booking"; btn.disabled = false; } }
 }
 
@@ -2846,9 +2846,9 @@ async function confirmReschedule() {
   const docId = document.getElementById("rescheduleDocId").value;
   const newDate = document.getElementById("rescheduleDate").value;
   const newTime = document.getElementById("rescheduleTime").value;
-  if (!newDate) { showToast("⚠️ Please select a new moving date."); return; }
+  if (!newDate) { showToast("<i data-lucide=triangle-alert></i> Please select a new moving date."); return; }
   const selected = new Date(newDate); const today = new Date(); today.setHours(0,0,0,0);
-  if (selected <= today) { showToast("⚠️ Please select a future date."); return; }
+  if (selected <= today) { showToast("<i data-lucide=triangle-alert></i> Please select a future date."); return; }
   if (!currentUser || !window._firebase) return;
   const btn = document.getElementById("btnConfirmReschedule");
   if (btn) { btn.textContent = "Saving..."; btn.disabled = true; }
@@ -2859,8 +2859,8 @@ async function confirmReschedule() {
       const b = bookingDoc.data();
       queueSMS(b.phone || "", "reschedule_confirmed", { name: b.customerName || "", bookingRef: b.bookingRef || docId, date: newDate });
     }
-    closeRescheduleModal(); showToast("✅ Booking rescheduled!"); loadUserBookings();
-  } catch(e) { showToast("❌ Error: " + e.message); }
+    closeRescheduleModal(); showToast("<i data-lucide=badge-check></i> Booking rescheduled!"); loadUserBookings();
+  } catch(e) { showToast("<i data-lucide=x></i> Error: " + e.message); }
   finally { if (btn) { btn.textContent = "Confirm Reschedule"; btn.disabled = false; } }
 }
 
@@ -2878,7 +2878,7 @@ function closeRateDriverModal() { document.getElementById("rateDriverModal").sty
 function selectDriverRating(n) { selectedDriverRating = n; document.querySelectorAll(".rate-star").forEach((s,i) => s.classList.toggle("active",i<n)); }
 
 async function submitDriverRating() {
-  if (!selectedDriverRating) { showToast("⚠️ Please select a star rating."); return; }
+  if (!selectedDriverRating) { showToast("<i data-lucide=triangle-alert></i> Please select a star rating."); return; }
   if (!currentUser || !window._firebase) return;
   const feedback = document.getElementById("ratingFeedback").value.trim();
   const btn = document.getElementById("btnSubmitRating");
@@ -2929,8 +2929,8 @@ function previewDamagePhotos(input) {
 async function submitDamageClaim() {
   const damageType = document.getElementById("damageType").value;
   const damageDesc = document.getElementById("damageDesc").value.trim();
-  if (!damageType) { showToast("⚠️ Please select the type of damage."); return; }
-  if (!damageDesc) { showToast("⚠️ Please describe what happened."); return; }
+  if (!damageType) { showToast("<i data-lucide=triangle-alert></i> Please select the type of damage."); return; }
+  if (!damageDesc) { showToast("<i data-lucide=triangle-alert></i> Please describe what happened."); return; }
   if (!currentUser || !window._firebase) return;
   const btn = document.getElementById("btnSubmitDamage");
   if (btn) { btn.textContent = "Submitting..."; btn.disabled = true; }
@@ -2939,7 +2939,7 @@ async function submitDamageClaim() {
     await window._firebase.db.collection("bookings").doc(damageBookingDocId).update({ damageClaimed: true, damageClaimId: claimRef.id, damageClaimedAt: firebase.firestore.FieldValue.serverTimestamp() });
     const b = (await window._firebase.db.collection("bookings").doc(damageBookingDocId).get()).data();
     queueSMS(b?.phone||"", "damage_claim", { name: b?.customerName||"Customer", bookingRef: b?.bookingRef||damageBookingDocId, claimId: claimRef.id.slice(0,8).toUpperCase() });
-    closeDamageModal(); showToast("✅ Claim submitted!"); loadUserBookings();
+    closeDamageModal(); showToast("<i data-lucide=badge-check></i> Claim submitted!"); loadUserBookings();
   } catch(e) {
     const msgEl = document.getElementById("damageMsg");
     if (msgEl) { msgEl.textContent = "Error: " + e.message; msgEl.style.color = "#dc2626"; }
@@ -2997,11 +2997,11 @@ async function requestPushPermission() {
 function subscribeToBookingNotifications(bookingDocId) {
   if (!bookingDocId || !window._firebase) return;
   const msgs = {
-    assigned: {title:"🚛 Driver Assigned!", body:"Your driver is on the way."},
-    packing: {title:"📦 Packing Started", body:"Our team is packing your items."},
-    transit: {title:"🚚 On The Move!", body:"Your goods are in transit."},
-    delivered: {title:"🎉 Delivered!", body:"Your move is complete."},
-    cancelled: {title:"❌ Booking Cancelled",body:"Your booking has been cancelled."}
+    assigned: {title:"<i data-lucide=truck></i> Driver Assigned!", body:"Your driver is on the way."},
+    packing: {title:"<i data-lucide=package></i> Packing Started", body:"Our team is packing your items."},
+    transit: {title:"<i data-lucide=truck></i> On The Move!", body:"Your goods are in transit."},
+    delivered: {title:"<i data-lucide=party-popper></i> Delivered!", body:"Your move is complete."},
+    cancelled: {title:"<i data-lucide=x></i> Booking Cancelled",body:"Your booking has been cancelled."}
   };
   let lastStatus = "";
   window._firebase.db.collection("bookings").doc(bookingDocId).onSnapshot(doc => {
@@ -3043,17 +3043,17 @@ function getFurnitureSummary() {
 CREATE DRIVER (Admin)
 ============================================ */
 async function createDriver() {
-  if (!currentUser) { showToast("⚠️ Please login as admin."); return; }
+  if (!currentUser) { showToast("<i data-lucide=triangle-alert></i> Please login as admin."); return; }
   const name = document.getElementById("newDriverName").value.trim();
   const email = document.getElementById("newDriverEmail").value.trim();
   const password = document.getElementById("newDriverPassword").value.trim();
   const msg = document.getElementById("adminMsg");
   const setMsg = (text, ok) => { msg.style.color = ok ? "#16a34a" : "#dc2626"; msg.textContent = text; };
-  if (!name) return setMsg("⚠️ Please enter driver name.", false);
-  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return setMsg("⚠️ Invalid email.", false);
-  if (password.length < 6) return setMsg("⚠️ Password must be at least 6 characters.", false);
+  if (!name) return setMsg("<i data-lucide=triangle-alert></i> Please enter driver name.", false);
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return setMsg("<i data-lucide=triangle-alert></i> Invalid email.", false);
+  if (password.length < 6) return setMsg("<i data-lucide=triangle-alert></i> Password must be at least 6 characters.", false);
   const adminSnap = await window._firebase.db.collection("users").doc(currentUser.uid).get();
-  if (!adminSnap.exists || adminSnap.data().role !== "admin") return setMsg("⚠️ Access denied.", false);
+  if (!adminSnap.exists || adminSnap.data().role !== "admin") return setMsg("<i data-lucide=triangle-alert></i> Access denied.", false);
   setMsg("⏳ Creating driver account...", true);
   try {
     const secondaryApp = firebase.initializeApp(firebase.app().options, "driverCreation" + Date.now());
@@ -3064,10 +3064,10 @@ async function createDriver() {
       name, email, role: "driver", isOnline: false, phone: "", vehicle: "", rating: 0, totalMoves: 0,
       createdBy: currentUser.uid, createdAt: firebase.firestore.FieldValue.serverTimestamp()
     });
-    setMsg(`✅ Driver "${name}" created!`, true);
+    setMsg(`<i data-lucide=badge-check></i> Driver "${name}" created!`, true);
     ["newDriverName","newDriverEmail","newDriverPassword"].forEach(id => { document.getElementById(id).value = ""; });
   } catch(error) {
-    setMsg("⚠️ " + (error.code === "auth/email-already-in-use" ? "Email already exists." : error.message), false);
+    setMsg("<i data-lucide=triangle-alert></i> " + (error.code === "auth/email-already-in-use" ? "Email already exists." : error.message), false);
   }
 }
 
@@ -3075,17 +3075,17 @@ async function createDriver() {
 INVOICE / PDF
 ============================================ */
 async function emailInvoice(docId) {
-  if (typeof emailjs === "undefined") { showToast("⚠️ Email service not ready."); return; }
-  if (!window._firebase) { showToast("⚠️ Firebase not initialized."); return; }
+  if (typeof emailjs === "undefined") { showToast("<i data-lucide=triangle-alert></i> Email service not ready."); return; }
+  if (!window._firebase) { showToast("<i data-lucide=triangle-alert></i> Firebase not initialized."); return; }
 
   let targetId = docId || currentBookingId;
-  if (!targetId) { showToast("⚠️ No booking found."); return; }
+  if (!targetId) { showToast("<i data-lucide=triangle-alert></i> No booking found."); return; }
 
   showToast("⏳ Sending Email...");
 
   try {
     const docSnap = await window._firebase.db.collection("bookings").doc(targetId).get();
-    if (!docSnap.exists) { showToast("⚠️ Booking not found."); return; }
+    if (!docSnap.exists) { showToast("<i data-lucide=triangle-alert></i> Booking not found."); return; }
 
     const b = docSnap.data();
 
@@ -3095,7 +3095,7 @@ async function emailInvoice(docId) {
       if(userSnap.exists && userSnap.data().email) {
         b.email = userSnap.data().email;
       } else {
-        showToast("⚠️ No email address found for this customer.");
+        showToast("<i data-lucide=triangle-alert></i> No email address found for this customer.");
         return;
       }
     }
@@ -3115,30 +3115,30 @@ async function emailInvoice(docId) {
       amount: b.total || 0,
       message: "Your invoice has been generated. You can download the PDF from your PackZen dashboard."
     }).then(() => {
-      showToast("✅ Invoice emailed successfully!");
+      showToast("<i data-lucide=badge-check></i> Invoice emailed successfully!");
     }).catch((err) => {
       console.error("Email failed:", err);
-      showToast("❌ Failed to send email.");
+      showToast("<i data-lucide=x></i> Failed to send email.");
     });
 
   } catch (err) {
      console.error("Error fetching for email:", err);
-     showToast("❌ Error sending email.");
+     showToast("<i data-lucide=x></i> Error sending email.");
   }
 }
 
 async function downloadInvoice(docId) {
-  if (typeof window.jspdf === "undefined") { showToast("⚠️ PDF library loading..."); return; }
-  if (!window._firebase) { showToast("⚠️ Firebase not initialized."); return; }
+  if (typeof window.jspdf === "undefined") { showToast("<i data-lucide=triangle-alert></i> PDF library loading..."); return; }
+  if (!window._firebase) { showToast("<i data-lucide=triangle-alert></i> Firebase not initialized."); return; }
 
   let targetId = docId || currentBookingId;
-  if (!targetId) { showToast("⚠️ No booking found."); return; }
+  if (!targetId) { showToast("<i data-lucide=triangle-alert></i> No booking found."); return; }
 
   showToast("⏳ Generating Invoice...");
 
   try {
     const docSnap = await window._firebase.db.collection("bookings").doc(targetId).get();
-    if (!docSnap.exists) { showToast("⚠️ Booking not found."); return; }
+    if (!docSnap.exists) { showToast("<i data-lucide=triangle-alert></i> Booking not found."); return; }
 
     const b = docSnap.data();
     const { jsPDF } = window.jspdf;
@@ -3330,22 +3330,22 @@ async function downloadInvoice(docId) {
     doc.text("Support: 9945095453", 150, pageHeight - 7);
 
     doc.save(`PackZen-Invoice-${b.bookingRef || targetId}.pdf`);
-    showToast("✅ Invoice downloaded successfully!");
+    showToast("<i data-lucide=badge-check></i> Invoice downloaded successfully!");
 
   } catch (error) {
     console.error("Error generating invoice:", error);
-    showToast("❌ Error generating invoice.");
+    showToast("<i data-lucide=x></i> Error generating invoice.");
   }
 }
 
 function copyBookingId() {
   const id = document.getElementById("bookingIdDisplay")?.textContent;
   if (!id || id === "—") return;
-  navigator.clipboard.writeText(id).then(() => showToast("✅ Booking ID copied!"))
+  navigator.clipboard.writeText(id).then(() => showToast("<i data-lucide=badge-check></i> Booking ID copied!"))
     .catch(() => {
       const el = document.createElement("textarea"); el.value = id;
       document.body.appendChild(el); el.select(); document.execCommand("copy");
-      document.body.removeChild(el); showToast("✅ Booking ID copied!");
+      document.body.removeChild(el); showToast("<i data-lucide=badge-check></i> Booking ID copied!");
     });
 }
 
@@ -3363,7 +3363,7 @@ function sendEmailNotification(bookingRef, name, phone, pickup, drop, date, tota
 WHATSAPP AFTER PAYMENT
 ============================================ */
 function sendWhatsAppAfterPayment() {
-  showToast("✅ Booking confirmed! Our team will contact you shortly.");
+  showToast("<i data-lucide=badge-check></i> Booking confirmed! Our team will contact you shortly.");
   closeModal();
 }
 
@@ -3397,7 +3397,7 @@ async function handleFirebaseActionCode() {
         if (user) {
           await window._firebase.db.collection('users').doc(user.uid).update({ emailVerified: true });
         }
-        showToast("✅ Email verified successfully!");
+        showToast("<i data-lucide=badge-check></i> Email verified successfully!");
         // Clear the URL parameters
         window.history.replaceState(null, '', window.location.pathname);
       } else if (mode === 'resetPassword') {
@@ -3410,7 +3410,7 @@ async function handleFirebaseActionCode() {
       }
     } catch (err) {
       console.error(err);
-      showToast("⚠️ Invalid or expired link. Please try again.");
+      showToast("<i data-lucide=triangle-alert></i> Invalid or expired link. Please try again.");
     }
   });
 }
@@ -3422,7 +3422,7 @@ async function submitNewPassword() {
   const btn = document.getElementById('btnSubmitNewPassword');
 
   if (!newPassword || newPassword.length < 6) {
-    showError("newPasswordError", "⚠️ Password must be at least 6 characters.");
+    showError("newPasswordError", "<i data-lucide=triangle-alert></i> Password must be at least 6 characters.");
     return;
   }
 
@@ -3433,7 +3433,7 @@ async function submitNewPassword() {
     const auth = window._firebase.auth;
     try {
       await auth.confirmPasswordReset(oobCode, newPassword);
-      showError("newPasswordError", "✅ Password updated successfully! Please login.", "success");
+      showError("newPasswordError", "<i data-lucide=badge-check></i> Password updated successfully! Please login.", "success");
       setTimeout(() => {
         closeNewPasswordModal();
         openAuthModal();
@@ -3468,7 +3468,7 @@ document.addEventListener("DOMContentLoaded", () => {
   if (localStorage.getItem("packzen-theme") === "dark") {
     document.body.classList.add("dark-mode");
     const btn = document.getElementById("themeToggle");
-    if (btn) btn.textContent = "☀️";
+    if (btn) btn.textContent = "";
   }
 
   document.addEventListener("focusin", (e) => {
@@ -3612,7 +3612,7 @@ document.addEventListener("DOMContentLoaded", () => {
 window.addEventListener("load", () => {
   const pendingBooking = localStorage.getItem("pendingBooking");
   if (pendingBooking) {
-    console.log("⚠️ Found unsaved booking backup");
+    console.log(" Found unsaved booking backup");
     showToast("Recovered unsaved booking data.");
     localStorage.removeItem("pendingBooking");
   }
@@ -3670,7 +3670,7 @@ function onBsDatePicked(val) {
   if (!val) return;
   const today = new Date(); today.setHours(0,0,0,0);
   const d = new Date(val + "T00:00:00");
-  if (d < today) { showToast("⚠️ Please select today or a future date."); return; }
+  if (d < today) { showToast("<i data-lucide=triangle-alert></i> Please select today or a future date."); return; }
   document.querySelectorAll(".bs-date-card").forEach(c => c.classList.remove("selected"));
   applyDate(val, d);
 }
@@ -3705,7 +3705,7 @@ function buildBsHouseOptions() {
   const config = MOVE_TYPE_CONFIG[selectedMoveType || "home"] || MOVE_TYPE_CONFIG.home;
   if (!config) return;
   const title = document.querySelector("#bsHouse .bs-title");
-  if (title) title.textContent = "🏠 " + config.sizeLabel;
+  if (title) title.textContent = " " + config.sizeLabel;
   const selected = document.getElementById("house")?.value;
   body.innerHTML = config.sizes.map(s => `<div class="bs-house-card ${s.value === selected ? "selected" : ""}" data-house-value="${s.value}" data-house-label="${s.icon} ${s.label}" data-house-short="${s.label}" role="button" tabindex="0"><div class="bs-house-icon">${s.icon}</div><div class="bs-house-label">${s.label}</div><div class="bs-house-sub">${s.sub || ""}</div></div>`).join("");
   body.querySelectorAll('.bs-house-card').forEach(card => {
@@ -3773,7 +3773,7 @@ function debounce(fn, ms) {
 ============================================ */
 
 function openNotifications() {
-    showToast("🔔 No notifications yet.");
+    showToast("<i data-lucide=bell></i> No notifications yet.");
 }
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -3801,3 +3801,12 @@ window.addEventListener("load", () => {
 /* ============================================
 END OF FILE
 ============================================ */
+
+// PackZen Icons Initialization via Mutation Observer
+document.addEventListener('DOMContentLoaded', () => {
+  if (typeof lucide !== 'undefined') {
+    lucide.createIcons();
+    const observer = new MutationObserver(() => lucide.createIcons());
+    observer.observe(document.body, { childList: true, subtree: true });
+  }
+});
