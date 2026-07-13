@@ -87,18 +87,19 @@
       .content { padding: 1.2rem 1rem 4rem; }
     }
   </style>
+  <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
 
 <div class="hero">
-  <h1>📱 MSG91 SMS + Firebase Setup</h1>
+  <h1><i data-lucide="circle"></i> MSG91 SMS + Firebase Setup</h1>
   <p>Step-by-step guide to activate SMS notifications for PackZen · ~45 minutes total</p>
 </div>
 
 <div class="content">
 
   <div class="good" style="margin-top:1.2rem">
-    ✅ <strong>What you get after this setup:</strong> Automatic SMS to customers when they book, when driver is assigned, when move starts, and when delivered. All for ~₹0.18 per SMS.
+    <i data-lucide="badge-check"></i> <strong>What you get after this setup:</strong> Automatic SMS to customers when they book, when driver is assigned, when move starts, and when delivered. All for ~₹0.18 per SMS.
   </div>
 
   <!-- ═══════════════════ PHASE 1: MSG91 ═══════════════════ -->
@@ -117,7 +118,7 @@
     <div class="step-head"><div class="step-num">2</div> Register Sender ID</div>
     <p>Go to <strong>SMS → Sender ID → Add New</strong>. Enter <code>PKZNSM</code> (6 letters, no spaces). Select "Transactional".</p>
     <p>Approval takes 1–2 hours. This is what customers see as the sender name on their phone.</p>
-    <div class="warn">⚠️ DLT registration is mandatory in India since 2021. Without it, SMSes get blocked. See Step 4.</div>
+    <div class="warn"><i data-lucide="triangle-alert"></i> DLT registration is mandatory in India since 2021. Without it, SMSes get blocked. See Step 4.</div>
   </div>
 
   <div class="step">
@@ -155,7 +156,7 @@ your driver on packzenblr.in. Thank you for choosing PackZen!</span>
 has been received. Our team will respond within 3 business days.
 Queries: 9945095453</span></code></pre>
     <p>4. Copy the Template IDs from DLT and enter them in MSG91 → SMS Templates → link each template to its DLT ID.</p>
-    <div class="info">💡 MSG91 has a DLT guide in their dashboard. Follow their "DLT Onboarding" wizard — it walks you through step by step.</div>
+    <div class="info"><i data-lucide="lightbulb"></i> MSG91 has a DLT guide in their dashboard. Follow their "DLT Onboarding" wizard — it walks you through step by step.</div>
   </div>
 
   <!-- ═══════════════════ PHASE 2: Firebase CLI ═══════════════════ -->
@@ -186,7 +187,7 @@ Queries: 9945095453</span></code></pre>
 <span class="cmd">firebase use --add</span>   <span class="comment"># shows list of your Firebase projects</span>
 <span class="comment"># Select your PackZen project from the list</span>
 <span class="comment"># Give it alias: default</span></code></pre>
-    <div class="info">💡 Your Firebase project name is in your Firebase Console URL: console.firebase.google.com/project/<strong>YOUR-PROJECT-NAME</strong></div>
+    <div class="info"><i data-lucide="lightbulb"></i> Your Firebase project name is in your Firebase Console URL: console.firebase.google.com/project/<strong>YOUR-PROJECT-NAME</strong></div>
   </div>
 
   <!-- ═══════════════════ PHASE 3: Deploy ═══════════════════ -->
@@ -211,7 +212,7 @@ Queries: 9945095453</span></code></pre>
 
 <span class="comment"># Verify it was saved:</span>
 <span class="cmd">firebase functions:config:get</span></code></pre>
-    <div class="warn">⚠️ Replace <code>YOUR_MSG91_AUTH_KEY_HERE</code> with your actual key from Step 3. Never commit this key to GitHub.</div>
+    <div class="warn"><i data-lucide="triangle-alert"></i> Replace <code>YOUR_MSG91_AUTH_KEY_HERE</code> with your actual key from Step 3. Never commit this key to GitHub.</div>
   </div>
 
   <div class="step">
@@ -219,7 +220,7 @@ Queries: 9945095453</span></code></pre>
     <pre><code><span class="cmd">firebase deploy --only functions</span>
 
 <span class="comment"># You should see something like:</span>
-<span class="comment"># ✔  Deploy complete!</span>
+<span class="comment"># <i data-lucide="circle"></i>  Deploy complete!</span>
 <span class="comment"># Function URL: https://asia-south1-YOUR-PROJECT.cloudfunctions.net/sendSMS</span></code></pre>
     <p>Deployment takes 2–3 minutes. After this, every booking will automatically send an SMS.</p>
   </div>
@@ -228,10 +229,10 @@ Queries: 9945095453</span></code></pre>
     <div class="step-head"><div class="step-num green">11</div> Test It</div>
     <p>Make a test booking on your site. Then check:</p>
     <p>1. <strong>Firebase Console → Firestore → smsQueue</strong> — you should see a new doc with <code>status: "sent"</code></p>
-    <p>2. <strong>Firebase Console → Functions → Logs</strong> — look for <code>✅ SMS sent to 91XXXXXXXXXX</code></p>
+    <p>2. <strong>Firebase Console → Functions → Logs</strong> — look for <code><i data-lucide="badge-check"></i> SMS sent to 91XXXXXXXXXX</code></p>
     <p>3. Check the phone number you used — SMS should arrive within 30 seconds</p>
-    <div class="good">✅ If status shows "sent" in Firestore, everything is working!</div>
-    <div class="warn">⚠️ If status shows "failed", check Functions logs for the error. Common issues: wrong auth key, DLT template not approved yet, or mobile number format issue.</div>
+    <div class="good"><i data-lucide="badge-check"></i> If status shows "sent" in Firestore, everything is working!</div>
+    <div class="warn"><i data-lucide="triangle-alert"></i> If status shows "failed", check Functions logs for the error. Common issues: wrong auth key, DLT template not approved yet, or mobile number format issue.</div>
   </div>
 
   <div class="step">
@@ -247,7 +248,7 @@ Queries: 9945095453</span></code></pre>
 
   <!-- Cost breakdown -->
   <div class="phase" style="background:linear-gradient(135deg,#475569,#334155);margin-top:2.5rem">
-    <div class="phase-num">💰</div>
+    <div class="phase-num"><i data-lucide="indian-rupee"></i></div>
     Cost Breakdown
   </div>
 
@@ -263,7 +264,7 @@ Queries: 9945095453</span></code></pre>
   </table>
 
   <div class="good" style="margin-top:1rem">
-    🎉 <strong>You're done!</strong> From now on, every customer automatically gets SMS at booking, driver assignment, move start, delivery, and damage claims. No manual work needed.
+    <i data-lucide="party-popper"></i> <strong>You're done!</strong> From now on, every customer automatically gets SMS at booking, driver assignment, move start, delivery, and damage claims. No manual work needed.
   </div>
 
 </div>

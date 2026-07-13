@@ -106,25 +106,25 @@ const PRICING_CONFIG = Object.freeze({
 
 const VEHICLE_CONFIG = Object.freeze({
   tata_ace: {
-    id: "tata_ace", htmlValue: "200", name: "Tata Ace", icon: "🛻",
+    id: "tata_ace", htmlValue: "200", name: "Tata Ace", icon: "<i data-lucide=circle></i>",
     sub: "Ideal for single items & 1 RK", displayRate: "From ₹1,999",
     minHouseValue: 0, maxHouseValue: 2500, moveTypes: ["home", "single"],
     helpers: 1, loadTimeMin: 45, unloadTimeMin: 30,
   },
   truck_14ft: {
-    id: "truck_14ft", htmlValue: "2500", name: "14 ft Truck", icon: "🚚",
+    id: "truck_14ft", htmlValue: "2500", name: "14 ft Truck", icon: "<i data-lucide=truck></i>",
     sub: "Ideal for 1–2 BHK", displayRate: "From ₹4,500",
     minHouseValue: 2500, maxHouseValue: 6500, moveTypes: ["home", "office", "intercity"],
     helpers: 2, loadTimeMin: 90, unloadTimeMin: 60,
   },
   truck_17ft: {
-    id: "truck_17ft", htmlValue: "4000", name: "17 ft Truck", icon: "🚛",
+    id: "truck_17ft", htmlValue: "4000", name: "17 ft Truck", icon: "<i data-lucide=truck></i>",
     sub: "Ideal for 2–3 BHK", displayRate: "From ₹6,000",
     minHouseValue: 6500, maxHouseValue: 10500, moveTypes: ["home", "office", "intercity"],
     helpers: 3, loadTimeMin: 150, unloadTimeMin: 120,
   },
   truck_22ft: {
-    id: "truck_22ft", htmlValue: "5500", name: "22 ft Truck", icon: "🚜",
+    id: "truck_22ft", htmlValue: "5500", name: "22 ft Truck", icon: "<i data-lucide=circle></i>",
     sub: "Ideal for 3+ BHK", displayRate: "From ₹7,500",
     minHouseValue: 8500, maxHouseValue: Infinity, moveTypes: ["home", "office", "intercity"],
     helpers: 4, loadTimeMin: 240, unloadTimeMin: 180,
@@ -261,9 +261,9 @@ function calcCapacityCharge(furniture, cartonQty, vehicleCfg) {
     if (idx >= 0 && idx < VEHICLE_ORDER.length - 1) {
       const nextVehicle = VEHICLE_CONFIG[VEHICLE_ORDER[idx + 1]];
       recommendation = nextVehicle;
-      warning = `⚠️ Capacity exceeds 100% (${Math.round(capacityUsed)}%). We recommend upgrading to ${nextVehicle.name} for adequate space.`;
+      warning = `<i data-lucide=triangle-alert></i> Capacity exceeds 100% (${Math.round(capacityUsed)}%). We recommend upgrading to ${nextVehicle.name} for adequate space.`;
     } else {
-      warning = `⚠️ Capacity exceeds 100% (${Math.round(capacityUsed)}%). Multiple trips or an extra vehicle may be required.`;
+      warning = `<i data-lucide=triangle-alert></i> Capacity exceeds 100% (${Math.round(capacityUsed)}%). Multiple trips or an extra vehicle may be required.`;
     }
   }
 
@@ -431,7 +431,7 @@ function _renderV2Breakdown(result, resultEl) {
   const fmt = n => Number(n).toLocaleString("en-IN");
   const rows = [];
 
-  rows.push(`📍 Local · ~${km.toFixed ? km.toFixed(1) : km} km`);
+  rows.push(`<i data-lucide=map-pin></i> Local · ~${km.toFixed ? km.toFixed(1) : km} km`);
   rows.push(`Base Vehicle: ₹${fmt(breakdown.baseFare)}`);
   if (breakdown.distanceCharge > 0) rows.push(`Distance Charge: ₹${fmt(breakdown.distanceCharge)}`);
   if (breakdown.capacityCharge > 0) rows.push(`Vehicle Capacity (${breakdown.capacityDetail.slab} - ${Math.round(breakdown.capacityDetail.capacityUsed)}%): ₹${fmt(breakdown.capacityCharge)}`);
@@ -447,7 +447,7 @@ function _renderV2Breakdown(result, resultEl) {
   rows.push(`<strong>Grand Total: ₹${fmt(breakdown.grandTotal)}</strong>`);
 
   if (warnings.length > 0) {
-    rows.push(`⚠️ ${warnings.join(" | ")}`);
+    rows.push(`<i data-lucide=triangle-alert></i> ${warnings.join(" | ")}`);
   }
 
   resultEl.innerHTML = rows.join("<br>");

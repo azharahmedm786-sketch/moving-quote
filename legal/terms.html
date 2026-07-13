@@ -223,6 +223,7 @@
       .refund-table td, .refund-table th { padding: 0.5rem 0.6rem; }
     }
   </style>
+  <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
 
@@ -234,14 +235,14 @@
     </a>
     <div class="nav-links">
       <a href="../index.html">← Back to Home</a>
-      <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Toggle theme">🌙</button>
+      <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Toggle theme"><i data-lucide="moon"></i></button>
     </div>
   </div>
 </nav>
 
 <!-- HERO -->
 <div class="legal-hero">
-  <h1>📄 Terms of Service</h1>
+  <h1><i data-lucide="file-text"></i> Terms of Service</h1>
   <p>Last updated: February 2026 &nbsp;·&nbsp; PackZen Packers & Movers, Bangalore</p>
 </div>
 
@@ -256,7 +257,7 @@
 TERMS OF SERVICE
   ═══════════════════════════════════════ -->
   <div class="legal-section active" style="display:block" id="legal-terms">
-    <span class="legal-updated">📅 Effective: 1 February 2026</span>
+    <span class="legal-updated"><i data-lucide="calendar-days"></i> Effective: 1 February 2026</span>
     <h2>Terms of Service</h2>
     <p>By using the PackZen website (packzenblr.in) or booking our services, you agree to the following terms. Please read them carefully.</p>
 
@@ -326,8 +327,8 @@ TERMS OF SERVICE
         <p>We're happy to explain anything in plain language</p>
       </div>
       <div class="contact-card-btns">
-        <a href="https://wa.me/919945095453" class="btn-wa">💬 WhatsApp</a>
-        <a href="tel:9945095453" class="btn-tel">📞 Call Us</a>
+        <a href="https://wa.me/919945095453" class="btn-wa"> WhatsApp</a>
+        <a href="tel:9945095453" class="btn-tel"><i data-lucide="phone"></i> Call Us</a>
       </div>
     </div>
 </div>
@@ -336,13 +337,13 @@ TERMS OF SERVICE
 <footer class="footer">
   <div class="footer-inner">
     <div class="footer-brand">
-      <div class="footer-logo">📦 Pack<span>Zen</span></div>
+      <div class="footer-logo"><i data-lucide="package"></i> Pack<span>Zen</span></div>
       <p>Bangalore's trusted packers & movers. Safe, reliable, affordable.</p>
     </div>
     <div class="footer-info">
-      <div class="footer-detail">📍 HSR Layout, Bangalore</div>
-      <div class="footer-detail">📞 <a href="tel:9945095453">9945095453</a></div>
-      <div class="footer-detail">💬 <a href="https://wa.me/919945095453">WhatsApp Us</a></div>
+      <div class="footer-detail"><i data-lucide="map-pin"></i> HSR Layout, Bangalore</div>
+      <div class="footer-detail"><i data-lucide="phone"></i> <a href="tel:9945095453">9945095453</a></div>
+      <div class="footer-detail"> <a href="https://wa.me/919945095453">WhatsApp Us</a></div>
     </div>
   </div>
   <div class="footer-bottom">
@@ -355,11 +356,11 @@ TERMS OF SERVICE
   function toggleTheme() {
     const isDark = document.body.classList.toggle("dark-mode");
     localStorage.setItem("packzen-theme", isDark ? "dark" : "light");
-    document.getElementById("themeToggle").textContent = isDark ? "☀️" : "🌙";
+    document.getElementById("themeToggle").textContent = isDark ? "" : "";
   }
   if (localStorage.getItem("packzen-theme") === "dark") {
     document.body.classList.add("dark-mode");
-    document.getElementById("themeToggle").textContent = "☀️";
+    document.getElementById("themeToggle").textContent = "";
   }
 
   </script>

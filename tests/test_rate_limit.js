@@ -56,10 +56,10 @@ function runTests() {
 
   function assert(condition, message) {
     if (condition) {
-      console.log(`✅ ${message}`);
+      console.log(` ${message}`);
       passed++;
     } else {
-      console.error(`❌ ${message}`);
+      console.error(` ${message}`);
       failed++;
     }
   }

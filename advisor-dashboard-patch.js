@@ -17,7 +17,7 @@
 (function loadAdvisorMaps() {
   if (window.google && window.google.maps) return;
   if (!window.ENV || !window.ENV.GOOGLE_MAPS_KEY) {
-    console.error("❌ GOOGLE_MAPS_KEY missing from env-config.js — New Booking distance calc will fall back to a flat estimate.");
+    console.error(" GOOGLE_MAPS_KEY missing from env-config.js — New Booking distance calc will fall back to a flat estimate.");
     return;
   }
   const s = document.createElement("script");
@@ -38,30 +38,30 @@ const NB_MOVE_TYPE_CONFIG = {
   home: {
     sizeLabel: "House Type",
     sizes: [
-      { icon:"🏠", label:"1 RK",  sub:"Studio",   value:"2500"  },
-      { icon:"🏡", label:"1 BHK", sub:"Small",    value:"4500"  },
-      { icon:"🏘️", label:"2 BHK", sub:"Medium",   value:"6500"  },
-      { icon:"🏰", label:"3 BHK", sub:"Large",    value:"8500"  },
-      { icon:"🏯", label:"4 BHK", sub:"X-Large",  value:"10500" },
-      { icon:"🌇", label:"Villa", sub:"Premium",  value:"13500" }
+      { icon:"<i data-lucide=house></i>", label:"1 RK",  sub:"Studio",   value:"2500"  },
+      { icon:"<i data-lucide=home></i>", label:"1 BHK", sub:"Small",    value:"4500"  },
+      { icon:"<i data-lucide=home></i>", label:"2 BHK", sub:"Medium",   value:"6500"  },
+      { icon:"<i data-lucide=castle></i>", label:"3 BHK", sub:"Large",    value:"8500"  },
+      { icon:"<i data-lucide=castle></i>", label:"4 BHK", sub:"X-Large",  value:"10500" },
+      { icon:"<i data-lucide=building></i>", label:"Villa", sub:"Premium",  value:"13500" }
     ]
   },
   office: {
     sizeLabel: "Office Size",
     sizes: [
-      { icon:"💼", label:"Cabin",  sub:"1–5 desks",   value:"6500"  },
-      { icon:"🏢", label:"Small",  sub:"5–15 desks",  value:"10500" },
-      { icon:"🏬", label:"Medium", sub:"15–30 desks", value:"16500" },
-      { icon:"🏭", label:"Large",  sub:"30+ desks",   value:"25500" }
+      { icon:"<i data-lucide=briefcase></i>", label:"Cabin",  sub:"1–5 desks",   value:"6500"  },
+      { icon:"<i data-lucide=building-2></i>", label:"Small",  sub:"5–15 desks",  value:"10500" },
+      { icon:"<i data-lucide=store></i>", label:"Medium", sub:"15–30 desks", value:"16500" },
+      { icon:"<i data-lucide=factory></i>", label:"Large",  sub:"30+ desks",   value:"25500" }
     ]
   },
   single: {
     sizeLabel: "Item Type",
     sizes: [
-      { icon:"🛋️", label:"Furniture", sub:"Sofa, bed…",  value:"0"   },
+      { icon:"<i data-lucide=sofa></i>", label:"Furniture", sub:"Sofa, bed…",  value:"0"   },
       { icon:"🧊", label:"Appliance", sub:"Fridge, AC…", value:"0"   },
-      { icon:"🏍️", label:"Bike/Cycle",sub:"Two-wheeler", value:"500" },
-      { icon:"📦", label:"Boxes",     sub:"Cartons",     value:"0"   }
+      { icon:"<i data-lucide=bike></i>", label:"Bike/Cycle",sub:"Two-wheeler", value:"500" },
+      { icon:"<i data-lucide=package></i>", label:"Boxes",     sub:"Cartons",     value:"0"   }
     ]
   }
 };
@@ -129,14 +129,14 @@ function nbInitAutocomplete() {
 
   pickupAuto.addListener("place_changed", () => {
     const place = pickupAuto.getPlace();
-    if (!place.geometry) { toast("⚠️ Select pickup address from the dropdown"); return; }
+    if (!place.geometry) { toast("<i data-lucide=triangle-alert></i> Select pickup address from the dropdown"); return; }
     nbPickupPlace = place;
     nbSaveDraft();
     nbCalc();
   });
   dropAuto.addListener("place_changed", () => {
     const place = dropAuto.getPlace();
-    if (!place.geometry) { toast("⚠️ Select drop address from the dropdown"); return; }
+    if (!place.geometry) { toast("<i data-lucide=triangle-alert></i> Select drop address from the dropdown"); return; }
     nbDropPlace = place;
     nbSaveDraft();
     nbCalc();
@@ -322,7 +322,7 @@ function nbRestoreDraft() {
   }
   const banner = document.getElementById("nbDraftBanner");
   if (banner) banner.style.display = "none";
-  toast("📝 Draft restored");
+  toast("<i data-lucide=circle></i> Draft restored");
 }
 
 function nbDiscardDraft() {
@@ -441,7 +441,7 @@ async function nbApplyCoupon() {
     const maxFraction = window.PackZenPricing?.config?.discounts?.maxPromoFraction || 0.5;
     const raw = promo.type === "percent" ? Math.round(baseTotal * promo.value / 100) : promo.value;
     nbPromoAmount = Math.min(raw, Math.floor(baseTotal * maxFraction));
-    if (msgEl) { msgEl.textContent = `🎉 ₹${nbPromoAmount} off applied`; msgEl.style.color = "var(--green)"; }
+    if (msgEl) { msgEl.textContent = ` ₹${nbPromoAmount} off applied`; msgEl.style.color = "var(--green)"; }
     nbCalc();
   } catch (e) {
     if (msgEl) { msgEl.textContent = "Error checking code."; msgEl.style.color = "var(--red)"; }
@@ -457,7 +457,7 @@ async function nbApplyCoupon() {
    originalTotal, paid, paymentType, status, source, promoDiscount,
    driverUid/driverName, createdAt).
 
-   ⚠️ REQUIRES a Firestore rules update — see the accompanying
+   <i data-lucide=triangle-alert></i> REQUIRES a Firestore rules update — see the accompanying
    rules diff. Without it this write will be rejected because
    the rule currently requires customerUid == request.auth.uid,
    which an advisor-created walk-in booking cannot satisfy.
@@ -476,15 +476,15 @@ async function nbSaveBooking() {
   const timeVal = document.getElementById("nbTime")?.value;
   const timeLabel = document.getElementById("nbTime")?.selectedOptions?.[0]?.textContent || "";
 
-  if (!name)  return setErr("⚠️ Customer name is required.");
-  if (!/^\d{10}$/.test(phone || "")) return setErr("⚠️ Valid 10-digit phone required.");
-  if (!nbMoveType) return setErr("⚠️ Select a move type.");
-  if (!pickup || !drop) return setErr("⚠️ Pickup and drop address are required.");
-  if (!date) return setErr("⚠️ Moving date is required.");
-  if (!timeVal) return setErr("⚠️ Select a time slot.");
-  if (nbMoveType !== "single" && nbLastKm <= 100 && nbVehicleHtml === "0") return setErr("⚠️ Select a vehicle.");
-  if (!nbLastQuote || !nbLastQuote.valid) return setErr("⚠️ Waiting on price calculation — try again in a moment.");
-  if (!window._firebase) return setErr("⚠️ Not connected to Firebase.");
+  if (!name)  return setErr("<i data-lucide=triangle-alert></i> Customer name is required.");
+  if (!/^\d{10}$/.test(phone || "")) return setErr("<i data-lucide=triangle-alert></i> Valid 10-digit phone required.");
+  if (!nbMoveType) return setErr("<i data-lucide=triangle-alert></i> Select a move type.");
+  if (!pickup || !drop) return setErr("<i data-lucide=triangle-alert></i> Pickup and drop address are required.");
+  if (!date) return setErr("<i data-lucide=triangle-alert></i> Moving date is required.");
+  if (!timeVal) return setErr("<i data-lucide=triangle-alert></i> Select a time slot.");
+  if (nbMoveType !== "single" && nbLastKm <= 100 && nbVehicleHtml === "0") return setErr("<i data-lucide=triangle-alert></i> Select a vehicle.");
+  if (!nbLastQuote || !nbLastQuote.valid) return setErr("<i data-lucide=triangle-alert></i> Waiting on price calculation — try again in a moment.");
+  if (!window._firebase) return setErr("<i data-lucide=triangle-alert></i> Not connected to Firebase.");
 
   const driverUid = document.getElementById("nbDriver")?.value || "";
   const driver = driverUid ? (allDrivers || []).find(d => d.id === driverUid) : null;
@@ -561,15 +561,15 @@ async function nbSaveBooking() {
   if (btn) { btn.disabled = true; btn.textContent = "Saving…"; }
   try {
     await window._firebase.db.collection("bookings").add(payload);
-    toast("✅ Booking created: " + bookingRef);
+    toast("<i data-lucide=badge-check></i> Booking created: " + bookingRef);
     nbDiscardDraft();
     nbResetForm();
   } catch (e) {
-    setErr("❌ " + (e.code === "permission-denied"
+    setErr("<i data-lucide=x></i> " + (e.code === "permission-denied"
       ? "Permission denied — the Firestore rule for advisor-created bookings needs the update described in the deployment notes."
       : e.message));
   } finally {
-    if (btn) { btn.disabled = false; btn.textContent = "✅ Create Booking"; }
+    if (btn) { btn.disabled = false; btn.textContent = " Create Booking"; }
   }
 }
 
@@ -600,7 +600,7 @@ function nbEnsureAssignModal() {
   div.style.cssText = "display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9999;align-items:center;justify-content:center;padding:20px;";
   div.innerHTML = `
     <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:24px;max-width:400px;width:100%">
-      <h3 style="font-family:var(--mono);color:var(--gold);margin-bottom:14px;font-size:.95rem">🚚 Assign Driver</h3>
+      <h3 style="font-family:var(--mono);color:var(--gold);margin-bottom:14px;font-size:.95rem"><i data-lucide=truck></i> Assign Driver</h3>
       <div id="assignDriverInfo" style="font-size:.82rem;color:var(--muted);margin-bottom:14px;line-height:1.7"></div>
       <label style="font-size:.7rem;color:var(--muted);font-weight:700;text-transform:uppercase;display:block;margin-bottom:6px">Select Driver</label>
       <select id="assignDriverSelect" style="width:100%;background:var(--bg);border:1px solid var(--border2);border-radius:8px;padding:9px 12px;color:var(--text);margin-bottom:16px">
@@ -608,7 +608,7 @@ function nbEnsureAssignModal() {
       </select>
       <div style="display:flex;gap:10px">
         <button onclick="closeAssignModal()" style="flex:1;padding:10px;background:var(--surface2);border:1px solid var(--border2);color:var(--muted);border-radius:8px;cursor:pointer;font-weight:700">Cancel</button>
-        <button onclick="confirmAssign()" style="flex:2;padding:10px;background:var(--gold);border:none;color:#000;border-radius:8px;cursor:pointer;font-weight:800">Assign ✓</button>
+        <button onclick="confirmAssign()" style="flex:2;padding:10px;background:var(--gold);border:none;color:#000;border-radius:8px;cursor:pointer;font-weight:800">Assign <i data-lucide=check></i></button>
       </div>
     </div>`;
   document.body.appendChild(div);
@@ -640,7 +640,7 @@ function closeAssignModal() {
 
 async function confirmAssign() {
   const driverUid = document.getElementById("assignDriverSelect")?.value;
-  if (!driverUid) { toast("⚠️ Select a driver"); return; }
+  if (!driverUid) { toast("<i data-lucide=triangle-alert></i> Select a driver"); return; }
   if (!assignBookingId || !window._firebase) return;
   const driver = (allDrivers || []).find(d => d.id === driverUid);
   try {
@@ -648,10 +648,10 @@ async function confirmAssign() {
       driverUid, driverName: driver?.name || "Driver", driverPhone: driver?.phone || "", status: "assigned"
     });
     await window._firebase.db.collection("users").doc(driverUid).update({ currentBooking: assignBookingId });
-    toast("✅ Driver assigned");
+    toast("<i data-lucide=badge-check></i> Driver assigned");
     closeAssignModal();
   } catch (e) {
-    toast("❌ " + (e.code === "permission-denied" ? "Permission denied — check Firestore rules." : e.message));
+    toast("<i data-lucide=x></i> " + (e.code === "permission-denied" ? "Permission denied — check Firestore rules." : e.message));
   }
 }
 
@@ -665,7 +665,7 @@ async function confirmAssign() {
   function watch(collectionName, roleValue) {
     if (!window._firebase) { setTimeout(() => watch(collectionName, roleValue), 500); return; }
     window._firebase.db.collection("users").where("role", "==", roleValue)
-      .onSnapshot(() => {}, err => toast("⚠️ " + collectionName + ": " + err.message));
+      .onSnapshot(() => {}, err => toast("<i data-lucide=triangle-alert></i> " + collectionName + ": " + err.message));
   }
   watch("Customers", "customer");
   watch("Drivers", "driver");
