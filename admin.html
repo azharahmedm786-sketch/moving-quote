@@ -137,7 +137,7 @@
 <!-- LOGIN SCREEN -->
 <div class="admin-login" id="adminLogin">
   <div class="login-card">
-    <div class="login-logo"><i data-lucide="package"></i> PackZen <span style="color:var(--text-muted);font-size:.9rem;font-weight:500;">Admin</span></div>
+    <div class="login-logo"><img src="assets/icons/pz-package.svg" alt="Package" style="width: 1em; height: 1em; vertical-align: middle;"> PackZen <span style="color:var(--text-muted);font-size:.9rem;font-weight:500;">Admin</span></div>
     <p class="login-sub">Restricted — admin access only</p>
 
     <!-- <i data-lucide="badge-check"></i> FIX: autocomplete off prevents browser from suggesting admin credentials to non-admins -->
@@ -409,11 +409,11 @@ function buildShell(adminName) {
   const shell = document.getElementById("adminShell");
   shell.innerHTML = `
   <aside class="sidebar">
-    <div class="sidebar-logo"><span><i data-lucide="package"></i> Pack<b>Zen</b></span><br><small style="color:rgba(255,255,255,.35);font-size:.72rem;">Admin Panel</small></div>
+    <div class="sidebar-logo"><span><img src="assets/icons/pz-package.svg" alt="Package" style="width: 1em; height: 1em; vertical-align: middle;"> Pack<b>Zen</b></span><br><small style="color:rgba(255,255,255,.35);font-size:.72rem;">Admin Panel</small></div>
     <div class="sb-role">Main</div>
     <div class="nav-item active" onclick="showSection('overview',this)"><span class="ni"><i data-lucide="circle"></i></span> Overview</div>
-    <div class="nav-item" onclick="showSection('bookings',this)"><span class="ni"><i data-lucide="package"></i></span> Bookings</div>
-    <div class="nav-item" onclick="showSection('drivers',this)"><span class="ni"><i data-lucide="truck"></i></span> Drivers</div>
+    <div class="nav-item" onclick="showSection('bookings',this)"><span class="ni"><img src="assets/icons/pz-package.svg" alt="Package" style="width: 1em; height: 1em; vertical-align: middle;"></span> Bookings</div>
+    <div class="nav-item" onclick="showSection('drivers',this)"><span class="ni"><img src="assets/icons/pz-truck.svg" alt="Truck" style="width: 1em; height: 1em; vertical-align: middle;"></span> Drivers</div>
     <div class="sb-role">Manage</div>
     <div class="nav-item" onclick="showSection('customers',this)"><span class="ni"><i data-lucide="circle"></i></span> Customers</div>
     <div class="nav-item" onclick="showSection('reviews',this)"><span class="ni">⭐</span> Reviews</div>
@@ -508,7 +508,7 @@ function buildShell(adminName) {
     <!-- DRIVERS -->
     <div class="section" id="sectionDrivers">
       <div class="table-card" style="margin-bottom:20px;">
-        <div class="table-hdr"><div class="table-title"><i data-lucide="truck"></i> Create New Driver Account</div></div>
+        <div class="table-hdr"><div class="table-title"><img src="assets/icons/pz-truck.svg" alt="Truck" style="width: 1em; height: 1em; vertical-align: middle;"> Create New Driver Account</div></div>
         <div style="padding:20px;">
           <div class="driver-form-grid">
             <div>
@@ -528,8 +528,8 @@ function buildShell(adminName) {
               <select id="newDriverVehicle">
                 <option value="">Select vehicle</option>
                 <option value="Tata Ace"><i data-lucide="circle"></i> Tata Ace (Small)</option>
-                <option value="14 ft Truck"><i data-lucide="truck"></i> 14 ft Truck (Medium)</option>
-                <option value="17 ft Truck"><i data-lucide="truck"></i> 17 ft Truck (Large)</option>
+                <option value="14 ft Truck"><img src="assets/icons/pz-truck.svg" alt="Truck" style="width: 1em; height: 1em; vertical-align: middle;"> 14 ft Truck (Medium)</option>
+                <option value="17 ft Truck"><img src="assets/icons/pz-truck.svg" alt="Truck" style="width: 1em; height: 1em; vertical-align: middle;"> 17 ft Truck (Large)</option>
                 <option value="22 ft Truck"><i data-lucide="circle"></i> 22 ft Truck (XL)</option>
               </select>
             </div>
@@ -677,7 +677,7 @@ function buildShell(adminName) {
   <!-- ASSIGN MODAL -->
   <div class="assign-overlay" id="assignModal" style="display:none;">
     <div class="assign-box">
-      <div class="assign-title"><i data-lucide="truck"></i> Assign Driver to Booking</div>
+      <div class="assign-title"><img src="assets/icons/pz-truck.svg" alt="Truck" style="width: 1em; height: 1em; vertical-align: middle;"> Assign Driver to Booking</div>
       <div class="assign-info" id="assignInfo">Loading...</div>
       <label class="field-label">Select Driver</label>
       <select class="field-input" id="assignSelect"><option value="">-- Select a driver --</option></select>
@@ -928,7 +928,7 @@ function renderOverview() {
       <td><span class="badge badge-${b.status||"pending"}">${cap(b.status||"pending")}</span></td>
       <td><button class="btn-sm btn-assign"
 onclick="openAssignModal('${b.id}')">
-<i data-lucide="truck"></i> ${b.driverUid ? "Change Driver" : "Assign Driver"}
+<img src="assets/icons/pz-truck.svg" alt="Truck" style="width: 1em; height: 1em; vertical-align: middle;"> ${b.driverUid ? "Change Driver" : "Assign Driver"}
 </button>
 </td>
     </tr>`).join("");
@@ -961,7 +961,7 @@ function renderBookingsTable(list) {
 
 <button class="btn-sm btn-assign"
 onclick="openAssignModal('${b.id}')">
-<i data-lucide="truck"></i> ${b.driverUid ? "Change" : "Assign"}
+<img src="assets/icons/pz-truck.svg" alt="Truck" style="width: 1em; height: 1em; vertical-align: middle;"> ${b.driverUid ? "Change" : "Assign"}
 </button>
 
   <button class="btn-sm"
@@ -987,7 +987,7 @@ line-height:1.8;
 ">
 
   <h3 style="margin-bottom:15px;color:#2563eb;">
-<i data-lucide="package"></i> Booking Details
+<img src="assets/icons/pz-package.svg" alt="Package" style="width: 1em; height: 1em; vertical-align: middle;"> Booking Details
 </h3>
 
 <b>Booking Ref:</b> ${b.bookingRef || "-"}<br><br>
@@ -1034,7 +1034,7 @@ ${b.createdAt?.toDate ? b.createdAt.toDate().toLocaleString("en-IN") : "-"}
 
 <button class="btn-sm btn-assign"
 onclick="openAssignModal('${b.id}')">
-<i data-lucide="truck"></i> ${b.driverUid ? "Change Driver" : "Assign Driver"}
+<img src="assets/icons/pz-truck.svg" alt="Truck" style="width: 1em; height: 1em; vertical-align: middle;"> ${b.driverUid ? "Change Driver" : "Assign Driver"}
 </button>
 
 <button class="btn-sm"
