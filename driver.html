@@ -186,8 +186,8 @@
 <!-- LOGIN -->
 <div class="driver-login" id="driverLogin">
   <div class="login-card">
-    <div class="login-logo"><i data-lucide="package"></i> PackZen</div>
-    <div class="login-role"><i data-lucide="truck"></i> Driver Portal</div>
+    <div class="login-logo"><img src="assets/icons/pz-package.svg" alt="Package" style="width: 1em; height: 1em; vertical-align: middle;"> PackZen</div>
+    <div class="login-role"><img src="assets/icons/pz-truck.svg" alt="Truck" style="width: 1em; height: 1em; vertical-align: middle;"> Driver Portal</div>
     <label class="field-label">Email</label>
     <input id="drvEmail" type="email" class="field-input" placeholder="driver@packzen.com">
     <label class="field-label">Password</label>
@@ -218,7 +218,7 @@
 
   <!-- BOTTOM NAV -->
   <nav class="bottom-nav" id="bottomNav">
-    <button class="bn-item active" onclick="switchTab('job',this)"><span class="bn-icon"><i data-lucide="package"></i></span>Current Job</button>
+    <button class="bn-item active" onclick="switchTab('job',this)"><span class="bn-icon"><img src="assets/icons/pz-package.svg" alt="Package" style="width: 1em; height: 1em; vertical-align: middle;"></span>Current Job</button>
     <button class="bn-item" onclick="switchTab('history',this)"><span class="bn-icon"><i data-lucide="clipboard-list"></i></span>History</button>
     <button class="bn-item" onclick="switchTab('earnings',this)"><span class="bn-icon"><i data-lucide="indian-rupee"></i></span>Earnings</button>
   </nav>
@@ -253,7 +253,7 @@
   <!-- CURRENT BOOKING -->
   <div class="booking-card" id="bookingCard">
     <div class="booking-header">
-      <div class="booking-title"><i data-lucide="package"></i> Current Assignment</div>
+      <div class="booking-title"><img src="assets/icons/pz-package.svg" alt="Package" style="width: 1em; height: 1em; vertical-align: middle;"> Current Assignment</div>
       <div class="booking-id" id="bkId">—</div>
     </div>
     <div class="info-row"><span class="info-icon"><i data-lucide="user-round"></i></span><div class="info-text"><span class="lbl">Customer</span><span id="bkCustomer">—</span></div></div>
@@ -427,9 +427,9 @@ let chatListener = null, bookingListener = null;
 let selectedDeliveryPhotos = [];
 
 const STATUS_STEPS = [
-  { key: "assigned", icon: "<i data-lucide="truck"></i>", name: "Job Assigned",    desc: "You've been assigned to this booking" },
-  { key: "packing",  icon: "<i data-lucide="package"></i>", name: "Packing Started", desc: "Items are being packed at pickup" },
-  { key: "transit",  icon: "<i data-lucide="truck"></i>", name: "In Transit",      desc: "Moving items to destination" },
+  { key: "assigned", icon: "<img src="assets/icons/pz-truck.svg" alt="Truck" style="width: 1em; height: 1em; vertical-align: middle;">", name: "Job Assigned",    desc: "You've been assigned to this booking" },
+  { key: "packing",  icon: "<img src="assets/icons/pz-package.svg" alt="Package" style="width: 1em; height: 1em; vertical-align: middle;">", name: "Packing Started", desc: "Items are being packed at pickup" },
+  { key: "transit",  icon: "<img src="assets/icons/pz-truck.svg" alt="Truck" style="width: 1em; height: 1em; vertical-align: middle;">", name: "In Transit",      desc: "Moving items to destination" },
   { key: "delivered",icon: "<i data-lucide="party-popper"></i>", name: "Delivered",       desc: "Items delivered. Job complete!" }
 ];
 

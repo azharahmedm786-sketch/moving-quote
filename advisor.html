@@ -761,7 +761,7 @@
 <div class="login-wrap" id="loginWrap">
   <div class="login-card">
     <div class="login-badge"><i data-lucide="lock"></i> Restricted Access</div>
-    <div class="login-logo"><i data-lucide="package"></i> PackZen</div>
+    <div class="login-logo"><img src="assets/icons/pz-package.svg" alt="Package" style="width: 1em; height: 1em; vertical-align: middle;"> PackZen</div>
     <div class="login-tagline">Advisor Dashboard</div>
     <label class="field-label">Email Address</label>
     <input id="adEmail" type="email" class="field-input" placeholder="your@packzenblr.in" autocomplete="off"
@@ -896,7 +896,7 @@ function buildShell() {
   shell.innerHTML = `
   <aside class="sidebar">
     <div class="sb-logo">
-      <div class="sb-logo-text"><i data-lucide="package"></i> PackZen</div>
+      <div class="sb-logo-text"><img src="assets/icons/pz-package.svg" alt="Package" style="width: 1em; height: 1em; vertical-align: middle;"> PackZen</div>
       <div class="sb-logo-sub">Advisor Console</div>
     </div>
     <div class="sb-section">Analytics</div>
@@ -904,9 +904,9 @@ function buildShell() {
     <div class="nav-item" onclick="showSection('revenue',this)"><span class="nav-icon"><i data-lucide="indian-rupee"></i></span> Revenue</div>
     <div class="sb-section">Operations</div>
     <div class="nav-item" onclick="showSection('newbooking',this)"><span class="nav-icon"><i data-lucide="circle"></i></span> New Booking</div>
-    <div class="nav-item" onclick="showSection('bookings',this)"><span class="nav-icon"><i data-lucide="package"></i></span> All Bookings</div>
+    <div class="nav-item" onclick="showSection('bookings',this)"><span class="nav-icon"><img src="assets/icons/pz-package.svg" alt="Package" style="width: 1em; height: 1em; vertical-align: middle;"></span> All Bookings</div>
     <div class="nav-item" onclick="showSection('customers',this)"><span class="nav-icon"><i data-lucide="circle"></i></span> Customers</div>
-    <div class="nav-item" onclick="showSection('drivers',this)"><span class="nav-icon"><i data-lucide="truck"></i></span> Drivers</div>
+    <div class="nav-item" onclick="showSection('drivers',this)"><span class="nav-icon"><img src="assets/icons/pz-truck.svg" alt="Truck" style="width: 1em; height: 1em; vertical-align: middle;"></span> Drivers</div>
     <div class="sb-bottom">
       <div class="advisor-chip">
         <div class="advisor-avatar">${initLetter}</div>
@@ -932,7 +932,7 @@ function buildShell() {
     <div class="section active" id="secOverview">
       <div class="stats-grid">
         <div class="stat-card gold">
-          <div class="stat-icon"><i data-lucide="package"></i></div>
+          <div class="stat-icon"><img src="assets/icons/pz-package.svg" alt="Package" style="width: 1em; height: 1em; vertical-align: middle;"></div>
           <div class="stat-label">Total Bookings</div>
           <div class="stat-value" id="stTotal">—</div>
           <div class="stat-sub">All time</div>
@@ -962,7 +962,7 @@ function buildShell() {
           <div class="stat-sub">Registered users</div>
         </div>
         <div class="stat-card">
-          <div class="stat-icon"><i data-lucide="truck"></i></div>
+          <div class="stat-icon"><img src="assets/icons/pz-truck.svg" alt="Truck" style="width: 1em; height: 1em; vertical-align: middle;"></div>
           <div class="stat-label">Drivers</div>
           <div class="stat-value" id="stDrivers">—</div>
           <div class="stat-sub">Active fleet</div>
@@ -1068,11 +1068,11 @@ function buildShell() {
           </div>
 
           <div class="nb-card">
-            <h3><i data-lucide="package"></i> Move Type</h3>
+            <h3><img src="assets/icons/pz-package.svg" alt="Package" style="width: 1em; height: 1em; vertical-align: middle;"> Move Type</h3>
             <div class="nb-type-grid" id="nbTypeGrid">
               <div class="nb-type-card" data-type="home" onclick="nbSelectMoveType('home')"><i data-lucide="house"></i><br>Home</div>
               <div class="nb-type-card" data-type="office" onclick="nbSelectMoveType('office')"><i data-lucide="building-2"></i><br>Office</div>
-              <div class="nb-type-card" data-type="single" onclick="nbSelectMoveType('single')"><i data-lucide="package"></i><br>Single Item</div>
+              <div class="nb-type-card" data-type="single" onclick="nbSelectMoveType('single')"><img src="assets/icons/pz-package.svg" alt="Package" style="width: 1em; height: 1em; vertical-align: middle;"><br>Single Item</div>
             </div>
             <div style="margin-top:16px">
               <label style="display:block;font-size:.68rem;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px" id="nbSizeLabel">House Type</label>
@@ -1107,7 +1107,7 @@ function buildShell() {
           </div>
 
           <div class="nb-card" id="nbVehicleCard">
-            <h3><i data-lucide="truck"></i> Vehicle</h3>
+            <h3><img src="assets/icons/pz-truck.svg" alt="Truck" style="width: 1em; height: 1em; vertical-align: middle;"> Vehicle</h3>
             <div class="nb-vehicle-grid" id="nbVehicleGrid"><span style="font-size:.78rem;color:var(--muted2)">Select a move type first</span></div>
           </div>
 
@@ -1126,7 +1126,7 @@ function buildShell() {
               </div>
             </div>
             <div class="nb-toggle-row"><span><i data-lucide="circle"></i> Lift available (50% off floor charge)</span><label class="nb-switch"><input type="checkbox" id="nbLift" onchange="nbCalc()"><span class="sldr"></span></label></div>
-            <div class="nb-toggle-row"><span><i data-lucide="package"></i> Packing service</span><label class="nb-switch"><input type="checkbox" id="nbPacking" onchange="nbCalc()"><span class="sldr"></span></label></div>
+            <div class="nb-toggle-row"><span><img src="assets/icons/pz-package.svg" alt="Package" style="width: 1em; height: 1em; vertical-align: middle;"> Packing service</span><label class="nb-switch"><input type="checkbox" id="nbPacking" onchange="nbCalc()"><span class="sldr"></span></label></div>
             <div class="nb-toggle-row"><span><i data-lucide="circle"></i> Unpacking service</span><label class="nb-switch"><input type="checkbox" id="nbUnpacking"><span class="sldr"></span></label></div>
             <div class="nb-toggle-row"><span><i data-lucide="wrench"></i> Dismantling</span><label class="nb-switch"><input type="checkbox" id="nbDismantle"><span class="sldr"></span></label></div>
             <div class="nb-toggle-row"><span><i data-lucide="circle"></i> Assembly</span><label class="nb-switch"><input type="checkbox" id="nbAssembly"><span class="sldr"></span></label></div>
@@ -1255,7 +1255,7 @@ function buildShell() {
     <div class="section" id="secDrivers">
       <div class="stats-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:20px">
         <div class="stat-card">
-          <div class="stat-icon"><i data-lucide="truck"></i></div>
+          <div class="stat-icon"><img src="assets/icons/pz-truck.svg" alt="Truck" style="width: 1em; height: 1em; vertical-align: middle;"></div>
           <div class="stat-label">Total Drivers</div>
           <div class="stat-value" id="drvTotal">—</div>
         </div>
@@ -1265,7 +1265,7 @@ function buildShell() {
           <div class="stat-value" id="drvOnline">—</div>
         </div>
         <div class="stat-card">
-          <div class="stat-icon"><i data-lucide="package"></i></div>
+          <div class="stat-icon"><img src="assets/icons/pz-package.svg" alt="Package" style="width: 1em; height: 1em; vertical-align: middle;"></div>
           <div class="stat-label">On a Job</div>
           <div class="stat-value" id="drvOnJob">—</div>
         </div>
@@ -1637,7 +1637,7 @@ function renderRevenue() {
     revenueTypeChart = new Chart(ctx3, {
       type: "bar",
       data: {
-        labels: ["<i data-lucide="house"></i> Home Move", "<i data-lucide="building-2"></i> Office Shift", "<i data-lucide="package"></i> Single Item", "Other"],
+        labels: ["<i data-lucide="house"></i> Home Move", "<i data-lucide="building-2"></i> Office Shift", "<img src="assets/icons/pz-package.svg" alt="Package" style="width: 1em; height: 1em; vertical-align: middle;"> Single Item", "Other"],
         datasets: [{
           data: [typeRev.home, typeRev.office, typeRev.single, typeRev.other],
           backgroundColor: ["rgba(245,166,35,.5)","rgba(61,156,245,.5)","rgba(0,209,122,.5)","rgba(155,114,245,.5)"],
@@ -1867,8 +1867,8 @@ function nbSelectMoveType(type) {
     vehicleGrid.innerHTML = `
       <div class="nb-vehicle-btn" onclick="nbSelectVehicle('2 Wheeler')"><i data-lucide="bike"></i> 2 Wheeler</div>
       <div class="nb-vehicle-btn" onclick="nbSelectVehicle('3 Wheeler')"><i data-lucide="circle"></i> 3 Wheeler</div>
-      <div class="nb-vehicle-btn" onclick="nbSelectVehicle('Tata Ace')"><i data-lucide="truck"></i> Tata Ace</div>
-      <div class="nb-vehicle-btn" onclick="nbSelectVehicle('Pickup 8ft')"><i data-lucide="truck"></i> Pickup 8ft</div>
+      <div class="nb-vehicle-btn" onclick="nbSelectVehicle('Tata Ace')"><img src="assets/icons/pz-truck.svg" alt="Truck" style="width: 1em; height: 1em; vertical-align: middle;"> Tata Ace</div>
+      <div class="nb-vehicle-btn" onclick="nbSelectVehicle('Pickup 8ft')"><img src="assets/icons/pz-truck.svg" alt="Truck" style="width: 1em; height: 1em; vertical-align: middle;"> Pickup 8ft</div>
     `;
   }
 

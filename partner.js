@@ -402,7 +402,7 @@ function initDashboardPage() {
       '<h1 style="font-size:1.2rem;font-weight:800;margin:0 0 4px;">Welcome back, ' + pzEsc(name) + ' <i data-lucide=circle></i></h1>' +
       '<p style="color:var(--text-muted);font-size:0.86rem;margin:0 0 18px;">Here\'s how your business is doing today.</p>' +
       '<div class="pstat-grid">' +
-        '<div class="pstat-card"><div class="pstat-icon blue"><i data-lucide=package></i></div><div class="pstat-value" id="statTotalJobs">' + (partner.totalJobs || 0) + '</div><div class="pstat-label">Total Jobs</div></div>' +
+        '<div class="pstat-card"><div class="pstat-icon blue"><img src="assets/icons/pz-package.svg" alt="Package" style="width: 1em; height: 1em; vertical-align: middle;"></div><div class="pstat-value" id="statTotalJobs">' + (partner.totalJobs || 0) + '</div><div class="pstat-label">Total Jobs</div></div>' +
         '<div class="pstat-card"><div class="pstat-icon green"><i data-lucide=badge-check></i></div><div class="pstat-value" id="statCompletedJobs">' + (partner.completedJobs || 0) + '</div><div class="pstat-label">Completed</div></div>' +
         '<div class="pstat-card"><div class="pstat-icon amber"><i data-lucide=indian-rupee></i></div><div class="pstat-value" id="statEarnings">' + pzMoney(partner.totalEarnings || 0) + '</div><div class="pstat-label">Total Earnings</div></div>' +
         '<div class="pstat-card"><div class="pstat-icon purple">⭐</div><div class="pstat-value" id="statRating">' + (partner.rating ? partner.rating.toFixed(1) : "New") + '</div><div class="pstat-label">Rating</div></div>' +
@@ -418,7 +418,7 @@ function initDashboardPage() {
       .limit(5)
       .onSnapshot(function (snap) {
         if (snap.empty) {
-          listEl.innerHTML = emptyStateHtml("<i data-lucide=package></i>", "No bookings yet", "New booking requests will appear here.");
+          listEl.innerHTML = emptyStateHtml('<img src="assets/icons/pz-package.svg" alt="Package" style="width: 1em; height: 1em; vertical-align: middle;">', "No bookings yet", "New booking requests will appear here.");
           return;
         }
         listEl.innerHTML = snap.docs.map(bookingCardHtml).join("");
@@ -460,7 +460,7 @@ function bookingCardHtml(doc) {
     '<div class="pbk-route">' + pzEsc(pickup) + ' → ' + pzEsc(drop) + '</div>' +
     '<div class="pbk-meta">' +
       '<span><i data-lucide=calendar-days></i> ' + pzDate(b.movingDate || b.createdAt) + '</span>' +
-      '<span><i data-lucide=truck></i> ' + pzEsc(b.vehicleType || "Vehicle") + '</span>' +
+      '<span><img src="assets/icons/pz-truck.svg" alt="Truck" style="width: 1em; height: 1em; vertical-align: middle;"> ' + pzEsc(b.vehicleType || "Vehicle") + '</span>' +
       '<span class="pbk-fare">' + pzMoney(b.partnerEarnings || b.fare || 0) + '</span>' +
     '</div></div>';
 }
@@ -520,7 +520,7 @@ function loadBookingsTab(tab) {
     .limit(50)
     .onSnapshot(function (snap) {
       if (snap.empty) {
-        listEl.innerHTML = emptyStateHtml("<i data-lucide=package></i>", "Nothing here", "Bookings in this category will show up here.");
+        listEl.innerHTML = emptyStateHtml('<img src="assets/icons/pz-package.svg" alt="Package" style="width: 1em; height: 1em; vertical-align: middle;">', "Nothing here", "Bookings in this category will show up here.");
         return;
       }
       listEl.innerHTML = snap.docs.map(function (doc) { return bookingCardHtmlWithActions(doc, tab); }).join("");
@@ -1075,17 +1075,17 @@ function initVehiclesPage() {
   });
 }
 
-var VEHICLE_ICONS = { "Mini Truck": "<i data-lucide=truck></i>", "Tata Ace": "<i data-lucide=circle></i>", "Tempo": "<i data-lucide=truck></i>", "Pickup": "<i data-lucide=circle></i>" };
+var VEHICLE_ICONS = { "Mini Truck": '<img src="assets/icons/pz-truck.svg" alt="Truck" style="width: 1em; height: 1em; vertical-align: middle;">', "Tata Ace": "<i data-lucide=circle></i>", "Tempo": '<img src="assets/icons/pz-truck.svg" alt="Truck" style="width: 1em; height: 1em; vertical-align: middle;">', "Pickup": "<i data-lucide=circle></i>" };
 
 function loadVehicles() {
   var listEl = qs("#vehiclesList");
   var unsub = window._firebase.db.collection("partners").doc(PZ.uid).collection("vehicles")
     .orderBy("addedAt", "desc")
     .onSnapshot(function (snap) {
-      if (snap.empty) { listEl.innerHTML = emptyStateHtml("<i data-lucide=truck></i>", "No vehicles added", "Add a vehicle to start receiving matching bookings."); return; }
+      if (snap.empty) { listEl.innerHTML = emptyStateHtml('<img src="assets/icons/pz-truck.svg" alt="Truck" style="width: 1em; height: 1em; vertical-align: middle;">', "No vehicles added", "Add a vehicle to start receiving matching bookings."); return; }
       listEl.innerHTML = snap.docs.map(function (doc) {
         var v = doc.data();
-        return '<div class="plist-item"><div class="plist-avatar">' + (VEHICLE_ICONS[v.type] || "<i data-lucide=truck></i>") + '</div><div class="plist-info">' +
+        return '<div class="plist-item"><div class="plist-avatar">' + (VEHICLE_ICONS[v.type] || '<img src="assets/icons/pz-truck.svg" alt="Truck" style="width: 1em; height: 1em; vertical-align: middle;">') + '</div><div class="plist-info">' +
           '<div class="plist-name">' + pzEsc(v.type) + ' · ' + pzEsc(v.number) + '</div><div class="plist-sub">Capacity: ' + pzEsc(v.capacity || "—") + '</div></div>' +
           '<button class="plist-menu-btn edit-vehicle-btn" data-id="' + doc.id + '"><i data-lucide=circle></i></button>' +
           '<button class="plist-menu-btn delete-vehicle-btn" data-id="' + doc.id + '"><i data-lucide=circle></i></button></div>';
