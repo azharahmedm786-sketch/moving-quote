@@ -250,7 +250,7 @@
     const c = document.createElement('div');
     c.className = 'pzs-cards';
     [
-      { action:'booking', icon:'<i data-lucide=package></i>', title:'Book a Move',      sub:'Schedule your packing & moving' },
+      { action:'booking', icon:'<img src="assets/icons/pz-package.svg" alt="Package" style="width: 1em; height: 1em; vertical-align: middle;">', title:'Book a Move',      sub:'Schedule your packing & moving' },
       { action:'quote',   icon:'<i data-lucide=indian-rupee></i>', title:'Get a Quote',      sub:'Estimate your moving cost'       },
       { action:'faq',     icon:'<i data-lucide=circle></i>', title:'Ask a Question',   sub:'Services, payment, areas & more' },
       { action:'call',    icon:'<i data-lucide=phone></i>', title:'Call Us',          sub:'Speak to our team directly'      },
@@ -369,7 +369,7 @@
     sum.innerHTML = `<div class="pzs-sum-hdr">Booking Request</div>` +
       STEPS.map(s => `<div class="pzs-sum-row"><div class="pzs-sum-k">${icons[s.key]} ${labels[s.key]}</div><div class="pzs-sum-v">${booking[s.key] || '—'}</div></div>`).join('');
     const waText = encodeURIComponent(
-      `<i data-lucide=truck></i> *New Booking — PackZen*\n\n<i data-lucide=user-round></i> ${booking.name||'—'}\n<i data-lucide=circle></i> ${booking.phone||'—'}\n<i data-lucide=map-pin></i> From: ${booking.from||'—'}\n<i data-lucide=flag></i> To: ${booking.to||'—'}\n<i data-lucide=calendar-days></i> Date: ${booking.date||'—'}\n<i data-lucide=house></i> Size: ${booking.size||'—'}\n\n_Via packzenblr.in_`
+      `<img src="assets/icons/pz-truck.svg" alt="Truck" style="width: 1em; height: 1em; vertical-align: middle;"> *New Booking — PackZen*\n\n<i data-lucide=user-round></i> ${booking.name||'—'}\n<i data-lucide=circle></i> ${booking.phone||'—'}\n<i data-lucide=map-pin></i> From: ${booking.from||'—'}\n<i data-lucide=flag></i> To: ${booking.to||'—'}\n<i data-lucide=calendar-days></i> Date: ${booking.date||'—'}\n<i data-lucide=house></i> Size: ${booking.size||'—'}\n\n_Via packzenblr.in_`
     );
     const wa = document.createElement('a');
     wa.href = `https://wa.me/${WA_NUMBER}?text=${waText}`;
@@ -422,7 +422,7 @@
   }
 
   function showBackChips() {
-    const chips = makeChips(['<i data-lucide=package></i> Book a Move','<i data-lucide=circle></i> More Questions','<i data-lucide=house></i> Main Menu']);
+    const chips = makeChips(['<img src="assets/icons/pz-package.svg" alt="Package" style="width: 1em; height: 1em; vertical-align: middle;"> Book a Move','<i data-lucide=circle></i> More Questions','<i data-lucide=house></i> Main Menu']);
     chips.addEventListener('click', e => {
       const c = e.target.closest('.pzs-chip'); if(!c) return;
       chips.remove(); addUserGrp(c.textContent);

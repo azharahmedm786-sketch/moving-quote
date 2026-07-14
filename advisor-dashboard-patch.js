@@ -61,7 +61,7 @@ const NB_MOVE_TYPE_CONFIG = {
       { icon:"<i data-lucide=sofa></i>", label:"Furniture", sub:"Sofa, bed…",  value:"0"   },
       { icon:"🧊", label:"Appliance", sub:"Fridge, AC…", value:"0"   },
       { icon:"<i data-lucide=bike></i>", label:"Bike/Cycle",sub:"Two-wheeler", value:"500" },
-      { icon:"<i data-lucide=package></i>", label:"Boxes",     sub:"Cartons",     value:"0"   }
+      { icon:'<img src="assets/icons/pz-package.svg" alt="Package" style="width: 1em; height: 1em; vertical-align: middle;">', label:"Boxes",     sub:"Cartons",     value:"0"   }
     ]
   }
 };
@@ -600,7 +600,7 @@ function nbEnsureAssignModal() {
   div.style.cssText = "display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9999;align-items:center;justify-content:center;padding:20px;";
   div.innerHTML = `
     <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:24px;max-width:400px;width:100%">
-      <h3 style="font-family:var(--mono);color:var(--gold);margin-bottom:14px;font-size:.95rem"><i data-lucide=truck></i> Assign Driver</h3>
+      <h3 style="font-family:var(--mono);color:var(--gold);margin-bottom:14px;font-size:.95rem"><img src="assets/icons/pz-truck.svg" alt="Truck" style="width: 1em; height: 1em; vertical-align: middle;"> Assign Driver</h3>
       <div id="assignDriverInfo" style="font-size:.82rem;color:var(--muted);margin-bottom:14px;line-height:1.7"></div>
       <label style="font-size:.7rem;color:var(--muted);font-weight:700;text-transform:uppercase;display:block;margin-bottom:6px">Select Driver</label>
       <select id="assignDriverSelect" style="width:100%;background:var(--bg);border:1px solid var(--border2);border-radius:8px;padding:9px 12px;color:var(--text);margin-bottom:16px">

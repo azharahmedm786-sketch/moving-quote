@@ -60,7 +60,7 @@
 
     menu: [
       { label: "<i data-lucide=indian-rupee></i> Pricing & Rates", intent: "pricing" },
-      { label: "<i data-lucide=truck></i> Vehicle Options", intent: "vehicles" },
+      { label: "<img src="assets/icons/pz-truck.svg" alt="Truck" style="width: 1em; height: 1em; vertical-align: middle;"> Vehicle Options", intent: "vehicles" },
       { label: "<i data-lucide=clipboard-list></i> How Booking Works", intent: "booking_steps" },
       { label: "<i data-lucide=map-pin></i> Service Areas", intent: "service_area" },
       { label: "<i data-lucide=message-circle></i> Talk to Support", intent: "human" },
@@ -91,7 +91,7 @@
   "<i data-lucide=building-2></i> Floor Charges:\n" +
 "• With Lift: Lower handling charges apply\n" +
 "• Without Lift: Additional floor charges apply\n\n" +
-  "<i data-lucide=truck></i> Intercity pricing is calculated based on distance, house size and vehicle requirements.\n\n" +
+  "<img src="assets/icons/pz-truck.svg" alt="Truck" style="width: 1em; height: 1em; vertical-align: middle;"> Intercity pricing is calculated based on distance, house size and vehicle requirements.\n\n" +
   "Use our Instant Quote form to get an exact price instantly.",
          cta: { type: "book", label: "Get My Instant Quote" },
         followUp: ["vehicles", "booking_steps", "human"],
@@ -105,8 +105,8 @@
         reply:
           "We match the vehicle to your home size so you never overpay:\n\n" +
           "<i data-lucide=circle></i> Mini Truck (Tata Ace, open) — best for 1 RK / 1 BHK, ~750 kg load\n" +
-          "<i data-lucide=truck></i> Tempo 14ft (covered) — best for 2 BHK, ~1.5 ton load\n" +
-          "<i data-lucide=truck></i> Tempo 17ft (covered) — best for 3 BHK, ~2.5 ton load\n" +
+          "<img src="assets/icons/pz-truck.svg" alt="Truck" style="width: 1em; height: 1em; vertical-align: middle;"> Tempo 14ft (covered) — best for 2 BHK, ~1.5 ton load\n" +
+          "<img src="assets/icons/pz-truck.svg" alt="Truck" style="width: 1em; height: 1em; vertical-align: middle;"> Tempo 17ft (covered) — best for 3 BHK, ~2.5 ton load\n" +
           "<i data-lucide=circle></i> Container Truck 19–22ft — best for 4+ BHK / villas, ~4–7 ton load\n\n" +
           "All covered vehicles protect your belongings from weather during transit. The quote form auto-suggests the right vehicle once you enter your BHK.",
         cta: { type: "book", label: "Get Vehicle Recommendation" },
