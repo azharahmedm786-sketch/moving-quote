@@ -2860,7 +2860,7 @@ function loadUserReviews() {
             ${escapeHTML(err.message)}
         </div>`;
 });
-
+       }
 function loadProfileData() {
   if (!currentUser || !window._firebase) return;
   window._firebase.db.collection("users").doc(currentUser.uid).get().then(doc => {
