@@ -2623,21 +2623,62 @@ function switchDashTab(tab, el) {
   if (tab === "invoices") loadUserInvoices();
   if (tab === "reviews") loadUserReviews();
 }
-
 function loadUserQuotes() {
-  if (!currentUser || !window._firebase) return;
-  window._firebase.db.collection("quotes").where("uid","==",currentUser.uid).orderBy("createdAt","desc").limit(10).get()
-    .then(snap => {
-      const list = document.getElementById("quotesList");
-      if (!list) return;
-      if (snap.empty) { list.innerHTML = 'No saved quotes yet.'; return; }
-      list.innerHTML = snap.docs.map(d => {
-        const q = d.data();
-        return `<div class="quote-item"><div class="qi-route">📍 ${q.pickup||"?"} → 🏁 ${q.drop||"?"}</div><div class="qi-details"><span>${q.house||"—"}</span><span>${q.vehicle||"—"}</span><span class="qi-price">₹${(q.total||0).toLocaleString("en-IN")}</span></div><div class="qi-date">${q.date||""}</div></div>`;
-      }).join("");
-    }).catch(() => {});
-}
 
+    if (!currentUser || !window._firebase) return;
+
+    const list = document.getElementById("quotesList");
+
+    list.innerHTML = "Loading...";
+
+    window._firebase.db
+        .collection("quotes")
+        .where("uid", "==", currentUser.uid)
+        .orderBy("createdAt", "desc")
+        .limit(10)
+        .get()
+        .then(snap => {
+
+            if (snap.empty) {
+                list.innerHTML = "No saved quotes.";
+                return;
+            }
+
+            list.innerHTML = snap.docs.map(doc => {
+                const q = doc.data();
+
+                return `
+                <div class="quote-item">
+                    <div class="qi-route">
+                        📍 ${q.pickup || "-"} →
+                        🏁 ${q.drop || "-"}
+                    </div>
+
+                    <div class="qi-details">
+                        <span>${q.house || "-"}</span>
+                        <span>${q.vehicle || "-"}</span>
+                        <span class="qi-price">
+                            ₹${Number(q.total || 0).toLocaleString("en-IN")}
+                        </span>
+                    </div>
+
+                    <div class="qi-date">
+                        ${q.date || ""}
+                    </div>
+                </div>`;
+            }).join("");
+
+        })
+        .catch(err => {
+
+            console.error("Quotes Error", err);
+
+            list.innerHTML =
+                "<div class='empty-state'>Unable to load quotes.</div>";
+
+        });
+
+}
 function loadUserBookings() {
   if (!currentUser || !window._firebase) return;
   const list = document.getElementById("bookingsList");
@@ -2751,6 +2792,27 @@ function loadUserInvoices() {
                   <button class="btn-auth" style="padding:6px 12px;font-size:0.8rem;min-height:unset;" onclick="downloadInvoice('${d.id}')">Download</button>
                 </div>`;
       }).join("");
+function loadUserInvoices() {
+  if (!currentUser || !window._firebase) return;
+  const list = document.getElementById("invoicesList");
+  if (!list) return;
+  list.innerHTML = 'Loading invoices...';
+  window._firebase.db.collection("bookings")
+    .where("customerUid", "==", currentUser.uid)
+    .where("status", "in", ["completed", "delivered"])
+    .orderBy("createdAt", "desc").limit(10).get()
+    .then(snap => {
+      if (snap.empty) { list.innerHTML = '<div class="dash-empty">No invoices available.</div>'; return; }
+      list.innerHTML = snap.docs.map(d => {
+        const b = d.data();
+        return `<div class="quote-item" style="display:flex;justify-content:space-between;align-items:center;">
+                  <div>
+                    <div style="font-weight:bold;">Invoice #${b.bookingRef || d.id.substring(0,8)}</div>
+                    <div style="font-size:0.8rem;color:var(--text-muted);">₹${(b.total||0).toLocaleString("en-IN")} • ${b.date||"N/A"}</div>
+                  </div>
+                  <button class="btn-auth" style="padding:6px 12px;font-size:0.8rem;min-height:unset;" onclick="downloadInvoice('${d.id}')">Download</button>
+                </div>`;
+      }).join("");
     }).catch(err => { console.error("Error loading invoices:", err); list.innerHTML = '<div class="dash-empty">Error loading invoices.</div>'; });
 }
 
@@ -2777,8 +2839,27 @@ function loadUserReviews() {
                   <div style="font-size:0.75rem;color:var(--text-muted);margin-top:4px;">Status: ${escapeHTML(r.status || "pending")}</div>
                 </div>`;
       }).join("");
-    }).catch(err => { console.error("Error loading reviews:", err); list.innerHTML = '<div class="dash-empty">Error loading reviews.</div>'; });
-}
+.catch(err => {
+    console.error("Error loading reviews:", err);
+
+    if (err.code === "failed-precondition") {
+        list.innerHTML =
+            '<div class="dash-empty">Firestore index is missing.</div>';
+        return;
+    }
+
+    if (err.code === "permission-denied") {
+        list.innerHTML =
+            '<div class="dash-empty">Permission denied.</div>';
+        return;
+    }
+
+    list.innerHTML =
+        `<div class="dash-empty">
+            Error loading reviews.<br>
+            ${escapeHTML(err.message)}
+        </div>`;
+});
 
 function loadProfileData() {
   if (!currentUser || !window._firebase) return;
