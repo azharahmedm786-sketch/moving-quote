@@ -82,14 +82,22 @@ function goLogin() {
    Ensures user is logged in AND status === approved, otherwise redirects. */
 function requirePartner(onReady) {
   waitFB(function () {
-    window._firebase.auth.onAuthStateChanged(function (user) {
-      if (!user) { goLogin(); return; }
+    // Prevent duplicate listeners
+    if (PZ.authUnsub) PZ.authUnsub();
+
+    PZ.authUnsub = window._firebase.auth.onAuthStateChanged(function (user) {
+      if (!user) {
+        document.body.innerHTML = ''; // Clear immediately if on protected route without auth
+        goLogin();
+        return;
+      }
       window._firebase.db.collection("partners").doc(user.uid).get()
         .then(function (doc) {
           if (!doc.exists) {
-            window._firebase.auth.signOut();
-            showToast("Partner profile not found. Please contact support.");
-            goLogin();
+            window._firebase.auth.signOut().then(function() {
+              document.body.innerHTML = '';
+              goLogin();
+            });
             return;
           }
           var data = doc.data();
@@ -240,10 +248,15 @@ function initLoginPage() {
       if (remembered) { qs("#loginEmail").value = remembered; qs("#rememberMe").checked = true; }
     } catch (e) {}
 
-    window._firebase.auth.onAuthStateChanged(function (user) {
+    if (PZ.authUnsub) PZ.authUnsub();
+
+    PZ.authUnsub = window._firebase.auth.onAuthStateChanged(function (user) {
       if (!user) return;
       window._firebase.db.collection("partners").doc(user.uid).get().then(function (doc) {
-        if (!doc.exists) return;
+        if (!doc.exists) {
+          window._firebase.auth.signOut();
+          return;
+        }
         var status = doc.data().verificationStatus;
         if (status === "approved") window.location.href = "partner-dashboard.html";
         else if (status === "pending") window.location.href = "registration-success.html?status=pending";
@@ -372,7 +385,9 @@ function initRegistrationStatusPage() {
   paint(status);
 
   waitFB(function () {
-    window._firebase.auth.onAuthStateChanged(function (user) {
+    if (PZ.authUnsub) PZ.authUnsub();
+
+    PZ.authUnsub = window._firebase.auth.onAuthStateChanged(function (user) {
       if (!user) return;
       var unsub = window._firebase.db.collection("partners").doc(user.uid)
         .onSnapshot(function (doc) {

@@ -519,9 +519,24 @@ function showApp(data) {
 
 waitFB(() => {
   window._firebase.auth.onAuthStateChanged(u => {
-    if (!u) return;
+    if (!u) {
+      document.getElementById("driverApp").classList.remove("active");
+      document.getElementById("bottomNav").classList.remove("active");
+      document.getElementById("driverLogin").style.display = "flex";
+      return;
+    }
     window._firebase.db.collection("users").doc(u.uid).get().then(doc => {
-      if (doc.exists && doc.data().role === "driver") { driverUser = u; showApp(doc.data()); }
+      if (doc.exists && doc.data().role === "driver") {
+        driverUser = u;
+        showApp(doc.data());
+      } else {
+        window._firebase.auth.signOut();
+        driverUser = null;
+        document.getElementById("drvErr").textContent = "Access denied. Driver accounts only.";
+        document.getElementById("driverApp").classList.remove("active");
+        document.getElementById("bottomNav").classList.remove("active");
+        document.getElementById("driverLogin").style.display = "flex";
+      }
     });
   });
 });

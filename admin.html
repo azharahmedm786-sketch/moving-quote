@@ -285,7 +285,13 @@ document.addEventListener("DOMContentLoaded", () => {
   waitFB(() => {
     const { auth, db } = window._firebase;
     auth.onAuthStateChanged(async (user) => {
-      if (!user) return; // Not logged in — show login form, nothing else
+      if (!user) {
+        // Not logged in — ensure login form is shown and shell is hidden
+        document.getElementById("adminLogin").style.display = "flex";
+        const shell = document.getElementById("adminShell");
+        if (shell) { shell.classList.remove("active"); shell.innerHTML = ""; }
+        return;
+      }
       const userEmail = (user.email || "").toLowerCase();
       try {
         const snap = await db.collection("users").doc(user.uid).get();
@@ -293,12 +299,21 @@ document.addEventListener("DOMContentLoaded", () => {
         if (data.role === "admin" || ADMIN_EMAILS.includes(userEmail)) {
           adminUser = user;
           showShell(data.name || user.displayName || "Admin");
+        } else {
+          // If not admin role — sign out and show error
+          auth.signOut();
+          adminUser = null;
+          const err = document.getElementById("adminErr");
+          if (err) err.textContent = "Access denied. Your account does not have admin permissions.";
+          document.getElementById("adminLogin").style.display = "flex";
         }
-        // If not admin role — do nothing (don't redirect, just show login)
       } catch(e) {
         if (ADMIN_EMAILS.includes(userEmail)) {
           adminUser = user;
           showShell(user.displayName || "Admin");
+        } else {
+          auth.signOut();
+          adminUser = null;
         }
       }
     });

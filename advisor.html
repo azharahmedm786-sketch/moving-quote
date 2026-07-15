@@ -830,9 +830,22 @@ function waitFB(cb, n = 0) {
 document.addEventListener("DOMContentLoaded", () => {
   waitFB(() => {
     auth.onAuthStateChanged(async user => {
-      if (!user) return;
+      if (!user) {
+        document.getElementById("loginWrap").style.display = "flex";
+        document.getElementById("shell").style.display = "none";
+        document.getElementById("shell").innerHTML = "";
+        return;
+      }
       const ok = await isAdvisor(user);
-      if (ok) { advisorUser = user; buildShell(); }
+      if (ok) {
+        advisorUser = user;
+        buildShell();
+      } else {
+        auth.signOut();
+        advisorUser = null;
+        document.getElementById("loginErr").textContent = "Access denied. Your account does not have advisor permissions.";
+        document.getElementById("loginWrap").style.display = "flex";
+      }
     });
   });
 });
