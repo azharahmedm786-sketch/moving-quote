@@ -1749,6 +1749,8 @@ function updateTrackBanner(b) {
   const banner = document.getElementById("trackOrderBanner");
   if (b.status === "delivered" && banner) {
     banner.style.background = "linear-gradient(135deg,#15803d,#16a34a)";
+
+    
     const title = banner.querySelector(".tob-title");
     if (title) title.textContent = "🎉 Your Move is Complete!";
   }
@@ -2634,14 +2636,17 @@ function switchDashTab(tab, el) {
 }
 
 function loadUserBookings() {
+      console.log("loadUserBookings called");
   if (!currentUser || !window._firebase) return;
   const list = document.getElementById("bookingsList");
   if (list) list.innerHTML = 'Loading...';
   window._firebase.db.collection("bookings").where("customerUid","==",currentUser.uid).orderBy("createdAt","desc").limit(10).get()
     .then(snap => {
+      console.log("Documents:", snap.size);
       if (!list) return;
       if (snap.empty) { list.innerHTML = 'No bookings yet.'; return; }
       const statusColors = {confirmed:"#0057ff",assigned:"#7c3aed",packing:"#0ea5e9",transit:"#f97316",delivered:"#16a34a",cancelled:"#dc2626"};
+      console.log(snap.docs);
       const statusIcons = {confirmed:"📋",assigned:"🚛",packing:"📦",transit:"🚚",delivered:"✅",cancelled:"❌"};
       list.innerHTML = snap.docs.map(d => {
         const b = d.data(), id = d.id;
@@ -2662,16 +2667,24 @@ ${showOtp ? `
     border-radius:10px;
     text-align:center;
 ">
-    <div style="font-size:12px;color:#666;">Delivery OTP</div>
-    <div style="font-size:34px;font-weight:bold;letter-spacing:8px;color:#16a34a;">
+    <div style="font-size:12px;color:#666;">
+        Delivery OTP
+    </div>
+
+    <div style="
+        font-size:34px;
+        font-weight:bold;
+        letter-spacing:8px;
+        color:#16a34a;
+    ">
         ${b.deliveryOtp}
     </div>
+
     <div style="font-size:13px;color:#666;">
         Give this OTP to the driver only after delivery.
     </div>
 </div>
 ` : ""}
-
 ${canCancel?`<button class="bk-btn cancel" data-action="cancel" data-id="${id}" data-ref="${b.bookingRef||id}" data-status="${b.status||""}">✕ Cancel</button>`:""}
 ${canRate?`<button class="bk-btn rate" data-action="rate" data-id="${id}" data-ref="${b.bookingRef||id}" data-driver="${b.driverName||""}">⭐ Rate Driver</button>`:""}
 ${canClaim?`<button class="bk-btn claim" data-action="claim" data-id="${id}" data-ref="${b.bookingRef||id}">🔧 Report Damage</button>`:""}
