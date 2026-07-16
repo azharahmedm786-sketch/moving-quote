@@ -1417,7 +1417,8 @@ function onPaymentSuccess(response, name, phone, email, paid, total) {
       distance: window._lastCalculatedKm || 0,
       quoteBreakdown: window._lastQuoteResult?.breakdown || null,
       paymentId: response.razorpay_payment_id,
-      photos: uploadedPhotos.slice(0, 3),
+   photos: uploadedPhotos.slice(0, 3),
+      deliveryOtp: generateDeliveryOtp(),
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
     };
     window.PackZenShared.createBooking(payload, (docId) => {
@@ -1549,7 +1550,8 @@ function bookWithoutPayment() {
     promoDiscount,
     distance: window._lastCalculatedKm || 0,
     quoteBreakdown: window._lastQuoteResult?.breakdown || null,
-    photos: uploadedPhotos.slice(0, 3),
+   photos: uploadedPhotos.slice(0, 3),
+    deliveryOtp: generateDeliveryOtp(),
     createdAt: firebase.firestore.FieldValue.serverTimestamp()
   };
 
@@ -1739,12 +1741,12 @@ function updateTrackBanner(b) {
     if (i < idx) step.classList.add("done");
     if (i === idx) step.classList.add("active");
   });
-  const driverRow = document.getElementById("tobDriverRow");
-  if (b.driverName && driverRow) {
-    document.getElementById("tobDriverName").textContent = "Driver: " + b.driverName;
-    const phoneEl = document.getElementById("tobDriverPhone");
-    if (b.driverPhone) { phoneEl.href = "tel:" + b.driverPhone; phoneEl.textContent = "📞 Call Driver"; }
-    driverRow.style.display = "flex";
+  const otpRow = document.getElementById("tobOtpRow");
+  const otpVal = document.getElementById("tobOtpValue");
+  const showOtp = ["assigned","packing","transit","delivered"].includes(b.status) && b.deliveryOtp;
+  if (otpRow) {
+    otpRow.style.display = showOtp ? "block" : "none";
+    if (showOtp && otpVal) otpVal.textContent = b.deliveryOtp;
   }
   const banner = document.getElementById("trackOrderBanner");
   if (b.status === "delivered" && banner) {
@@ -3089,6 +3091,9 @@ function subscribeToBookingNotifications(bookingDocId) {
   setupStatusSMS(bookingDocId, "", "", "");
 }
 
+function generateDeliveryOtp() {
+  return String(Math.floor(1000 + Math.random() * 9000)); // 4-digit OTP
+}
 /* ============================================
 HELPERS
 ============================================ */
