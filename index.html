@@ -465,9 +465,10 @@
     </a>
   </div>
 </div>
-    <!-- FAQ -->
+<!-- CHAT & FAQ -->
     <div class="home-section" id="faq">
-      <div class="section-label">FAQ</div>
+      <div class="section-label">Help &amp; Support</div>
+      <button class="offer-btn" style="width:100%;justify-content:center;display:flex;margin-bottom:14px;" onclick="openChatModal()">💬 Chat with us</button>
       <div class="faq-app-list faq-list">
         <div class="faq-item">
           <button class="faq-q" onclick="toggleFaq(this)">How early should I book?<span class="faq-arrow">▾</span></button>
@@ -689,10 +690,7 @@
           <div class="field-group">
             <label class="field-label"><span class="field-icon">📍</span> Pickup Location</label>
             <input id="pickup" aria-label="Pickup address" aria-required="true" placeholder="Enter pickup address" class="field-input" autocomplete="off">
-            <label class="toggle-row">
-              <span class="toggle-text">📱 Use my current location</span>
-              <label class="toggle"><input type="checkbox" id="useCurrentLocation"><span class="slider"></span></label>
-            </label>
+        <button type="button" class="date-more-btn" style="margin-top:0.5rem;width:100%;" onclick="openPickOnMapModal()">🗺️ Pick location on map</button>
           </div>
           <div class="field-group">
             <label class="field-label"><span class="field-icon">🏁</span> Drop Location</label>
@@ -953,7 +951,18 @@
 <!-- ═══════════════════════════════════════════
      ALL EXISTING MODALS (IDs preserved exactly)
 ═══════════════════════════════════════════ -->
-
+<!-- PICK ON MAP MODAL -->
+<div id="pickMapModal" class="modal-overlay" style="display:none;">
+  <div class="modal-box" style="max-width:480px;">
+    <button class="modal-x" onclick="closePickOnMapModal()">✕</button>
+    <h2 class="modal-title">📍 Pick Pickup Location</h2>
+    <p class="modal-sub">Drag the pin or tap the map to set your pickup point</p>
+    <div id="pickMapDiv" style="width:100%;height:320px;border-radius:12px;overflow:hidden;border:1.5px solid var(--border-light);"></div>
+    <div id="pickMapAddress" style="margin-top:12px;font-size:0.85rem;color:var(--text-secondary);text-align:center;min-height:20px;"></div>
+    <button class="btn-auth" onclick="confirmPickedLocation()" style="margin-top:16px;">✅ Use This Location</button>
+  </div>
+</div>
+  
 <!-- AUTH MODAL -->
 <div id="authModal" class="modal-overlay" role="dialog" aria-modal="true" style="display:none;">
   <div class="modal-box auth-modal-box">
@@ -1515,9 +1524,6 @@ if ('serviceWorker' in navigator) {
   });
 }
 </script>
-
-<link rel="stylesheet" href="pzchatbot.css">
-<script src="pzchatbot.js" defer></script>
 
 </body>
 </html>
