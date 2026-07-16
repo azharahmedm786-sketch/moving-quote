@@ -2654,7 +2654,8 @@ function loadUserBookings() {
         const icon = statusIcons[b.status] || "📋";
         const canCancel = !["packing","transit","delivered","cancelled"].includes(b.status);
         const canReschedule = !["transit","delivered","cancelled"].includes(b.status);
-        const canRate = b.status === "delivered" && !b.driverRating;
+     const canRate = b.status === "delivered" && !b.driverRating;
+const canClaim = b.status === "delivered" && !b.damageClaimed;
 const showOtp = ["assigned", "packing", "transit", "delivered"].includes(b.status) && b.deliveryOtp;
         return `<div class="bk-card"> <div class="bk-card-top"><div class="bk-route">${escapeHTML((b.pickup||"?").split(",")[0])} → ${escapeHTML((b.drop||"?").split(",")[0])}</div><div class="bk-status" style="color:${color}">${icon} ${escapeHTML(capitalize(b.status||"confirmed"))}</div></div> <div class="bk-meta"><span>₹${(b.total||0).toLocaleString("en-IN")}</span><span>${escapeHTML(b.date)||"Date TBD"}</span><span style="font-size:.72rem;color:#5a6a8a">${escapeHTML(b.bookingRef)||""}</span></div> ${canCancel||canReschedule||canRate||canClaim?`
 ${canReschedule?`<button class="bk-btn reschedule" data-action="reschedule" data-id="${id}" data-ref="${b.bookingRef||id}" data-date="${b.date||""}">📅 Reschedule</button>`:""}
@@ -2695,7 +2696,10 @@ ${canClaim?`<button class="bk-btn claim" data-action="claim" data-id="${id}" dat
 </div>`;
       }).join("");
       attachBookingButtonListeners();
-    }).catch(() => {});
+}).catch((err) => {
+      console.error("loadUserBookings failed:", err);
+      if (list) list.innerHTML = `<div class="dash-empty">Error loading bookings: ${escapeHTML(err.message)}</div>`;
+    });
 }
 
 function attachBookingButtonListeners() {
