@@ -2461,9 +2461,8 @@ async function openDashboard() {
     document.getElementById("dashAvatar").textContent = name.charAt(0).toUpperCase();
     const adminTabBtn = document.getElementById("adminTabBtn");
     if (userData.role === "admin" && adminTabBtn) adminTabBtn.style.display = "inline-flex";
-    await loadQuotes();
-    document.getElementById("dashboardModal").style.display = "flex";
-    switchDashTab("quotes", document.querySelector(".dash-tab"));
+document.getElementById("dashboardModal").style.display = "flex";
+switchDashTab("bookings", document.querySelector(".dash-tab"));
   } catch (e) { console.error("Dashboard error:", e); }
 }
 
