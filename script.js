@@ -2650,9 +2650,29 @@ function loadUserBookings() {
         const canCancel = !["packing","transit","delivered","cancelled"].includes(b.status);
         const canReschedule = !["transit","delivered","cancelled"].includes(b.status);
         const canRate = b.status === "delivered" && !b.driverRating;
-        const canClaim = b.status === "delivered" && !b.damageClaimed;
+const showOtp = ["assigned", "packing", "transit", "delivered"].includes(b.status) && b.deliveryOtp;
         return `<div class="bk-card"> <div class="bk-card-top"><div class="bk-route">${escapeHTML((b.pickup||"?").split(",")[0])} → ${escapeHTML((b.drop||"?").split(",")[0])}</div><div class="bk-status" style="color:${color}">${icon} ${escapeHTML(capitalize(b.status||"confirmed"))}</div></div> <div class="bk-meta"><span>₹${(b.total||0).toLocaleString("en-IN")}</span><span>${escapeHTML(b.date)||"Date TBD"}</span><span style="font-size:.72rem;color:#5a6a8a">${escapeHTML(b.bookingRef)||""}</span></div> ${canCancel||canReschedule||canRate||canClaim?`
 ${canReschedule?`<button class="bk-btn reschedule" data-action="reschedule" data-id="${id}" data-ref="${b.bookingRef||id}" data-date="${b.date||""}">📅 Reschedule</button>`:""}
+${showOtp ? `
+<div style="
+    margin:12px 0;
+    padding:14px;
+    background:#f0fff4;
+    border:2px dashed #16a34a;
+    border-radius:10px;
+    text-align:center;
+">
+    <div style="font-size:12px;color:#666;">Delivery OTP</div>
+    <div style="font-size:34px;font-weight:bold;letter-spacing:8px;color:#16a34a;">
+        ${b.deliveryOtp}
+    </div>
+    <div style="font-size:13px;color:#666;">
+        Give this OTP to the driver only after delivery.
+    </div>
+</div>
+` : ""}
+
+${canReschedule ? ...
 ${canCancel?`<button class="bk-btn cancel" data-action="cancel" data-id="${id}" data-ref="${b.bookingRef||id}" data-status="${b.status||""}">✕ Cancel</button>`:""}
 ${canRate?`<button class="bk-btn rate" data-action="rate" data-id="${id}" data-ref="${b.bookingRef||id}" data-driver="${b.driverName||""}">⭐ Rate Driver</button>`:""}
 ${canClaim?`<button class="bk-btn claim" data-action="claim" data-id="${id}" data-ref="${b.bookingRef||id}">🔧 Report Damage</button>`:""}
