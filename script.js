@@ -1879,7 +1879,7 @@ function loadTrackingData() {
   if (!currentUser || !window._firebase) return;
   if (trackingListener) { trackingListener(); trackingListener = null; }
   trackingListener = window._firebase.db.collection("bookings")
-    .where("customerUid","==",currentUser.uid).orderBy("createdAt","desc").limit(1)
+    .where("customerUid","==",currentUser.uid).limit(1)
     .onSnapshot(snap => {
       if (snap.empty) { document.getElementById("trackingBookingId").textContent = "No active booking"; return; }
       const booking = { id: snap.docs[0].id, ...snap.docs[0].data() };
