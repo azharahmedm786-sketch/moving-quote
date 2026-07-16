@@ -1943,8 +1943,9 @@ select.field-input {
     opacity: 0;
   }
 }
-/* Hide floating chatbot bubble on mobile — accessible via "Chat with us" button instead.
-   Visible on desktop (matches the app's desktop breakpoint at 768px). */
+/* Hide only the floating bubble/teaser on mobile — keep the chat window itself
+   functional so "Chat with us" can still open it via JS. Bubble stays visible on desktop. */
 @media (max-width: 767px) {
-  #pz-chat-root { display: none !important; }
+  #pzToggleBtn { display: none !important; }
+  #pzTeaser { display: none !important; }
 }
