@@ -1005,11 +1005,43 @@ function initPickMap() {
       pickMapMarker.setPosition(e.latLng);
       reverseGeocodePick(e.latLng);
     });
+
+    const searchInput = document.getElementById("pickMapSearchInput");
+    if (searchInput) {
+      const autocomplete = new google.maps.places.Autocomplete(searchInput);
+      autocomplete.bindTo("bounds", pickMapInstance);
+      autocomplete.addListener("place_changed", () => {
+        const place = autocomplete.getPlace();
+        if (!place.geometry) { showToast("⚠️ Please select a place from the dropdown"); return; }
+        pickMapInstance.setCenter(place.geometry.location);
+        pickMapInstance.setZoom(16);
+        pickMapMarker.setPosition(place.geometry.location);
+        pickedLocationResult = place;
+        const addrEl = document.getElementById("pickMapAddress");
+        if (addrEl) addrEl.textContent = place.formatted_address || place.name;
+      });
+    }
+
     reverseGeocodePick(pickMapMarker.getPosition());
   } else {
     google.maps.event.trigger(pickMapInstance, "resize");
     pickMapInstance.setCenter(center);
     pickMapMarker.setPosition(center);
+  }
+}
+
+async function useCurrentLocationInPickMap() {
+  if (!isGoogleMapsReady()) { showToast("⚠️ Maps not ready yet."); return; }
+  showToast("📍 Getting your current location...");
+  try {
+    const coords = await getCurrentLocation();
+    const latLng = new google.maps.LatLng(coords.lat, coords.lng);
+    pickMapInstance.setCenter(latLng);
+    pickMapInstance.setZoom(16);
+    pickMapMarker.setPosition(latLng);
+    reverseGeocodePick(latLng);
+  } catch (err) {
+    showToast("⚠️ " + err.message);
   }
 }
 
