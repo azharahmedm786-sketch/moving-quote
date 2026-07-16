@@ -2628,8 +2628,8 @@ DASHBOARD TABS
 function closeDashboard() { document.getElementById("dashboardModal").style.display = "none"; }
 
 function switchDashTab(tab, el) {
-  ["dashQuotes","dashBookings","dashAddresses","dashInvoices","dashReviews","dashReferral","dashProfile","dashAdmin"].forEach(id => {
-    const panel = document.getElementById(id);
+["dashBookings","dashAddresses","dashReferral","dashProfile","dashAdmin"].forEach(id => {
+  const panel = document.getElementById(id);
     if (panel) panel.style.display = "none";
   });
   document.querySelectorAll(".dash-tab").forEach(t => t.classList.remove("active"));
@@ -2640,65 +2640,8 @@ function switchDashTab(tab, el) {
   if (tab === "bookings") loadUserBookings();
   if (tab === "profile") loadProfileData();
   if (tab === "addresses") loadUserAddresses();
-  if (tab === "invoices") loadUserInvoices();
-  if (tab === "reviews") loadUserReviews();
 }
-function loadUserQuotes() {
 
-    if (!currentUser || !window._firebase) return;
-
-    const list = document.getElementById("quotesList");
-
-    list.innerHTML = "Loading...";
-
-    window._firebase.db
-        .collection("quotes")
-        .where("uid", "==", currentUser.uid)
-        .orderBy("createdAt", "desc")
-        .limit(10)
-        .get()
-        .then(snap => {
-
-            if (snap.empty) {
-                list.innerHTML = "No saved quotes.";
-                return;
-            }
-
-            list.innerHTML = snap.docs.map(doc => {
-                const q = doc.data();
-
-                return `
-                <div class="quote-item">
-                    <div class="qi-route">
-                        📍 ${q.pickup || "-"} →
-                        🏁 ${q.drop || "-"}
-                    </div>
-
-                    <div class="qi-details">
-                        <span>${q.house || "-"}</span>
-                        <span>${q.vehicle || "-"}</span>
-                        <span class="qi-price">
-                            ₹${Number(q.total || 0).toLocaleString("en-IN")}
-                        </span>
-                    </div>
-
-                    <div class="qi-date">
-                        ${q.date || ""}
-                    </div>
-                </div>`;
-            }).join("");
-
-        })
-        .catch(err => {
-
-            console.error("Quotes Error", err);
-
-            list.innerHTML =
-                "<div class='empty-state'>Unable to load quotes.</div>";
-
-        });
-
-}
 function loadUserBookings() {
   if (!currentUser || !window._firebase) return;
   const list = document.getElementById("bookingsList");
