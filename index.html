@@ -694,12 +694,13 @@
               <span class="toggle-text">📱 Use my current location</span>
               <label class="toggle"><input type="checkbox" id="useCurrentLocation"><span class="slider"></span></label>
             </label>
-            <button type="button" class="date-more-btn" style="margin-top:0.5rem;width:100%;" onclick="openPickOnMapModal()">🗺️ Pick location on map</button>
+<button type="button" class="date-more-btn" style="margin-top:0.5rem;width:100%;" onclick="openPickOnMapModal('pickup')">🗺️ Pick pickup on map</button>
           </div>
-          <div class="field-group">
-            <label class="field-label"><span class="field-icon">🏁</span> Drop Location</label>
-            <input id="drop" aria-label="Drop address" aria-required="true" placeholder="Enter drop address" class="field-input" autocomplete="off">
-          </div>
+       <div class="field-group">
+  <label class="field-label"><span class="field-icon">🏁</span> Drop Location</label>
+  <input id="drop" aria-label="Drop address" aria-required="true" placeholder="Enter drop address" class="field-input" autocomplete="off">
+  <button type="button" class="date-more-btn" style="margin-top:0.5rem;width:100%;" onclick="openPickOnMapModal('drop')">🗺️ Pick drop on map</button>
+</div>
           <div id="map"></div>
           <div id="distanceInfo" class="distance-badge"></div>
           <div id="intercityBadge" class="intercity-badge" style="display:none">
@@ -959,7 +960,7 @@
 <div id="pickMapModal" class="modal-overlay" style="display:none;">
   <div class="modal-box" style="max-width:480px;">
     <button class="modal-x" onclick="closePickOnMapModal()">✕</button>
-    <h2 class="modal-title">📍 Pick Pickup Location</h2>
+<h2 class="modal-title" id="pickMapModalTitle">📍 Pick Location</h2>
     <p class="modal-sub">Search, drag the pin, or use your current location</p>
     <input id="pickMapSearchInput" class="field-input" placeholder="Search for a place" style="margin-bottom:10px;">
     <button type="button" class="date-more-btn" style="width:100%;margin-bottom:10px;" onclick="useCurrentLocationInPickMap()">📍 Use my current location</button>
