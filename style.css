@@ -1943,3 +1943,7 @@ select.field-input {
     opacity: 0;
   }
 }
+#pzchatbot-launcher, .pzchatbot-launcher,
+#pzchatbot-bubble, .pzchatbot-bubble,
+#pzchatbot-toggle, .pzchatbot-toggle,
+.pzchatbot-widget-button { display: none !important; }
