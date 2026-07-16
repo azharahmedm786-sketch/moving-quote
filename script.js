@@ -2487,7 +2487,7 @@ async function loadQuotes() {
     container.innerHTML = "";
  snapshot.forEach(doc => {
     const data = doc.data();
-
+    console.log(data);
     container.innerHTML += `
         <div style="
             padding:16px;
