@@ -319,11 +319,8 @@ function showToast(msg, dur = 3000) {
 }
 
 function openAIChatbot() {
-  const selectors = ['#pzchatbot-launcher', '.pzchatbot-launcher', '#pzchatbot-bubble', '.pzchatbot-bubble', '#pzchatbot-toggle', '.pzchatbot-toggle', '.pzchatbot-widget-button'];
-  for (const sel of selectors) {
-    const el = document.querySelector(sel);
-    if (el) { el.click(); return; }
-  }
+  const btn = document.getElementById("pzToggleBtn");
+  if (btn) { btn.click(); return; }
   showToast("⚠️ Chatbot not available right now.");
 }
 /* ============================================
