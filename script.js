@@ -2672,14 +2672,14 @@ ${showOtp ? `
 </div>
 ` : ""}
 
-${canReschedule ? ...
 ${canCancel?`<button class="bk-btn cancel" data-action="cancel" data-id="${id}" data-ref="${b.bookingRef||id}" data-status="${b.status||""}">✕ Cancel</button>`:""}
 ${canRate?`<button class="bk-btn rate" data-action="rate" data-id="${id}" data-ref="${b.bookingRef||id}" data-driver="${b.driverName||""}">⭐ Rate Driver</button>`:""}
 ${canClaim?`<button class="bk-btn claim" data-action="claim" data-id="${id}" data-ref="${b.bookingRef||id}">🔧 Report Damage</button>`:""}
 <button class="bk-btn invoice" onclick="downloadInvoice('${id}')" style="background:#0ea5e9;color:white;border:none;">📄 Invoice</button>
 <button class="bk-btn email" onclick="emailInvoice('${id}')" style="background:#0284c7;color:white;border:none;">✉️ Email</button>
 
-`:""} </div>`;
+`:""} 
+</div>`;
       }).join("");
       attachBookingButtonListeners();
     }).catch(() => {});
