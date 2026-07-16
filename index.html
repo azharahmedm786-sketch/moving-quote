@@ -159,7 +159,6 @@
   <div class="dropdown-divider"></div>
   <a href="#" onclick="openDashboard();closeUserMenu()"><span>📋</span> My Bookings</a>
   <a href="#" onclick="openTrackingModal();closeUserMenu()"><span>📍</span> Track My Move</a>
-  <a href="#" onclick="openChatModal();closeUserMenu()"><span>💬</span> Chat with Driver</a>
   <a href="#" onclick="openChecklist();closeUserMenu()"><span>✅</span> Moving Checklist</a>
   <a href="#" onclick="openProfile();closeUserMenu()"><span>👤</span> Edit Profile</a>
   <a href="admin.html" id="adminNavLink" style="display:none"><span>🔐</span> Admin Panel</a>
@@ -690,7 +689,11 @@
           <div class="field-group">
             <label class="field-label"><span class="field-icon">📍</span> Pickup Location</label>
             <input id="pickup" aria-label="Pickup address" aria-required="true" placeholder="Enter pickup address" class="field-input" autocomplete="off">
-        <button type="button" class="date-more-btn" style="margin-top:0.5rem;width:100%;" onclick="openPickOnMapModal()">🗺️ Pick location on map</button>
+<label class="toggle-row">
+              <span class="toggle-text">📱 Use my current location</span>
+              <label class="toggle"><input type="checkbox" id="useCurrentLocation"><span class="slider"></span></label>
+            </label>
+            <button type="button" class="date-more-btn" style="margin-top:0.5rem;width:100%;" onclick="openPickOnMapModal()">🗺️ Pick location on map</button>
           </div>
           <div class="field-group">
             <label class="field-label"><span class="field-icon">🏁</span> Drop Location</label>
@@ -956,7 +959,9 @@
   <div class="modal-box" style="max-width:480px;">
     <button class="modal-x" onclick="closePickOnMapModal()">✕</button>
     <h2 class="modal-title">📍 Pick Pickup Location</h2>
-    <p class="modal-sub">Drag the pin or tap the map to set your pickup point</p>
+    <p class="modal-sub">Search, drag the pin, or use your current location</p>
+    <input id="pickMapSearchInput" class="field-input" placeholder="Search for a place" style="margin-bottom:10px;">
+    <button type="button" class="date-more-btn" style="width:100%;margin-bottom:10px;" onclick="useCurrentLocationInPickMap()">📍 Use my current location</button>
     <div id="pickMapDiv" style="width:100%;height:320px;border-radius:12px;overflow:hidden;border:1.5px solid var(--border-light);"></div>
     <div id="pickMapAddress" style="margin-top:12px;font-size:0.85rem;color:var(--text-secondary);text-align:center;min-height:20px;"></div>
     <button class="btn-auth" onclick="confirmPickedLocation()" style="margin-top:16px;">✅ Use This Location</button>
