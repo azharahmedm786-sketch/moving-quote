@@ -167,40 +167,7 @@
   <a href="#" onclick="signOutUser()" class="dropdown-signout"><span>🚪</span> Sign Out</a>
 </div>
 
-<!-- TRACK ORDER BANNER (keep existing ID) -->
-<div id="trackOrderBanner" style="display:none;">
-  <div class="tob-inner">
-    <div class="tob-top">
-      <div class="tob-pulse"></div>
-      <div class="tob-text">
-        <div class="tob-title"> Active Booking</div>
-        <div class="tob-id">ID: <strong id="tobBookingId">—</strong> · <span id="tobStatusLabel" class="tob-status-label">Confirmed</span></div>
-      </div>
-      <div class="tob-top-actions">
-        <button class="tob-btn-track" onclick="openTrackingOrLogin()">Track →</button>
-        <button class="tob-dismiss" onclick="dismissTrackBanner()">✕</button>
-      </div>
-    </div>
-    <div class="tob-progress-bar"><div class="tob-progress-fill" id="tobProgressFill"></div></div>
-    <div class="tob-steps">
-      <div class="tob-step active" id="tobs0"><div class="tob-step-dot"><span>✓</span></div><div class="tob-step-line"></div><div class="tob-step-label">Booked</div></div>
-      <div class="tob-step" id="tobs1"><div class="tob-step-dot"><span> </span></div><div class="tob-step-line"></div><div class="tob-step-label">Assigned</div></div>
-      <div class="tob-step" id="tobs2"><div class="tob-step-dot"><span></span></div><div class="tob-step-line"></div><div class="tob-step-label">Packing</div></div>
-      <div class="tob-step" id="tobs3"><div class="tob-step-dot"><span>🚚</span></div><div class="tob-step-line"></div><div class="tob-step-label">Transit</div></div>
-      <div class="tob-step" id="tobs4"><div class="tob-step-dot"><span>🎉</span></div><div class="tob-step-label">Delivered</div></div>
-    </div>
-    <div class="tob-driver" id="tobDriverRow" style="display:none;">
-      <span class="tob-driver-icon">🚚</span>
-      <span id="tobDriverName">Driver assigned</span>
-      <a id="tobDriverPhone" href="#" class="tob-driver-call">Call Driver</a>
-    </div>
-  </div>
-</div>
-<div id="tobOtpRow" style="display:none; margin-top:10px; padding:12px; background:#f0fff4; border:2px dashed #16a34a; border-radius:10px; text-align:center;">
-  <div style="font-size:12px; color:#666;">Delivery OTP</div>
-  <div id="tobOtpValue" style="font-size:28px; font-weight:bold; letter-spacing:6px; color:#16a34a;"></div>
-  <div style="font-size:12px; color:#666;">Give this to the driver only after delivery.</div>
-</div>
+
 <!-- ═══════════════════════════════════════════
      MAIN APP CONTENT
 ═══════════════════════════════════════════ -->
@@ -314,7 +281,73 @@
         <div class="offer-right"> </div>
       </div>
     </div>
+<!-- TRACK ORDER BANNER (keep existing ID) -->
 
+<div id="trackOrderBanner" style="display:none;">
+
+  <div class="tob-inner">
+
+    <div class="tob-top">
+
+      <div class="tob-pulse"></div>
+
+      <div class="tob-text">
+
+        <div class="tob-title"> Active Booking</div>
+
+        <div class="tob-id">ID: <strong id="tobBookingId">—</strong> · <span id="tobStatusLabel" class="tob-status-label">Confirmed</span></div>
+
+      </div>
+
+      <div class="tob-top-actions">
+
+        <button class="tob-btn-track" onclick="openTrackingOrLogin()">Track →</button>
+
+        <button class="tob-dismiss" onclick="dismissTrackBanner()">✕</button>
+
+      </div>
+
+    </div>
+
+    <div class="tob-progress-bar"><div class="tob-progress-fill" id="tobProgressFill"></div></div>
+
+    <div class="tob-steps">
+
+      <div class="tob-step active" id="tobs0"><div class="tob-step-dot"><span>✓</span></div><div class="tob-step-line"></div><div class="tob-step-label">Booked</div></div>
+
+      <div class="tob-step" id="tobs1"><div class="tob-step-dot"><span> </span></div><div class="tob-step-line"></div><div class="tob-step-label">Assigned</div></div>
+
+      <div class="tob-step" id="tobs2"><div class="tob-step-dot"><span></span></div><div class="tob-step-line"></div><div class="tob-step-label">Packing</div></div>
+
+      <div class="tob-step" id="tobs3"><div class="tob-step-dot"><span>🚚</span></div><div class="tob-step-line"></div><div class="tob-step-label">Transit</div></div>
+
+      <div class="tob-step" id="tobs4"><div class="tob-step-dot"><span>🎉</span></div><div class="tob-step-label">Delivered</div></div>
+
+    </div>
+
+    <div class="tob-driver" id="tobDriverRow" style="display:none;">
+
+      <span class="tob-driver-icon">🚚</span>
+
+      <span id="tobDriverName">Driver assigned</span>
+
+      <a id="tobDriverPhone" href="#" class="tob-driver-call">Call Driver</a>
+
+    </div>
+
+  </div>
+
+</div>
+
+<div id="tobOtpRow" style="display:none; margin-top:10px; padding:12px; background:#f0fff4; border:2px dashed #16a34a; border-radius:10px; text-align:center;">
+
+  <div style="font-size:12px; color:#666;">Delivery OTP</div>
+
+  <div id="tobOtpValue" style="font-size:28px; font-weight:bold; letter-spacing:6px; color:#16a34a;"></div>
+
+  <div style="font-size:12px; color:#666;">Give this to the driver only after delivery.</div>
+
+</div>
     <!-- Why Us Cards -->
     <div class="home-section">
       <div class="section-label">Trust & Safety</div>
