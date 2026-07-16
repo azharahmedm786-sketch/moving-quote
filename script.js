@@ -304,10 +304,32 @@ function showToast(msg, dur = 3000) {
   clearTimeout(t._hideTimer);
   t._hideTimer = setTimeout(() => t.classList.remove("show"), dur);
 }
+function showToast(msg, dur = 3000) {
+  let t = document.getElementById("toastMsg");
+  if (!t) {
+    t = document.createElement("div");
+    t.id = "toastMsg";
+    t.className = "toast-msg";
+    document.body.appendChild(t);
+  }
+  t.textContent = msg;
+  t.classList.add("show");
+  clearTimeout(t._hideTimer);
+  t._hideTimer = setTimeout(() => t.classList.remove("show"), dur);
+}
 
+function openAIChatbot() {
+  const selectors = ['#pzchatbot-launcher', '.pzchatbot-launcher', '#pzchatbot-bubble', '.pzchatbot-bubble', '#pzchatbot-toggle', '.pzchatbot-toggle', '.pzchatbot-widget-button'];
+  for (const sel of selectors) {
+    const el = document.querySelector(sel);
+    if (el) { el.click(); return; }
+  }
+  showToast("⚠️ Chatbot not available right now.");
+}
 /* ============================================
 MOVE TYPE SELECTION
 ============================================ */
+
 function selectMoveType(el, type) {
   selectedMoveType = type;
   document.querySelectorAll(".move-type-card").forEach(card => card.classList.remove("selected"));
