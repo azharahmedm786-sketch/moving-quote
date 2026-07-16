@@ -468,7 +468,7 @@
 <!-- CHAT & FAQ -->
     <div class="home-section" id="faq">
       <div class="section-label">Help &amp; Support</div>
-      <button class="offer-btn" style="width:100%;justify-content:center;display:flex;margin-bottom:14px;" onclick="openChatModal()">💬 Chat with us</button>
+<button class="offer-btn" style="width:100%;justify-content:center;display:flex;margin-bottom:14px;" onclick="openAIChatbot()">Need more help? 💬 Chat with us</button>
       <div class="faq-app-list faq-list">
         <div class="faq-item">
           <button class="faq-q" onclick="toggleFaq(this)">How early should I book?<span class="faq-arrow">▾</span></button>
@@ -1524,6 +1524,7 @@ if ('serviceWorker' in navigator) {
   });
 }
 </script>
-
+<link rel="stylesheet" href="pzchatbot.css">
+<script src="pzchatbot.js" defer></script>
 </body>
 </html>
