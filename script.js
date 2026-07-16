@@ -1853,14 +1853,6 @@ function openTrackingModal() {
   loadTrackingData();
 }
 
-function minimizeTrackingModal() {
-  trackingMinimized = true;
-
-  document
-    .getElementById("trackingModal")
-    .classList.add("tracking-minimized");
-}
-
 function closeTrackingModal() {
   trackingMinimized = false;
 
