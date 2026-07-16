@@ -958,7 +958,64 @@ async function handleCurrentLocationToggle() {
     if (toggleLabel) toggleLabel.textContent = originalText;
   }
 }
+let pickMapInstance = null;
+let pickMapMarker = null;
+let pickedLocationResult = null;
 
+function openPickOnMapModal() {
+  document.getElementById("pickMapModal").style.display = "flex";
+  setTimeout(initPickMap, 100);
+}
+
+function closePickOnMapModal() {
+  document.getElementById("pickMapModal").style.display = "none";
+}
+
+function initPickMap() {
+  if (typeof google === "undefined" || !google.maps) { showToast("⚠️ Maps not ready yet."); return; }
+  const center = pickupPlace?.geometry?.location || { lat: 12.9716, lng: 77.5946 };
+  const mapDiv = document.getElementById("pickMapDiv");
+  if (!pickMapInstance) {
+    pickMapInstance = new google.maps.Map(mapDiv, { center, zoom: 14 });
+    pickMapMarker = new google.maps.Marker({ position: center, map: pickMapInstance, draggable: true });
+    pickMapMarker.addListener("dragend", () => reverseGeocodePick(pickMapMarker.getPosition()));
+    pickMapInstance.addListener("click", (e) => {
+      pickMapMarker.setPosition(e.latLng);
+      reverseGeocodePick(e.latLng);
+    });
+    reverseGeocodePick(pickMapMarker.getPosition());
+  } else {
+    google.maps.event.trigger(pickMapInstance, "resize");
+    pickMapInstance.setCenter(center);
+    pickMapMarker.setPosition(center);
+  }
+}
+
+function reverseGeocodePick(latLng) {
+  const geocoder = new google.maps.Geocoder();
+  geocoder.geocode({ location: latLng }, (results, status) => {
+    const addrEl = document.getElementById("pickMapAddress");
+    if (status === "OK" && results[0]) {
+      pickedLocationResult = results[0];
+      if (addrEl) addrEl.textContent = results[0].formatted_address;
+    } else if (addrEl) {
+      addrEl.textContent = "Could not find address for this point.";
+    }
+  });
+}
+
+function confirmPickedLocation() {
+  if (!pickedLocationResult) { showToast("⚠️ Please select a point on the map."); return; }
+  const pickupInput = document.getElementById("pickup");
+  if (pickupInput) {
+    pickupInput.value = pickedLocationResult.formatted_address;
+    pickupPlace = pickedLocationResult;
+    showLocation("pickup");
+    calculateQuote(true);
+    showToast(`✅ Location set: ${pickedLocationResult.formatted_address.split(",")[0]}`);
+  }
+  closePickOnMapModal();
+}
 function setupCurrentLocationListener() {
   const toggle = document.getElementById("useCurrentLocation");
   if (!toggle) return;
