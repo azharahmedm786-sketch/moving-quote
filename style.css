@@ -1419,7 +1419,8 @@ select.field-input {
 /* ════════════════════════════════════════════
    TRACK ORDER BANNER
 ════════════════════════════════════════════ */
-#trackOrderBanner { margin: calc(var(--app-bar-h) + var(--safe-top) + 0.5rem) 1rem 0.5rem; }
+#trackOrderBanner { margin: 0.5rem 1rem 1.25rem; }
+
 
 .tob-inner {
   background: linear-gradient(135deg, var(--navy-900), var(--navy-800));
