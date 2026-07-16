@@ -6,7 +6,7 @@ Pricing Engine: v2.0 (pricing-engine-v2.js)
 
 // ─── GLOBAL STATE ───────────────────────────────────
 let pickupPlace = null, dropPlace = null;
-let map = null, directionsService = null, directionsRenderer = null;
+let map = null, directionsService = null, directionsRenderer = null; 
 let pickupMarker = null, dropMarker = null;
 let lastCalculatedTotal = 0;
 let paymentReceiptId = "";
