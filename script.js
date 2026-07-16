@@ -2485,10 +2485,30 @@ async function loadQuotes() {
     const snapshot = await db.collection("quotes").where("uid", "==", currentUser.uid).orderBy("createdAt", "desc").get();
     if (snapshot.empty) { container.innerHTML = `<div style="opacity:0.7;text-align:center;padding:20px;">No quotes found yet 🚚</div>`; return; }
     container.innerHTML = "";
-    snapshot.forEach(doc => {
-      const data = doc.data();
-      container.innerHTML += `<div style="padding:12px;margin-bottom:12px;border:1px solid #333;border-radius:10px;background:#0f172a;"></div>`;
-    });
+ snapshot.forEach(doc => {
+    const data = doc.data();
+
+    container.innerHTML += `
+        <div style="
+            padding:16px;
+            margin-bottom:12px;
+            border:1px solid #333;
+            border-radius:10px;
+            background:#0f172a;
+            color:white;
+        ">
+            <h3>Quote ID: ${doc.id}</h3>
+
+            <p><strong>Pickup:</strong> ${data.pickup || "N/A"}</p>
+
+            <p><strong>Drop:</strong> ${data.drop || "N/A"}</p>
+
+            <p><strong>Price:</strong> ₹${data.price || 0}</p>
+
+            <p><strong>Status:</strong> ${data.status || "Pending"}</p>
+        </div>
+    `;
+});
   } catch (error) { container.innerHTML = "❌ Failed to load quotes"; }
 }
 
