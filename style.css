@@ -1943,7 +1943,8 @@ select.field-input {
     opacity: 0;
   }
 }
-#pzchatbot-launcher, .pzchatbot-launcher,
-#pzchatbot-bubble, .pzchatbot-bubble,
-#pzchatbot-toggle, .pzchatbot-toggle,
-.pzchatbot-widget-button { display: none !important; }
+/* Hide floating chatbot bubble on mobile — accessible via "Chat with us" button instead.
+   Visible on desktop (matches the app's desktop breakpoint at 768px). */
+@media (max-width: 767px) {
+  #pz-chat-root { display: none !important; }
+}
