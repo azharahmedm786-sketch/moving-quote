@@ -1537,13 +1537,15 @@ function renderAdvisorStats() {
 
   const stats = {};
   advisorBookings.forEach(b => {
-    const key = b.createdByAdvisor || "unknown";
-    if (!stats[key]) {
-      stats[key] = {
-        name: b.createdByAdvisorName || b.createdByAdvisorEmail || "Unknown Advisor",
-        count: 0, revenue: 0, delivered: 0, cancelled: 0
-      };
-    }
+ const key = b.createdByAdvisor || "unknown";
+if (!stats[key]) {
+  stats[key] = {
+    name: b.createdByAdvisorName
+      || b.createdByAdvisorEmail
+      || (b.createdByAdvisor ? "Advisor #" + b.createdByAdvisor.slice(-6).toUpperCase() : "Legacy Booking (no advisor recorded)"),
+    count: 0, revenue: 0, delivered: 0, cancelled: 0
+  };
+}
     stats[key].count++;
     stats[key].revenue += b.total || 0;
     if (b.status === "delivered") stats[key].delivered++;
