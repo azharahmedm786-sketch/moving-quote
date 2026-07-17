@@ -483,8 +483,9 @@ async function nbSaveBooking() {
   if (!date) return setErr("⚠️ Moving date is required.");
   if (!timeVal) return setErr("⚠️ Select a time slot.");
   if (nbMoveType !== "single" && nbLastKm <= 100 && nbVehicleHtml === "0") return setErr("⚠️ Select a vehicle.");
-  if (!nbLastQuote || !nbLastQuote.valid) return setErr("⚠️ Waiting on price calculation — try again in a moment.");
-  if (!window._firebase) return setErr("⚠️ Not connected to Firebase.");
+if (!nbLastQuote || !nbLastQuote.valid) return setErr("⚠️ Waiting on price calculation — try again in a moment.");
+if (!advisorUser || !advisorUser.uid) return setErr("⚠️ Advisor session not detected — please refresh the page and log in again before saving.");
+if (!window._firebase) return setErr("⚠️ Not connected to Firebase.");
 
   const driverUid = document.getElementById("nbDriver")?.value || "";
   const driver = driverUid ? (allDrivers || []).find(d => d.id === driverUid) : null;
