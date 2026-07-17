@@ -349,8 +349,7 @@ function nbCalc() {
     const dateVal = document.getElementById("nbDate")?.value || null;
     const timeVal = document.getElementById("nbTime")?.value || "";
     const shiftHour = timeVal ? parseInt(timeVal.split(":")[0], 10) : null;
-
-    const raw = {
+const raw = {
       pickup, drop, km,
       houseValue: nbHouseValue,
       vehicleHtmlValue: nbVehicleHtml,
@@ -359,12 +358,17 @@ function nbCalc() {
       pickupFloor: parseInt(document.getElementById("nbPickupFloor")?.value || "0", 10),
       dropFloor: parseInt(document.getElementById("nbDropFloor")?.value || "0", 10),
       liftAvailable: !!document.getElementById("nbLift")?.checked,
+      packingService: !!document.getElementById("nbPacking")?.checked,
+      unpackingService: !!document.getElementById("nbUnpacking")?.checked,
+      dismantlingService: !!document.getElementById("nbDismantle")?.checked,
+      assemblyService: !!document.getElementById("nbAssembly")?.checked,
+      storageNeeded: !!document.getElementById("nbStorage")?.checked,
+      storageDays: parseInt(document.getElementById("nbStorageDays")?.value || "0", 10),
       moveType: nbMoveType || "home",
       shiftDate: dateVal,
       shiftHour,
       promoDiscount: nbPromoAmount
     };
-
     const quote = window.PackZenPricing.calculateQuote(raw);
     nbLastQuote = quote;
     nbRenderQuote(quote);
@@ -414,8 +418,13 @@ function nbRenderQuote(quote) {
   if (b.distanceCharge > 0) rows.push(`<div class="nb-summary-line"><span>Distance</span><strong>₹${b.distanceCharge.toLocaleString("en-IN")}</strong></div>`);
   if (b.furnitureCharge > 0) rows.push(`<div class="nb-summary-line"><span>Furniture</span><strong>₹${b.furnitureCharge.toLocaleString("en-IN")}</strong></div>`);
   if (b.cartonCharge > 0) rows.push(`<div class="nb-summary-line"><span>Cartons</span><strong>₹${b.cartonCharge.toLocaleString("en-IN")}</strong></div>`);
-  if (b.floorCharge > 0) rows.push(`<div class="nb-summary-line"><span>Floor Charge</span><strong>₹${b.floorCharge.toLocaleString("en-IN")}</strong></div>`);
-  if (b.discount > 0) rows.push(`<div class="nb-summary-line"><span>Discount</span><strong style="color:var(--green)">−₹${b.discount.toLocaleString("en-IN")}</strong></div>`);
+if (b.floorCharge > 0) rows.push(`<div class="nb-summary-line"><span>Floor Charge</span><strong>₹${b.floorCharge.toLocaleString("en-IN")}</strong></div>`);
+  if (b.packingCharge > 0) rows.push(`<div class="nb-summary-line"><span>Packing</span><strong>₹${b.packingCharge.toLocaleString("en-IN")}</strong></div>`);
+  if (b.unpackingCharge > 0) rows.push(`<div class="nb-summary-line"><span>Unpacking</span><strong>₹${b.unpackingCharge.toLocaleString("en-IN")}</strong></div>`);
+  if (b.dismantlingCharge > 0) rows.push(`<div class="nb-summary-line"><span>Dismantling</span><strong>₹${b.dismantlingCharge.toLocaleString("en-IN")}</strong></div>`);
+  if (b.assemblyCharge > 0) rows.push(`<div class="nb-summary-line"><span>Assembly</span><strong>₹${b.assemblyCharge.toLocaleString("en-IN")}</strong></div>`);
+  if (b.storageCharge > 0) rows.push(`<div class="nb-summary-line"><span>Storage</span><strong>₹${b.storageCharge.toLocaleString("en-IN")}</strong></div>`);
+   if (b.discount > 0) rows.push(`<div class="nb-summary-line"><span>Discount</span><strong style="color:var(--green)">−₹${b.discount.toLocaleString("en-IN")}</strong></div>`);
   linesEl.innerHTML = rows.join("");
   totalEl.textContent = "₹" + b.grandTotal.toLocaleString("en-IN");
 }
@@ -541,8 +550,9 @@ if (!window._firebase) return setErr("⚠️ Not connected to Firebase.");
     unpackingService: !!document.getElementById("nbUnpacking")?.checked,
     dismantling: !!document.getElementById("nbDismantle")?.checked,
     assembly: !!document.getElementById("nbAssembly")?.checked,
-    storageNeeded: !!document.getElementById("nbStorage")?.checked,
-    remarks: document.getElementById("nbRemarks")?.value.trim() || "",
+storageNeeded: !!document.getElementById("nbStorage")?.checked,
+    storageDays: parseInt(document.getElementById("nbStorageDays")?.value || "0", 10),
+     remarks: document.getElementById("nbRemarks")?.value.trim() || "",
     fragileItems: document.getElementById("nbFragile")?.value.trim() || "",
     specialItems: document.getElementById("nbSpecial")?.value.trim() || "",
     total: grandTotal,
@@ -577,8 +587,8 @@ if (!window._firebase) return setErr("⚠️ Not connected to Firebase.");
 }
 
 function nbResetForm() {
-  ["nbName","nbPhone","nbAltPhone","nbEmail","nbPickup","nbDrop","nbDate","nbRemarks","nbFragile","nbSpecial","nbCoupon"].forEach(id => {
-    const el = document.getElementById(id); if (el) el.value = "";
+  ["nbName","nbPhone","nbAltPhone","nbEmail","nbPickup","nbDrop","nbDate","nbRemarks","nbFragile","nbSpecial","nbCoupon","nbStorageDays"].forEach(id => {
+     const el = document.getElementById(id); if (el) el.value = "";
   });
   document.getElementById("nbCartonQty") && (document.getElementById("nbCartonQty").value = "0");
   document.querySelectorAll(".nb-type-card, .nb-select-card, .nb-furn-card.active").forEach(c => c.classList.remove("selected", "active"));
