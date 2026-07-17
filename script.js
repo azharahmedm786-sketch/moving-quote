@@ -340,6 +340,9 @@ function selectMoveType(el, type) {
 /* ============================================
 SIZE CARDS RENDERER
 ============================================ */
+/* ============================================
+SIZE CARDS RENDERER (FIXED)
+============================================ */
 function renderSizeCards(type) {
   console.log("renderSizeCards", type);
   const container = document.getElementById("houseCards");
@@ -360,16 +363,15 @@ function renderSizeCards(type) {
     card.className = "select-card";
     card.dataset.value = s.value;
     card.innerHTML = `<div class="sc-icon">${s.icon}</div><div class="sc-label">${s.label}</div><div class="sc-sub">${s.sub}</div>`;
- card.addEventListener("click", () => {
-    container.querySelectorAll(".select-card").forEach(c => c.classList.remove("selected"));
-    card.classList.add("selected");
+    
+    card.addEventListener("click", () => {
+      container.querySelectorAll(".select-card").forEach(c => c.classList.remove("selected"));
+      card.classList.add("selected");
+      if (select) select.value = s.value;
+      recommendVehicle(type, s.label);
+      calculateQuote(true);
+    });
 
-    if (select) select.value = s.value;
-
-    recommendVehicle(type, s.label);
-
-    calculateQuote(true);
-});
     container.appendChild(card);
 
     if (select) {
@@ -380,7 +382,6 @@ function renderSizeCards(type) {
     }
   });
 }
-
 /* ============================================
 FURNITURE QUANTITY
 ============================================ */
@@ -2937,25 +2938,25 @@ function loadUserReviews() {
 .catch(err => {
     console.error("Error loading reviews:", err);
 
-    if (err.code === "failed-precondition") {
-        list.innerHTML =
-            '<div class="dash-empty">Firestore index is missing.</div>';
-        return;
-    }
+        if (err.code === "failed-precondition") {
+            list.innerHTML =
+                '<div class="dash-empty">Firestore index is missing.</div>';
+            return;
+        }
 
-    if (err.code === "permission-denied") {
-        list.innerHTML =
-            '<div class="dash-empty">Permission denied.</div>';
-        return;
-    }
+        if (err.code === "permission-denied") {
+            list.innerHTML =
+                '<div class="dash-empty">Permission denied.</div>';
+            return;
+        }
 
-    list.innerHTML =
-        `<div class="dash-empty">
-            Error loading reviews.<br>
-            ${escapeHTML(err.message)}
-        </div>`;
-});
-       }
+        list.innerHTML =
+            `<div class="dash-empty">
+                Error loading reviews.<br>
+                ${escapeHTML(err.message)}
+            </div>`;
+    });
+}
 function loadProfileData() {
   if (!currentUser || !window._firebase) return;
   window._firebase.db.collection("users").doc(currentUser.uid).get().then(doc => {
