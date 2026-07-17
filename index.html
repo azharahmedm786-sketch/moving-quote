@@ -832,7 +832,46 @@
       <div class="form-step">
         <div class="step-body">
           <p class="step-hint">Select items you're moving. Kitchen & other items: <strong>free</strong>. Carton boxes: <strong>₹50 each</strong>.</p>
-          <div class="furniture-grid"></div>
+<div class="furniture-grid"></div>
+
+          <div class="field-group" style="margin-top:1rem">
+            <label class="field-label"><span class="field-icon">🧰</span> Additional Services</label>
+            <label class="toggle-row">
+              <span class="toggle-text">📦 Packing service</span>
+              <label class="toggle"><input type="checkbox" id="packingService"><span class="slider"></span></label>
+            </label>
+            <label class="toggle-row">
+              <span class="toggle-text">📤 Unpacking service</span>
+              <label class="toggle"><input type="checkbox" id="unpackingService"><span class="slider"></span></label>
+            </label>
+            <label class="toggle-row">
+              <span class="toggle-text">🔧 Dismantling</span>
+              <label class="toggle"><input type="checkbox" id="dismantlingService"><span class="slider"></span></label>
+            </label>
+            <label class="toggle-row">
+              <span class="toggle-text">🔩 Assembly</span>
+              <label class="toggle"><input type="checkbox" id="assemblyService"><span class="slider"></span></label>
+            </label>
+            <label class="toggle-row">
+              <span class="toggle-text">🏬 Storage needed</span>
+              <label class="toggle"><input type="checkbox" id="storageService"><span class="slider"></span></label>
+            </label>
+          </div>
+
+          <div class="field-group">
+            <label class="field-label"><span class="field-icon">⚠️</span> Fragile Items <span style="font-weight:400;color:var(--text-muted)">(optional)</span></label>
+            <input id="custFragileItems" class="field-input" placeholder="e.g. TV, glassware">
+          </div>
+
+          <div class="field-group">
+            <label class="field-label"><span class="field-icon">💎</span> Special Items <span style="font-weight:400;color:var(--text-muted)">(optional)</span></label>
+            <input id="custSpecialItems" class="field-input" placeholder="e.g. Piano, safe">
+          </div>
+
+          <div class="field-group">
+            <label class="field-label"><span class="field-icon">📝</span> Remarks / Notes for Crew <span style="font-weight:400;color:var(--text-muted)">(optional)</span></label>
+            <textarea id="custRemarks" class="field-input" rows="2" placeholder="Any additional notes for the crew"></textarea>
+          </div>
           <div class="photo-upload-section">
             <label class="field-label"><span class="field-icon">📸</span> Upload Item Photos <span style="font-weight:400;color:var(--text-muted)">(optional)</span></label>
             <div class="photo-upload-area" onclick="document.getElementById('itemPhotos').click()">
@@ -865,9 +904,13 @@
               <input id="custPhone" aria-label="Mobile phone number" aria-required="true" placeholder="Mobile number" class="field-input" type="tel">
             </div>
           </div>
-          <div class="field-group">
+       <div class="field-group">
             <label class="field-label"><span class="field-icon">✉️</span> Email Address</label>
             <input id="custEmail" aria-label="Email address" aria-required="true" placeholder="Email address" class="field-input" type="email">
+          </div>
+          <div class="field-group">
+            <label class="field-label"><span class="field-icon">📱</span> Alternate Phone <span style="font-weight:400;color:var(--text-muted)">(optional)</span></label>
+            <input id="custAltPhone" aria-label="Alternate phone number" placeholder="Optional alternate number" class="field-input" type="tel" maxlength="10">
           </div>
           <div class="price-box">
             <div class="price-box-top">
