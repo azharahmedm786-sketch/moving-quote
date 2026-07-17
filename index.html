@@ -836,26 +836,30 @@
 
           <div class="field-group" style="margin-top:1rem">
             <label class="field-label"><span class="field-icon">🧰</span> Additional Services</label>
-            <label class="toggle-row">
+          <label class="toggle-row">
               <span class="toggle-text">📦 Packing service</span>
-              <label class="toggle"><input type="checkbox" id="packingService"><span class="slider"></span></label>
+              <label class="toggle"><input type="checkbox" id="packingService" onchange="calculateQuote(true)"><span class="slider"></span></label>
             </label>
             <label class="toggle-row">
               <span class="toggle-text">📤 Unpacking service</span>
-              <label class="toggle"><input type="checkbox" id="unpackingService"><span class="slider"></span></label>
+              <label class="toggle"><input type="checkbox" id="unpackingService" onchange="calculateQuote(true)"><span class="slider"></span></label>
             </label>
             <label class="toggle-row">
               <span class="toggle-text">🔧 Dismantling</span>
-              <label class="toggle"><input type="checkbox" id="dismantlingService"><span class="slider"></span></label>
+              <label class="toggle"><input type="checkbox" id="dismantlingService" onchange="calculateQuote(true)"><span class="slider"></span></label>
             </label>
             <label class="toggle-row">
               <span class="toggle-text">🔩 Assembly</span>
-              <label class="toggle"><input type="checkbox" id="assemblyService"><span class="slider"></span></label>
+              <label class="toggle"><input type="checkbox" id="assemblyService" onchange="calculateQuote(true)"><span class="slider"></span></label>
             </label>
-            <label class="toggle-row">
+           <label class="toggle-row">
               <span class="toggle-text">🏬 Storage needed</span>
-              <label class="toggle"><input type="checkbox" id="storageService"><span class="slider"></span></label>
+              <label class="toggle"><input type="checkbox" id="storageService" onchange="calculateQuote(true)"><span class="slider"></span></label>
             </label>
+            <div class="field-group" style="margin-top:.5rem">
+              <label class="field-label" style="font-weight:400">Storage Duration (days)</label>
+              <input id="storageDays" type="number" min="0" max="90" value="0" class="field-input" oninput="calculateQuote(true)">
+            </div>
           </div>
 
           <div class="field-group">
