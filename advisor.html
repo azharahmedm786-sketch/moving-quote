@@ -1126,12 +1126,13 @@ function buildShell() {
               </div>
             </div>
             <div class="nb-toggle-row"><span>🛗 Lift available (50% off floor charge)</span><label class="nb-switch"><input type="checkbox" id="nbLift" onchange="nbCalc()"><span class="sldr"></span></label></div>
-            <div class="nb-toggle-row"><span>📦 Packing service</span><label class="nb-switch"><input type="checkbox" id="nbPacking" onchange="nbCalc()"><span class="sldr"></span></label></div>
-            <div class="nb-toggle-row"><span>📤 Unpacking service</span><label class="nb-switch"><input type="checkbox" id="nbUnpacking"><span class="sldr"></span></label></div>
-            <div class="nb-toggle-row"><span>🔧 Dismantling</span><label class="nb-switch"><input type="checkbox" id="nbDismantle"><span class="sldr"></span></label></div>
-            <div class="nb-toggle-row"><span>🔩 Assembly</span><label class="nb-switch"><input type="checkbox" id="nbAssembly"><span class="sldr"></span></label></div>
-            <div class="nb-toggle-row"><span>🏬 Storage needed</span><label class="nb-switch"><input type="checkbox" id="nbStorage"><span class="sldr"></span></label></div>
-            <div class="nb-toggle-row"><span>🛡️ Insurance (included on every move)</span><label class="nb-switch"><input type="checkbox" id="nbInsurance" checked disabled><span class="sldr"></span></label></div>
+<div class="nb-toggle-row"><span>📦 Packing service</span><label class="nb-switch"><input type="checkbox" id="nbPacking" onchange="nbCalc()"><span class="sldr"></span></label></div>
+<div class="nb-toggle-row"><span>📤 Unpacking service</span><label class="nb-switch"><input type="checkbox" id="nbUnpacking" onchange="nbCalc()"><span class="sldr"></span></label></div>
+<div class="nb-toggle-row"><span>🔧 Dismantling</span><label class="nb-switch"><input type="checkbox" id="nbDismantle" onchange="nbCalc()"><span class="sldr"></span></label></div>
+<div class="nb-toggle-row"><span>🔩 Assembly</span><label class="nb-switch"><input type="checkbox" id="nbAssembly" onchange="nbCalc()"><span class="sldr"></span></label></div>
+<div class="nb-toggle-row"><span>🏬 Storage needed</span><label class="nb-switch"><input type="checkbox" id="nbStorage" onchange="nbCalc()"><span class="sldr"></span></label></div>
+<div class="nb-field" style="margin-top:8px"><label>Storage Duration (days)</label><input id="nbStorageDays" type="number" min="0" max="90" value="0" onchange="nbCalc()"></div>
+<div class="nb-toggle-row"><span>🛡️ Insurance (included on every move)</span><label class="nb-switch"><input type="checkbox" id="nbInsurance" checked disabled><span class="sldr"></span></label></div>
           </div>
 
           <div class="nb-card">
