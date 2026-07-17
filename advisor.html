@@ -906,6 +906,7 @@ function buildShell() {
     <div class="nav-item" onclick="showSection('bookings',this)"><span class="nav-icon">📦</span> All Bookings</div>
     <div class="nav-item" onclick="showSection('customers',this)"><span class="nav-icon">👥</span> Customers</div>
     <div class="nav-item" onclick="showSection('drivers',this)"><span class="nav-icon">🚚</span> Drivers</div>
+    <div class="nav-item" onclick="showSection('advisors',this)"><span class="nav-icon">🧑‍💼</span> Advisor Stats</div>
     <div class="sb-bottom">
       <div class="advisor-chip">
         <div class="advisor-avatar">${initLetter}</div>
@@ -1279,6 +1280,22 @@ function buildShell() {
             <thead><tr><th>Driver</th><th>Email</th><th>Phone</th><th>Vehicle</th><th>Status</th><th>Current Job</th><th>Rating</th><th>Total Moves</th></tr></thead>
             <tbody id="driversTable"><tr><td class="empty-td" colspan="8"><span class="spinner"></span></td></tr></tbody>
           </table>
+       </div>
+      </div>
+    </div>
+
+    <!-- ADVISOR STATS -->
+    <div class="section" id="secAdvisors">
+      <div class="table-card">
+        <div class="table-hdr">
+          <div class="table-title">Advisor Performance</div>
+          <button class="btn-refresh" onclick="renderAdvisorStats()">↻ Refresh</button>
+        </div>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th>Advisor</th><th>Bookings Created</th><th>Revenue</th><th>Avg. Value</th><th>Delivered</th><th>Cancelled</th></tr></thead>
+            <tbody id="advisorStatsTable"><tr><td class="empty-td" colspan="6"><span class="spinner"></span></td></tr></tbody>
+          </table>
         </div>
       </div>
     </div>
@@ -1305,8 +1322,9 @@ function loadAll() {
       updateStats();
       renderRecentTable();
       renderBookingsTable(allBookings);
-      renderCharts();
+   renderCharts();
       renderRevenue();
+      renderAdvisorStats();
     }, err => toast("⚠️ Bookings: " + err.message));
 
   // Customers
@@ -1504,6 +1522,50 @@ function renderDrivers() {
       <td class="amount">${d.totalMoves || 0}</td>
     </tr>`).join("");
 }
+  /* ════════════════════════════════════════════
+   ADVISOR STATS
+   ════════════════════════════════════════════ */
+function renderAdvisorStats() {
+  const tbody = document.getElementById("advisorStatsTable");
+  if (!tbody) return;
+
+  const advisorBookings = allBookings.filter(b => b.source === "advisor");
+  if (!advisorBookings.length) {
+    tbody.innerHTML = '<tr><td class="empty-td" colspan="6">No advisor-created bookings yet</td></tr>';
+    return;
+  }
+
+  const stats = {};
+  advisorBookings.forEach(b => {
+    const key = b.createdByAdvisor || "unknown";
+    if (!stats[key]) {
+      stats[key] = {
+        name: b.createdByAdvisorName || b.createdByAdvisorEmail || "Unknown Advisor",
+        count: 0, revenue: 0, delivered: 0, cancelled: 0
+      };
+    }
+    stats[key].count++;
+    stats[key].revenue += b.total || 0;
+    if (b.status === "delivered") stats[key].delivered++;
+    if (b.status === "cancelled") stats[key].cancelled++;
+  });
+
+  const rows = Object.values(stats).sort((a, b) => b.revenue - a.revenue);
+  tbody.innerHTML = rows.map(s => `
+    <tr>
+      <td>
+        <div class="cust-cell">
+          <div class="cust-avatar">${s.name.charAt(0).toUpperCase()}</div>
+          ${s.name}
+        </div>
+      </td>
+      <td class="amount">${s.count}</td>
+      <td class="amount">₹${s.revenue.toLocaleString("en-IN")}</td>
+      <td class="amount">₹${s.count ? Math.round(s.revenue / s.count).toLocaleString("en-IN") : 0}</td>
+      <td class="amount" style="color:var(--green)">${s.delivered}</td>
+      <td class="amount" style="color:var(--red)">${s.cancelled}</td>
+    </tr>`).join("");
+}
 
 /* ════════════════════════════════════════════
    CHARTS
@@ -1665,7 +1727,8 @@ const sectionMeta = {
   newbooking: { title: "New Booking", sub: "Create a booking on behalf of a customer" },
   bookings:   { title: "Bookings",    sub: "All move orders from packzenblr.in" },
   customers:  { title: "Customers",   sub: "Registered users & spending" },
-  drivers:    { title: "Drivers",     sub: "Fleet status & performance" }
+drivers:    { title: "Drivers",     sub: "Fleet status & performance" },
+  advisors:   { title: "Advisor Stats", sub: "Bookings created by each advisor" }
 };
 
 function showSection(name, navEl) {
@@ -1680,7 +1743,8 @@ function showSection(name, navEl) {
   activeSection = name;
   if (name === "overview")   renderCharts();
   if (name === "revenue")    renderRevenue();
-  if (name === "drivers")    renderDrivers();
+if (name === "drivers")    renderDrivers();
+  if (name === "advisors")   renderAdvisorStats();
   if (name === "newbooking") nbInit();
 }
 
