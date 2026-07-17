@@ -77,8 +77,24 @@ const PRICING_CONFIG = Object.freeze({
     pricePerHelper: 400
   },
 
-  packing: {
+packing: {
     pricePerUnit: 20
+  },
+
+  unpacking: {
+    pricePerUnit: 14
+  },
+
+  dismantling: {
+    pricePerUnit: 27
+  },
+
+  assembly: {
+    pricePerUnit: 27
+  },
+
+  storage: {
+    pricePerDay: 180
   },
 
   waiting: {
@@ -201,8 +217,13 @@ function validateQuoteInput(raw) {
     cartonQty: Math.min(50, Math.max(0, cartonQty || 0)),
     pickupFloor,
     dropFloor,
-    liftAvailable: liftAvail,
+  liftAvailable: liftAvail,
     packingService: !!raw.packingService,
+    unpackingService: !!raw.unpackingService,
+    dismantlingService: !!raw.dismantlingService,
+    assemblyService: !!raw.assemblyService,
+    storageNeeded: !!raw.storageNeeded,
+    storageDays: Math.max(0, parseInt(raw.storageDays ?? 0, 10) || 0),
     moveType,
     promoDiscount: Math.max(0, Number(raw.promoDiscount) || 0),
     extraHelpers: Math.max(0, parseInt(raw.extraHelpers ?? 0, 10) || 0),
@@ -288,6 +309,25 @@ function calcPackingCharge(packingService, totalUnits) {
   return totalUnits * PRICING_CONFIG.packing.pricePerUnit;
 }
 
+function calcUnpackingCharge(unpackingService, totalUnits) {
+  if (!unpackingService) return 0;
+  return totalUnits * PRICING_CONFIG.unpacking.pricePerUnit;
+}
+
+function calcDismantlingCharge(dismantlingService, totalUnits) {
+  if (!dismantlingService) return 0;
+  return totalUnits * PRICING_CONFIG.dismantling.pricePerUnit;
+}
+
+function calcAssemblyCharge(assemblyService, totalUnits) {
+  if (!assemblyService) return 0;
+  return totalUnits * PRICING_CONFIG.assembly.pricePerUnit;
+}
+
+function calcStorageCharge(storageNeeded, storageDays) {
+  if (!storageNeeded || storageDays <= 0) return 0;
+  return storageDays * PRICING_CONFIG.storage.pricePerDay;
+}
 function calcWaitingCharge(waitingHours) {
   return waitingHours * PRICING_CONFIG.waiting.pricePerHour;
 }
@@ -311,9 +351,10 @@ function calculateQuoteV2(raw) {
   const { valid, errors, data } = validateQuoteInput(raw);
   if (!valid) return _errorResult(errors);
 
-  const {
+const {
     km, vehicleCfg, furniture, cartonQty, pickupFloor, dropFloor, liftAvailable,
-    packingService, promoDiscount: rawPromo, extraHelpers, waitingHours, longCarryDistance, houseValue, moveType
+    packingService, unpackingService, dismantlingService, assemblyService, storageNeeded, storageDays,
+    promoDiscount: rawPromo, extraHelpers, waitingHours, longCarryDistance, houseValue, moveType
   } = data;
 
   const baseFare = calcBaseVehicleCharge(vehicleCfg);
@@ -325,23 +366,33 @@ function calculateQuoteV2(raw) {
   const floorCharge = calcFloorCharge(pickupFloor, dropFloor, liftAvailable);
   const labourCharge = calcLabourCharge(vehicleCfg, extraHelpers);
   const packingCharge = calcPackingCharge(packingService, capResult.totalUnits);
+  const unpackingCharge = calcUnpackingCharge(unpackingService, capResult.totalUnits);
+  const dismantlingCharge = calcDismantlingCharge(dismantlingService, capResult.totalUnits);
+  const assemblyCharge = calcAssemblyCharge(assemblyService, capResult.totalUnits);
+  const storageCharge = calcStorageCharge(storageNeeded, storageDays);
   const waitingCharge = calcWaitingCharge(waitingHours);
   const longCarryCharge = calcLongCarryCharge(longCarryDistance);
 
-  const subtotal = baseFare + distanceCharge + vehicleCapacityCharge + floorCharge + labourCharge + packingCharge + waitingCharge + longCarryCharge;
+  const subtotal = baseFare + distanceCharge + vehicleCapacityCharge + floorCharge + labourCharge
+    + packingCharge + unpackingCharge + dismantlingCharge + assemblyCharge + storageCharge
+    + waitingCharge + longCarryCharge;
   const { gstAmount, gstInclusive } = calcTaxes(subtotal);
   const totalBeforeDiscount = Math.max(subtotal + (gstInclusive ? 0 : gstAmount), PRICING_CONFIG.minimumFare);
 
   let cappedDiscount = calcDiscount(totalBeforeDiscount, rawPromo);
   let grandTotal = Math.max(totalBeforeDiscount - cappedDiscount, PRICING_CONFIG.minimumFare);
 
-  const breakdown = {
+const breakdown = {
     baseFare,
     distanceCharge,
     capacityCharge: vehicleCapacityCharge,
     floorCharge,
     labourCharge,
     packingCharge,
+    unpackingCharge,
+    dismantlingCharge,
+    assemblyCharge,
+    storageCharge,
     waitingCharge,
     longCarryCharge,
     subtotal,
@@ -418,8 +469,13 @@ function _readFormState() {
     cartonQty: parseInt(g("cartonQty")?.value ?? 0, 10) || 0,
     pickupFloor: parseInt(g("pickupFloor")?.value ?? 0, 10) || 0,
     dropFloor: parseInt(g("dropFloor")?.value ?? 0, 10) || 0,
-    liftAvailable: !!g("liftAvailable")?.checked,
+  liftAvailable: !!g("liftAvailable")?.checked,
     packingService: !!(g("packingService")?.checked || window._packingServiceRequested),
+    unpackingService: !!g("unpackingService")?.checked,
+    dismantlingService: !!g("dismantlingService")?.checked,
+    assemblyService: !!g("assemblyService")?.checked,
+    storageNeeded: !!g("storageService")?.checked,
+    storageDays: parseInt(g("storageDays")?.value ?? 0, 10) || 0,
     moveType: window.selectedMoveType || "home",
     promoDiscount: window.promoDiscount || 0,
   };
@@ -437,7 +493,11 @@ function _renderV2Breakdown(result, resultEl) {
   if (breakdown.capacityCharge > 0) rows.push(`Vehicle Capacity (${breakdown.capacityDetail.slab} - ${Math.round(breakdown.capacityDetail.capacityUsed)}%): ₹${fmt(breakdown.capacityCharge)}`);
   if (breakdown.floorCharge > 0) rows.push(`Floor Charge: ₹${fmt(breakdown.floorCharge)}`);
   if (breakdown.labourCharge > 0) rows.push(`Labour Charge: ₹${fmt(breakdown.labourCharge)}`);
-  if (breakdown.packingCharge > 0) rows.push(`Packing Charge: ₹${fmt(breakdown.packingCharge)}`);
+if (breakdown.packingCharge > 0) rows.push(`Packing Charge: ₹${fmt(breakdown.packingCharge)}`);
+  if (breakdown.unpackingCharge > 0) rows.push(`Unpacking Charge: ₹${fmt(breakdown.unpackingCharge)}`);
+  if (breakdown.dismantlingCharge > 0) rows.push(`Dismantling Charge: ₹${fmt(breakdown.dismantlingCharge)}`);
+  if (breakdown.assemblyCharge > 0) rows.push(`Assembly Charge: ₹${fmt(breakdown.assemblyCharge)}`);
+  if (breakdown.storageCharge > 0) rows.push(`Storage Charge: ₹${fmt(breakdown.storageCharge)}`);
   if (breakdown.waitingCharge > 0) rows.push(`Waiting Charge: ₹${fmt(breakdown.waitingCharge)}`);
   if (breakdown.longCarryCharge > 0) rows.push(`Long Carry Charge: ₹${fmt(breakdown.longCarryCharge)}`);
 
