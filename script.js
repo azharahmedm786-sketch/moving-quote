@@ -1511,13 +1511,14 @@ function onPaymentSuccess(response, name, phone, email, paid, total) {
     total, paymentLabel: selectedPayment === "full" ? `Paid Full — ₹${paid.toLocaleString("en-IN")}` : `Advance ₹${paid.toLocaleString("en-IN")} paid`,
     paymentNote: `Payment ID: ${response.razorpay_payment_id}`, source: "payment", showInvoice: true
   });
-  if (window._firebase) {
+ if (window._firebase) {
     const activeUser = currentUser || window._firebase?.auth?.currentUser;
     const discountedTotal = _getDiscountedTotal();
     const payload = {
       bookingRef, customerUid: activeUser?.uid, customerName: name,
-    phone,
-    email,
+      phone,
+      altPhone: document.getElementById("custAltPhone")?.value.trim() || "",
+      email,
       pickup: pickup?.value || "", drop: drop?.value || "", moveType: selectedMoveType,
       house: houseEl?.options[houseEl?.selectedIndex]?.text || "",
       vehicle: vehicleEl?.options[vehicleEl?.selectedIndex]?.text || "",
@@ -1525,7 +1526,15 @@ function onPaymentSuccess(response, name, phone, email, paid, total) {
       pickupFloor: document.getElementById("pickupFloor")?.options[document.getElementById("pickupFloor")?.selectedIndex]?.text || "",
       dropFloor: document.getElementById("dropFloor")?.options[document.getElementById("dropFloor")?.selectedIndex]?.text || "",
       liftAvailable: !!document.getElementById("liftAvailable")?.checked,
-      packingService: false,
+      packingService: !!document.getElementById("packingService")?.checked,
+      unpackingService: !!document.getElementById("unpackingService")?.checked,
+      dismantling: !!document.getElementById("dismantlingService")?.checked,
+      assembly: !!document.getElementById("assemblyService")?.checked,
+      storageNeeded: !!document.getElementById("storageService")?.checked,
+      storageDays: parseInt(document.getElementById("storageDays")?.value || 0, 10),
+      fragileItems: document.getElementById("custFragileItems")?.value.trim() || "",
+      specialItems: document.getElementById("custSpecialItems")?.value.trim() || "",
+      remarks: document.getElementById("custRemarks")?.value.trim() || "",
       total: discountedTotal,
       originalTotal: lastCalculatedTotal,
       paid,
@@ -1540,7 +1549,7 @@ function onPaymentSuccess(response, name, phone, email, paid, total) {
       distance: window._lastCalculatedKm || 0,
       quoteBreakdown: window._lastQuoteResult?.breakdown || null,
       paymentId: response.razorpay_payment_id,
-   photos: uploadedPhotos.slice(0, 3),
+     photos: uploadedPhotos.slice(0, 3),
       deliveryOtp: generateDeliveryOtp(),
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
     };
@@ -1645,11 +1654,12 @@ function bookWithoutPayment() {
   // Use v2 engine total as the canonical total
   const discountedTotal = _getDiscountedTotal();
 
-  const payload = {
+ const payload = {
     bookingRef,
     customerUid: activeUser.uid,
     customerName: name,
     phone,
+    altPhone: document.getElementById("custAltPhone")?.value.trim() || "",
     email,
     pickup: pickupVal,
     drop: dropVal,
@@ -1663,7 +1673,15 @@ function bookWithoutPayment() {
     pickupFloor: document.getElementById("pickupFloor")?.options[document.getElementById("pickupFloor")?.selectedIndex]?.text || "",
     dropFloor: document.getElementById("dropFloor")?.options[document.getElementById("dropFloor")?.selectedIndex]?.text || "",
     liftAvailable: !!document.getElementById("liftAvailable")?.checked,
-    packingService: false,
+    packingService: !!document.getElementById("packingService")?.checked,
+    unpackingService: !!document.getElementById("unpackingService")?.checked,
+    dismantling: !!document.getElementById("dismantlingService")?.checked,
+    assembly: !!document.getElementById("assemblyService")?.checked,
+    storageNeeded: !!document.getElementById("storageService")?.checked,
+    storageDays: parseInt(document.getElementById("storageDays")?.value || 0, 10),
+    fragileItems: document.getElementById("custFragileItems")?.value.trim() || "",
+    specialItems: document.getElementById("custSpecialItems")?.value.trim() || "",
+    remarks: document.getElementById("custRemarks")?.value.trim() || "",
     total: discountedTotal,
     originalTotal: lastCalculatedTotal,
     paid: 0,
@@ -1803,7 +1821,8 @@ function startNewBooking() {
 function resetBookingForm() {
   currentStep = 0; showStep(0);
   ["pickup","drop","house","vehicle","moveType"].forEach(id => { const el = document.getElementById(id); if (el) el.value = ""; });
-  ["custName","custPhone"].forEach(id => { const el = document.getElementById(id); if (el) el.value = ""; });
+  ["custName","custPhone","custAltPhone","custFragileItems","custSpecialItems","custRemarks","storageDays"].forEach(id => { const el = document.getElementById(id); if (el) el.value = ""; });
+  ["packingService","unpackingService","dismantlingService","assemblyService","storageService"].forEach(id => { const el = document.getElementById(id); if (el) el.checked = false; });
   document.querySelectorAll(".move-type-card, .select-card, .vehicle-card").forEach(c => c.classList.remove("selected"));
   selectedMoveType = null;
   const mapDiv = document.getElementById("map");
