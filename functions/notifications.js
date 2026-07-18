@@ -17,7 +17,7 @@ const admin = require("firebase-admin");
 // Do not call it again here — Firebase will throw "app already exists".
  
 const { sendCustomerEmail, sendAdminEmail } = require("./notification-service");
-
+const { BREVO_SECRETS } = require("./brevo-client");
 /* ────────────────────────────────────────────────────────────
    HELPERS: queue SMS and WhatsApp messages directly to Firestore
    ──────────────────────────────────────────────────────────── */
@@ -101,6 +101,7 @@ async function getCustomerEmail(booking) {
    ════════════════════════════════════════════════════════════ */
 exports.onBookingCreatedNotify = functions
   .region("asia-south1")
+  .runWith({ secrets: BREVO_SECRETS })
   .firestore.document("bookings/{bookingId}")
   .onCreate(async (snap, context) => {
     const b = snap.data();
@@ -146,6 +147,7 @@ exports.onBookingCreatedNotify = functions
    ════════════════════════════════════════════════════════════ */
 exports.onBookingUpdatedNotify = functions
   .region("asia-south1")
+  .runWith({ secrets: BREVO_SECRETS })
   .firestore.document("bookings/{bookingId}")
   .onUpdate(async (change, context) => {
     const before = change.before.data();
@@ -262,6 +264,7 @@ exports.onBookingUpdatedNotify = functions
    ════════════════════════════════════════════════════════════ */
 exports.onCancelRequestCreatedNotify = functions
   .region("asia-south1")
+  .runWith({ secrets: BREVO_SECRETS })
   .firestore.document("cancelRequests/{requestId}")
   .onCreate(async (snap, context) => {
     const req = snap.data();
@@ -282,6 +285,7 @@ exports.onCancelRequestCreatedNotify = functions
    ════════════════════════════════════════════════════════════ */
 exports.onReviewCreatedNotify = functions
   .region("asia-south1")
+  .runWith({ secrets: BREVO_SECRETS })
   .firestore.document("reviews/{reviewId}")
   .onCreate(async (snap, context) => {
     const r = snap.data();
@@ -303,6 +307,7 @@ exports.onReviewCreatedNotify = functions
    ════════════════════════════════════════════════════════════ */
 exports.onDamageClaimCreatedNotify = functions
   .region("asia-south1")
+  .runWith({ secrets: BREVO_SECRETS })
   .firestore.document("damageClaims/{claimId}")
   .onCreate(async (snap, context) => {
     const c = snap.data();
@@ -323,6 +328,7 @@ exports.onDamageClaimCreatedNotify = functions
    ════════════════════════════════════════════════════════════ */
 exports.onAccountDeletionRequestCreatedNotify = functions
   .region("asia-south1")
+  .runWith({ secrets: BREVO_SECRETS })
   .firestore.document("accountDeletionRequests/{requestId}")
   .onWrite(async (change, context) => {
     // Only send on create (when before doc doesn't exist)
@@ -352,6 +358,7 @@ exports.onAccountDeletionRequestCreatedNotify = functions
    ════════════════════════════════════════════════════════════ */
 exports.retryFailedEmailNotifications = functions
   .region("asia-south1")
+  .runWith({ secrets: BREVO_SECRETS })
   .https.onCall(async (data, context) => {
     if (!context.auth) throw new functions.https.HttpsError("unauthenticated", "Must be logged in");
     const userDoc = await admin.firestore().collection("users").doc(context.auth.uid).get();
