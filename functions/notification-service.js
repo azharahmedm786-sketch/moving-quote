@@ -77,11 +77,12 @@ async function sendCustomerEmail(templateKey, toEmail, data) {
     return { success: false, error: "TEMPLATE_RENDER_ERROR" };
   }
 
-  const result = await sendBrevoEmail({
+const result = await sendBrevoEmail({
     toEmail,
     toName: data?.customerName || "",
     subject,
-    htmlContent: html
+    htmlContent: html,
+    textContent: html.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim()
   });
 
   await logNotification({
@@ -119,11 +120,12 @@ async function sendAdminEmail(subjectPrefix, bodyLines, bookingRef) {
 
   const results = [];
   for (const email of adminEmails) {
-    const result = await sendBrevoEmail({
+const result = await sendBrevoEmail({
       toEmail: email,
       toName: "PackZen Admin",
       subject: `[Admin] ${subjectPrefix}`,
-      htmlContent: html
+      htmlContent: html,
+      textContent: html.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim()
     });
     await logNotification({
       bookingRef,
@@ -165,11 +167,12 @@ async function retryFailedNotifications() {
     // full context was preserved in the log's "context" field.
     if (!log.context) continue;
 
-    const result = await sendBrevoEmail({
+const result = await sendBrevoEmail({
       toEmail: log.recipient,
       toName: log.context.customerName || "",
       subject: log.context.subject,
-      htmlContent: log.context.html
+      htmlContent: log.context.html,
+      textContent: (log.context.html || "").replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim()
     });
 
     await doc.ref.update({
