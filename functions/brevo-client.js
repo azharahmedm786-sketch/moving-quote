@@ -8,13 +8,20 @@
    ============================================================ */
 const functions = require("firebase-functions");
 const https = require("https");
+const { defineSecret } = require("firebase-functions/params");
+
+// Shared Brevo secrets — any exported Cloud Function that calls sendBrevoEmail(),
+// directly or indirectly, must add BREVO_SECRETS to its .runWith({ secrets: ... }).
+const BREVO_API_KEY      = defineSecret("BREVO_API_KEY");
+const BREVO_SENDER_EMAIL = defineSecret("BREVO_SENDER_EMAIL");
+const BREVO_SENDER_NAME  = defineSecret("BREVO_SENDER_NAME");
+const BREVO_SECRETS = [BREVO_API_KEY, BREVO_SENDER_EMAIL, BREVO_SENDER_NAME];
 
 function getBrevoConfig() {
-  const cfg = functions.config().brevo || {};
   return {
-    apiKey: cfg.apikey || null,
-    senderEmail: cfg.senderemail || "no-reply@packzenblr.in",
-    senderName: cfg.sendername || "PackZen Packers & Movers"
+    apiKey: BREVO_API_KEY.value() || null,
+    senderEmail: BREVO_SENDER_EMAIL.value() || "no-reply@packzenblr.in",
+    senderName: BREVO_SENDER_NAME.value() || "PackZen Packers & Movers"
   };
 }
 
@@ -23,24 +30,23 @@ function getBrevoConfig() {
  * Returns a Promise resolving to { success, response, error }.
  * Never throws — always resolves so callers can log the outcome.
  */
-function sendBrevoEmail({ toEmail, toName, subject, htmlContent }) {
+function sendBrevoEmail({ toEmail, toName, subject, htmlContent, textContent }) {
   return new Promise((resolve) => {
     const { apiKey, senderEmail, senderName } = getBrevoConfig();
-
     if (!apiKey) {
-      resolve({ success: false, response: null, error: "BREVO_API_KEY_NOT_CONFIGURED" });
+      resolve({ success: false, response: null, error: "BREVO_API_KEY_NOT_CONFIGURED", retryable: false });
       return;
     }
     if (!toEmail) {
-      resolve({ success: false, response: null, error: "MISSING_RECIPIENT_EMAIL" });
+      resolve({ success: false, response: null, error: "MISSING_RECIPIENT_EMAIL", retryable: false });
       return;
     }
-
     const payload = JSON.stringify({
       sender: { name: senderName, email: senderEmail },
       to: [{ email: toEmail, name: toName || toEmail }],
       subject: subject,
-      htmlContent: htmlContent
+      htmlContent: htmlContent,
+      textContent: textContent || undefined
     });
 
     const options = {
@@ -55,7 +61,7 @@ function sendBrevoEmail({ toEmail, toName, subject, htmlContent }) {
       }
     };
 
-    const req = https.request(options, (res) => {
+const req = https.request(options, (res) => {
       let body = "";
       res.on("data", (chunk) => { body += chunk; });
       res.on("end", () => {
@@ -64,21 +70,23 @@ function sendBrevoEmail({ toEmail, toName, subject, htmlContent }) {
           if (res.statusCode >= 200 && res.statusCode < 300) {
             resolve({ success: true, response: parsed, error: null });
           } else {
-            resolve({ success: false, response: parsed, error: parsed.message || ("HTTP " + res.statusCode) });
+            const retryable = res.statusCode === 429 || res.statusCode >= 500;
+            resolve({ success: false, response: parsed, error: parsed.message || ("HTTP " + res.statusCode), retryable });
           }
         } catch (e) {
-          resolve({ success: false, response: body.slice(0, 500), error: "Invalid JSON response: " + e.message });
+          resolve({ success: false, response: body.slice(0, 500), error: "Invalid JSON response: " + e.message, retryable: false });
         }
       });
     });
-
     req.on("error", (err) => {
-      resolve({ success: false, response: null, error: err.message });
+      resolve({ success: false, response: null, error: err.message, retryable: true });
     });
-
+    req.setTimeout(10000, () => {
+      req.destroy();
+      resolve({ success: false, response: null, error: "Brevo request timed out", retryable: true });
+    });
     req.write(payload);
     req.end();
-  });
-}
+     
 
-module.exports = { sendBrevoEmail, getBrevoConfig };
+module.exports = { sendBrevoEmail, getBrevoConfig, BREVO_SECRETS };
