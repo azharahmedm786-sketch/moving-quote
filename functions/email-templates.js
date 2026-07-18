@@ -9,8 +9,8 @@ const BRAND = {
   name: "PackZen Packers & Movers",
   logoUrl: "https://packzenblr.in/assets/logo/packzen-logo.png",
   website: "https://packzenblr.in",
-  supportEmail: "moveeasyblr@gmail.com",
-  supportPhone: "+91 99450 95453",
+supportEmail: "support@packzenblr.in",
+   supportPhone: "+91 99450 95453",
   instagram: "https://instagram.com/packzenblr",
   primaryColor: "#ea580c",
   darkBg: "#0f172a"
