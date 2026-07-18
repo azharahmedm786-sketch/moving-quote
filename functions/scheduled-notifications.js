@@ -15,7 +15,7 @@
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
 const { sendCustomerEmail } = require("./notification-service");
-
+const { BREVO_SECRETS } = require("./brevo-client");
 function bookingToTemplateData(b) {
   return {
     bookingRef: b.bookingRef || "",
@@ -50,6 +50,7 @@ async function getCustomerEmail(booking) {
    ──────────────────────────────────────────────────────────── */
 exports.sendBookingReminders = functions
   .region("asia-south1")
+  .runWith({ secrets: BREVO_SECRETS })
   .pubsub.schedule("every 60 minutes")
   .onRun(async (context) => {
     const db = admin.firestore();
@@ -91,6 +92,7 @@ exports.sendBookingReminders = functions
    ──────────────────────────────────────────────────────────── */
 exports.sendFeedbackRequests = functions
   .region("asia-south1")
+  .runWith({ secrets: BREVO_SECRETS })
   .pubsub.schedule("every 180 minutes")
   .onRun(async (context) => {
     const db = admin.firestore();
