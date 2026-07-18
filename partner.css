@@ -34,7 +34,7 @@
 /* Reuse pz-btn classes if not already present in style.css (safe fallback) */
 .pz-btn {
   display: inline-flex; align-items: center; justify-content: center;
-  gap: 8px; text-decoration: none; font-family: 'Manrope', sans-serif;
+  gap: 8px; text-decoration: none; font-family: 'Nunito', sans-serif;
   font-weight: 700; border-radius: var(--radius-pill); cursor: pointer;
   transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
   border: none;
@@ -42,7 +42,7 @@
 .pz-btn-sm { padding: 0.45rem 1rem; font-size: 0.8rem; }
 .pz-btn-lg { padding: 0.95rem 1.75rem; font-size: 0.95rem; width: 100%; }
 .pz-btn-primary {
-  background: var(--gold-gradient); color: #fff; box-shadow: var(--gold-glow);
+  background: #16a34a; color: #fff; box-shadow: var(--gold-glow);
 }
 .pz-btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(34,197,94,0.45); }
 .pz-btn-outline {
@@ -128,7 +128,7 @@
 }
 .partner-stat { text-align: center; }
 .partner-stat-num {
-  display: block; font-family: 'Space Grotesk', sans-serif;
+  display: block; font-family: 'Nunito', sans-serif;
   font-size: 1.3rem; font-weight: 800; color: var(--green-600);
 }
 .partner-stat-label {
@@ -232,7 +232,7 @@
 .tl-num {
   position: absolute; left: -1.5rem; top: 0;
   width: 28px; height: 28px; border-radius: 50%;
-  background: var(--gold-gradient); color: #fff;
+  background: #16a34a; color: #fff;
   display: flex; align-items: center; justify-content: center;
   font-size: 0.78rem; font-weight: 800;
   box-shadow: 0 3px 10px rgba(34,197,94,0.35);
@@ -320,7 +320,7 @@
 .ptc-author { display: flex; align-items: center; gap: 0.7rem; }
 .ptc-avatar {
   width: 38px; height: 38px; border-radius: 50%;
-  background: var(--accent-gradient); color: #fff;
+  background: #16a34a; color: #fff;
   display: flex; align-items: center; justify-content: center;
   font-weight: 800; font-size: 0.95rem; flex-shrink: 0;
 }
