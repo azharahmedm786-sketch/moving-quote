@@ -2415,8 +2415,8 @@ async function signupUser() {
   if (btn) { btn.disabled = true; btn.textContent = "Creating account..."; }
   showError("signupError", "⏳ Creating your account...", "info");
 
-  waitForFirebase(async () => {
-    const { auth, db } = window._firebase;
+waitForFirebase(async () => {
+    const { auth, db, functions } = window._firebase;
     try {
       // 1. Create User
       const cred = await auth.createUserWithEmailAndPassword(email, password);
@@ -2425,8 +2425,8 @@ async function signupUser() {
       // 2. Update Profile Name
       await newUser.updateProfile({ displayName: fullName });
 
-      // 3. Send Email Verification
-      await newUser.sendEmailVerification();
+      // 3. Send Email Verification (via Brevo)
+      await functions.httpsCallable("sendVerificationEmailBrevo")();
 
       // 4. Create Firestore Document
       const refCode = newUser.uid.slice(0, 8).toUpperCase();
@@ -2558,16 +2558,16 @@ async function sendResetEmail() {
   if (btn) { btn.disabled = true; btn.textContent = "Sending..."; }
   showError("recoverError", "⏳ Sending reset link...", "info");
 
-  waitForFirebase(async () => {
-    const { auth } = window._firebase;
+ waitForFirebase(async () => {
+    const { functions } = window._firebase;
     try {
-      await auth.sendPasswordResetEmail(email);
+      await functions.httpsCallable("sendPasswordResetEmailBrevo")({ email });
       showError("recoverError", "✅ Reset link sent! Check your inbox.", "success");
       setTimeout(() => switchPanel('panelLogin'), 3000);
     } catch (err) {
       console.error(err);
-      if (err.code === "auth/user-not-found") showError("recoverError", "⚠️ No account found with this email.");
-      else showError("recoverError", getAuthErrorMessage(err.code));
+      if (err.code === "functions/not-found") showError("recoverError", "⚠️ No account found with this email.");
+      else showError("recoverError", "⚠️ " + (err.message || "Something went wrong. Please try again."));
     } finally {
       if (btn) { btn.disabled = false; btn.textContent = "Send Reset Link →"; }
     }
@@ -3622,13 +3622,22 @@ async function handleFirebaseActionCode() {
         showToast("✅ Email verified successfully!");
         // Clear the URL parameters
         window.history.replaceState(null, '', window.location.pathname);
-      } else if (mode === 'resetPassword') {
+  } else if (mode === 'resetPassword') {
         const email = await auth.verifyPasswordResetCode(oobCode);
         const modal = document.getElementById('newPasswordModal');
         if (modal) {
           document.getElementById('newPasswordEmailDisplay').textContent = email;
           modal.style.display = 'flex';
         }
+      } else if (mode === 'verifyAndChangeEmail') {
+        await auth.applyActionCode(oobCode);
+        await auth.currentUser?.reload();
+        const user = auth.currentUser;
+        if (user) {
+          await window._firebase.db.collection('users').doc(user.uid).update({ email: user.email });
+        }
+        showToast("✅ Email address updated successfully!");
+        window.history.replaceState(null, '', window.location.pathname);
       }
     } catch (err) {
       console.error(err);
@@ -3674,6 +3683,20 @@ async function submitNewPassword() {
 function closeNewPasswordModal() {
   const modal = document.getElementById('newPasswordModal');
   if (modal) modal.style.display = 'none';
+}
+async function requestEmailChange(newEmail) {
+  if (!currentUser) { showToast("⚠️ Please login first."); return; }
+  if (!newEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newEmail)) { showToast("⚠️ Enter a valid email address."); return; }
+  waitForFirebase(async () => {
+    const { functions } = window._firebase;
+    try {
+      await functions.httpsCallable("sendEmailChangeLinkBrevo")({ newEmail });
+      showToast("✅ Confirmation link sent to " + newEmail + ". Check your inbox to confirm the change.");
+    } catch (err) {
+      console.error(err);
+      showToast("⚠️ " + (err.message || "Failed to send confirmation email."));
+    }
+  });
 }
 
 /* ============================================
