@@ -11,6 +11,7 @@ const {
   sendBookingCompletedEmail,
   sendReviewRequestEmail
 } = require("./booking-notifications");
+const { BREVO_SECRETS } = require("./brevo-client");
 
 /* ============================================================
    SEND SMS VIA MSG91
@@ -290,6 +291,7 @@ amount: safeAmount * 100,
 const crypto = require("crypto");
 exports.verifyRazorpayPayment = functions
   .region("asia-south1")
+  .runWith({ secrets: BREVO_SECRETS })
   .https.onRequest(async (req, res) => {
     console.log("VERIFY VERSION 2");
 
@@ -406,5 +408,7 @@ console.log("BOOKING CREATED SUCCESSFULLY");
   });
 
 // Notification system (additive — booking-notifications.js, notifications.js, scheduled-notifications.js)
+// Notification system (additive — booking-notifications.js, notifications.js, scheduled-notifications.js)
 Object.assign(exports, require("./notifications"));
 Object.assign(exports, require("./scheduled-notifications"));
+Object.assign(exports, require("./auth-emails"));
