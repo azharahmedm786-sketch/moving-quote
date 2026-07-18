@@ -27,12 +27,13 @@ on top of v9.6.1 already loaded in HTML, causing conflicts)
       console.log("✅ Firebase initialized with Auth API key");
     }
 
-    const auth = firebase.auth();
+ const auth = firebase.auth();
     const db = firebase.firestore();
     const storage = firebase.storage ? firebase.storage() : null;
+    const functionsRef = firebase.functions ? firebase.app().functions("asia-south1") : null;
 
     // Make Firebase globally accessible
-    window._firebase = { auth, db, storage };
+    window._firebase = { auth, db, storage, functions: functionsRef };
     console.log("✅ PackZen Firebase ready!");
   } catch (e) {
     console.error("❌ Firebase init failed:", e);
