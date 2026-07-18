@@ -28,7 +28,7 @@
 #pz-chat-root,
 #pz-chat-root * {
   box-sizing: border-box;
-  font-family: var(--pz-font-body);
+  font-family: "Nunito", sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -220,7 +220,7 @@
 }
 
 .pz-chat-header-text .pz-brand {
-  font-family: var(--pz-font-brand);
+  font-family: "Nunito", sans-serif;
   font-size: 16.5px;
   letter-spacing: 0.3px;
   font-weight: 700;
@@ -482,7 +482,7 @@
   font-size: 14px;
   resize: none;
   max-height: 90px;
-  font-family: var(--pz-font-body);
+  font-family: "Nunito", sans-serif;
 }
 
 .pz-chat-input:focus {

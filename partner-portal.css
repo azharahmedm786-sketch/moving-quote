@@ -93,7 +93,7 @@
   cursor: pointer; padding: 4px; border-radius: 10px;
 }
 .portal-avatar {
-  width: 34px; height: 34px; border-radius: 50%; background: var(--accent-gradient);
+  width: 34px; height: 34px; border-radius: 50%; background: #16a34a;
   color: #fff; font-weight: 800; display: flex; align-items: center; justify-content: center;
   font-size: 0.9rem; flex-shrink: 0;
 }
@@ -280,7 +280,7 @@
 
 /* ---------- Wallet ---------- */
 .wallet-hero {
-  background: var(--accent-gradient); border-radius: 18px; padding: 22px; color: #fff; margin-bottom: 18px;
+  background: #16a34a; border-radius: 18px; padding: 22px; color: #fff; margin-bottom: 18px;
 }
 .wallet-hero-label { font-size: 0.78rem; opacity: .9; font-weight: 700; }
 .wallet-hero-amount { font-size: 2rem; font-weight: 800; margin: 4px 0 14px; }
