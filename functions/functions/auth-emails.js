@@ -9,6 +9,8 @@ const PACKZEN_LOGO_URL = defineString("PACKZEN_LOGO_URL", { default: "https://pa
 
 const REQUEST_TIMEOUT_MS = 10000;
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const crypto = require("crypto");
+const OTP_EXPIRY_MS = 10 * 60 * 1000;
 
 /* ── EMAIL TEMPLATE (green branding, mobile responsive) ── */
 function buildEmailHtml({ preheader, heading, bodyLines, ctaLabel, ctaUrl }) {
@@ -116,7 +118,62 @@ async function sendAuthEmail(type, toEmail, toName, subject, emailContent) {
   }
   return result;
 }
+/* ── PHASE 0 — SIGNUP OTP (verify email BEFORE account exists) ── */
+exports.sendSignupOtpBrevo = functions
+  .runWith({ secrets: BREVO_SECRETS })
+  .region("asia-south1")
+  .https.onCall(async (data, context) => {
+    const email = (data?.email || "").trim().toLowerCase();
+    const name = (data?.name || "").trim();
+    if (!EMAIL_REGEX.test(email)) throw new functions.https.HttpsError("invalid-argument", "A valid email is required.");
 
+    // Reject if an account already exists for this email
+    try {
+      await admin.auth().getUserByEmail(email);
+      throw new functions.https.HttpsError("already-exists", "auth/email-already-in-use");
+    } catch (e) {
+      if (e.code !== "auth/user-not-found") throw e;
+    }
+
+    await enforceRateLimit("signup_otp", email);
+
+    const otp = String(crypto.randomInt(100000, 999999));
+    await admin.firestore().collection("signupOtps").doc(email).set({
+      otp, expiresAt: Date.now() + OTP_EXPIRY_MS, attempts: 0, createdAt: Date.now()
+    });
+
+    await sendAuthEmail("signup_otp", email, name, "Your PackZen verification code", {
+      preheader: `Your PackZen verification code is ${otp}.`,
+      heading: `Verify your email, ${name || "there"}`,
+      bodyLines: [
+        `Your verification code is: <strong style="font-size:24px;letter-spacing:4px">${otp}</strong>`,
+        "Enter this code to finish creating your PackZen account. This code expires in 10 minutes."
+      ],
+      ctaLabel: "Go to PackZen →", ctaUrl: ACTION_URL.value()
+    });
+    return { success: true };
+  });
+
+exports.verifySignupOtpBrevo = functions
+  .region("asia-south1")
+  .https.onCall(async (data, context) => {
+    const email = (data?.email || "").trim().toLowerCase();
+    const otp = (data?.otp || "").trim();
+    if (!EMAIL_REGEX.test(email)) throw new functions.https.HttpsError("invalid-argument", "A valid email is required.");
+    if (!otp) throw new functions.https.HttpsError("invalid-argument", "OTP is required.");
+
+    const ref = admin.firestore().collection("signupOtps").doc(email);
+    const snap = await ref.get();
+    if (!snap.exists) throw new functions.https.HttpsError("not-found", "No OTP request found. Please request a new code.");
+
+    const record = snap.data();
+    if (Date.now() > record.expiresAt) { await ref.delete(); throw new functions.https.HttpsError("deadline-exceeded", "OTP expired. Please request a new code."); }
+    if (record.attempts >= 5) { await ref.delete(); throw new functions.https.HttpsError("resource-exhausted", "Too many incorrect attempts. Please request a new code."); }
+    if (record.otp !== otp) { await ref.update({ attempts: (record.attempts || 0) + 1 }); throw new functions.https.HttpsError("invalid-argument", "Incorrect code. Please try again."); }
+
+    await ref.delete();
+    return { success: true };
+  });
 /* ── PHASE 1 — EMAIL VERIFICATION ── */
 exports.sendVerificationEmailBrevo = functions
   .runWith({ secrets: BREVO_SECRETS })
