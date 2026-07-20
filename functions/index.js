@@ -412,4 +412,4 @@ console.log("BOOKING CREATED SUCCESSFULLY");
 // Notification system (additive — booking-notifications.js, notifications.js, scheduled-notifications.js)
 Object.assign(exports, require("./notifications"));
 Object.assign(exports, require("./scheduled-notifications"));
-Object.assign(exports, require("./auth-emails"));
+Object.assign(exports, require("./functions/auth-emails"));
