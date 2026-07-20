@@ -88,9 +88,6 @@ const req = https.request(options, (res) => {
     req.write(payload);
     req.end();
      
-
-req.write(payload);
-    req.end();
   });
 }
 
