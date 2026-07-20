@@ -89,4 +89,9 @@ const req = https.request(options, (res) => {
     req.end();
      
 
+req.write(payload);
+    req.end();
+  });
+}
+
 module.exports = { sendBrevoEmail, getBrevoConfig, BREVO_SECRETS };
