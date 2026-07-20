@@ -1,15 +1,23 @@
+/* ============================================================
+   AUTH EMAILS — PackZen
+   All auth-adjacent emails (signup OTP, email verification,
+   password reset, email change) route through Brevo via
+   brevo-client.js. No Firebase Auth account is created until
+   verifySignupOtpBrevo succeeds — see that function below for
+   the full server-side signup flow.
+   ============================================================ */
 const functions = require("firebase-functions");
 const admin     = require("firebase-admin");
-const { defineSecret, defineString } = require("firebase-functions/params");
+const { defineString } = require("firebase-functions/params");
 const { sendBrevoEmail, BREVO_SECRETS } = require("./brevo-client");
 const { logNotification } = require("./notification-service");
+const crypto = require("crypto");
 
 const ACTION_URL       = defineString("PACKZEN_ACTION_URL", { default: "https://packzenblr.in/" });
 const PACKZEN_LOGO_URL = defineString("PACKZEN_LOGO_URL", { default: "https://packzenblr.in/assets/logo/packzen-logo.png" });
 
-const REQUEST_TIMEOUT_MS = 10000;
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const crypto = require("crypto");
+const PHONE_REGEX = /^\d{10}$/;
 const OTP_EXPIRY_MS = 10 * 60 * 1000;
 
 /* ── EMAIL TEMPLATE (green branding, mobile responsive) ── */
@@ -118,21 +126,35 @@ async function sendAuthEmail(type, toEmail, toName, subject, emailContent) {
   }
   return result;
 }
-/* ── PHASE 0 — SIGNUP OTP (verify email BEFORE account exists) ── */
+
+/* ════════════════════════════════════════════════════════════
+   PHASE 0a — SEND SIGNUP OTP
+   No Firebase Auth account or Firestore doc exists at this
+   point. Duplicate checks here are fast-feedback only — the
+   authoritative, race-safe checks happen in verifySignupOtpBrevo
+   below, at the moment the account is actually created.
+   ════════════════════════════════════════════════════════════ */
 exports.sendSignupOtpBrevo = functions
   .runWith({ secrets: BREVO_SECRETS })
   .region("asia-south1")
   .https.onCall(async (data, context) => {
     const email = (data?.email || "").trim().toLowerCase();
-    const name = (data?.name || "").trim();
-    if (!EMAIL_REGEX.test(email)) throw new functions.https.HttpsError("invalid-argument", "A valid email is required.");
+    const name  = (data?.name || "").trim();
+    const phone = (data?.phone || "").trim();
 
-    // Reject if an account already exists for this email
+    if (!EMAIL_REGEX.test(email)) throw new functions.https.HttpsError("invalid-argument", "A valid email is required.");
+    if (phone && !PHONE_REGEX.test(phone)) throw new functions.https.HttpsError("invalid-argument", "A valid 10-digit phone number is required.");
+
     try {
       await admin.auth().getUserByEmail(email);
       throw new functions.https.HttpsError("already-exists", "auth/email-already-in-use");
     } catch (e) {
       if (e.code !== "auth/user-not-found") throw e;
+    }
+
+    if (phone) {
+      const phoneSnap = await admin.firestore().collection("phoneIndex").doc("+91" + phone).get();
+      if (phoneSnap.exists) throw new functions.https.HttpsError("already-exists", "auth/phone-already-in-use");
     }
 
     await enforceRateLimit("signup_otp", email);
@@ -154,27 +176,120 @@ exports.sendSignupOtpBrevo = functions
     return { success: true };
   });
 
+/* ════════════════════════════════════════════════════════════
+   PHASE 0b — VERIFY OTP + CREATE ACCOUNT (server side, only path)
+   This is the ONLY place a PackZen Firebase Auth account or
+   users/{uid} Firestore doc gets created. The client never calls
+   createUserWithEmailAndPassword directly. Steps:
+     1. Atomically validate + consume the OTP (Firestore txn).
+     2. Atomically reserve the phone number (Firestore txn) so two
+        concurrent signups can never claim the same phone.
+     3. Create the Firebase Auth user (Firebase Auth itself
+        guarantees email uniqueness atomically).
+     4. Write the Firestore profile.
+     5. On any failure after step 3, roll back what was created so
+        nothing orphaned is left behind.
+     6. Return a custom token — the client signs in with it instead
+        of creating the account itself.
+   ════════════════════════════════════════════════════════════ */
 exports.verifySignupOtpBrevo = functions
   .region("asia-south1")
   .https.onCall(async (data, context) => {
-    const email = (data?.email || "").trim().toLowerCase();
-    const otp = (data?.otp || "").trim();
+    const email     = (data?.email || "").trim().toLowerCase();
+    const otp       = (data?.otp || "").trim();
+    const password  = data?.password || "";
+    const firstName = (data?.firstName || "").trim();
+    const lastName  = (data?.lastName || "").trim();
+    const phone     = (data?.phone || "").trim();
+    const referral  = (data?.referral || "").trim().toUpperCase();
+
     if (!EMAIL_REGEX.test(email)) throw new functions.https.HttpsError("invalid-argument", "A valid email is required.");
     if (!otp) throw new functions.https.HttpsError("invalid-argument", "OTP is required.");
+    if (!password || password.length < 6) throw new functions.https.HttpsError("invalid-argument", "Password must be at least 6 characters.");
+    if (!firstName || !lastName) throw new functions.https.HttpsError("invalid-argument", "First and last name are required.");
+    if (!PHONE_REGEX.test(phone)) throw new functions.https.HttpsError("invalid-argument", "A valid 10-digit phone number is required.");
 
-    const ref = admin.firestore().collection("signupOtps").doc(email);
-    const snap = await ref.get();
-    if (!snap.exists) throw new functions.https.HttpsError("not-found", "No OTP request found. Please request a new code.");
+    const db = admin.firestore();
+    const otpRef = db.collection("signupOtps").doc(email);
 
-    const record = snap.data();
-    if (Date.now() > record.expiresAt) { await ref.delete(); throw new functions.https.HttpsError("deadline-exceeded", "OTP expired. Please request a new code."); }
-    if (record.attempts >= 5) { await ref.delete(); throw new functions.https.HttpsError("resource-exhausted", "Too many incorrect attempts. Please request a new code."); }
-    if (record.otp !== otp) { await ref.update({ attempts: (record.attempts || 0) + 1 }); throw new functions.https.HttpsError("invalid-argument", "Incorrect code. Please try again."); }
+    // Step 1 — validate + single-use consume, atomically.
+    await db.runTransaction(async (tx) => {
+      const snap = await tx.get(otpRef);
+      if (!snap.exists) throw new functions.https.HttpsError("not-found", "No OTP request found. Please request a new code.");
+      const record = snap.data();
+      if (Date.now() > record.expiresAt) { tx.delete(otpRef); throw new functions.https.HttpsError("deadline-exceeded", "OTP expired. Please request a new code."); }
+      if ((record.attempts || 0) >= 5) { tx.delete(otpRef); throw new functions.https.HttpsError("resource-exhausted", "Too many incorrect attempts. Please request a new code."); }
+      if (record.otp !== otp) { tx.update(otpRef, { attempts: (record.attempts || 0) + 1 }); throw new functions.https.HttpsError("invalid-argument", "Incorrect code. Please try again."); }
+      tx.delete(otpRef);
+    });
 
-    await ref.delete();
-    return { success: true };
+    const fullName = `${firstName} ${lastName}`;
+    const phoneKey = "+91" + phone;
+    const phoneRef = db.collection("phoneIndex").doc(phoneKey);
+
+    // Step 2 — reserve the phone number atomically.
+    await db.runTransaction(async (tx) => {
+      const phoneSnap = await tx.get(phoneRef);
+      if (phoneSnap.exists) throw new functions.https.HttpsError("already-exists", "auth/phone-already-in-use");
+      tx.set(phoneRef, { status: "reserved", reservedAt: Date.now() });
+    });
+
+    // Step 3 — create the Auth account. Firebase Auth enforces email
+    // uniqueness atomically, so a genuine race on email is resolved here.
+    let userRecord;
+    try {
+      userRecord = await admin.auth().createUser({ email, password, displayName: fullName, emailVerified: true });
+    } catch (err) {
+      await phoneRef.delete().catch(() => {});
+      if (err.code === "auth/email-already-exists") throw new functions.https.HttpsError("already-exists", "auth/email-already-in-use");
+      throw new functions.https.HttpsError("internal", err.message || "Account creation failed.");
+    }
+
+    // Step 4 — Firestore profile + finalize phone reservation.
+    try {
+      const refCode = userRecord.uid.slice(0, 8).toUpperCase();
+      await phoneRef.set({ status: "active", uid: userRecord.uid, phone: phoneKey }, { merge: true });
+      await db.collection("users").doc(userRecord.uid).set({
+        firstName, lastName, name: fullName, email, phone: phoneKey,
+        role: "customer", phoneVerified: false, emailVerified: true,
+        prefEmail: true, prefSMS: true,
+        referralCode: refCode, referralCount: 0, referralCredits: 0,
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+        lastLoginAt: admin.firestore.FieldValue.serverTimestamp()
+      });
+
+      if (referral) {
+        try {
+          const refSnap = await db.collection("users").where("referralCode", "==", referral).limit(1).get();
+          if (!refSnap.empty && refSnap.docs[0].id !== userRecord.uid) {
+            await refSnap.docs[0].ref.update({
+              referralCount: admin.firestore.FieldValue.increment(1),
+              referralCredits: admin.firestore.FieldValue.increment(500)
+            });
+            await db.collection("users").doc(userRecord.uid).update({ referredBy: referral, referralCreditApplied: 500 });
+          }
+        } catch (e) {
+          console.error("Referral processing error (non-fatal):", e.message);
+        }
+      }
+    } catch (err) {
+      // Step 5 — roll back so nothing orphaned survives a partial failure.
+      await admin.auth().deleteUser(userRecord.uid).catch(() => {});
+      await phoneRef.delete().catch(() => {});
+      throw new functions.https.HttpsError("internal", "Account setup failed. Please try again.");
+    }
+
+    // Step 6 — hand the client a token instead of letting it create the account.
+    const token = await admin.auth().createCustomToken(userRecord.uid);
+    return { success: true, token };
   });
-/* ── PHASE 1 — EMAIL VERIFICATION ── */
+
+/* ════════════════════════════════════════════════════════════
+   PHASE 1 — EMAIL VERIFICATION (unchanged)
+   Used for Google-linked accounts and any other post-signup
+   re-verification path — not part of the primary signup flow
+   above, which already creates accounts with emailVerified:true.
+   ════════════════════════════════════════════════════════════ */
 exports.sendVerificationEmailBrevo = functions
   .runWith({ secrets: BREVO_SECRETS })
   .region("asia-south1")
@@ -200,113 +315,52 @@ exports.sendVerificationEmailBrevo = functions
     return { success: true };
   });
 
-/* ── PHASE 2 — PASSWORD RESET ── */
-async function signupUser() {
-  if (!checkRateLimit("signup_otp", 3, 300000)) { showError("signupError", "⚠️ Too many OTP requests. Please try again later."); return; }
-  const firstName = document.getElementById("signupFirstName").value.trim();
-  const lastName = document.getElementById("signupLastName").value.trim();
-  const phone = document.getElementById("signupPhone").value.trim();
-  const email = document.getElementById("signupEmail").value.trim();
-  const password = document.getElementById("signupPassword").value;
-  const referral = document.getElementById("signupReferral")?.value.trim().toUpperCase() || "";
+/* ════════════════════════════════════════════════════════════
+   PHASE 2 — PASSWORD RESET
+   Google-only accounts (no password provider linked) never get
+   a reset email — this check happens here, server side, never
+   trusting the client. Accounts with BOTH Google and a password
+   linked still get to reset normally.
+   ════════════════════════════════════════════════════════════ */
+exports.sendPasswordResetEmailBrevo = functions
+  .runWith({ secrets: BREVO_SECRETS })
+  .region("asia-south1")
+  .https.onCall(async (data, context) => {
+    const email = (data?.email || "").trim().toLowerCase();
+    if (!EMAIL_REGEX.test(email)) throw new functions.https.HttpsError("invalid-argument", "A valid email is required.");
 
-  if (!firstName) return showError("signupError", "⚠️ Please enter your first name.");
-  if (!lastName) return showError("signupError", "⚠️ Please enter your last name.");
-  if (!/^\d{10}$/.test(phone)) return showError("signupError", "⚠️ Please enter a valid 10-digit mobile number.");
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return showError("signupError", "⚠️ Please enter a valid email address.");
-  if (password.length < 6) return showError("signupError", "⚠️ Password must be at least 6 characters.");
-
-  const fullName = firstName + " " + lastName;
-  const btn = document.getElementById("btnSignup");
-  if (btn) { btn.disabled = true; btn.textContent = "Sending code..."; }
-  showError("signupError", "⏳ Sending verification code...", "info");
-
-  waitForFirebase(async () => {
-    const { functions } = window._firebase;
+    let userRecord;
     try {
-      await functions.httpsCallable("sendSignupOtpBrevo")({ email, name: fullName });
-      pendingSignupData = { firstName, lastName, fullName, phone, email, password, referral };
-      closeAuthModal();
-      openSignupOtpModal(email);
-    } catch (err) {
-      console.error("Signup OTP error:", err);
-      if (err.code === "functions/already-exists") showError("signupError", "⚠️ This email is already registered. Please login.");
-      else showError("signupError", "⚠️ " + (err.message || "Something went wrong. Please try again."));
-    } finally {
-      if (btn) { btn.disabled = false; btn.textContent = "Create Account →"; }
+      userRecord = await admin.auth().getUserByEmail(email);
+    } catch (e) {
+      if (e.code === "auth/user-not-found") throw new functions.https.HttpsError("not-found", "No account found with this email.");
+      throw e;
     }
-  });
-}
 
-function openSignupOtpModal(email) {
-  const modal = document.getElementById("signupOtpModal");
-  if (!modal) { showToast("⚠️ OTP screen not found."); return; }
-  document.getElementById("signupOtpEmailDisplay").textContent = email;
-  document.getElementById("signupOtpInput").value = "";
-  document.getElementById("signupOtpError").textContent = "";
-  modal.style.display = "flex";
-}
-
-function closeSignupOtpModal() { document.getElementById("signupOtpModal").style.display = "none"; }
-
-async function verifySignupOtp() {
-  if (!pendingSignupData) { showToast("⚠️ Signup session expired. Please start again."); closeSignupOtpModal(); return; }
-  const otp = document.getElementById("signupOtpInput").value.trim();
-  if (!otp || otp.length !== 6) { showError("signupOtpError", "⚠️ Enter the 6-digit code."); return; }
-
-  const btn = document.getElementById("btnVerifySignupOtp");
-  if (btn) { btn.disabled = true; btn.textContent = "Verifying..."; }
-
-  waitForFirebase(async () => {
-    const { auth, db, functions } = window._firebase;
-    const { firstName, lastName, fullName, phone, email, password, referral } = pendingSignupData;
-    try {
-      await functions.httpsCallable("verifySignupOtpBrevo")({ email, otp });
-
-      const cred = await auth.createUserWithEmailAndPassword(email, password);
-      const newUser = cred.user;
-      await newUser.updateProfile({ displayName: fullName });
-
-      const refCode = newUser.uid.slice(0, 8).toUpperCase();
-      await db.collection("users").doc(newUser.uid).set({
-        firstName, lastName, name: fullName, email, phone: "+91" + phone,
-        role: "customer", phoneVerified: false, emailVerified: true,
-        prefEmail: true, prefSMS: true,
-        referralCode: refCode, referralCount: 0, referralCredits: 0,
-        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-        lastLoginAt: firebase.firestore.FieldValue.serverTimestamp()
-      });
-
-      if (referral) await processReferral(referral, newUser.uid);
-
-      pendingSignupData = null;
-      closeSignupOtpModal();
-      showToast(`👋 Welcome to PackZen, ${firstName}!`);
-    } catch (err) {
-      console.error("OTP verify / account creation error:", err);
-      if (err.code === "auth/email-already-in-use") showError("signupOtpError", "⚠️ This email is already registered. Please login.");
-      else if (err.code === "functions/not-found") showError("signupOtpError", "⚠️ No code found. Please request a new one.");
-      else if (err.code === "functions/deadline-exceeded") showError("signupOtpError", "⚠️ Code expired. Please request a new one.");
-      else if (err.code === "functions/resource-exhausted") showError("signupOtpError", "⚠️ Too many attempts. Please request a new code.");
-      else if (err.code === "functions/invalid-argument") showError("signupOtpError", "⚠️ Incorrect code. Please try again.");
-      else showError("signupOtpError", getAuthErrorMessage(err.code));
-    } finally {
-      if (btn) { btn.disabled = false; btn.textContent = "Verify & Create Account"; }
+    const hasPasswordProvider = userRecord.providerData.some(p => p.providerId === "password");
+    if (!hasPasswordProvider) {
+      throw new functions.https.HttpsError("failed-precondition", "auth/google-account-no-password");
     }
-  });
-}
 
-async function resendSignupOtp() {
-  if (!pendingSignupData) return;
-  const { email, fullName } = pendingSignupData;
-  waitForFirebase(async () => {
-    try {
-      await window._firebase.functions.httpsCallable("sendSignupOtpBrevo")({ email, name: fullName });
-      showToast("📧 New code sent!");
-    } catch (err) { showError("signupOtpError", "⚠️ " + (err.message || "Failed to resend code.")); }
+    await enforceRateLimit("password_reset", email);
+
+    const link = await admin.auth().generatePasswordResetLink(email, { url: ACTION_URL.value(), handleCodeInApp: false });
+
+    await sendAuthEmail("password_reset", email, userRecord.displayName, "Reset your PackZen password", {
+      preheader: "Reset your PackZen account password.",
+      heading: `Reset your password, ${userRecord.displayName || "there"}`,
+      bodyLines: [
+        "We received a request to reset your PackZen account password. Click below to choose a new one.",
+        "If you didn't request this, you can safely ignore this email — your password will remain unchanged."
+      ],
+      ctaLabel: "Reset Password →", ctaUrl: link
+    });
+    return { success: true };
   });
-}
-/* ── PHASE 3 — EMAIL CHANGE ── */
+
+/* ════════════════════════════════════════════════════════════
+   PHASE 3 — EMAIL CHANGE (unchanged)
+   ════════════════════════════════════════════════════════════ */
 exports.sendEmailChangeLinkBrevo = functions
   .runWith({ secrets: BREVO_SECRETS })
   .region("asia-south1")
