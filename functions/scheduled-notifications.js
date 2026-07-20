@@ -125,3 +125,26 @@ exports.sendFeedbackRequests = functions
     }
     return null;
   });
+/* ── SIGNUP OTP CLEANUP ──────────────────────────────────────
+   Runs every 30 minutes. Deletes expired, never-verified OTP
+   requests so signupOtps never grows unbounded and a stale
+   record can never be replayed.
+   ──────────────────────────────────────────────────────────── */
+exports.cleanupExpiredSignupOtps = functions
+  .region("asia-south1")
+  .pubsub.schedule("every 30 minutes")
+  .onRun(async (context) => {
+    const db = admin.firestore();
+    const now = Date.now();
+    try {
+      const snap = await db.collection("signupOtps").where("expiresAt", "<", now).limit(200).get();
+      if (snap.empty) return null;
+      const batch = db.batch();
+      snap.docs.forEach(d => batch.delete(d.ref));
+      await batch.commit();
+      console.log(`Cleaned up ${snap.size} expired signup OTP(s).`);
+    } catch (e) {
+      console.error("cleanupExpiredSignupOtps error:", e.message);
+    }
+    return null;
+  });
