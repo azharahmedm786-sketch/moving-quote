@@ -2553,12 +2553,10 @@ PASSWORD RESET FLOW
 async function sendResetEmail() {
   const email = document.getElementById("resetEmail").value.trim();
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return showError("recoverError", "⚠️ Please enter a valid email address.");
-
   const btn = document.getElementById("btnSendResetEmail");
   if (btn) { btn.disabled = true; btn.textContent = "Sending..."; }
   showError("recoverError", "⏳ Sending reset link...", "info");
-
- waitForFirebase(async () => {
+  waitForFirebase(async () => {
     const { functions } = window._firebase;
     try {
       await functions.httpsCallable("sendPasswordResetEmailBrevo")({ email });
@@ -2567,21 +2565,15 @@ async function sendResetEmail() {
     } catch (err) {
       console.error(err);
       if (err.code === "functions/not-found") showError("recoverError", "⚠️ No account found with this email.");
+      else if (err.code === "functions/failed-precondition" && err.message === "auth/google-account-no-password") {
+        showError("recoverError", "⚠️ Unable to reset password — you previously continued with Google. Please use \"Continue with Google\" to sign in instead.");
+      }
       else showError("recoverError", "⚠️ " + (err.message || "Something went wrong. Please try again."));
     } finally {
       if (btn) { btn.disabled = false; btn.textContent = "Send Reset Link →"; }
     }
   });
 }
-
-function signOutUser() {
-  waitForFirebase(() => {
-    window._firebase.auth.signOut().then(() => {
-      currentUser = null; closeUserMenu(); showToast("👋 Signed out successfully.");
-    });
-  });
-}
-
 /* ============================================
 DASHBOARD
 ============================================ */
@@ -3650,10 +3642,15 @@ async function submitNewPassword() {
   const urlParams = new URLSearchParams(window.location.search);
   const oobCode = urlParams.get('oobCode');
   const newPassword = document.getElementById('newPasswordInput').value;
+  const confirmPassword = document.getElementById('newPasswordConfirmInput').value;
   const btn = document.getElementById('btnSubmitNewPassword');
 
   if (!newPassword || newPassword.length < 6) {
     showError("newPasswordError", "⚠️ Password must be at least 6 characters.");
+    return;
+  }
+  if (newPassword !== confirmPassword) {
+    showError("newPasswordError", "⚠️ Passwords do not match.");
     return;
   }
 
