@@ -3642,7 +3642,7 @@ async function submitNewPassword() {
   const urlParams = new URLSearchParams(window.location.search);
   const oobCode = urlParams.get('oobCode');
   const newPassword = document.getElementById('newPasswordInput').value;
-  const confirmPassword = document.getElementById('newPasswordConfirmInput').value;
+  const confirmPassword = document.getElementById('newPasswordConfirmInput').value; 
   const btn = document.getElementById('btnSubmitNewPassword');
 
   if (!newPassword || newPassword.length < 6) {
