@@ -2393,7 +2393,8 @@ function getAuthErrorMessage(code) {
 }
 
 /* ═══════════════════════════════════════════════
-SIGN UP FLOW
+/* ═══════════════════════════════════════════════
+SIGN UP FLOW — OTP verified BEFORE account exists
 ═══════════════════════════════════════════════ */
 async function signupUser() {
   if (!checkRateLimit("signup_otp", 3, 300000)) { showError("signupError", "⚠️ Too many OTP requests. Please try again later."); return; }
@@ -2412,47 +2413,87 @@ async function signupUser() {
 
   const fullName = firstName + " " + lastName;
   const btn = document.getElementById("btnSignup");
-  if (btn) { btn.disabled = true; btn.textContent = "Creating account..."; }
-  showError("signupError", "⏳ Creating your account...", "info");
+  if (btn) { btn.disabled = true; btn.textContent = "Sending code..."; }
+  showError("signupError", "⏳ Sending verification code...", "info");
 
-waitForFirebase(async () => {
-    const { auth, db, functions } = window._firebase;
+  waitForFirebase(async () => {
+    const { functions } = window._firebase;
     try {
-      // 1. Create User
-      const cred = await auth.createUserWithEmailAndPassword(email, password);
-      const newUser = cred.user;
-
-      // 2. Update Profile Name
-      await newUser.updateProfile({ displayName: fullName });
-
-      // 3. Send Email Verification (via Brevo)
-      await functions.httpsCallable("sendVerificationEmailBrevo")();
-
-      // 4. Create Firestore Document
-      const refCode = newUser.uid.slice(0, 8).toUpperCase();
-      await db.collection("users").doc(newUser.uid).set({
-        firstName, lastName, name: fullName, email, phone: "+91" + phone,
-        role: "customer",
-        phoneVerified: false,
-        emailVerified: false,
-        prefEmail: true, prefSMS: true,
-        referralCode: refCode, referralCount: 0, referralCredits: 0,
-        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-        lastLoginAt: firebase.firestore.FieldValue.serverTimestamp()
-      });
-
-      if (referral) await processReferral(referral, newUser.uid);
-
+      await functions.httpsCallable("sendSignupOtpBrevo")({ email, name: fullName, phone });
+      pendingSignupData = { firstName, lastName, fullName, phone, email, password, referral };
       closeAuthModal();
-      showToast(`👋 Welcome to PackZen, ${firstName}! Please verify your email.`);
+      openSignupOtpModal(email);
     } catch (err) {
-      console.error("Signup error:", err);
-      if (err.code === "auth/email-already-in-use") showError("signupError", "⚠️ This email is already registered. Please login.");
-      else if (err.code === "auth/weak-password") showError("signupError", "⚠️ Password too weak. Use at least 6 characters.");
-      else showError("signupError", getAuthErrorMessage(err.code));
+      console.error("Signup OTP error:", err);
+      if (err.code === "functions/already-exists" && err.message === "auth/email-already-in-use") showError("signupError", "⚠️ This email is already registered. Please login.");
+      else if (err.code === "functions/already-exists" && err.message === "auth/phone-already-in-use") showError("signupError", "⚠️ This phone number is already registered.");
+      else showError("signupError", "⚠️ " + (err.message || "Something went wrong. Please try again."));
     } finally {
       if (btn) { btn.disabled = false; btn.textContent = "Create Account →"; }
     }
+  });
+}
+
+function openSignupOtpModal(email) {
+  const modal = document.getElementById("signupOtpModal");
+  if (!modal) { showToast("⚠️ OTP screen not found."); return; }
+  document.getElementById("signupOtpEmailDisplay").textContent = email;
+  document.getElementById("signupOtpInput").value = "";
+  document.getElementById("signupOtpError").textContent = "";
+  modal.style.display = "flex";
+}
+
+function closeSignupOtpModal() { document.getElementById("signupOtpModal").style.display = "none"; }
+
+async function verifySignupOtp() {
+  if (!pendingSignupData) { showToast("⚠️ Signup session expired. Please start again."); closeSignupOtpModal(); return; }
+  const otp = document.getElementById("signupOtpInput").value.trim();
+  if (!otp || otp.length !== 6) { showError("signupOtpError", "⚠️ Enter the 6-digit code."); return; }
+
+  const btn = document.getElementById("btnVerifySignupOtp");
+  if (btn) { btn.disabled = true; btn.textContent = "Verifying..."; }
+
+  waitForFirebase(async () => {
+    const { auth, functions } = window._firebase;
+    const { firstName, lastName, phone, email, password, referral } = pendingSignupData;
+    try {
+      // Account + Firestore profile are created entirely server-side —
+      // see verifySignupOtpBrevo in auth-emails.js. The client only
+      // signs in with the token it hands back.
+      const result = await functions.httpsCallable("verifySignupOtpBrevo")({
+        email, otp, password, firstName, lastName, phone, referral
+      });
+      const token = result?.data?.token;
+      if (!token) throw new Error("No sign-in token returned.");
+
+      await auth.signInWithCustomToken(token);
+
+      pendingSignupData = null;
+      closeSignupOtpModal();
+      showToast(`👋 Welcome to PackZen, ${firstName}!`);
+    } catch (err) {
+      console.error("OTP verify / account creation error:", err);
+      if (err.code === "functions/already-exists" && err.message === "auth/email-already-in-use") showError("signupOtpError", "⚠️ This email is already registered. Please login.");
+      else if (err.code === "functions/already-exists" && err.message === "auth/phone-already-in-use") showError("signupOtpError", "⚠️ This phone number is already registered.");
+      else if (err.code === "functions/not-found") showError("signupOtpError", "⚠️ No code found. Please request a new one.");
+      else if (err.code === "functions/deadline-exceeded") showError("signupOtpError", "⚠️ Code expired. Please request a new one.");
+      else if (err.code === "functions/resource-exhausted") showError("signupOtpError", "⚠️ Too many attempts. Please request a new code.");
+      else if (err.code === "functions/invalid-argument") showError("signupOtpError", "⚠️ Incorrect code. Please try again.");
+      else showError("signupOtpError", getAuthErrorMessage(err.code));
+    } finally {
+      if (btn) { btn.disabled = false; btn.textContent = "Verify & Create Account"; }
+    }
+  });
+}
+
+async function resendSignupOtp() {
+  if (!pendingSignupData) return;
+  const { email, fullName, phone } = pendingSignupData;
+  waitForFirebase(async () => {
+    try {
+      await window._firebase.functions.httpsCallable("sendSignupOtpBrevo")({ email, name: fullName, phone });
+      showToast("📧 New code sent!");
+    } catch (err) { showError("signupOtpError", "⚠️ " + (err.message || "Failed to resend code.")); }
   });
 }
 
