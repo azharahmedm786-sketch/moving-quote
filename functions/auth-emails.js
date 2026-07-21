@@ -242,6 +242,7 @@ exports.verifySignupOtpBrevo = functions
     } catch (err) {
       await phoneRef.delete().catch(() => {});
       if (err.code === "auth/email-already-exists") throw new functions.https.HttpsError("already-exists", "auth/email-already-in-use");
+      console.error("verifySignupOtpBrevo — createUser failed:", err);
       throw new functions.https.HttpsError("internal", err.message || "Account creation failed.");
     }
 
@@ -274,14 +275,27 @@ exports.verifySignupOtpBrevo = functions
       }
     } catch (err) {
       // Step 5 — roll back so nothing orphaned survives a partial failure.
+      console.error("verifySignupOtpBrevo — Firestore profile setup failed:", err);
       await admin.auth().deleteUser(userRecord.uid).catch(() => {});
       await phoneRef.delete().catch(() => {});
       throw new functions.https.HttpsError("internal", "Account setup failed. Please try again.");
     }
 
     // Step 6 — hand the client a token instead of letting it create the account.
-    const token = await admin.auth().createCustomToken(userRecord.uid);
-    return { success: true, token };
+    try {
+      const token = await admin.auth().createCustomToken(userRecord.uid);
+      return { success: true, token };
+    } catch (err) {
+      // If token signing fails (commonly: the functions service account is
+      // missing the "Service Account Token Creator" IAM role needed by
+      // createCustomToken), roll back everything so the user isn't left
+      // with an unusable half-created account.
+      console.error("verifySignupOtpBrevo — createCustomToken failed:", err);
+      await admin.firestore().collection("users").doc(userRecord.uid).delete().catch(() => {});
+      await phoneRef.delete().catch(() => {});
+      await admin.auth().deleteUser(userRecord.uid).catch(() => {});
+      throw new functions.https.HttpsError("internal", "Account setup failed. Please try again — if this keeps happening, contact support.");
+    }
   });
 
 /* ════════════════════════════════════════════════════════════
