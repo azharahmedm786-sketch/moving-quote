@@ -2373,7 +2373,17 @@ function showError(id, msg, type = "error") {
   el.style.color = type === "success" ? "#16a34a" : type === "info" ? "#2563eb" : "#dc2626";
 }
 
-function getAuthErrorMessage(code) {
+function roleRedirectMessage(role) {
+  const map = {
+    driver: "⚠️ This account is a driver account. Please sign in from the driver portal.",
+    admin: "⚠️ This account is an admin account. Please sign in from the admin portal.",
+    advisor: "⚠️ This account is an advisor account. Please sign in from the advisor portal.",
+    partner: "⚠️ This account is a partner account. Please sign in from the partner portal."
+  };
+  return map[role] || "⚠️ This account cannot sign in here. Please use the correct portal.";
+}
+
+function getAuthErrorMessage(code) { 
   const map = {
     "auth/user-not-found": "⚠️ No account found. Please sign up first.",
     "auth/wrong-password": "⚠️ Incorrect password. Please try again.",
@@ -2524,8 +2534,15 @@ async function loginUser() {
 
   waitForFirebase(async () => {
     const { auth, db, functions } = window._firebase;
-    try {
+  try {
       const cred = await auth.signInWithEmailAndPassword(email, pass);
+      const userDoc = await db.collection("users").doc(cred.user.uid).get();
+      const role = userDoc.exists ? userDoc.data().role : null;
+      if (role && role !== "customer") {
+        await auth.signOut();
+        showError("loginError", roleRedirectMessage(role));
+        return;
+      }
       await db.collection("users").doc(cred.user.uid).update({ lastLoginAt: firebase.firestore.FieldValue.serverTimestamp() }).catch(()=>{});
       closeAuthModal();
       showToast("✅ Login successful");
@@ -2554,15 +2571,20 @@ async function _handleOAuthUser(user, db, providerName) {
   const userRef = db.collection("users").doc(user.uid);
   const existingDoc = await userRef.get();
   if (existingDoc.exists) {
+    const role = existingDoc.data().role || "customer";
+    if (role !== "customer") return role; // block — never touch a non-customer doc further
     await userRef.update({ lastLoginAt: firebase.firestore.FieldValue.serverTimestamp(), loginMethod: providerName });
-    return;
+    return role;
   }
   const emailSnap = await db.collection("users").where("email", "==", user.email).limit(1).get();
   if (!emailSnap.empty) {
     const existingData = emailSnap.docs[0].data();
+    const role = existingData.role || "customer";
+    if (role !== "customer") return role; // block — do NOT migrate/delete a driver, admin, advisor, or partner doc
     const oldDocId = emailSnap.docs[0].id;
     await userRef.set({ ...existingData, loginMethod: providerName, [providerName + 'Linked']: true, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
     if (oldDocId !== user.uid) await db.collection("users").doc(oldDocId).delete().catch(() => {});
+    return role;
   } else {
     const refCode = user.uid.slice(0, 8).toUpperCase();
     await userRef.set({
@@ -2571,17 +2593,22 @@ async function _handleOAuthUser(user, db, providerName) {
       referralCode: refCode, referralCount: 0, referralCredits: 0, createdAt: firebase.firestore.FieldValue.serverTimestamp(),
       lastLoginAt: firebase.firestore.FieldValue.serverTimestamp()
     });
+    return "customer";
   }
 }
-
 window.signInWithGoogle = async function () {
   waitForFirebase(async () => {
     const { auth, db } = window._firebase;
     const provider = new firebase.auth.GoogleAuthProvider();
     provider.setCustomParameters({ prompt: "select_account" });
     try {
-      const result = await auth.signInWithPopup(provider);
-      await _handleOAuthUser(result.user, db, 'google');
+ const result = await auth.signInWithPopup(provider);
+      const role = await _handleOAuthUser(result.user, db, 'google');
+      if (role !== "customer") {
+        await auth.signOut();
+        showError("loginError", roleRedirectMessage(role));
+        return;
+      }
       closeAuthModal();
       const name = (result.user.displayName || result.user.email?.split("@")[0] || "User").split(" ")[0];
       showToast(`👋 Welcome, ${name}!`);
@@ -2601,8 +2628,13 @@ window.signInWithApple = async function () {
     provider.addScope('email');
     provider.addScope('name');
     try {
-      const result = await auth.signInWithPopup(provider);
-      await _handleOAuthUser(result.user, db, 'apple');
+const result = await auth.signInWithPopup(provider);
+      const role = await _handleOAuthUser(result.user, db, 'apple');
+      if (role !== "customer") {
+        await auth.signOut();
+        showError("loginError", roleRedirectMessage(role));
+        return;
+      }
       closeAuthModal();
       const name = (result.user.displayName || result.user.email?.split("@")[0] || "User").split(" ")[0];
       showToast(`👋 Welcome, ${name}!`);
