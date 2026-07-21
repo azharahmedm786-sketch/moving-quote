@@ -2503,7 +2503,7 @@ async function verifySignupOtp() {
       else if (err.code === "functions/deadline-exceeded") showError("signupOtpError", "⚠️ Code expired. Please request a new one.");
       else if (err.code === "functions/resource-exhausted") showError("signupOtpError", "⚠️ Too many attempts. Please request a new code.");
       else if (err.code === "functions/invalid-argument") showError("signupOtpError", "⚠️ Incorrect code. Please try again.");
-      else showError("signupOtpError", getAuthErrorMessage(err.code));
+      else showError("signupOtpError", err.message ? ("⚠️ " + err.message) : getAuthErrorMessage(err.code));
     } finally {
       if (btn) { btn.disabled = false; btn.textContent = "Verify & Create Account"; }
     }
