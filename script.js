@@ -2388,6 +2388,10 @@ function getAuthErrorMessage(code) {
     "auth/invalid-verification-code": "⚠️ Incorrect OTP. Please try again.",
     "auth/quota-exceeded": "⚠️ SMS quota exceeded. Try again later.",
     "auth/credential-already-in-use": "⚠️ This phone number is already linked to another account.",
+    "auth/account-exists-with-different-credential": "⚠️ This email is already registered with a different sign-in method. Try logging in with email and password instead.",
+    "auth/expired-action-code": "⚠️ This link has expired. Please request a new one.",
+    "auth/invalid-action-code": "⚠️ This link is invalid or has already been used. Please request a new one.",
+    "auth/user-disabled": "⚠️ This account has been disabled. Please contact support.",
   };
   return map[code] || ("⚠️ " + (code || "Something went wrong. Please try again."));
 }
@@ -2423,9 +2427,19 @@ async function signupUser() {
       pendingSignupData = { firstName, lastName, fullName, phone, email, password, referral };
       closeAuthModal();
       openSignupOtpModal(email);
-    } catch (err) {
+  } catch (err) {
       console.error("Signup OTP error:", err);
-      if (err.code === "functions/already-exists" && err.message === "auth/email-already-in-use") showError("signupError", "⚠️ This email is already registered. Please login.");
+      if (err.code === "functions/already-exists" && err.message === "auth/email-already-in-use") {
+        try {
+          const check = await functions.httpsCallable("checkAuthProvider")({ email });
+          const { hasGoogle, hasApple, hasPassword } = check.data || {};
+          if (hasGoogle && !hasPassword) showError("signupError", "⚠️ This email is linked to a Google account. Please use \"Continue with Google\" instead.");
+          else if (hasApple && !hasPassword) showError("signupError", "⚠️ This email is linked to an Apple account. Please use \"Continue with Apple\" instead.");
+          else showError("signupError", "⚠️ This email is already registered. Please login.");
+        } catch (checkErr) {
+          showError("signupError", "⚠️ This email is already registered. Please login.");
+        }
+      }
       else if (err.code === "functions/already-exists" && err.message === "auth/phone-already-in-use") showError("signupError", "⚠️ This phone number is already registered.");
       else showError("signupError", "⚠️ " + (err.message || "Something went wrong. Please try again."));
     } finally {
@@ -2509,7 +2523,7 @@ async function loginUser() {
   if (btn) { btn.disabled = true; btn.textContent = "Signing in..."; }
 
   waitForFirebase(async () => {
-    const { auth, db } = window._firebase;
+    const { auth, db, functions } = window._firebase;
     try {
       const cred = await auth.signInWithEmailAndPassword(email, pass);
       await db.collection("users").doc(cred.user.uid).update({ lastLoginAt: firebase.firestore.FieldValue.serverTimestamp() }).catch(()=>{});
@@ -2517,7 +2531,20 @@ async function loginUser() {
       showToast("✅ Login successful");
     } catch (err) {
       console.error('Customer Auth Error:', err.code, err.message);
-      showError("loginError", "⚠️ Incorrect email or password");
+      const invalidCredCodes = ["auth/wrong-password", "auth/invalid-credential", "auth/invalid-login-credentials", "auth/user-not-found"];
+      if (invalidCredCodes.includes(err.code)) {
+        try {
+          const check = await functions.httpsCallable("checkAuthProvider")({ email });
+          const { exists, hasGoogle, hasApple, hasPassword } = check.data || {};
+          if (exists && hasGoogle && !hasPassword) showError("loginError", "⚠️ This email is linked to a Google account. Please use \"Continue with Google\" to sign in.");
+          else if (exists && hasApple && !hasPassword) showError("loginError", "⚠️ This email is linked to an Apple account. Please use \"Continue with Apple\" to sign in.");
+          else showError("loginError", "⚠️ Incorrect email or password.");
+        } catch (checkErr) {
+          showError("loginError", "⚠️ Incorrect email or password.");
+        }
+      } else {
+        showError("loginError", getAuthErrorMessage(err.code));
+      }
     }
     finally { if (btn) { btn.disabled = false; btn.textContent = "Login →"; } }
   });
