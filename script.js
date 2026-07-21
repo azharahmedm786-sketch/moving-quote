@@ -2567,6 +2567,19 @@ async function loginUser() {
   });
 }
 
+async function signOutUser() {
+  waitForFirebase(async () => {
+    try {
+      await window._firebase.auth.signOut();
+      document.getElementById("userDropdown")?.classList.remove("open");
+      showToast("👋 Signed out successfully");
+    } catch (err) {
+      console.error("Sign out error:", err);
+      showToast("⚠️ Something went wrong signing out. Please try again.");
+    }
+  });
+}
+
 async function _handleOAuthUser(user, db, providerName) {
   const userRef = db.collection("users").doc(user.uid);
   const existingDoc = await userRef.get();
