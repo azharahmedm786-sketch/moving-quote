@@ -346,7 +346,7 @@ exports.sendPasswordResetEmailBrevo = functions
 
     const link = await admin.auth().generatePasswordResetLink(email, { url: ACTION_URL.value(), handleCodeInApp: false });
 
-    await sendAuthEmail("password_reset", email, userRecord.displayName, "Reset your PackZen password", {
+ await sendAuthEmail("password_reset", email, userRecord.displayName, "Reset your PackZen password", {
       preheader: "Reset your PackZen account password.",
       heading: `Reset your password, ${userRecord.displayName || "there"}`,
       bodyLines: [
@@ -356,6 +356,37 @@ exports.sendPasswordResetEmailBrevo = functions
       ctaLabel: "Reset Password →", ctaUrl: link
     });
     return { success: true };
+  });
+
+/* ════════════════════════════════════════════════════════════
+   PHASE 2b — CHECK AUTH PROVIDER
+   Lets the client ask "how is this email registered?" without
+   relying on fetchSignInMethodsForEmail (unreliable now that
+   Email Enumeration Protection is on by default). Used by the
+   signup and login error handlers to give an accurate message
+   instead of a generic Firebase error code.
+   ════════════════════════════════════════════════════════════ */
+exports.checkAuthProvider = functions
+  .region("asia-south1")
+  .https.onCall(async (data, context) => {
+    const email = (data?.email || "").trim().toLowerCase();
+    if (!EMAIL_REGEX.test(email)) throw new functions.https.HttpsError("invalid-argument", "A valid email is required.");
+
+    await enforceRateLimit("check_provider", email);
+
+    try {
+      const userRecord = await admin.auth().getUserByEmail(email);
+      const providers = userRecord.providerData.map(p => p.providerId);
+      return {
+        exists: true,
+        hasPassword: providers.includes("password"),
+        hasGoogle: providers.includes("google.com"),
+        hasApple: providers.includes("apple.com")
+      };
+    } catch (e) {
+      if (e.code === "auth/user-not-found") return { exists: false, hasPassword: false, hasGoogle: false, hasApple: false };
+      throw e;
+    }
   });
 
 /* ════════════════════════════════════════════════════════════
