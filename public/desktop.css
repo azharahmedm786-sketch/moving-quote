@@ -942,3 +942,16 @@
   }
 
 }
+
+@media (min-width: 1024px) {
+  .hero-premium-section { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; padding: 4rem 2rem; max-width: 1400px; margin: 0 auto; }
+  .hero-premium-title { font-size: 4rem; margin-bottom: 1.5rem; }
+  .hero-premium-desc { font-size: 1.1rem; font-weight: 500; }
+  .hero-premium-actions { flex-direction: row; gap: 1.5rem; }
+  .hero-premium-illustration { margin-top: 0; }
+  .floating-track-card { right: auto; width: 320px; left: -30px; bottom: 30px; }
+
+  .trust-signals-card { flex-direction: row; justify-content: space-between; align-items: center; padding: 1.5rem 3rem; border-radius: 100px; margin: -2rem auto 4rem; max-width: 1200px; position: relative; z-index: 10; box-shadow: 0 10px 40px rgba(0,0,0,0.08); }
+  .trust-divider { display: block; width: 1px; height: 24px; background: #e2e8f0; }
+  .app-phone-btn { display: flex; }
+}
