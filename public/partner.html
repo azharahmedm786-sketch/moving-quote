@@ -34,6 +34,8 @@
 <link rel="stylesheet" href="desktop.css">
 <link rel="stylesheet" href="partner.css">
 
+
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 </head>
 
 <body class="app-body partner-body">
@@ -130,11 +132,11 @@ Partner Login
 <ul class="partner-trust-row">
 
 <li>
-✅ No Joining Fee
+<i data-lucide="check-circle"></i> No Joining Fee
 </li>
 
 <li>
-💰 Weekly Payouts
+<i data-lucide="indian-rupee"></i> Weekly Payouts
 </li>
 
 <li>
@@ -142,11 +144,11 @@ Partner Login
 </li>
 
 <li>
-📦 Daily Booking Requests
+<i data-lucide="package"></i> Daily Booking Requests
 </li>
 
 <li>
-📍 Live Tracking
+<i data-lucide="map-pin"></i> Live Tracking
 </li>
 
 </ul>
@@ -219,7 +221,7 @@ We help professional movers grow their business by connecting them with genuine 
 
 <div class="partner-benefit-card">
 
-<div class="pbc-icon">📦</div>
+<div class="pbc-icon"><i data-lucide="package"></i></div>
 
 <h3>Daily Bookings</h3>
 
@@ -231,7 +233,7 @@ Receive moving requests from verified customers.
 
 <div class="partner-benefit-card">
 
-<div class="pbc-icon">💰</div>
+<div class="pbc-icon"><i data-lucide="indian-rupee"></i></div>
 
 <h3>Weekly Payments</h3>
 
@@ -243,7 +245,7 @@ Fast and transparent weekly payouts.
 
 <div class="partner-benefit-card">
 
-<div class="pbc-icon">📍</div>
+<div class="pbc-icon"><i data-lucide="map-pin"></i></div>
 
 <h3>Smart Dispatch</h3>
 
@@ -310,27 +312,27 @@ Whether you're an individual mover or an established relocation company, PackZen
 <div class="partner-who-grid">
 
 <div class="partner-who-card">
-<div class="pwc-icon">🏠</div>
+<div class="pwc-icon"><i data-lucide="home"></i></div>
 <span>Packers & Movers</span>
 </div>
 
 <div class="partner-who-card">
-<div class="pwc-icon">🚚</div>
+<div class="pwc-icon"><i data-lucide="truck"></i></div>
 <span>Tata Ace Owners</span>
 </div>
 
 <div class="partner-who-card">
-<div class="pwc-icon">🚛</div>
+<div class="pwc-icon"><i data-lucide="truck"></i></div>
 <span>Mini Truck Owners</span>
 </div>
 
 <div class="partner-who-card">
-<div class="pwc-icon">📦</div>
+<div class="pwc-icon"><i data-lucide="package"></i></div>
 <span>Loading Teams</span>
 </div>
 
 <div class="partner-who-card">
-<div class="pwc-icon">🏢</div>
+<div class="pwc-icon"><i data-lucide="building-2"></i></div>
 <span>Office Relocation Teams</span>
 </div>
 
@@ -340,7 +342,7 @@ Whether you're an individual mover or an established relocation company, PackZen
 </div>
 
 <div class="partner-who-card">
-<div class="pwc-icon">🚐</div>
+<div class="pwc-icon"><i data-lucide="car"></i></div>
 <span>Tempo Operators</span>
 </div>
 
@@ -355,7 +357,7 @@ Whether you're an individual mover or an established relocation company, PackZen
 </div>
 
 <div class="partner-who-card">
-<div class="pwc-icon">📍</div>
+<div class="pwc-icon"><i data-lucide="map-pin"></i></div>
 <span>Local Transporters</span>
 </div>
 
@@ -487,7 +489,7 @@ Keep these documents ready before registering.
 </div>
 
 <div class="partner-req-card">
-<div class="prc-icon">🚚</div>
+<div class="prc-icon"><i data-lucide="truck"></i></div>
 <span>Vehicle RC</span>
 </div>
 
@@ -507,12 +509,12 @@ Keep these documents ready before registering.
 </div>
 
 <div class="partner-req-card">
-<div class="prc-icon">📱</div>
+<div class="prc-icon"><i data-lucide="smartphone"></i></div>
 <span>Smartphone</span>
 </div>
 
 <div class="partner-req-card">
-<div class="prc-icon">🏠</div>
+<div class="prc-icon"><i data-lucide="home"></i></div>
 <span>Address</span>
 </div>
 
@@ -537,19 +539,19 @@ Increase your revenue by accepting verified moving requests through PackZen.
 <div class="partner-earnings-grid">
 
 <div class="partner-earn-card">
-<div class="pec-icon">💰</div>
+<div class="pec-icon"><i data-lucide="indian-rupee"></i></div>
 <h3>Fair Commission</h3>
 <p>Transparent commission structure with no hidden deductions.</p>
 </div>
 
 <div class="partner-earn-card">
-<div class="pec-icon">📅</div>
+<div class="pec-icon"><i data-lucide="calendar"></i></div>
 <h3>Weekly Payouts</h3>
 <p>Receive payments every week directly into your registered bank account.</p>
 </div>
 
 <div class="partner-earn-card">
-<div class="pec-icon">⭐</div>
+<div class="pec-icon"><i data-lucide="star"></i></div>
 <h3>Performance Rewards</h3>
 <p>Top-rated partners receive priority booking allocation.</p>
 </div>
@@ -881,7 +883,7 @@ WhatsApp Support
 
 <p>
 
-📞 +91 99450 95453
+<i data-lucide="phone"></i> +91 99450 95453
 
 </p>
 
@@ -893,7 +895,7 @@ WhatsApp Support
 
 <p>
 
-📍 Bangalore, Karnataka
+<i data-lucide="map-pin"></i> Bangalore, Karnataka
 
 </p>
 
@@ -993,6 +995,36 @@ window.location.href="partner-dashboard.html";
 
 </script>
 
+
+
+
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+
+        // Debounced observer to prevent infinite loops and performance issues
+        let timeout;
+        const observer = new MutationObserver((mutations) => {
+            let shouldUpdate = false;
+            for (let m of mutations) {
+                if (m.addedNodes.length > 0) {
+                    shouldUpdate = true;
+                    break;
+                }
+            }
+            if (shouldUpdate) {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => lucide.createIcons(), 50);
+            }
+        });
+        observer.observe(document.body, { childList: true, subtree: true });
+    }
+  });
+</script>
+
+  <script src="icon-init.js"></script>
 </body>
 
 </html>

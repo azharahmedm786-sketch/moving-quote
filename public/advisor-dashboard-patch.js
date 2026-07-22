@@ -322,7 +322,7 @@ function nbRestoreDraft() {
   }
   const banner = document.getElementById("nbDraftBanner");
   if (banner) banner.style.display = "none";
-  toast("📝 Draft restored");
+  toast(" Draft restored");
 }
 
 function nbDiscardDraft() {
@@ -574,7 +574,7 @@ storageNeeded: !!document.getElementById("nbStorage")?.checked,
   if (btn) { btn.disabled = true; btn.textContent = "Saving…"; }
   try {
     await window._firebase.db.collection("bookings").add(payload);
-    toast("✅ Booking created: " + bookingRef);
+    toast("Success: Booking created: " + bookingRef);
     nbDiscardDraft();
     nbResetForm();
   } catch (e) {
@@ -661,10 +661,10 @@ async function confirmAssign() {
       driverUid, driverName: driver?.name || "Driver", driverPhone: driver?.phone || "", status: "assigned"
     });
     await window._firebase.db.collection("users").doc(driverUid).update({ currentBooking: assignBookingId });
-    toast("✅ Driver assigned");
+    toast("Success: Driver assigned");
     closeAssignModal();
   } catch (e) {
-    toast("❌ " + (e.code === "permission-denied" ? "Permission denied — check Firestore rules." : e.message));
+    toast("Failed: " + (e.code === "permission-denied" ? "Permission denied — check Firestore rules." : e.message));
   }
 }
 

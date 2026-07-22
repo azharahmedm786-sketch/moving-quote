@@ -15,7 +15,7 @@
   --navy-600: #1a3a7a;
 
   /* Green trust accent */
-  --green-600: #16a34a;
+  --green-600: #10b981;
   --green-500: #22c55e;
   --green-400: #4ade80;
   --green-100: #dcfce7;
@@ -120,7 +120,7 @@ html {
 ========================= */
 
 body{
-    font-family: 'Nunito', sans-serif;
+    font-family: 'Inter', sans-serif;
     font-size:16px;
     line-height:1.65;
     font-weight:400;
@@ -136,7 +136,7 @@ h3,
 h4,
 h5,
 h6{
-    font-family: 'Nunito', sans-serif;
+    font-family: 'Inter', sans-serif;
     font-weight:800;
     letter-spacing:-0.03em;
     line-height:1.15;
@@ -223,7 +223,7 @@ img { max-width: 100%; height: auto; display: block; }
   box-shadow: 0 2px 8px rgba(0,0,0,0.3);
 }
 .app-logo-text {
-  font-family: 'Nunito', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-weight: 800; font-size: 1.1rem;
   color: #fff; letter-spacing: -0.02em;
 }
@@ -604,7 +604,7 @@ img { max-width: 100%; height: auto; display: block; }
   padding: 3px 8px; border-radius: 100px; margin-bottom: 6px;
   text-transform: uppercase;
 }
-.offer-title { font-family: 'Nunito', sans-serif; font-size: 1.1rem; font-weight: 800; color: #fff; margin-bottom: 3px; }
+.offer-title { font-family: 'Inter', sans-serif; font-size: 1.1rem; font-weight: 800; color: #fff; margin-bottom: 3px; }
 .offer-sub   { font-size: 0.78rem; color: rgba(255,255,255,0.7); margin-bottom: 12px; }
 .offer-btn {
   display: inline-flex; align-items: center;
@@ -646,7 +646,7 @@ img { max-width: 100%; height: auto; display: block; }
   background: var(--navy-900);
   padding: 1rem 1.25rem;
 }
-.pricing-app-title { font-family: 'Nunito', sans-serif; font-size: 1rem; font-weight: 800; color: #fff; }
+.pricing-app-title { font-family: 'Inter', sans-serif; font-size: 1rem; font-weight: 800; color: #fff; }
 .pricing-app-sub   { font-size: 0.75rem; color: rgba(255,255,255,0.6); margin-top: 2px; }
 
 .pricing-rows { padding: 0 1.25rem; }
@@ -867,7 +867,7 @@ img { max-width: 100%; height: auto; display: block; }
   padding: 4px 1.25rem 12px;
   flex-shrink: 0;
 }
-.sheet-title { font-family: 'Nunito', sans-serif; font-size: 1.1rem; font-weight: 800; color: var(--text-primary); }
+.sheet-title { font-family: 'Inter', sans-serif; font-size: 1.1rem; font-weight: 800; color: var(--text-primary); }
 .sheet-close {
   width: 36px; height: 36px; border-radius: 50%;
   background: var(--bg-secondary); border: 1px solid var(--border-light);
@@ -914,7 +914,7 @@ img { max-width: 100%; height: auto; display: block; }
 .step-header-top {
   display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.875rem;
 }
-.step-counter { font-family: 'Nunito', sans-serif; font-size: 1.8rem; font-weight: 800; color: #fff; line-height: 1; }
+.step-counter { font-family: 'Inter', sans-serif; font-size: 1.8rem; font-weight: 800; color: #fff; line-height: 1; }
 .step-of      { font-size: 0.95rem; color: rgba(255,255,255,0.4); }
 .step-header-label { font-size: 0.82rem; font-weight: 600; color: rgba(255,255,255,0.8); }
 
@@ -999,7 +999,7 @@ img { max-width: 100%; height: auto; display: block; }
   width: 100%; padding: 0.875rem 1rem;
   border: 1.5px solid var(--border-light);
   border-radius: var(--radius-md);
-  font-family: 'Nunito', sans-serif; font-size: 16px;
+  font-family: 'Inter', sans-serif; font-size: 16px;
   background: var(--bg-secondary); color: var(--text-primary);
   transition: border-color 0.2s, box-shadow 0.2s;
   box-sizing: border-box;
@@ -1044,7 +1044,7 @@ select.field-input {
   display: flex; align-items: center; justify-content: center; gap: 6px;
   background: #16a34a; color: #fff;
   border: none; border-radius: var(--radius-pill);
-  font-family: 'Nunito', sans-serif; font-size: 0.95rem; font-weight: 700;
+  font-family: 'Inter', sans-serif; font-size: 0.95rem; font-weight: 700;
   cursor: pointer; transition: box-shadow 0.3s cubic-bezier(0.25, 1, 0.5, 1);
   box-shadow: var(--gold-glow);
   position: relative; overflow: hidden;
@@ -1056,7 +1056,7 @@ select.field-input {
   display: flex; align-items: center; justify-content: center; gap: 6px;
   background: var(--bg-secondary); color: var(--text-muted);
   border: 1.5px solid var(--border-light); border-radius: var(--radius-pill);
-  font-family: 'Nunito', sans-serif; font-size: 0.9rem; font-weight: 600;
+  font-family: 'Inter', sans-serif; font-size: 0.9rem; font-weight: 600;
   cursor: pointer; transition: background 0.2s;
 }
 .btn-back:hover { background: var(--border-light); color: var(--text-primary); }
@@ -1172,7 +1172,7 @@ select.field-input {
 .date-card.selected .dc-month { color: #fff !important; }
 
 .dc-day   { font-size: 0.6rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-muted); margin-bottom: 3px; }
-.dc-num   { font-family: 'Nunito', sans-serif; font-size: 1.25rem; font-weight: 800; color: var(--text-primary); line-height: 1; }
+.dc-num   { font-family: 'Inter', sans-serif; font-size: 1.25rem; font-weight: 800; color: var(--text-primary); line-height: 1; }
 .dc-month { font-size: 0.58rem; color: var(--text-muted); margin-top: 3px; font-weight: 600; }
 .dc-tag   { font-size: 0.52rem; font-weight: 700; background: var(--green-600); color: #fff; padding: 1px 5px; border-radius: 6px; margin-top: 3px; text-transform: uppercase; }
 .date-card.selected .dc-tag { background: rgba(255,255,255,0.3); }
@@ -1182,7 +1182,7 @@ select.field-input {
   font-size: 0.78rem; font-weight: 600; color: var(--green-600);
   background: var(--green-50); border: 1.5px solid rgba(34,197,94,0.25);
   border-radius: var(--radius-pill); padding: 6px 14px;
-  cursor: pointer; transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1); font-family: 'Nunito', sans-serif; min-height: 36px;
+  cursor: pointer; transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1); font-family: 'Inter', sans-serif; min-height: 36px;
 }
 .date-more-btn:hover { background: var(--green-600); color: #fff; }
 .date-selected-label { font-size: 0.78rem; color: var(--text-muted); }
@@ -1195,7 +1195,7 @@ select.field-input {
   padding: 12px 6px; border: 1.5px solid var(--border-light);
   border-radius: var(--radius-lg); cursor: pointer;
   background: var(--bg-secondary); transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
-  font-family: 'Nunito', sans-serif; min-height: 64px;
+  font-family: 'Inter', sans-serif; min-height: 64px;
 }
 .time-slot-btn:hover  { border-color: var(--green-500); background: var(--green-50); }
 .time-slot-btn.selected {
@@ -1321,7 +1321,7 @@ select.field-input {
 }
 .price-box-top { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 0.5rem; flex-wrap: wrap; }
 .price-label   { font-size: 0.65rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px; }
-.price-amount  { font-size: 2rem; font-weight: 800; color: var(--green-600); font-family: 'Nunito', sans-serif; white-space: nowrap; }
+.price-amount  { font-size: 2rem; font-weight: 800; color: var(--green-600); font-family: 'Inter', sans-serif; white-space: nowrap; }
 .price-breakdown { font-size: 0.75rem; color: var(--text-muted); line-height: 1.5; }
 .discount-row  { font-size: 0.78rem; color: var(--success); font-weight: 700; margin-top: 3px; }
 .advance-info  { font-size: 0.75rem; color: var(--text-muted); padding-top: 8px; border-top: 1px solid rgba(34,197,94,0.18); }
@@ -1332,7 +1332,7 @@ select.field-input {
 .promo-input {
   flex: 1; padding: 0.8rem 1rem;
   border: 1.5px solid var(--border-light); border-radius: var(--radius-md);
-  text-transform: uppercase; font-family: 'Nunito', sans-serif;
+  text-transform: uppercase; font-family: 'Inter', sans-serif;
   font-size: 0.88rem; font-weight: 700; letter-spacing: 1px;
   background: var(--bg-secondary); color: var(--text-primary);
 }
@@ -1386,7 +1386,7 @@ select.field-input {
 .btn-pay {
   width: 100%; padding: 1rem; background: #16a34a; color: #fff;
   border: none; border-radius: var(--radius-pill);
-  font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 0.95rem;
+  font-family: 'Inter', sans-serif; font-weight: 800; font-size: 0.95rem;
   cursor: pointer; transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
   box-shadow: var(--gold-glow); min-height: 52px;
   position: relative; overflow: hidden;
@@ -1400,21 +1400,21 @@ select.field-input {
 }
 .bs-icon     { font-size: 3rem; animation: bsPop 0.5s cubic-bezier(0.34,1.56,0.64,1); }
 @keyframes bsPop { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-.bs-title    { font-family: 'Nunito', sans-serif; font-size: 1.4rem; font-weight: 800; color: var(--success); }
+.bs-title    { font-family: 'Inter', sans-serif; font-size: 1.4rem; font-weight: 800; color: var(--success); }
 .bs-subtitle { font-size: 0.86rem; color: var(--text-muted); max-width: 260px; line-height: 1.5; }
 .bs-id       { font-size: 0.78rem; color: var(--text-muted); background: var(--bg-secondary); padding: 5px 14px; border-radius: 20px; }
 .bs-id strong { color: var(--green-600); font-family: monospace; font-size: 0.88rem; }
 .bs-track-btn {
   width: 100%; max-width: 280px; padding: 0.85rem;
   background: #16a34a; color: #fff; border: none;
-  border-radius: var(--radius-pill); font-family: 'Nunito', sans-serif;
+  border-radius: var(--radius-pill); font-family: 'Inter', sans-serif;
   font-size: 0.88rem; font-weight: 700; cursor: pointer; box-shadow: var(--gold-glow);
 }
 .bs-new-btn {
   width: 100%; max-width: 280px; padding: 0.75rem;
   background: transparent; color: var(--text-muted);
   border: 1.5px solid var(--border-light); border-radius: var(--radius-pill);
-  font-family: 'Nunito', sans-serif; font-size: 0.84rem; font-weight: 600; cursor: pointer;
+  font-family: 'Inter', sans-serif; font-size: 0.84rem; font-weight: 600; cursor: pointer;
 }
 
 /* ════════════════════════════════════════════
@@ -1518,7 +1518,7 @@ select.field-input {
 }
 
 .app-footer-col-title {
-  font-family: 'Nunito', sans-serif;
+  font-family: 'Inter', sans-serif;
   color: #fff;
   font-size: 1.1rem;
   font-weight: 700;
@@ -1526,7 +1526,7 @@ select.field-input {
 }
 
 .app-footer-logo {
-  font-family: 'Nunito', sans-serif; font-size: 1.8rem; font-weight: 800;
+  font-family: 'Inter', sans-serif; font-size: 1.8rem; font-weight: 800;
   color: #fff; margin-bottom: 0.25rem;
 }
 .app-footer-logo span { color: var(--green-400); }
@@ -1608,7 +1608,7 @@ select.field-input {
 .modal-sub   { text-align: center; color: var(--text-muted); font-size: 0.86rem; margin-bottom: 1.5rem; }
 
 /* Auth modal */
-.auth-logo  { font-family: 'Nunito', sans-serif; font-size: 1.3rem; font-weight: 800; color: var(--navy-800); margin-bottom: 0.875rem; }
+.auth-logo  { font-family: 'Inter', sans-serif; font-size: 1.3rem; font-weight: 800; color: var(--navy-800); margin-bottom: 0.875rem; }
 .auth-title { font-size: 1.3rem; margin-bottom: 3px; color: var(--text-primary); }
 .auth-sub   { color: var(--text-muted); font-size: 0.86rem; margin-bottom: 1.25rem; }
 .auth-error { color: #dc2626; font-size: 0.76rem; margin: 3px 0; min-height: 18px; }
@@ -1616,7 +1616,7 @@ select.field-input {
 .btn-auth {
   width: 100%; padding: 1rem; background: #16a34a; color: #fff;
   border: none; border-radius: var(--radius-pill); font-weight: 700;
-  cursor: pointer; margin: 0.875rem 0; font-family: 'Nunito', sans-serif;
+  cursor: pointer; margin: 0.875rem 0; font-family: 'Inter', sans-serif;
   font-size: 0.93rem; transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1); box-shadow: var(--gold-glow); min-height: 44px;
   position: relative; overflow: hidden;
 }
@@ -1625,7 +1625,7 @@ select.field-input {
 .btn-auth-outline {
   width: 100%; padding: 0.95rem; background: transparent; color: var(--navy-800);
   border: 2px solid var(--navy-800); border-radius: var(--radius-pill);
-  font-weight: 600; cursor: pointer; transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1); font-family: 'Nunito', sans-serif;
+  font-weight: 600; cursor: pointer; transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1); font-family: 'Inter', sans-serif;
 }
 .btn-auth-outline:hover { background: var(--navy-800); color: #fff; }
 
@@ -1737,9 +1737,9 @@ select.field-input {
 .am-warning { font-size: 0.8rem; color: #92400e; background: var(--gold-tint); border: 1px solid rgba(249,115,22,0.25); border-radius: var(--radius-md); padding: 0.75rem 1rem; margin-bottom: 1rem; line-height: 1.5; }
 .am-footer { display: flex; gap: 8px; padding-top: 0.875rem; }
 .modal-close { background: var(--bg-secondary); border: 1px solid var(--border-light); border-radius: 50%; min-width: 44px; min-height: 44px; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; cursor: pointer; color: var(--text-muted); transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1); flex-shrink: 0; }
-.am-btn-secondary { flex: 1; padding: 0.875rem; background: var(--bg-secondary); border: 1.5px solid var(--border-light); border-radius: var(--radius-pill); font-family: 'Nunito', sans-serif; font-size: 0.86rem; font-weight: 600; cursor: pointer; color: var(--text-secondary); }
-.am-btn-danger    { flex: 1; padding: 0.875rem; background: #dc2626; color: #fff; border: none; border-radius: var(--radius-pill); font-family: 'Nunito', sans-serif; font-size: 0.86rem; font-weight: 700; cursor: pointer; }
-.am-btn-primary, .am-btn-confirm { flex: 1; padding: 0.875rem; background: #16a34a; color: #fff; border: none; border-radius: var(--radius-pill); font-family: 'Nunito', sans-serif; font-size: 0.86rem; font-weight: 700; cursor: pointer; box-shadow: var(--gold-glow); position: relative; overflow: hidden; }
+.am-btn-secondary { flex: 1; padding: 0.875rem; background: var(--bg-secondary); border: 1.5px solid var(--border-light); border-radius: var(--radius-pill); font-family: 'Inter', sans-serif; font-size: 0.86rem; font-weight: 600; cursor: pointer; color: var(--text-secondary); }
+.am-btn-danger    { flex: 1; padding: 0.875rem; background: #dc2626; color: #fff; border: none; border-radius: var(--radius-pill); font-family: 'Inter', sans-serif; font-size: 0.86rem; font-weight: 700; cursor: pointer; }
+.am-btn-primary, .am-btn-confirm { flex: 1; padding: 0.875rem; background: #16a34a; color: #fff; border: none; border-radius: var(--radius-pill); font-family: 'Inter', sans-serif; font-size: 0.86rem; font-weight: 700; cursor: pointer; box-shadow: var(--gold-glow); position: relative; overflow: hidden; }
 
 .star-row  { display: flex; justify-content: center; gap: 6px; margin-bottom: 1rem; }
 .star-btn  { background: none; border: none; font-size: 2rem; cursor: pointer; color: var(--border-medium); transition: all 0.15s; }
@@ -1769,7 +1769,7 @@ select.field-input {
 .ti-row:last-child { border-bottom: none; }
 .ti-lbl { color: var(--text-muted); font-weight: 600; font-size: 0.76rem; }
 .ti-val { color: var(--text-primary); font-weight: 700; text-align: right; word-break: break-word; max-width: 200px; }
-.btn-open-chat { width: 100%; margin-top: 1rem; padding: 0.875rem; background: #16a34a; color: #fff; border: none; border-radius: var(--radius-pill); font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 0.9rem; cursor: pointer; box-shadow: var(--gold-glow); }
+.btn-open-chat { width: 100%; margin-top: 1rem; padding: 0.875rem; background: #16a34a; color: #fff; border: none; border-radius: var(--radius-pill); font-family: 'Inter', sans-serif; font-weight: 700; font-size: 0.9rem; cursor: pointer; box-shadow: var(--gold-glow); }
 
 /* Chat */
 .chat-box { background: var(--bg-primary); border-radius: var(--radius-2xl); overflow: hidden; max-width: 480px; width: 100%; height: 72vh; max-height: 72vh; display: flex; flex-direction: column; box-shadow: var(--shadow-2xl); }
@@ -1785,7 +1785,7 @@ select.field-input {
 .chat-time      { font-size: 0.6rem; opacity: 0.65; margin-top: 2px; display: block; text-align: right; }
 .chat-empty-msg { text-align: center; color: var(--text-muted); font-size: 0.84rem; margin: auto; padding: 2rem; }
 .chat-input-row { display: flex; gap: 8px; padding: 0.75rem 1rem; border-top: 1px solid var(--border-light); background: #fff; }
-.chat-text-input { flex: 1; background: var(--bg-secondary); border: 1.5px solid transparent; border-radius: 24px; padding: 0.65rem 1rem; font-size: 0.9rem; color: var(--text-primary); outline: none; transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1); font-family: 'Nunito', sans-serif; }
+.chat-text-input { flex: 1; background: var(--bg-secondary); border: 1.5px solid transparent; border-radius: 24px; padding: 0.65rem 1rem; font-size: 0.9rem; color: var(--text-primary); outline: none; transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1); font-family: 'Inter', sans-serif; }
 .chat-text-input:focus { border-color: var(--green-500); background: #fff; }
 .btn-send { width: 42px; height: 42px; border-radius: 50%; background: #16a34a; color: #fff; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: var(--gold-glow); }
 
@@ -1948,3 +1948,56 @@ select.field-input {
    functional so "Chat with us" can still open it via JS. Bubble stays visible on desktop. */
 #pzToggleBtn { display: none !important; }
 #pzTeaser { display: none !important; }
+
+    /* Premium Modern Fixes */
+button, .btn, .btn-primary, .action-btn {
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    font-weight: 500;
+    letter-spacing: -0.01em;
+}
+
+button:hover, .btn:hover, .btn-primary:hover, .action-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+}
+
+button:active, .btn:active, .btn-primary:active, .action-btn:active {
+    transform: translateY(0);
+}
+
+.card, .service-card, .dashboard-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border: 1px solid rgba(0,0,0,0.03);
+}
+
+.card:hover, .service-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+input, select, textarea {
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    border-radius: var(--radius-md);
+}
+
+input:focus, select:focus, textarea:focus {
+    border-color: var(--green-600);
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+    outline: none;
+}
+
+body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    color: #111827;
+}
+
+/* Elegant Modal Animation */
+.modal-content {
+    animation: modalFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes modalFadeIn {
+    from { opacity: 0; transform: translateY(10px) scale(0.98); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
