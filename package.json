@@ -1,5 +1,6 @@
 {
   "dependencies": {
-    "@bubblewrap/core": "^1.24.1"
+    "@bubblewrap/core": "^1.24.1",
+    "jsdom": "^29.1.1"
   }
 }
