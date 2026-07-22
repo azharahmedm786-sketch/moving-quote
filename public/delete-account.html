@@ -180,6 +180,8 @@
       }
     }
   </style>
+
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 </head>
 <body class="light-mode">
 
@@ -187,7 +189,7 @@
   <nav class="app-nav">
     <div class="nav-inner-desktop">
       <div class="nav-left">
-        <a href="index.html" class="app-logo">📦 Pack<span>Zen</span></a>
+        <a href="index.html" class="app-logo"><i data-lucide="package"></i> Pack<span>Zen</span></a>
       </div>
       <div class="nav-right">
         <a href="index.html" class="nav-link">Home</a>
@@ -266,7 +268,7 @@
     </div>
 
     <div id="successMessage">
-      <h2>✅ Request Received</h2>
+      <h2><i data-lucide="check-circle"></i> Request Received</h2>
       <p>Your account deletion request has been received.</p>
       <p>Our team will review and process your request within 7 business days.</p>
       <p>You will receive an email once your request has been reviewed.</p>
@@ -279,7 +281,7 @@
   <footer class="app-footer">
     <div class="app-footer-inner-desktop">
       <div class="app-footer-col">
-        <div class="app-footer-logo">📦 Pack<span>Zen</span></div>
+        <div class="app-footer-logo"><i data-lucide="package"></i> Pack<span>Zen</span></div>
         <p>Premium packing and moving services in Bangalore. Safe, reliable, and hassle-free relocation.</p>
       </div>
 
@@ -305,8 +307,8 @@
       <div class="app-footer-col">
         <div class="app-footer-col-title">Contact</div>
         <div class="app-footer-contact">
-          <a href="https://wa.me/919945095453" target="_blank">💬 WhatsApp: +91 9945095453</a>
-          <a href="tel:9945095453">📞 Phone: +91 9945095453</a>
+          <a href="https://wa.me/919945095453" target="_blank"><i data-lucide="message-circle"></i> WhatsApp: +91 9945095453</a>
+          <a href="tel:9945095453"><i data-lucide="phone"></i> Phone: +91 9945095453</a>
           <a href="mailto:moveeasyblr@gmail.com">✉️ Email: moveeasyblr@gmail.com</a>
           <span style="color: rgba(255,255,255,0.6); font-size: 0.85rem; margin-top: 4px;">🕒 Mon - Sun: 8:00 AM - 9:00 PM</span>
         </div>
@@ -423,5 +425,35 @@
       }
     });
   </script>
+
+
+
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+
+        // Debounced observer to prevent infinite loops and performance issues
+        let timeout;
+        const observer = new MutationObserver((mutations) => {
+            let shouldUpdate = false;
+            for (let m of mutations) {
+                if (m.addedNodes.length > 0) {
+                    shouldUpdate = true;
+                    break;
+                }
+            }
+            if (shouldUpdate) {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => lucide.createIcons(), 50);
+            }
+        });
+        observer.observe(document.body, { childList: true, subtree: true });
+    }
+  });
+</script>
+
+  <script src="icon-init.js"></script>
 </body>
 </html>
