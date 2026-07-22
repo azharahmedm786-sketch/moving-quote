@@ -753,6 +753,8 @@
     .nb-err { color: var(--red); font-size: .76rem; margin-top: 8px; min-height: 16px; font-weight: 600; }
     @media (max-width: 900px) { .nb-grid { grid-template-columns: 1fr; } .nb-summary { position: static; } }
   </style>
+
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 </head>
 <body>
 
@@ -760,7 +762,7 @@
 <div class="login-wrap" id="loginWrap">
   <div class="login-card">
     <div class="login-badge">🔐 Restricted Access</div>
-    <div class="login-logo">📦 PackZen</div>
+    <div class="login-logo"><i data-lucide="package"></i> PackZen</div>
     <div class="login-tagline">Advisor Dashboard</div>
     <label class="field-label">Email Address</label>
     <input id="adEmail" type="email" class="field-input" placeholder="your@packzenblr.in" autocomplete="off"
@@ -1833,5 +1835,35 @@ function toast(msg, dur=3000) {
 </script>
      <script src="advisor-dashboard-patch.js"></script>
 
+
+
+
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+
+        // Debounced observer to prevent infinite loops and performance issues
+        let timeout;
+        const observer = new MutationObserver((mutations) => {
+            let shouldUpdate = false;
+            for (let m of mutations) {
+                if (m.addedNodes.length > 0) {
+                    shouldUpdate = true;
+                    break;
+                }
+            }
+            if (shouldUpdate) {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => lucide.createIcons(), 50);
+            }
+        });
+        observer.observe(document.body, { childList: true, subtree: true });
+    }
+  });
+</script>
+
+  <script src="icon-init.js"></script>
 </body>
 </html>
