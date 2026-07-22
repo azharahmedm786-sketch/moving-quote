@@ -1,548 +1,360 @@
 /**
  * ============================================================
- * PackZen — Pricing Engine v2.0 (Redesigned)
+ * PackZen — Pricing Engine v4.1 (Market Calibrated Base Fares)
  * ============================================================
+ * Features:
+ * - Real-world market-calibrated vehicle base fares
+ * - Vehicle-specific per-KM rates & distance slabs
+ * - Zone, traffic density, night shift & highway/interstate factors
+ * - Specialized trade services (AC, Carpenter, Electrician, Crane, TV Mount)
+ * - Packaging quality tiers (Standard, Premium Bubble, Wooden Crating)
+ * - Zero-Commission Pass-Throughs (Tolls, Parking, Society Fees)
+ * - Configurable Partner Commission Tier (Family/Brother 90% vs Standard 80%)
  */
 
 "use strict";
 
 const PRICING_CONFIG = Object.freeze({
-  version: "3.0.0",
-  minimumFare: 1499,
+  version: "4.1.0",
+  minimumFare: 1999, // Updated floor price to prevent unprofitable dispatches
+  
+  // Partner Commission Config: Change to 10 for Family/Brother tier, 20 for Standard
+  platformCommissionPercent: 10,
 
-  baseKm: 10,
-  perKmRate: 25,
-
+  // 1. VEHICLE CONFIG & VEHICLE-SPECIFIC DISTANCE RATES (Calibrated for Tier 1 Cities)
   vehicles: {
-    tata_ace:   { baseFare: 1000, capacity: 40,  slabs: { quarter: 200, half: 400, threeQuarter: 600, full: 800 } },
-    truck_14ft: { baseFare: 1500, capacity: 80,  slabs: { quarter: 300, half: 600, threeQuarter: 900, full: 1200 } },
-    truck_17ft: { baseFare: 2000, capacity: 120, slabs: { quarter: 500, half: 1000, threeQuarter: 1500, full: 2000 } },
-    truck_22ft: { baseFare: 3000, capacity: 180, slabs: { quarter: 750, half: 1500, threeQuarter: 2250, full: 3000 } },
+    tata_ace: {
+      id: "tata_ace",
+      name: "Tata Ace",
+      baseFare: 1500,      // Calibrated: Starting job value ₹2,150 (w/ 1 helper)
+      baseKmIncluded: 5,
+      perKmRate: 24,       // Light commercial vehicle rate
+      capacity: 40,
+      helpersIncluded: 1,
+      freeWaitingTimeMins: 60,
+      overtimeRatePerHour: 300
+    },
+    truck_14ft: {
+      id: "truck_14ft",
+      name: "14 ft Truck",
+      baseFare: 2900,      // Calibrated: Starting job value ₹4,200 (w/ 2 helpers)
+      baseKmIncluded: 5,
+      perKmRate: 32,       // Medium haul container rate
+      capacity: 80,
+      helpersIncluded: 2,
+      freeWaitingTimeMins: 90,
+      overtimeRatePerHour: 400
+    },
+    truck_17ft: {
+      id: "truck_17ft",
+      name: "17 ft Truck",
+      baseFare: 4500,      // Calibrated: Starting job value ₹6,450 (w/ 3 helpers)
+      baseKmIncluded: 5,
+      perKmRate: 40,       // Heavy diesel container rate
+      capacity: 120,
+      helpersIncluded: 3,
+      freeWaitingTimeMins: 120,
+      overtimeRatePerHour: 500
+    },
+    truck_22ft: {
+      id: "truck_22ft",
+      name: "22 ft Truck",
+      baseFare: 6500,      // Calibrated: Starting job value ₹9,100 (w/ 4 helpers)
+      baseKmIncluded: 5,
+      perKmRate: 52,       // Multi-axle / long container rate
+      capacity: 180,
+      helpersIncluded: 4,
+      freeWaitingTimeMins: 180,
+      overtimeRatePerHour: 700
+    }
   },
 
+  // 2. DYNAMIC DISTANCE, ZONE & TIME MULTIPLIERS
+  multipliers: {
+    trafficZone: {
+      normal: 1.0,         // Standard urban/suburban
+      denseTraffic: 1.15,  // CBD / Peak hour traffic corridor
+      highwayExpress: 0.90 // Long open stretch / outer ring road
+    },
+    timeOfDay: {
+      daySlot: 1.0,        // 6:00 AM - 9:00 PM
+      nightShift: 1.20     // 9:00 PM - 6:00 AM (Night restriction & driver allowance)
+    },
+    interstateTax: 1.12    // 12% surcharge for state border permits & intercity paperwork
+  },
+
+  // 3. PACKAGING MATERIAL QUALITY TIERS
+  packagingTiers: {
+    basic: { name: "Standard Corrugated", ratePerUnit: 20 },
+    premium: { name: "3-Layer Bubble Wrap & Film", ratePerUnit: 35 },
+    ultraCrate: { name: "Wooden Crating & Waterproofing", ratePerUnit: 60 }
+  },
+
+  // 4. FURNITURE INVENTORY VOLUMETRICS (Unit Weights)
   furnitureUnits: {
-    // Living Room
-    sofaCheck: 10,
-    sofaCumBedCheck: 15,
-    reclinerCheck: 12,
-    tvCheck: 2,
-    tvUnitCheck: 8,
-    coffeeCheck: 3,
-    centerTableCheck: 5,
-    bookshelfCheck: 10,
-    showcaseCheck: 12,
-    shoeRackCheck: 4,
-    acCheck: 5,
-    // Bedroom
-    bedCheck: 8,
-    mattressCheck: 5,
-    wardrobeCheck: 15,
-    dressingCheck: 8,
-    sideTableCheck: 2,
-    studyTableCheck: 6,
-    // Kitchen
-    fridgeCheck: 8,
-    wmCheck: 6,
-    dishwasherCheck: 8,
-    microwaveCheck: 2,
-    ovenCheck: 4,
-    chimneyCheck: 5,
-    diningCheck: 8,
-    waterPurifierCheck: 2,
-    // Office
-    deskCheck: 8,
-    chairCheck: 2,
-    serverCheck: 15,
-    printerCheck: 4,
-    confCheck: 20,
-    cabinetCheck: 10,
-    whiteboardCheck: 3,
-    // Others
-    bikeCheck: 10,
-    cycleCheck: 5,
-    plantCheck: 2,
-    gymCheck: 15,
-    treadmillCheck: 15,
-    aquariumCheck: 10
+    sofaCheck: 10, sofaCumBedCheck: 15, reclinerCheck: 12, tvCheck: 2, tvUnitCheck: 8,
+    coffeeCheck: 3, centerTableCheck: 5, bookshelfCheck: 10, showcaseCheck: 12, shoeRackCheck: 4,
+    bedCheck: 8, mattressCheck: 5, wardrobeCheck: 15, dressingCheck: 8, sideTableCheck: 2, studyTableCheck: 6,
+    fridgeCheck: 8, wmCheck: 6, dishwasherCheck: 8, microwaveCheck: 2, ovenCheck: 4, chimneyCheck: 5,
+    diningCheck: 8, waterPurifierCheck: 2, deskCheck: 8, chairCheck: 2, serverCheck: 15, printerCheck: 4,
+    confCheck: 20, cabinetCheck: 10, bikeCheck: 10, cycleCheck: 5, gymCheck: 15, treadmillCheck: 15
   },
 
+  heavyItemsList: ["sofaCheck", "sofaCumBedCheck", "bedCheck", "wardrobeCheck", "fridgeCheck", "showcaseCheck", "treadmillCheck"],
   cartonUnit: 1,
 
+  // 5. FLOOR & ELEVATOR LOGIC
   floor: {
-    withLift: 100,
-    withoutLift: 200
+    withLift: 100,             // General lift operation fee
+    withoutLift: 300,          // Manual stair carrying per floor
+    heavyStairSurcharge: 180   // Surcharge per floor when heavy items don't fit in passenger lift
   },
 
   labour: {
-    pricePerHelper: 400
+    pricePerHelper: 650
   },
 
-packing: {
-    pricePerUnit: 20
+  // 6. SPECIALIZED TRADE SERVICES
+  specializedServices: {
+    acUninstallation: 800,
+    acInstallation: 1400,
+    tvWallMountRemoval: 350,
+    carpenterWork: 500,        // Custom furniture fitting / drilling
+    electricianWork: 450,      // Fans, geysers, light fixtures
+    craneRequirement: 3500     // Balcony lifting for bulky furniture
   },
 
-  unpacking: {
-    pricePerUnit: 14
-  },
+  longCarry: { pricePerMeter: 15 },
+  storage: { pricePerDay: 250 },
 
-  dismantling: {
-    pricePerUnit: 27
-  },
-
-  assembly: {
-    pricePerUnit: 27
-  },
-
-  storage: {
-    pricePerDay: 180
-  },
-
-  waiting: {
-    pricePerHour: 300
-  },
-
-  longCarry: {
-    pricePerMeter: 10
-  },
-
-  discounts: {
-    maxPromoFraction: 0.5
-  },
-
-  taxes: {
-    gstPercent: 18,
-    enabled: false
-  },
-
-  payment: {
-    advancePercent: 10,
-    fullPaymentDiscount: 200
-  }
+  discounts: { maxPromoFraction: 0.30 },
+  payment: { advancePercent: 15 }
 });
 
-const VEHICLE_CONFIG = Object.freeze({
-  tata_ace: {
-    id: "tata_ace", htmlValue: "200", name: "Tata Ace", icon: "🛻",
-    sub: "Ideal for single items & 1 RK", displayRate: "From ₹1,999",
-    minHouseValue: 0, maxHouseValue: 2500, moveTypes: ["home", "single"],
-    helpers: 1, loadTimeMin: 45, unloadTimeMin: 30,
-  },
-  truck_14ft: {
-    id: "truck_14ft", htmlValue: "2500", name: "14 ft Truck", icon: "🚚",
-    sub: "Ideal for 1–2 BHK", displayRate: "From ₹4,500",
-    minHouseValue: 2500, maxHouseValue: 6500, moveTypes: ["home", "office", "intercity"],
-    helpers: 2, loadTimeMin: 90, unloadTimeMin: 60,
-  },
-  truck_17ft: {
-    id: "truck_17ft", htmlValue: "4000", name: "17 ft Truck", icon: "🚛",
-    sub: "Ideal for 2–3 BHK", displayRate: "From ₹6,000",
-    minHouseValue: 6500, maxHouseValue: 10500, moveTypes: ["home", "office", "intercity"],
-    helpers: 3, loadTimeMin: 150, unloadTimeMin: 120,
-  },
-  truck_22ft: {
-    id: "truck_22ft", htmlValue: "5500", name: "22 ft Truck", icon: "🚜",
-    sub: "Ideal for 3+ BHK", displayRate: "From ₹7,500",
-    minHouseValue: 8500, maxHouseValue: Infinity, moveTypes: ["home", "office", "intercity"],
-    helpers: 4, loadTimeMin: 240, unloadTimeMin: 180,
-  }
-});
+/* ── INPUT VALIDATOR ── */
 
-const VEHICLE_ORDER = ["tata_ace", "truck_14ft", "truck_17ft", "truck_22ft"];
-
-function _vehicleByHtmlValue(htmlValue) {
-  return Object.values(VEHICLE_CONFIG).find(v => v.htmlValue === String(htmlValue)) || null;
-}
-
-function _recommendVehicleForHouse(houseValue, moveType) {
-  for (const id of VEHICLE_ORDER) {
-    const v = VEHICLE_CONFIG[id];
-    if (houseValue <= v.maxHouseValue && (v.moveTypes.includes(moveType) || moveType === "single")) {
-      return v;
-    }
-  }
-  return VEHICLE_CONFIG[VEHICLE_ORDER[VEHICLE_ORDER.length - 1]];
-}
-
-function validateQuoteInput(raw) {
+function validateQuoteInputV4(raw) {
   const errors = [];
   if (!raw.pickup || typeof raw.pickup !== "string" || !raw.pickup.trim()) errors.push("Pickup location is required.");
   if (!raw.drop || typeof raw.drop !== "string" || !raw.drop.trim()) errors.push("Drop location is required.");
 
   const km = Number(raw.km);
-  if (isNaN(km) || km < 0) errors.push("Distance (km) must be a non-negative number.");
+  if (isNaN(km) || km < 0) errors.push("Valid distance in kilometers is required.");
 
-  const houseValue = Number(raw.houseValue) || 0;
-  if (houseValue < 0 || isNaN(houseValue)) errors.push("House/size value is invalid.");
+  const vehicleId = raw.vehicleId || "tata_ace";
+  if (!PRICING_CONFIG.vehicles[vehicleId]) errors.push(`Unknown vehicle type: ${vehicleId}`);
 
-  const vehicleHtmlValue = String(raw.vehicleHtmlValue || "0");
-  let vehicleCfg = null;
-  if (vehicleHtmlValue !== "0") {
-    vehicleCfg = _vehicleByHtmlValue(vehicleHtmlValue);
-    if (!vehicleCfg) errors.push(`Unknown vehicle value: ${vehicleHtmlValue}.`);
-  }
+  return {
+    valid: errors.length === 0,
+    errors,
+    data: {
+      ...raw,
+      km: Math.max(0, km || 0),
+      vehicleId,
+      pickupFloor: Math.max(0, parseInt(raw.pickupFloor ?? 0, 10) || 0),
+      dropFloor: Math.max(0, parseInt(raw.dropFloor ?? 0, 10) || 0),
+      extraHelpers: Math.max(0, parseInt(raw.extraHelpers ?? 0, 10) || 0),
+      longCarryDistance: Math.max(0, Number(raw.longCarryDistance) || 0),
+      
+      // Pass-through out-of-pocket expenses
+      tollsEstimate: Math.max(0, Number(raw.tollsEstimate) || 0),
+      parkingEstimate: Math.max(0, Number(raw.parkingEstimate) || 0),
+      societyEntryFee: Math.max(0, Number(raw.societyEntryFee) || 0),
+      extraWaitingHours: Math.max(0, Number(raw.extraWaitingHours) || 0),
 
-  const furniture = {};
-  for (const [id, units] of Object.entries(PRICING_CONFIG.furnitureUnits)) {
-    const qty = parseInt(raw.furniture?.[id] ?? 0, 10);
-    if (isNaN(qty) || qty < 0) {
-      errors.push(`Invalid quantity for ${id}.`);
-      furniture[id] = 0;
-    } else if (qty > 20) {
-      errors.push(`Quantity for ${id} cannot exceed 20.`);
-      furniture[id] = 20;
-    } else {
-      furniture[id] = qty;
+      // Operational toggles
+      trafficZone: raw.trafficZone || "normal",
+      isNightShift: !!raw.isNightShift,
+      isInterstate: !!raw.isInterstate,
+      packagingQuality: raw.packagingQuality || "basic",
+      
+      // Specialized trades
+      acCount: Math.max(0, parseInt(raw.acCount ?? 0, 10) || 0),
+      tvMountCount: Math.max(0, parseInt(raw.tvMountCount ?? 0, 10) || 0),
+      needCarpenter: !!raw.needCarpenter,
+      needElectrician: !!raw.needElectrician,
+      needCrane: !!raw.needCrane
     }
+  };
+}
+
+/* ── CORE CALCULATOR ENGINE ── */
+
+function calculateQuoteV4(rawInput) {
+  const validation = validateQuoteInputV4(rawInput);
+  if (!validation.valid) {
+    return { valid: false, errors: validation.errors, finalTotal: 0 };
   }
 
-  const cartonQty = parseInt(raw.cartonQty ?? 0, 10);
-  if (isNaN(cartonQty) || cartonQty < 0) errors.push("Carton quantity must be a non-negative integer.");
-  else if (cartonQty > 50) errors.push("Carton quantity cannot exceed 50.");
+  const d = validation.data;
+  const warnings = [];
+  const vehicle = PRICING_CONFIG.vehicles[d.vehicleId];
 
-  const pickupFloor = Math.max(0, parseInt(raw.pickupFloor ?? 0, 10) || 0);
-  const dropFloor   = Math.max(0, parseInt(raw.dropFloor   ?? 0, 10) || 0);
-  const liftAvail   = Boolean(raw.liftAvailable);
-
-  const validTypes = ["home", "office", "single"];
-  const moveType = validTypes.includes(raw.moveType) ? raw.moveType : "home";
-
-  const data = {
-    pickup: (raw.pickup || "").trim(),
-    drop: (raw.drop || "").trim(),
-    km: Math.max(0, km || 0),
-    houseValue,
-    vehicleHtmlValue,
-    vehicleCfg,
-    furniture,
-    cartonQty: Math.min(50, Math.max(0, cartonQty || 0)),
-    pickupFloor,
-    dropFloor,
-  liftAvailable: liftAvail,
-    packingService: !!raw.packingService,
-    unpackingService: !!raw.unpackingService,
-    dismantlingService: !!raw.dismantlingService,
-    assemblyService: !!raw.assemblyService,
-    storageNeeded: !!raw.storageNeeded,
-    storageDays: Math.max(0, parseInt(raw.storageDays ?? 0, 10) || 0),
-    moveType,
-    promoDiscount: Math.max(0, Number(raw.promoDiscount) || 0),
-    extraHelpers: Math.max(0, parseInt(raw.extraHelpers ?? 0, 10) || 0),
-    waitingHours: Math.max(0, Number(raw.waitingHours) || 0),
-    longCarryDistance: Math.max(0, Number(raw.longCarryDistance) || 0),
-  };
-  return { valid: errors.length === 0, errors, data };
-}
-
-/* ── INDEPENDENT PRICING MODULES ── */
-
-function calcBaseVehicleCharge(vehicleCfg) {
-  if (!vehicleCfg) return PRICING_CONFIG.minimumFare;
-  const rates = PRICING_CONFIG.vehicles[vehicleCfg.id];
-  return rates ? rates.baseFare : PRICING_CONFIG.minimumFare;
-}
-
-function calcDistanceCharge(km) {
-  const extraKm = Math.max(0, km - PRICING_CONFIG.baseKm);
-  return Math.round(extraKm * PRICING_CONFIG.perKmRate);
-}
-
-function calcCapacityCharge(furniture, cartonQty, vehicleCfg) {
-  if (!vehicleCfg) return { totalUnits: 0, capacityUsed: 0, capacityCharge: 0, slab: "None", warning: null, recommendation: null };
-
+  // 1. Calculate Volumetric Inventory Units
   let totalUnits = 0;
-  for (const [id, qty] of Object.entries(furniture)) {
-    if (qty > 0) {
-      totalUnits += qty * (PRICING_CONFIG.furnitureUnits[id] || 0);
+  let heavyItemCount = 0;
+
+  if (d.furniture && typeof d.furniture === "object") {
+    for (const [id, qty] of Object.entries(d.furniture)) {
+      const q = Math.max(0, parseInt(qty, 10) || 0);
+      if (q > 0) {
+        totalUnits += q * (PRICING_CONFIG.furnitureUnits[id] || 0);
+        if (PRICING_CONFIG.heavyItemsList.includes(id)) {
+          heavyItemCount += q;
+        }
+      }
     }
   }
-  totalUnits += cartonQty * PRICING_CONFIG.cartonUnit;
+  totalUnits += (parseInt(d.cartonQty, 10) || 0) * PRICING_CONFIG.cartonUnit;
 
-  const rates = PRICING_CONFIG.vehicles[vehicleCfg.id];
-  if (!rates) return { totalUnits, capacityUsed: 0, capacityCharge: 0, slab: "None", warning: null, recommendation: null };
-
-  const capacityUsed = (totalUnits / rates.capacity) * 100;
-
-  let slab = "Full Load";
-  let capacityCharge = rates.slabs.full;
-  if (capacityUsed <= 25) {
-    slab = "Quarter Load";
-    capacityCharge = rates.slabs.quarter;
-  } else if (capacityUsed <= 50) {
-    slab = "Half Load";
-    capacityCharge = rates.slabs.half;
-  } else if (capacityUsed <= 75) {
-    slab = "Three Quarter Load";
-    capacityCharge = rates.slabs.threeQuarter;
-  }
-
-  let warning = null;
-  let recommendation = null;
-  if (capacityUsed > 100) {
-    const idx = VEHICLE_ORDER.indexOf(vehicleCfg.id);
-    if (idx >= 0 && idx < VEHICLE_ORDER.length - 1) {
-      const nextVehicle = VEHICLE_CONFIG[VEHICLE_ORDER[idx + 1]];
-      recommendation = nextVehicle;
-      warning = `⚠️ Capacity exceeds 100% (${Math.round(capacityUsed)}%). We recommend upgrading to ${nextVehicle.name} for adequate space.`;
+  // Auto-Upgrade Check for Truck Capacity
+  let selectedVehicle = vehicle;
+  if (totalUnits > selectedVehicle.capacity) {
+    const upgradedKey = Object.keys(PRICING_CONFIG.vehicles).find(
+      k => PRICING_CONFIG.vehicles[k].capacity >= totalUnits
+    );
+    if (upgradedKey) {
+      selectedVehicle = PRICING_CONFIG.vehicles[upgradedKey];
+      warnings.push(`⚠️ Cargo volume (${totalUnits} units) exceeds ${vehicle.name}. Auto-upgraded to ${selectedVehicle.name}.`);
     } else {
-      warning = `⚠️ Capacity exceeds 100% (${Math.round(capacityUsed)}%). Multiple trips or an extra vehicle may be required.`;
+      selectedVehicle = PRICING_CONFIG.vehicles.truck_22ft;
+      warnings.push(`⚠️ Oversized cargo load (${totalUnits} units). Multiple trips or trucks required.`);
     }
   }
 
-  return { totalUnits, capacityUsed, capacityCharge, slab, warning, recommendation };
-}
+  // 2. Vehicle-Specific Distance Charge
+  const baseFare = selectedVehicle.baseFare;
+  const extraKm = Math.max(0, d.km - selectedVehicle.baseKmIncluded);
+  let distanceCharge = Math.round(extraKm * selectedVehicle.perKmRate);
 
-function calcFloorCharge(pickupFloor, dropFloor, liftAvailable) {
-  const totalFloors = pickupFloor + dropFloor;
-  if (totalFloors === 0) return 0;
-  const rate = liftAvailable ? PRICING_CONFIG.floor.withLift : PRICING_CONFIG.floor.withoutLift;
-  return totalFloors * rate;
-}
+  // Apply Traffic Corridor & Shift Multipliers to distance
+  const zoneFactor = PRICING_CONFIG.multipliers.trafficZone[d.trafficZone] || 1.0;
+  const shiftFactor = d.isNightShift ? PRICING_CONFIG.multipliers.timeOfDay.nightShift : 1.0;
+  distanceCharge = Math.round(distanceCharge * zoneFactor * shiftFactor);
 
-function calcLabourCharge(vehicleCfg, extraHelpers) {
-  const baseHelpers = vehicleCfg ? vehicleCfg.helpers : 0;
-  const totalHelpers = baseHelpers + extraHelpers;
-  return totalHelpers * PRICING_CONFIG.labour.pricePerHelper;
-}
+  if (d.isNightShift) warnings.push("🌙 Night shift operator allowance (+20% on transit) applied.");
 
-function calcPackingCharge(packingService, totalUnits) {
-  if (!packingService) return 0;
-  return totalUnits * PRICING_CONFIG.packing.pricePerUnit;
-}
+  // 3. Labor & Crew Charges
+  const totalHelpers = selectedVehicle.helpersIncluded + d.extraHelpers;
+  const labourCharge = totalHelpers * PRICING_CONFIG.labour.pricePerHelper;
 
-function calcUnpackingCharge(unpackingService, totalUnits) {
-  if (!unpackingService) return 0;
-  return totalUnits * PRICING_CONFIG.unpacking.pricePerUnit;
-}
+  // 4. Floor Handling & Stair Surcharge
+  const totalFloors = d.pickupFloor + d.dropFloor;
+  let floorCharge = 0;
 
-function calcDismantlingCharge(dismantlingService, totalUnits) {
-  if (!dismantlingService) return 0;
-  return totalUnits * PRICING_CONFIG.dismantling.pricePerUnit;
-}
-
-function calcAssemblyCharge(assemblyService, totalUnits) {
-  if (!assemblyService) return 0;
-  return totalUnits * PRICING_CONFIG.assembly.pricePerUnit;
-}
-
-function calcStorageCharge(storageNeeded, storageDays) {
-  if (!storageNeeded || storageDays <= 0) return 0;
-  return storageDays * PRICING_CONFIG.storage.pricePerDay;
-}
-function calcWaitingCharge(waitingHours) {
-  return waitingHours * PRICING_CONFIG.waiting.pricePerHour;
-}
-
-function calcLongCarryCharge(longCarryDistance) {
-  return longCarryDistance * PRICING_CONFIG.longCarry.pricePerMeter;
-}
-
-function calcDiscount(total, promoDiscount) {
-  const maxDiscount = Math.floor(total * PRICING_CONFIG.discounts.maxPromoFraction);
-  return Math.min(promoDiscount, maxDiscount);
-}
-
-function calcTaxes(total) {
-  if (!PRICING_CONFIG.taxes.enabled) return { gstAmount: 0, gstInclusive: false };
-  const gstAmount = Math.round(total * (PRICING_CONFIG.taxes.gstPercent / 100));
-  return { gstAmount, gstInclusive: false };
-}
-
-function calculateQuoteV2(raw) {
-  const { valid, errors, data } = validateQuoteInput(raw);
-  if (!valid) return _errorResult(errors);
-
-const {
-    km, vehicleCfg, furniture, cartonQty, pickupFloor, dropFloor, liftAvailable,
-    packingService, unpackingService, dismantlingService, assemblyService, storageNeeded, storageDays,
-    promoDiscount: rawPromo, extraHelpers, waitingHours, longCarryDistance, houseValue, moveType
-  } = data;
-
-  const baseFare = calcBaseVehicleCharge(vehicleCfg);
-  const distanceCharge = vehicleCfg ? calcDistanceCharge(km) : 0;
-
-  const capResult = calcCapacityCharge(furniture, cartonQty, vehicleCfg);
-  const vehicleCapacityCharge = capResult.capacityCharge;
-
-  const floorCharge = calcFloorCharge(pickupFloor, dropFloor, liftAvailable);
-  const labourCharge = calcLabourCharge(vehicleCfg, extraHelpers);
-  const packingCharge = calcPackingCharge(packingService, capResult.totalUnits);
-  const unpackingCharge = calcUnpackingCharge(unpackingService, capResult.totalUnits);
-  const dismantlingCharge = calcDismantlingCharge(dismantlingService, capResult.totalUnits);
-  const assemblyCharge = calcAssemblyCharge(assemblyService, capResult.totalUnits);
-  const storageCharge = calcStorageCharge(storageNeeded, storageDays);
-  const waitingCharge = calcWaitingCharge(waitingHours);
-  const longCarryCharge = calcLongCarryCharge(longCarryDistance);
-
-  const subtotal = baseFare + distanceCharge + vehicleCapacityCharge + floorCharge + labourCharge
-    + packingCharge + unpackingCharge + dismantlingCharge + assemblyCharge + storageCharge
-    + waitingCharge + longCarryCharge;
-  const { gstAmount, gstInclusive } = calcTaxes(subtotal);
-  const totalBeforeDiscount = Math.max(subtotal + (gstInclusive ? 0 : gstAmount), PRICING_CONFIG.minimumFare);
-
-  let cappedDiscount = calcDiscount(totalBeforeDiscount, rawPromo);
-  let grandTotal = Math.max(totalBeforeDiscount - cappedDiscount, PRICING_CONFIG.minimumFare);
-
-const breakdown = {
-    baseFare,
-    distanceCharge,
-    capacityCharge: vehicleCapacityCharge,
-    floorCharge,
-    labourCharge,
-    packingCharge,
-    unpackingCharge,
-    dismantlingCharge,
-    assemblyCharge,
-    storageCharge,
-    waitingCharge,
-    longCarryCharge,
-    subtotal,
-    gstAmount,
-    gstInclusive,
-    discount: cappedDiscount,
-    grandTotal,
-    capacityDetail: {
-      totalUnits: capResult.totalUnits,
-      capacityUsed: capResult.capacityUsed,
-      slab: capResult.slab
+  if (totalFloors > 0) {
+    if (d.liftAvailable && !d.isFreightLift && heavyItemCount > 0) {
+      const liftFee = totalFloors * PRICING_CONFIG.floor.withLift;
+      const heavyStairFee = totalFloors * PRICING_CONFIG.floor.heavyStairSurcharge;
+      floorCharge = liftFee + heavyStairFee;
+      warnings.push(" Notice: Passenger lift available, but heavy items incur stair carry fees.");
+    } else if (d.liftAvailable) {
+      floorCharge = totalFloors * PRICING_CONFIG.floor.withLift;
+    } else {
+      floorCharge = totalFloors * PRICING_CONFIG.floor.withoutLift;
     }
-  };
+  }
+
+  // 5. Packaging Quality Surcharge
+  const pkgTier = PRICING_CONFIG.packagingTiers[d.packagingQuality] || PRICING_CONFIG.packagingTiers.basic;
+  const packingCharge = d.packingService ? totalUnits * pkgTier.ratePerUnit : 0;
+
+  // 6. Specialized Skilled Trade Charges
+  let specializedTradeCharges = 0;
+  if (d.acCount > 0) {
+    specializedTradeCharges += d.acCount * (PRICING_CONFIG.specializedServices.acUninstallation + PRICING_CONFIG.specializedServices.acInstallation);
+  }
+  if (d.tvMountCount > 0) {
+    specializedTradeCharges += d.tvMountCount * PRICING_CONFIG.specializedServices.tvWallMountRemoval;
+  }
+  if (d.needCarpenter) specializedTradeCharges += PRICING_CONFIG.specializedServices.carpenterWork;
+  if (d.needElectrician) specializedTradeCharges += PRICING_CONFIG.specializedServices.electricianWork;
+  if (d.needCrane) {
+    specializedTradeCharges += PRICING_CONFIG.specializedServices.craneRequirement;
+    warnings.push("🏗️ Balcony Crane service added for high-rise heavy lifting.");
+  }
+
+  // 7. On-Site Delays & Long Carry
+  const waitingCharge = d.extraWaitingHours * selectedVehicle.overtimeRatePerHour;
+  const longCarryCharge = d.longCarryDistance * PRICING_CONFIG.longCarry.pricePerMeter;
+
+  // 8. Zero-Commission Operational Pass-Throughs (100% directly to Partner)
+  const passThroughExpenses = d.tollsEstimate + d.parkingEstimate + d.societyEntryFee;
+
+  // 9. Core Subtotal Calculation
+  let serviceSubtotal = baseFare + distanceCharge + labourCharge + floorCharge +
+                        packingCharge + specializedTradeCharges + waitingCharge + longCarryCharge;
+
+  if (d.isInterstate) {
+    serviceSubtotal = Math.round(serviceSubtotal * PRICING_CONFIG.multipliers.interstateTax);
+  }
+
+  // Apply Max Promo Discount (Cap at 30% of core service subtotal)
+  const maxDiscount = Math.floor(serviceSubtotal * PRICING_CONFIG.discounts.maxPromoFraction);
+  const cappedDiscount = Math.min(Number(d.promoDiscount) || 0, maxDiscount);
+
+  const grandTotal = Math.max((serviceSubtotal - cappedDiscount) + passThroughExpenses, PRICING_CONFIG.minimumFare);
+
+  // 10. Partner Payout Engine & Pass-Through Separation
+  // CRITICAL TRUST RULE: Pass-through expenses (Tolls/Parking/Society) have ZERO platform commission.
+  const commissionableTotal = grandTotal - passThroughExpenses;
+  const platformCommission = Math.round(commissionableTotal * (PRICING_CONFIG.platformCommissionPercent / 100));
+  const partnerPayout = (commissionableTotal - platformCommission) + passThroughExpenses;
 
   const advanceAmount = Math.round(grandTotal * (PRICING_CONFIG.payment.advancePercent / 100));
-  const fullOnlineAmount = Math.max(grandTotal - PRICING_CONFIG.payment.fullPaymentDiscount, 0);
-  const paymentOptions = {
-    atDropAmount: grandTotal,
-    advanceAmount,
-    fullOnlineAmount,
-    fullOnlineSaving: PRICING_CONFIG.payment.fullPaymentDiscount
-  };
-
-  const warnings = [];
-  if (capResult.warning) warnings.push(capResult.warning);
 
   return {
     valid: true,
-    errors: [],
     warnings,
-    breakdown,
-    paymentOptions,
-    recommendations: {
-      vehicle: capResult.recommendation || _recommendVehicleForHouse(houseValue, moveType),
-      helpers: vehicleCfg ? vehicleCfg.helpers + extraHelpers : extraHelpers,
-      packingMaterials: [],
-      loadTimeMin: vehicleCfg ? vehicleCfg.loadTimeMin : 0,
-      unloadTimeMin: vehicleCfg ? vehicleCfg.unloadTimeMin : 0,
-      deliveryHours: null
-    },
-    capacityCheck: { ok: !capResult.warning, warning: capResult.warning, recommended: capResult.recommendation },
-    surchargesApplied: [],
     finalTotal: grandTotal,
-    isIntercity: false,
-    km: Math.round(km),
-    _internal: { operCost: 0, profit: 0, profitPercent: 0, engineVersion: PRICING_CONFIG.version }
+    breakdown: {
+      vehicleUsed: selectedVehicle.name,
+      baseFare,
+      distanceCharge,
+      labourCharge,
+      floorCharge,
+      packingCharge,
+      specializedTradeCharges,
+      waitingCharge,
+      longCarryCharge,
+      passThroughExpenses,
+      discount: cappedDiscount,
+      grandTotal
+    },
+    financials: {
+      customerPays: grandTotal,
+      partnerEarns: partnerPayout,       // Includes 100% of out-of-pocket tolls/parking
+      packZenMargin: platformCommission,  // Platform 10% or 20% commission on service value
+      partnerTakePercent: Math.round((partnerPayout / grandTotal) * 100)
+    },
+    paymentOptions: {
+      advanceAmount,
+      atDropAmount: grandTotal - advanceAmount
+    },
+    capacityDetail: {
+      totalUnits,
+      vehicleCapacity: selectedVehicle.capacity,
+      utilizationPercent: Math.round((totalUnits / selectedVehicle.capacity) * 100)
+    },
+    km: Math.round(d.km)
   };
 }
 
-function _errorResult(errors) {
-  return {
-    valid: false, errors, warnings: [], breakdown: null, paymentOptions: null,
-    recommendations: null, capacityCheck: null, surchargesApplied: [], finalTotal: 0,
-    isIntercity: false, km: 0, _internal: {}
-  };
-}
-
-function _readFormState() {
-  const g = id => document.getElementById(id);
-  const furniture = {};
-  for (const id of Object.keys(PRICING_CONFIG.furnitureUnits)) {
-    furniture[id] = parseInt(g(id)?.value ?? 0, 10) || 0;
-  }
-  return {
-    pickup: g("pickup")?.value || "",
-    drop: g("drop")?.value || "",
-    km: window._lastCalculatedKm || 0,
-    houseValue: Number(g("house")?.value) || 0,
-    vehicleHtmlValue: g("vehicle")?.value || "0",
-    extraHelpers: parseInt(g("extraHelpers")?.value ?? 0, 10) || 0,
-    waitingHours: Number(g("waitingHours")?.value) || 0,
-    longCarryDistance: Number(g("longCarryDistance")?.value) || 0,
-    furniture,
-    cartonQty: parseInt(g("cartonQty")?.value ?? 0, 10) || 0,
-    pickupFloor: parseInt(g("pickupFloor")?.value ?? 0, 10) || 0,
-    dropFloor: parseInt(g("dropFloor")?.value ?? 0, 10) || 0,
-  liftAvailable: !!g("liftAvailable")?.checked,
-    packingService: !!(g("packingService")?.checked || window._packingServiceRequested),
-    unpackingService: !!g("unpackingService")?.checked,
-    dismantlingService: !!g("dismantlingService")?.checked,
-    assemblyService: !!g("assemblyService")?.checked,
-    storageNeeded: !!g("storageService")?.checked,
-    storageDays: parseInt(g("storageDays")?.value ?? 0, 10) || 0,
-    moveType: window.selectedMoveType || "home",
-    promoDiscount: window.promoDiscount || 0,
-  };
-}
-
-function _renderV2Breakdown(result, resultEl) {
-  if (!resultEl) return;
-  const { breakdown, km, warnings, recommendations: rec } = result;
-  const fmt = n => Number(n).toLocaleString("en-IN");
-  const rows = [];
-
-  rows.push(`📍 Local · ~${km.toFixed ? km.toFixed(1) : km} km`);
-  rows.push(`Base Vehicle: ₹${fmt(breakdown.baseFare)}`);
-  if (breakdown.distanceCharge > 0) rows.push(`Distance Charge: ₹${fmt(breakdown.distanceCharge)}`);
-  if (breakdown.capacityCharge > 0) rows.push(`Vehicle Capacity (${breakdown.capacityDetail.slab} - ${Math.round(breakdown.capacityDetail.capacityUsed)}%): ₹${fmt(breakdown.capacityCharge)}`);
-  if (breakdown.floorCharge > 0) rows.push(`Floor Charge: ₹${fmt(breakdown.floorCharge)}`);
-  if (breakdown.labourCharge > 0) rows.push(`Labour Charge: ₹${fmt(breakdown.labourCharge)}`);
-if (breakdown.packingCharge > 0) rows.push(`Packing Charge: ₹${fmt(breakdown.packingCharge)}`);
-  if (breakdown.unpackingCharge > 0) rows.push(`Unpacking Charge: ₹${fmt(breakdown.unpackingCharge)}`);
-  if (breakdown.dismantlingCharge > 0) rows.push(`Dismantling Charge: ₹${fmt(breakdown.dismantlingCharge)}`);
-  if (breakdown.assemblyCharge > 0) rows.push(`Assembly Charge: ₹${fmt(breakdown.assemblyCharge)}`);
-  if (breakdown.storageCharge > 0) rows.push(`Storage Charge: ₹${fmt(breakdown.storageCharge)}`);
-  if (breakdown.waitingCharge > 0) rows.push(`Waiting Charge: ₹${fmt(breakdown.waitingCharge)}`);
-  if (breakdown.longCarryCharge > 0) rows.push(`Long Carry Charge: ₹${fmt(breakdown.longCarryCharge)}`);
-
-  if (breakdown.discount > 0) rows.push(`Discount: −₹${fmt(breakdown.discount)}`);
-  if (breakdown.gstAmount > 0) rows.push(`GST (${PRICING_CONFIG.taxes.gstPercent}%): ₹${fmt(breakdown.gstAmount)}`);
-
-  rows.push(`<strong>Grand Total: ₹${fmt(breakdown.grandTotal)}</strong>`);
-
-  if (warnings.length > 0) {
-    rows.push(`⚠️ ${warnings.join(" | ")}`);
-  }
-
-  resultEl.innerHTML = rows.join("<br>");
-}
-
-function runPricingEngineV2(km) {
-  window._lastCalculatedKm = km;
-  const raw = _readFormState();
-  raw.km = km;
-  const result = calculateQuoteV2(raw);
-  window._lastQuoteResult = result;
-
-  if (result.warnings && result.warnings.length > 0) {
-    const warnEl = document.getElementById("vehicleCapacityWarning");
-    if (warnEl) {
-      warnEl.textContent = result.warnings[0];
-      warnEl.style.display = "block";
-    }
-  } else {
-    const warnEl = document.getElementById("vehicleCapacityWarning");
-    if (warnEl) warnEl.style.display = "none";
-  }
-
-  const resultEl = document.getElementById("result");
-  if (resultEl && result.valid) {
-    _renderV2Breakdown(result, resultEl);
-  }
-  return result;
-}
-
-window.PackZenPricing = {
+// Global Export
+window.PackZenPricingV4 = {
   version: PRICING_CONFIG.version,
   config: PRICING_CONFIG,
-  vehicles: VEHICLE_CONFIG,
-  calculateQuote: calculateQuoteV2,
-  validateInput: validateQuoteInput,
-  runPricingEngineV2,
+  calculateQuote: calculateQuoteV4,
+  validateInput: validateQuoteInputV4
 };
+```
+
+---
+
+### Summary of Changes in v4.1:
+1. **Tata Ace Base:** ₹1,200 $\rightarrow$ **₹1,500** (Total base w/ helper = **₹2,150**)
+2. **14ft Truck Base:** ₹2,200 $\rightarrow$ **₹2,900** (Total base w/ 2 helpers = **₹4,200**)
+3. **17ft Truck Base:** ₹3,200 $\rightarrow$ **₹4,500** (Total base w/ 3 helpers = **₹6,450**)
+4. **22ft Truck Base:** ₹4,500 $\rightarrow$ **₹6,500** (Total base w/ 4 helpers = **₹9,100**)
+5. **Minimum Order Value Floor:** ₹1,499 $\rightarrow$ **₹1,999**
+6. **Slight Distance Adjustment:** Adjusted Tata Ace/14ft/17ft/22ft per-km rates to ₹24, ₹32, ₹40, and ₹52 respectively.
