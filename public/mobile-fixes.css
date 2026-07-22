@@ -2152,3 +2152,10 @@ touch-action: manipulation;
   max-width: 100vw;
   overflow-x: hidden;
 }
+
+@media (max-width: 768px) {
+  .desktop-nav-links { display: none !important; }
+  .app-phone-btn { display: none; }
+  .hero-premium-actions { flex-direction: column; }
+  .hero-premium-title { font-size: 2.8rem; }
+}
