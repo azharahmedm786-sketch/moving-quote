@@ -218,9 +218,26 @@
   <!-- BOTTOM NAV -->
   <nav class="bottom-nav" id="bottomNav">
     <button class="bn-item active" onclick="switchTab('job',this)"><span class="bn-icon">📦</span>Current Job</button>
+    <button class="bn-item" onclick="switchTab('parcel',this)"><span class="bn-icon">🛵</span>Parcel</button>
     <button class="bn-item" onclick="switchTab('history',this)"><span class="bn-icon">📋</span>History</button>
     <button class="bn-item" onclick="switchTab('earnings',this)"><span class="bn-icon">💰</span>Earnings</button>
   </nav>
+
+  <!-- TAB: PARCEL JOB -->
+  <div class="drv-tab" id="tabParcel">
+    <div style="background:#fff; border-radius:16px; padding:20px; box-shadow:0 10px 30px rgba(0,0,0,0.05); margin-bottom:20px;">
+      <h2 style="font-size:1.3rem; font-weight:800; margin-bottom:5px;">Available Parcel Jobs</h2>
+      <div id="availableParcelJobs">
+         <p style="color:var(--text-muted); font-size:0.9rem;">No parcel jobs available.</p>
+      </div>
+    </div>
+    <div style="background:#fff; border-radius:16px; padding:20px; box-shadow:0 10px 30px rgba(0,0,0,0.05);">
+      <h2 style="font-size:1.3rem; font-weight:800; margin-bottom:5px;">My Active Parcel</h2>
+      <div id="activeParcelJob">
+         <p style="color:var(--text-muted); font-size:0.9rem;">No active parcel job.</p>
+      </div>
+    </div>
+  </div>
 
   <!-- TAB: CURRENT JOB -->
   <div class="drv-tab active" id="tabJob">
@@ -923,6 +940,10 @@ function switchTab(tab, el) {
   document.querySelectorAll(".drv-tab").forEach(t => t.classList.remove("active"));
   document.getElementById("tab" + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add("active");
 
+  if (tab === 'parcel') {
+     loadParcelJobs();
+  }
+
   // Load data when tab opened
   if (tab === "history")  loadHistory();
   if (tab === "earnings") loadEarnings("all");
@@ -931,6 +952,110 @@ function switchTab(tab, el) {
 /* ============================================
    HISTORY - Completed Jobs
    ============================================ */
+/* ============================================
+   PARCEL JOBS TAB
+   ============================================ */
+function loadParcelJobs() {
+   if (!driverUser) return;
+
+   // Load unassigned parcel jobs
+   window._firebase.db.collection("parcelBookings").where("status", "==", "confirmed").onSnapshot(snap => {
+      const avail = document.getElementById("availableParcelJobs");
+      if (snap.empty) {
+         avail.innerHTML = "<p style='color:var(--text-muted); font-size:0.9rem;'>No parcel jobs available.</p>";
+      } else {
+         let html = "";
+         snap.forEach(doc => {
+            const d = doc.data();
+            html += `
+               <div style="border:1px solid var(--border); border-radius:12px; padding:15px; margin-top:10px;">
+                  <div style="font-weight:700;">Pickup: ${d.pickupAddress}</div>
+                  <div style="margin-top:5px; font-weight:700;">Drop: ${d.deliveryAddress}</div>
+                  <div style="margin-top:5px;">Distance: ${Number(d.distanceKm||0).toFixed(1)} km | Fare: ₹${d.totalFare}</div>
+                  <button onclick="acceptParcelJob('${doc.id}')" class="btn-primary" style="margin-top:10px; padding:8px 12px; width:100%;">Accept Job</button>
+               </div>
+            `;
+         });
+         avail.innerHTML = html;
+      }
+   });
+
+   // Load driver's active parcel jobs
+   window._firebase.db.collection("parcelBookings").where("driverUid", "==", driverUser.uid).where("status", "in", ["assigned", "arrived", "picked_up", "in_transit"]).onSnapshot(snap => {
+      const active = document.getElementById("activeParcelJob");
+      if (snap.empty) {
+         active.innerHTML = "<p style='color:var(--text-muted); font-size:0.9rem;'>No active parcel job.</p>";
+      } else {
+         let html = "";
+         snap.forEach(doc => {
+            const d = doc.data();
+            let nextAction = "";
+            let btnLabel = "";
+            if (d.status === "assigned") { nextAction = "arrived"; btnLabel = "Mark Arrived"; }
+            else if (d.status === "arrived") { nextAction = "picked_up"; btnLabel = "Confirm Pickup"; }
+            else if (d.status === "picked_up") { nextAction = "in_transit"; btnLabel = "Start Transit"; }
+            else if (d.status === "in_transit") { nextAction = "delivered"; btnLabel = "Complete Delivery"; }
+
+            html += `
+               <div style="border:1px solid var(--primary); border-radius:12px; padding:15px; margin-top:10px; background:#f0fdf4;">
+                  <div style="font-weight:800; color:var(--primary); margin-bottom:10px;">Status: ${d.status.toUpperCase()}</div>
+                  <div style="font-weight:700;">Customer: ${d.customerName} (${d.customerPhone})</div>
+                  <div style="font-weight:700; margin-top:5px;">Pickup: ${d.pickupAddress}</div>
+                  <div style="font-weight:700; margin-top:5px;">Drop: ${d.deliveryAddress}</div>
+                  <div style="margin-top:5px;">Receiver: ${d.receiverName} (${d.receiverMobile})</div>
+                  <div style="margin-top:10px; font-weight:800; font-size:1.1rem;">Delivery OTP: ${d.deliveryOTP}</div>
+
+                  <button onclick="updateParcelStatus('${doc.id}', '${nextAction}')" class="btn-primary" style="margin-top:15px; padding:10px 15px; width:100%;">${btnLabel}</button>
+                  <a href="https://maps.google.com/?q=${encodeURIComponent(d.status==='in_transit' ? d.deliveryAddress : d.pickupAddress)}" target="_blank" class="btn-secondary" style="margin-top:10px; text-decoration:none; display:block; text-align:center;">Navigate</a>
+               </div>
+            `;
+         });
+         active.innerHTML = html;
+      }
+   });
+}
+
+async function acceptParcelJob(jobId) {
+   if (!confirm("Accept this parcel job?")) return;
+   try {
+      await window._firebase.db.collection("parcelBookings").doc(jobId).update({
+         driverUid: driverUser.uid,
+         driverName: driverDocData.name || "Driver",
+         driverPhone: driverDocData.phone || "",
+         driverVehicle: driverDocData.vehicleType || "Vehicle",
+         status: "assigned",
+         assignedAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      alert("Job accepted!");
+   } catch (e) {
+      alert("Failed to accept job: " + e.message);
+   }
+}
+
+async function updateParcelStatus(jobId, newStatus) {
+   if (newStatus === 'delivered') {
+      const otp = prompt("Enter Delivery OTP from Customer:");
+      if (!otp) return;
+      const doc = await window._firebase.db.collection("parcelBookings").doc(jobId).get();
+      if (doc.data().deliveryOTP !== otp) {
+         alert("Invalid OTP");
+         return;
+      }
+   } else {
+      if (!confirm(`Update status to ${newStatus}?`)) return;
+   }
+
+   try {
+      await window._firebase.db.collection("parcelBookings").doc(jobId).update({
+         status: newStatus,
+         updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      alert(`Status updated to ${newStatus}`);
+   } catch (e) {
+      alert("Error updating status: " + e.message);
+   }
+}
+
 let allCompletedBookings = [];
 
 function loadHistory() {
