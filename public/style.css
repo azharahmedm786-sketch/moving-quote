@@ -567,6 +567,7 @@ img { max-width: 100%; height: auto; display: block; }
 .sac-office { background: #f0fdf4; }
 .sac-single { background: #f0fdf4; }
 .sac-local  { background: #f0fdf4; }
+.sac-parcel { background: #fffbeb; }
 
 .sac-body { flex: 1; min-width: 0; }
 .sac-title { font-size: 0.85rem; font-weight: 700; color: var(--text-primary); }

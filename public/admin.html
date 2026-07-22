@@ -412,6 +412,7 @@ function buildShell(adminName) {
     <div class="sb-role">Main</div>
     <div class="nav-item active" onclick="showSection('overview',this)"><span class="ni">📊</span> Overview</div>
     <div class="nav-item" onclick="showSection('bookings',this)"><span class="ni">📦</span> Bookings</div>
+    <div class="nav-item" onclick="showSection('parcel',this)"><span class="ni">🛵</span> Parcel</div>
     <div class="nav-item" onclick="showSection('drivers',this)"><span class="ni">🚚</span> Drivers</div>
     <div class="sb-role">Manage</div>
     <div class="nav-item" onclick="showSection('customers',this)"><span class="ni">👥</span> Customers</div>
@@ -504,6 +505,29 @@ function buildShell(adminName) {
         <tbody id="bookingsTable"><tr class="empty-row"><td colspan="9">Loading...</td></tr></tbody></table>
       </div>
     </div>
+    <!-- PARCEL -->
+    <div class="section" id="sectionParcel">
+      <div class="stats-grid">
+        <div class="stat-card"><div class="sc-lbl">Total Parcel Orders</div><div class="sc-val" id="parcelTotalOrders">0</div><div class="sc-sub">All time</div></div>
+        <div class="stat-card"><div class="sc-lbl">Parcel Revenue</div><div class="sc-val" id="parcelRevenue" style="font-size:1.4rem;color:#00c96e">₹0</div><div class="sc-sub">Total</div></div>
+        <div class="stat-card"><div class="sc-lbl">Completed Parcels</div><div class="sc-val" id="parcelCompleted">0</div><div class="sc-sub">Delivered</div></div>
+        <div class="stat-card"><div class="sc-lbl">Active Parcels</div><div class="sc-val" id="parcelActive" style="color:#d97706">0</div><div class="sc-sub">In progress</div></div>
+      </div>
+      <div class="table-card">
+        <div class="table-hdr">
+          <div class="table-title">Parcel Bookings</div>
+          <div class="table-actions">
+            <input type="text" id="parcelSearch" placeholder="Search ID or Phone..." class="search-input" onkeyup="filterParcel(this.value)">
+            <button class="btn-export" onclick="loadParcelBookings()">🔄 Refresh</button>
+          </div>
+        </div>
+        <table>
+          <thead><tr><th>ID</th><th>Customer</th><th>Pickup</th><th>Delivery</th><th>Fare</th><th>Status</th><th>Date</th></tr></thead>
+          <tbody id="parcelTable"><tr class="empty-row"><td colspan="7">Loading...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
     <!-- DRIVERS -->
     <div class="section" id="sectionDrivers">
       <div class="table-card" style="margin-bottom:20px;">
@@ -787,6 +811,57 @@ let bookingsChart = null;
 let revenueChart = null;
 let expandedBookingId = null;
 let filteredBookings = [];
+
+/* ── PARCEL MANAGEMENT ── */
+let allParcelBookings = [];
+function loadParcelBookings() {
+  window._firebase.db.collection("parcelBookings").orderBy("createdAt", "desc").get().then(snap => {
+    allParcelBookings = [];
+    let rev = 0, completed = 0, active = 0;
+    snap.forEach(doc => {
+      const d = doc.data();
+      d.id = doc.id;
+      allParcelBookings.push(d);
+      if (d.status === 'delivered') { completed++; rev += (d.totalFare || 0); }
+      else if (d.status !== 'cancelled') active++;
+    });
+    document.getElementById("parcelTotalOrders").textContent = allParcelBookings.length;
+    document.getElementById("parcelRevenue").textContent = "₹" + rev.toLocaleString('en-IN');
+    document.getElementById("parcelCompleted").textContent = completed;
+    document.getElementById("parcelActive").textContent = active;
+    renderParcelBookings(allParcelBookings);
+  });
+}
+function renderParcelBookings(list) {
+  const tb = document.getElementById("parcelTable");
+  tb.innerHTML = "";
+  if (!list.length) return tb.innerHTML="<tr class='empty-row'><td colspan='7'>No parcel bookings found.</td></tr>";
+  list.forEach(b => {
+    const d = b.createdAt ? b.createdAt.toDate().toLocaleDateString('en-IN') : "--";
+    const st = b.status || "confirmed";
+    const stColor = st==="delivered"?"color:#16a34a":st==="cancelled"?"color:#dc2626":"color:#d97706";
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td style="font-family:'Space Grotesk',sans-serif;font-weight:700;">${b.bookingId||b.id}</td>
+      <td><b>${b.customerName||"--"}</b><br><small style="color:var(--text-muted)">${b.customerPhone||"--"}</small></td>
+      <td><span class="truncate" style="display:inline-block;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${b.pickupAddress}">${b.pickupAddress||"--"}</span></td>
+      <td><span class="truncate" style="display:inline-block;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${b.deliveryAddress}">${b.deliveryAddress||"--"}</span></td>
+      <td style="font-weight:700;">₹${b.totalFare||0}</td>
+      <td style="font-weight:700;text-transform:capitalize;${stColor}">${st}</td>
+      <td style="font-size:0.85rem;color:var(--text-muted);">${d}</td>
+    `;
+    tb.appendChild(tr);
+  });
+}
+function filterParcel(query) {
+  query = query.toLowerCase();
+  const f = allParcelBookings.filter(b =>
+    (b.bookingId&&b.bookingId.toLowerCase().includes(query)) ||
+    (b.customerPhone&&b.customerPhone.includes(query)) ||
+    (b.customerName&&b.customerName.toLowerCase().includes(query))
+  );
+  renderParcelBookings(f);
+}
 
 function showShell(name) {
   document.getElementById("adminLogin").style.display = "none";
@@ -1270,10 +1345,11 @@ function showSection(name, el) {
   const sec = document.getElementById("section"+cap(name));
   if (sec) sec.classList.add("active");
   if (el) el.classList.add("active");
-  const titles = { overview:"Overview", bookings:"Bookings", drivers:"Drivers", customers:"Customers", reviews:"Reviews", cancels:"Cancellations", claims:"Damage Claims", promos:"Promo Codes", broadcast:"Broadcast", analytics:"Business Analytics" };
+  const titles = { overview:"Overview", bookings:"Bookings", parcel:"Parcel Management", drivers:"Drivers", customers:"Customers", reviews:"Reviews", cancels:"Cancellations", claims:"Damage Claims", promos:"Promo Codes", broadcast:"Broadcast", analytics:"Business Analytics" };
   const titleEl = document.getElementById("sectionTitle");
   if (titleEl) titleEl.textContent = titles[name] || cap(name);
   if (name==="overview") renderCharts();
+  if (name==="parcel")   loadParcelBookings();
   if (name==="cancels")  loadCancelRequests();
   if (name==="claims")   loadDamageClaims();
   if (name==="deletion") loadDeletionRequests();
