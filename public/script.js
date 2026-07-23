@@ -1,7 +1,7 @@
 /* ============================================
 PackZen — script.js (FULLY FIXED)
 SECURITY HARDENED VERSION - May 2026
-Pricing Engine: v2.0 (pricing-engine-v2.js)
+Pricing Engine: v4.2.0 (pricing-engine-v2.js) — exposed as window.PackZenPricing
 ============================================ */
 
 // ─── GLOBAL STATE ───────────────────────────────────
@@ -1156,9 +1156,98 @@ function detectAndShowIntercityBadge(km) {
 
 /* ============================================
 PRICE CALCULATION
-Delegates ALL pricing logic to Pricing Engine v2.
+Delegates ALL pricing logic to Pricing Engine v4.2.
 Google Maps distance API call is preserved exactly.
 ============================================ */
+
+// Legacy <select id="vehicle"> stores an old flat-price string in its
+// `value` (kept so existing markup/CSS didn't need to change) — map it
+// to the vehicleId keys the pricing engine actually understands.
+const VEHICLE_VALUE_TO_ID = {
+  "200": "tata_ace",
+  "2500": "truck_14ft",
+  "4000": "truck_17ft",
+  "5500": "truck_22ft"
+};
+
+/**
+ * Reads every input currently on the form and assembles the single
+ * "raw" payload object that window.PackZenPricing.calculateQuote()
+ * expects. Centralized here so every call site (auto-recalc, promo
+ * re-run, referral re-run) stays in sync with the engine's real API.
+ */
+function buildQuoteRawPayload(km) {
+  const pickup = document.getElementById("pickup");
+  const drop = document.getElementById("drop");
+  const vehicleEl = document.getElementById("vehicle");
+  const furnitureUnits = window.PackZenPricing?.config?.furnitureUnits || {};
+
+  const furniture = {};
+  Object.keys(furnitureUnits).forEach((itemId) => {
+    const el = document.getElementById(itemId);
+    if (el) furniture[itemId] = parseInt(el.value, 10) || 0;
+  });
+
+  return {
+    pickup: pickup?.value || "",
+    drop: drop?.value || "",
+    km,
+    vehicleId: VEHICLE_VALUE_TO_ID[vehicleEl?.value] || "tata_ace",
+    furniture,
+    cartonQty: parseInt(document.getElementById("cartonQty")?.value || "0", 10),
+    pickupFloor: parseInt(document.getElementById("pickupFloor")?.value || "0", 10),
+    dropFloor: parseInt(document.getElementById("dropFloor")?.value || "0", 10),
+    liftAvailable: !!document.getElementById("liftAvailable")?.checked,
+    packingService: !!document.getElementById("packingService")?.checked,
+    extraHelpers: parseInt(document.getElementById("extraHelpers")?.value || "0", 10),
+    isInterstate: !!isIntercityMove,
+    promoDiscount: promoDiscount || 0
+  };
+}
+
+/**
+ * Single source of truth for running the pricing engine and syncing
+ * its result into the page's shared state (lastCalculatedTotal,
+ * window._lastQuoteResult, window._lastCalculatedKm). Every call site
+ * that needs a fresh quote should go through this function instead of
+ * calling the engine directly.
+ *
+ * @param {number} km
+ * @param {{silent?: boolean}} opts - silent suppresses error toasts
+ *        (used for auto-recalculation on every keystroke/toggle).
+ * @returns {object|null} the engine's quote result, or null if the
+ *          engine isn't loaded / inputs are invalid.
+ */
+function runQuoteEngine(km, opts = {}) {
+  const { silent = false } = opts;
+
+  if (!window.PackZenPricing || typeof window.PackZenPricing.calculateQuote !== "function") {
+    if (!silent) showToast("⚠️ Pricing engine not ready. Please try again.");
+    return null;
+  }
+
+  const raw = buildQuoteRawPayload(km);
+  const quote = window.PackZenPricing.calculateQuote(raw);
+
+  window._lastQuoteResult = quote;
+  window._lastCalculatedKm = km;
+
+  if (quote.valid) {
+    lastCalculatedTotal = quote.finalTotal;
+    updatePriceDisplay();
+    if (currentUser) saveQuoteToFirestore(quote.finalTotal);
+  } else {
+    // Never leave a stale/₹0 price on screen without explanation.
+    lastCalculatedTotal = 0;
+    updatePriceDisplay();
+    if (!silent && quote.errors && quote.errors.length > 0) {
+      showToast("⚠️ " + quote.errors[0]);
+    }
+  }
+
+  return quote;
+}
+
 function calculateQuote(auto = false) {
   const pickup = document.getElementById("pickup");
   const drop = document.getElementById("drop");
@@ -1168,7 +1257,7 @@ function calculateQuote(auto = false) {
     return;
   }
 
-  // Guard: v2 engine must be loaded
+  // Guard: pricing engine must be loaded
   if (!window.PackZenPricing) {
     if (!auto) showToast("⚠️ Pricing engine not ready. Please try again.");
     return;
@@ -1176,7 +1265,7 @@ function calculateQuote(auto = false) {
 
   /**
    * applyPrice(km) — called once Google Maps returns the distance.
-   * All pricing delegated to Pricing Engine v2.
+   * All pricing delegated to the Pricing Engine.
    */
   function applyPrice(km) {
     if (km == null || isNaN(km)) {
@@ -1201,19 +1290,7 @@ function calculateQuote(auto = false) {
       }
     }
 
-    // Run Pricing Engine v2 — this is the single source of truth
-    const quote = window.PackZenPricing.runPricingEngineV2(km);
-
-    if (quote && quote.valid) {
-      lastCalculatedTotal = quote.finalTotal;
-      updatePriceDisplay();
-      if (currentUser) saveQuoteToFirestore(quote.finalTotal);
-    } else if (quote && !quote.valid) {
-      // Engine returned errors — show first one
-      if (!auto && quote.errors && quote.errors.length > 0) {
-        showToast("⚠️ " + quote.errors[0]);
-      }
-    }
+    runQuoteEngine(km, { silent: auto });
   }
 
   // ── Google Maps Distance Matrix (unchanged) ──────────────
@@ -2794,12 +2871,13 @@ async function applyPromoCode() {
           promoDiscount = window.PackZenPricing?.config?.discounts?.referralAmount || 100;
           msgEl.textContent = "🎉 Referral code applied! ₹" + promoDiscount + " discount.";
           msgEl.className = "promo-msg promo-success";
-          // Re-run v2 engine with updated promoDiscount
+          // Re-run the pricing engine with the updated promoDiscount
           if (window._lastCalculatedKm) {
-            const quote = window.PackZenPricing.runPricingEngineV2(window._lastCalculatedKm);
-            if (quote?.valid) { lastCalculatedTotal = quote.finalTotal; }
+            runQuoteEngine(window._lastCalculatedKm, { silent: true });
+          } else {
+            updatePriceDisplay();
           }
-          updatePriceDisplay(); return;
+          return;
         }
         msgEl.textContent = "Invalid promo code."; msgEl.className = "promo-msg promo-error"; return;
       }
@@ -2815,12 +2893,12 @@ async function applyPromoCode() {
       msgEl.textContent = `🎉 Code applied! ₹${promoDiscount} off.`;
       msgEl.className = "promo-msg promo-success";
 
-      // Re-run v2 engine with updated promoDiscount so it incorporates the discount
+      // Re-run the pricing engine with the updated promoDiscount so it incorporates the discount
       if (window._lastCalculatedKm) {
-        const quote = window.PackZenPricing.runPricingEngineV2(window._lastCalculatedKm);
-        if (quote?.valid) { lastCalculatedTotal = quote.finalTotal; }
+        runQuoteEngine(window._lastCalculatedKm, { silent: true });
+      } else {
+        updatePriceDisplay();
       }
-      updatePriceDisplay();
     } catch(e) { msgEl.textContent = "Error checking code."; msgEl.className = "promo-msg promo-error"; }
   });
 }
