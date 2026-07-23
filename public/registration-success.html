@@ -16,8 +16,6 @@
 <link rel="stylesheet" href="desktop.css">
 <link rel="stylesheet" href="partner.css">
 <link rel="stylesheet" href="partner-portal.css">
-
-  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 </head>
 <body class="app-body partner-body" data-page="registration-status">
 
@@ -27,7 +25,7 @@
       <img src="assets/logo/packzen-logo.png" alt="PackZen">
       <span>PackZen Partner</span>
     </div>
-    <div class="status-result-icon" id="statusIcon"><i data-lucide="clock"></i></div>
+    <div class="status-result-icon" id="statusIcon">⏳</div>
     <h1 id="statusTitle">Application Under Review</h1>
     <p id="statusSub">Thanks for registering! Our team is verifying your documents.</p>
     <div id="statusReason" class="auth-error-box" style="display:none"></div>
@@ -47,35 +45,5 @@
 <script src="firebase-config.js"></script>
 <script src="https://packzen-config.azharahmedm786.workers.dev"></script>
 <script src="partner.js"></script>
-
-
-
-
-<script>
-  document.addEventListener('DOMContentLoaded', () => {
-    if (typeof lucide !== 'undefined') {
-        lucide.createIcons();
-
-        // Debounced observer to prevent infinite loops and performance issues
-        let timeout;
-        const observer = new MutationObserver((mutations) => {
-            let shouldUpdate = false;
-            for (let m of mutations) {
-                if (m.addedNodes.length > 0) {
-                    shouldUpdate = true;
-                    break;
-                }
-            }
-            if (shouldUpdate) {
-                clearTimeout(timeout);
-                timeout = setTimeout(() => lucide.createIcons(), 50);
-            }
-        });
-        observer.observe(document.body, { childList: true, subtree: true });
-    }
-  });
-</script>
-
-  <script src="icon-init.js"></script>
 </body>
 </html>

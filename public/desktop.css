@@ -942,3 +942,38 @@
   }
 
 }
+
+@media (min-width: 1024px) {
+  .app-bar {
+    background: #ffffff !important;
+    border-bottom: 1px solid var(--border-light);
+  }
+
+  .app-bar-desktop-nav {
+    display: flex !important;
+    align-items: center;
+    gap: 2rem;
+    margin-right: auto;
+    margin-left: 3rem;
+  }
+
+  .desktop-nav-link {
+    color: var(--navy-900);
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.95rem;
+    transition: color 0.2s ease;
+  }
+
+  .desktop-nav-link:hover {
+    color: var(--green-600);
+  }
+
+  .app-bar-center {
+    display: none;
+  }
+
+  .app-logo-text {
+    color: var(--navy-900) !important;
+  }
+}

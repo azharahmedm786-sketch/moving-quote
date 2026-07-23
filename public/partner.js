@@ -1267,7 +1267,7 @@ function handleFirebaseActionCode() {
           if (user) {
             window._firebase.db.collection('partners').doc(user.uid).update({ emailVerified: true }).catch(function(){});
           }
-          alert("Success: Email verified successfully!");
+          alert("✅ Email verified successfully!");
           window.history.replaceState(null, '', window.location.pathname);
         }).catch(function(err) {
           console.error(err);

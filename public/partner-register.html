@@ -242,8 +242,6 @@
 .pw-strength.strong { background: var(--green-500); width: 100%; }
 .pw-strength-label  { font-size: 0.68rem; color: var(--text-muted); margin-top: 3px; }
 </style>
-
-  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 </head>
 <body class="app-body partner-body">
 
@@ -309,7 +307,7 @@
         </div>
 
         <div class="field-group">
-          <label class="field-label" for="regPassword"><span class="field-icon"><i data-lucide="lock"></i></span> Password <span aria-hidden="true" style="color:#dc2626">*</span></label>
+          <label class="field-label" for="regPassword"><span class="field-icon">🔒</span> Password <span aria-hidden="true" style="color:#dc2626">*</span></label>
           <input type="password" id="regPassword" class="field-input" placeholder="Min. 8 characters" autocomplete="new-password" required oninput="checkPasswordStrength(this.value)">
           <div class="pw-strength" id="pwStrengthBar" style="width:0;background:transparent"></div>
           <div class="pw-strength-label" id="pwStrengthLabel"></div>
@@ -317,7 +315,7 @@
         </div>
 
         <div class="field-group">
-          <label class="field-label" for="regConfirmPassword"><span class="field-icon"><i data-lucide="lock"></i></span> Confirm Password <span aria-hidden="true" style="color:#dc2626">*</span></label>
+          <label class="field-label" for="regConfirmPassword"><span class="field-icon">🔒</span> Confirm Password <span aria-hidden="true" style="color:#dc2626">*</span></label>
           <input type="password" id="regConfirmPassword" class="field-input" placeholder="Re-enter password" autocomplete="new-password" required>
           <div class="field-error" id="errConfirmPassword">Passwords do not match.</div>
         </div>
@@ -342,24 +340,24 @@
   <div class="reg-step" id="regStep2">
     <div class="reg-card">
       <div class="reg-card-header">
-        <div class="reg-card-icon"><i data-lucide="building-2"></i></div>
+        <div class="reg-card-icon">🏢</div>
         <div class="reg-card-title">Business Information</div>
         <div class="reg-card-sub">Tell us about your moving business.</div>
       </div>
       <div class="reg-card-body">
 
         <div class="field-group">
-          <label class="field-label" for="bizName"><span class="field-icon"><i data-lucide="building-2"></i></span> Business / Brand Name <span aria-hidden="true" style="color:#dc2626">*</span></label>
+          <label class="field-label" for="bizName"><span class="field-icon">🏢</span> Business / Brand Name <span aria-hidden="true" style="color:#dc2626">*</span></label>
           <input type="text" id="bizName" class="field-input" placeholder="e.g. Ravi Movers" autocomplete="organization" required>
           <div class="field-error" id="errBizName">Please enter your business name.</div>
         </div>
 
         <div class="field-group">
-          <label class="field-label"><span class="field-icon"><i data-lucide="truck"></i></span> Business Type <span aria-hidden="true" style="color:#dc2626">*</span></label>
+          <label class="field-label"><span class="field-icon">🚚</span> Business Type <span aria-hidden="true" style="color:#dc2626">*</span></label>
           <div class="vehicle-type-grid" id="bizTypeGrid">
-            <div class="vt-chip" data-value="packers_movers" onclick="selectBizType(this)"><span class="vt-icon"><i data-lucide="building-2"></i></span> Packers & Movers</div>
-            <div class="vt-chip" data-value="individual_mover" onclick="selectBizType(this)"><span class="vt-icon">🧑‍<i data-lucide="wrench"></i></span> Individual Mover</div>
-            <div class="vt-chip" data-value="vehicle_owner" onclick="selectBizType(this)"><span class="vt-icon"><i data-lucide="truck"></i></span> Vehicle Owner</div>
+            <div class="vt-chip" data-value="packers_movers" onclick="selectBizType(this)"><span class="vt-icon">🏢</span> Packers & Movers</div>
+            <div class="vt-chip" data-value="individual_mover" onclick="selectBizType(this)"><span class="vt-icon">🧑‍🔧</span> Individual Mover</div>
+            <div class="vt-chip" data-value="vehicle_owner" onclick="selectBizType(this)"><span class="vt-icon">🚛</span> Vehicle Owner</div>
             <div class="vt-chip" data-value="loading_team" onclick="selectBizType(this)"><span class="vt-icon">👷</span> Loading Team</div>
           </div>
           <input type="hidden" id="bizType">
@@ -367,7 +365,7 @@
         </div>
 
         <div class="field-group">
-          <label class="field-label" for="bizYears"><span class="field-icon"><i data-lucide="calendar"></i></span> Years in Business</label>
+          <label class="field-label" for="bizYears"><span class="field-icon">📅</span> Years in Business</label>
           <select id="bizYears" class="field-input">
             <option value="">Select experience</option>
             <option value="0">Less than 1 year</option>
@@ -379,7 +377,7 @@
         </div>
 
         <div class="field-group">
-          <label class="field-label"><span class="field-icon"><i data-lucide="map-pin"></i></span> Service Areas <span aria-hidden="true" style="color:#dc2626">*</span></label>
+          <label class="field-label"><span class="field-icon">📍</span> Service Areas <span aria-hidden="true" style="color:#dc2626">*</span></label>
           <div class="area-select-wrap" id="areaChipsWrap">
             <div class="area-select-chip" data-area="HSR Layout"        onclick="toggleArea(this)">HSR Layout</div>
             <div class="area-select-chip" data-area="Koramangala"       onclick="toggleArea(this)">Koramangala</div>
@@ -411,7 +409,7 @@
   <div class="reg-step" id="regStep3">
     <div class="reg-card">
       <div class="reg-card-header">
-        <div class="reg-card-icon"><i data-lucide="user"></i></div>
+        <div class="reg-card-icon">👤</div>
         <div class="reg-card-title">Owner Details</div>
         <div class="reg-card-sub">Your personal information as the account holder.</div>
       </div>
@@ -430,7 +428,7 @@
         <div class="field-error" id="errOwnerName">Please enter your full name.</div>
 
         <div class="field-group">
-          <label class="field-label" for="ownerPhone"><span class="field-icon"><i data-lucide="phone"></i></span> Mobile Number <span aria-hidden="true" style="color:#dc2626">*</span></label>
+          <label class="field-label" for="ownerPhone"><span class="field-icon">📞</span> Mobile Number <span aria-hidden="true" style="color:#dc2626">*</span></label>
           <div class="phone-row">
             <span class="phone-prefix">+91</span>
             <input type="tel" id="ownerPhone" class="field-input" style="flex:1" placeholder="10-digit mobile" maxlength="10" inputmode="numeric" autocomplete="tel" required>
@@ -444,7 +442,7 @@
         </div>
 
         <div class="field-group">
-          <label class="field-label" for="ownerAddress"><span class="field-icon"><i data-lucide="home"></i></span> Residential Address <span aria-hidden="true" style="color:#dc2626">*</span></label>
+          <label class="field-label" for="ownerAddress"><span class="field-icon">🏠</span> Residential Address <span aria-hidden="true" style="color:#dc2626">*</span></label>
           <textarea id="ownerAddress" class="field-input" rows="3" placeholder="Door no., Street, Area, City, PIN" style="resize:vertical" required></textarea>
           <div class="field-error" id="errOwnerAddress">Please enter your address.</div>
         </div>
@@ -464,19 +462,19 @@
   <div class="reg-step" id="regStep4">
     <div class="reg-card">
       <div class="reg-card-header">
-        <div class="reg-card-icon"><i data-lucide="truck"></i></div>
+        <div class="reg-card-icon">🚚</div>
         <div class="reg-card-title">Vehicle Information</div>
         <div class="reg-card-sub">Tell us about the vehicles you operate with.</div>
       </div>
       <div class="reg-card-body">
 
         <div class="field-group">
-          <label class="field-label"><span class="field-icon"><i data-lucide="truck"></i></span> Primary Vehicle Type <span aria-hidden="true" style="color:#dc2626">*</span></label>
+          <label class="field-label"><span class="field-icon">🚛</span> Primary Vehicle Type <span aria-hidden="true" style="color:#dc2626">*</span></label>
           <div class="vehicle-type-grid">
-            <div class="vt-chip" data-value="tata_ace"    onclick="selectVehicleType(this)"><span class="vt-icon"><i data-lucide="truck"></i></span> Tata Ace</div>
-            <div class="vt-chip" data-value="mini_truck"  onclick="selectVehicleType(this)"><span class="vt-icon"><i data-lucide="car"></i></span> Mini Truck</div>
-            <div class="vt-chip" data-value="14ft_truck"  onclick="selectVehicleType(this)"><span class="vt-icon"><i data-lucide="truck"></i></span> 14 ft Truck</div>
-            <div class="vt-chip" data-value="17ft_truck"  onclick="selectVehicleType(this)"><span class="vt-icon"><i data-lucide="truck"></i></span> 17 ft Truck</div>
+            <div class="vt-chip" data-value="tata_ace"    onclick="selectVehicleType(this)"><span class="vt-icon">🛻</span> Tata Ace</div>
+            <div class="vt-chip" data-value="mini_truck"  onclick="selectVehicleType(this)"><span class="vt-icon">🚐</span> Mini Truck</div>
+            <div class="vt-chip" data-value="14ft_truck"  onclick="selectVehicleType(this)"><span class="vt-icon">🚚</span> 14 ft Truck</div>
+            <div class="vt-chip" data-value="17ft_truck"  onclick="selectVehicleType(this)"><span class="vt-icon">🚛</span> 17 ft Truck</div>
             <div class="vt-chip" data-value="22ft_truck"  onclick="selectVehicleType(this)"><span class="vt-icon">🚜</span> 22 ft Truck</div>
             <div class="vt-chip" data-value="tempo"       onclick="selectVehicleType(this)"><span class="vt-icon">🚌</span> Tempo</div>
           </div>
@@ -507,7 +505,7 @@
         </div>
 
         <div class="field-group">
-          <label class="field-label" for="vehicleRegNo"><span class="field-icon"><i data-lucide="clipboard"></i></span> Vehicle Registration Number <span aria-hidden="true" style="color:#dc2626">*</span></label>
+          <label class="field-label" for="vehicleRegNo"><span class="field-icon">📋</span> Vehicle Registration Number <span aria-hidden="true" style="color:#dc2626">*</span></label>
           <input type="text" id="vehicleRegNo" class="field-input" placeholder="KA 01 AB 1234" style="text-transform:uppercase" required>
           <div class="field-error" id="errVehicleReg">Please enter the vehicle registration number.</div>
         </div>
@@ -567,7 +565,7 @@
         </div>
 
         <div class="field-group">
-          <label class="field-label"><span class="field-icon"><i data-lucide="truck"></i></span> Vehicle RC (Registration Certificate) <span aria-hidden="true" style="color:#dc2626">*</span></label>
+          <label class="field-label"><span class="field-icon">🚚</span> Vehicle RC (Registration Certificate) <span aria-hidden="true" style="color:#dc2626">*</span></label>
           <div class="upload-zone" id="uzRC">
             <input type="file" accept="image/*,application/pdf" id="fileRC" onchange="handleFileSelect('fileRC','uzRC','docRCName')">
             <div class="uz-icon">📷</div>
@@ -579,7 +577,7 @@
         </div>
 
         <div class="field-group">
-          <label class="field-label"><span class="field-icon"><i data-lucide="shield-check"></i></span> Vehicle Insurance <span aria-hidden="true" style="color:#dc2626">*</span></label>
+          <label class="field-label"><span class="field-icon">🛡️</span> Vehicle Insurance <span aria-hidden="true" style="color:#dc2626">*</span></label>
           <div class="upload-zone" id="uzInsurance">
             <input type="file" accept="image/*,application/pdf" id="fileInsurance" onchange="handleFileSelect('fileInsurance','uzInsurance','docInsuranceName')">
             <div class="uz-icon">📷</div>
@@ -624,7 +622,7 @@
         </div>
 
         <div class="field-group">
-          <label class="field-label" for="bankAccountName"><span class="field-icon"><i data-lucide="user"></i></span> Account Holder Name <span aria-hidden="true" style="color:#dc2626">*</span></label>
+          <label class="field-label" for="bankAccountName"><span class="field-icon">👤</span> Account Holder Name <span aria-hidden="true" style="color:#dc2626">*</span></label>
           <input type="text" id="bankAccountName" class="field-input" placeholder="As printed on passbook" required>
           <div class="field-error" id="errBankAccountName">Please enter the account holder name.</div>
         </div>
@@ -657,7 +655,7 @@
   <div class="reg-step" id="regStep7">
     <div class="reg-card">
       <div class="reg-card-header">
-        <div class="reg-card-icon"><i data-lucide="check-circle"></i></div>
+        <div class="reg-card-icon">✅</div>
         <div class="reg-card-title">Review & Submit</div>
         <div class="reg-card-sub">Check your details and agree to our terms to submit.</div>
       </div>
@@ -713,7 +711,7 @@
 
         <!-- Submit loading state -->
         <div id="regSubmitting" style="display:none; text-align:center; padding:1rem;">
-          <div style="font-size:2rem;animation:spin 1s linear infinite;display:inline-block"><i data-lucide="clock"></i></div>
+          <div style="font-size:2rem;animation:spin 1s linear infinite;display:inline-block">⏳</div>
           <p style="margin-top:0.5rem;font-size:0.82rem;color:var(--text-muted)" id="regSubmitStatus">Creating your account…</p>
         </div>
 
@@ -1236,35 +1234,5 @@ const spinStyle = document.createElement('style');
 spinStyle.textContent = '@keyframes spin { to { transform: rotate(360deg); } }';
 document.head.appendChild(spinStyle);
 </script>
-
-
-
-
-<script>
-  document.addEventListener('DOMContentLoaded', () => {
-    if (typeof lucide !== 'undefined') {
-        lucide.createIcons();
-
-        // Debounced observer to prevent infinite loops and performance issues
-        let timeout;
-        const observer = new MutationObserver((mutations) => {
-            let shouldUpdate = false;
-            for (let m of mutations) {
-                if (m.addedNodes.length > 0) {
-                    shouldUpdate = true;
-                    break;
-                }
-            }
-            if (shouldUpdate) {
-                clearTimeout(timeout);
-                timeout = setTimeout(() => lucide.createIcons(), 50);
-            }
-        });
-        observer.observe(document.body, { childList: true, subtree: true });
-    }
-  });
-</script>
-
-  <script src="icon-init.js"></script>
 </body>
 </html>
