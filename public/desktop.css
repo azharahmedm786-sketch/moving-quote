@@ -1049,3 +1049,50 @@
 @media (min-width: 1024px) {
   .vehicle-cards { grid-template-columns: repeat(2, 1fr); gap: 1rem; }
 }
+/* ============================================================
+   PREMIUM STEPPER — Phase 2b
+   ============================================================ */
+.step-header { background: #ffffff !important; border-bottom: 1px solid #f0f0f5; }
+.step-header::before, .step-header::after { display: none !important; }
+
+.step-header-top { margin-bottom: 1rem; }
+.step-counter, .step-of { display: none !important; }
+.step-header-label { font-size: 1.25rem !important; font-weight: 800 !important; color: #111827 !important; }
+
+.step-progress-track { display: none !important; }
+
+.step-indicators { align-items: center; }
+.step-dot { flex: none; gap: 0; }
+
+.dot-icon {
+  width: 32px !important;
+  height: 32px !important;
+  background: #fff !important;
+  border: 2px solid #e5e7eb !important;
+  color: #9ca3af !important;
+  font-size: 0.85rem !important;
+  font-weight: 700 !important;
+}
+.dot-label { display: none !important; }
+
+.step-dot.active .dot-icon {
+  background: #7c3aed !important;
+  border-color: #7c3aed !important;
+  color: #fff !important;
+  box-shadow: 0 0 0 4px rgba(124,58,237,0.18) !important;
+}
+
+.step-dot.done .dot-icon {
+  background: #7c3aed !important;
+  border-color: #7c3aed !important;
+}
+.step-dot.done .dot-icon::after { color: #fff !important; }
+
+.step-line {
+  max-width: none !important;
+  flex: 1;
+  margin-top: 0 !important;
+  align-self: center !important;
+  background: #e5e7eb !important;
+}
+.step-line.done { background: #7c3aed !important; }
