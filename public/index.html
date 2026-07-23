@@ -652,9 +652,9 @@
           <div class="step-line" id="line0"></div>
           <div class="step-dot" id="dot1"><span class="dot-icon">2</span><div class="dot-label">Location</div></div>
           <div class="step-line" id="line1"></div>
-          <div class="step-dot" id="dot2"><span class="dot-icon">3</span><div class="dot-label">Details</div></div>
+          <div class="step-dot" id="dot2"><span class="dot-icon">3</span><div class="dot-label">Items & Vehicle</div></div>
           <div class="step-line" id="line2"></div>
-          <div class="step-dot" id="dot3"><span class="dot-icon">4</span><div class="dot-label">Items</div></div>
+          <div class="step-dot" id="dot3"><span class="dot-icon">4</span><div class="dot-label">Details</div></div>
           <div class="step-line" id="line3"></div>
           <div class="step-dot" id="dot4"><span class="dot-icon">5</span><div class="dot-label">Book</div></div>
         </div>
@@ -780,52 +780,6 @@
               <label class="toggle"><input type="checkbox" id="liftAvailable" onchange="calculateQuote(true)"><span class="slider"></span></label>
             </label>
           </div>
-          <div class="field-group" id="vehicleCardGroup">
-            <label class="field-label"><span class="field-icon"><i data-lucide="truck"></i></span> Vehicle Type</label>
-<div class="vehicle-cards" id="vehicleCards">
-              <div class="vehicle-card" onclick="selectCard(this,'vehicle','200')">
-                <span class="vc-badge">Most Popular</span>
-                <div class="vc-icon"><i data-lucide="truck"></i></div>
-                <div class="vc-info">
-                  <div class="vc-name">Tata Ace</div>
-                  <div class="vc-sub">Ideal for single items & 1 RK</div>
-                  <div class="vc-rate">₹2,150</div>
-                </div>
-              </div>
-              <div class="vehicle-card" onclick="selectCard(this,'vehicle','2500')">
-                <div class="vc-icon"><i data-lucide="truck"></i></div>
-                <div class="vc-info">
-                  <div class="vc-name">14 ft Truck</div>
-                  <div class="vc-sub">Ideal for 1–2 BHK</div>
-                  <div class="vc-rate">₹4,200</div>
-                </div>
-              </div>
-              <div class="vehicle-card" onclick="selectCard(this,'vehicle','4000')">
-                <div class="vc-icon"><i data-lucide="truck"></i></div>
-                <div class="vc-info">
-                  <div class="vc-name">17 ft Truck</div>
-                  <div class="vc-sub">Ideal for 2–3 BHK</div>
-                  <div class="vc-rate">₹6,450</div>
-                </div>
-              </div>
-              <div class="vehicle-card" onclick="selectCard(this,'vehicle','5500')">
-                <div class="vc-icon"><i data-lucide="truck"></i></div>
-                <div class="vc-info">
-                  <div class="vc-name">22 ft Truck</div>
-                  <div class="vc-sub">Ideal for 3+ BHK</div>
-                  <div class="vc-rate">₹9,100</div>
-                </div>
-              </div>
-            </div>
-            
-            <select id="vehicle" class="field-input" style="display:none">
-              <option value="0">Select vehicle</option>
-              <option value="200">Tata Ace (Small)</option>
-              <option value="2500">14 ft Truck (Medium)</option>
-              <option value="4000">17 ft Truck (Large)</option>
-              <option value="5500">22 ft Truck (XL)</option>
-            </select>
-          </div>
         </div>
         <div class="step-footer">
           <button class="btn-back" onclick="prevStep()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg> Back</button>
@@ -834,10 +788,65 @@
       </div>
 
 
-      <!-- STEP 3: ITEMS -->
+      <!-- STEP 3: ITEMS & VEHICLE -->
       <div class="form-step">
         <div class="step-body">
-          <p class="step-hint">Select items you're moving. Kitchen & other items: <strong>free</strong>. Carton boxes: <strong>₹50 each</strong>.</p>
+          <div class="field-group" id="vehicleCardGroup">
+            <label class="field-label"><span class="field-icon"><i data-lucide="truck"></i></span> Select Vehicle</label>
+            <p class="step-hint" style="margin-top:-.4rem">Choose the perfect vehicle for your move</p>
+            <div class="vehicle-cards" id="vehicleCards">
+              <div class="vehicle-card" data-vehicle="tata_ace" onclick="selectCard(this,'vehicle','tata_ace')">
+                <span class="vc-badge">Most Popular</span>
+                <div class="vc-icon"><i data-lucide="truck"></i></div>
+                <div class="vc-info">
+                  <div class="vc-name">Tata Ace</div>
+                  <div class="vc-sub">1 RK / Small Items · Up to 600 kg</div>
+                  <div class="vc-rate">₹2,150</div>
+                </div>
+              </div>
+              <div class="vehicle-card" data-vehicle="truck_14ft" onclick="selectCard(this,'vehicle','truck_14ft')">
+                <div class="vc-icon"><i data-lucide="truck"></i></div>
+                <div class="vc-info">
+                  <div class="vc-name">14 ft Truck</div>
+                  <div class="vc-sub">1–2 BHK · Up to 1.5 Ton</div>
+                  <div class="vc-rate">₹4,200</div>
+                </div>
+              </div>
+              <div class="vehicle-card" data-vehicle="truck_17ft" onclick="selectCard(this,'vehicle','truck_17ft')">
+                <div class="vc-icon"><i data-lucide="truck"></i></div>
+                <div class="vc-info">
+                  <div class="vc-name">17 ft Truck</div>
+                  <div class="vc-sub">2–3 BHK · Up to 2.5 Ton</div>
+                  <div class="vc-rate">₹6,450</div>
+                </div>
+              </div>
+              <div class="vehicle-card" data-vehicle="truck_22ft" onclick="selectCard(this,'vehicle','truck_22ft')">
+                <div class="vc-icon"><i data-lucide="truck"></i></div>
+                <div class="vc-info">
+                  <div class="vc-name">22 ft Truck</div>
+                  <div class="vc-sub">3–4 BHK / Office · Up to 4 Ton</div>
+                  <div class="vc-rate">₹9,100</div>
+                </div>
+              </div>
+            </div>
+
+            <select id="vehicle" class="field-input" style="display:none">
+              <option value="">Select vehicle</option>
+              <option value="tata_ace">Tata Ace (Small)</option>
+              <option value="truck_14ft">14 ft Truck (Medium)</option>
+              <option value="truck_17ft">17 ft Truck (Large)</option>
+              <option value="truck_22ft">22 ft Truck (XL)</option>
+            </select>
+
+            <div class="trust-strip-inline">
+              <span>📍 GPS tracked</span>
+              <span>🛡️ Verified drivers &amp; helpers</span>
+              <span>✅ Insured &amp; safe delivery</span>
+              <span>⏱️ On-time guarantee</span>
+            </div>
+          </div>
+
+          <p class="step-hint" style="margin-top:1.5rem">Select items you're moving. Kitchen & other items: <strong>free</strong>. Carton boxes: <strong>₹50 each</strong>.</p>
 <div class="furniture-grid"></div>
 
           <div class="field-group" style="margin-top:1rem">
