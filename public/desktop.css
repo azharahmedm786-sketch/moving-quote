@@ -944,7 +944,7 @@
 }
 
 @media (min-width: 1024px) {
-.hero-premium-section { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: start; padding: 4rem 2rem; max-width: 1400px; margin: 0 auto; }
+.hero-premium-section { display: grid; grid-template-columns: 0.85fr 1.15fr; gap: 3rem; align-items: start; padding: 4rem 2rem; max-width: 1400px; margin: 0 auto; }
    .hero-premium-title { font-size: 4rem; margin-bottom: 1.5rem; }
   .hero-premium-desc { font-size: 1.1rem; font-weight: 500; }
   .hero-premium-actions { flex-direction: row; gap: 1.5rem; }
