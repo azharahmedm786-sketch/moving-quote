@@ -360,13 +360,7 @@ textarea {
    Hide on small screens to reduce cognitive clutter;
    progress bar alone is sufficient wayfinding.
    ============================================================ */
-@media (max-width: 600px) {
-  .step-indicators,
-  .step-line,
-  .dot-label {
-    display: none;
-  }
-}
+/* Numbered stepper now compact enough to keep on mobile (Phase 2b) */
 
 /* Desktop: clean dot sizing */
 .dot-icon {
