@@ -1047,7 +1047,24 @@
 }
 
 @media (min-width: 1024px) {
-  .vehicle-cards { grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+  .vehicle-cards { grid-template-columns: repeat(4, 1fr); gap: 1rem; }
+}
+
+.trust-strip-inline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem 1.4rem;
+  align-items: center;
+  justify-content: center;
+  background: #f5f3ff;
+  border-radius: 14px;
+  padding: 0.9rem 1.1rem;
+  margin-top: 1rem;
+}
+.trust-strip-inline span {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #5b21b6 !important;
 }
 /* ============================================================
    PREMIUM STEPPER — Phase 2b
