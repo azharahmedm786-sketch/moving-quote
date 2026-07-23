@@ -540,12 +540,12 @@ function recommendVehicle(moveType, sizeLabel) {
   if (!vehicle) return;
 
   const map = {
-    "1 RK": "ace",
-    "1 BHK": "14ft",
-    "2 BHK": "17ft",
-    "3 BHK": "22ft",
-    "4 BHK": "22ft",
-    "Villa": "22ft"
+    "1 RK": "tata_ace",
+    "1 BHK": "truck_14ft",
+    "2 BHK": "truck_17ft",
+    "3 BHK": "truck_22ft",
+    "4 BHK": "truck_22ft",
+    "Villa": "truck_22ft"
   };
 
   const recommended = map[sizeLabel];
@@ -556,12 +556,13 @@ function recommendVehicle(moveType, sizeLabel) {
   document.querySelectorAll(".vehicle-card").forEach(card => {
     card.classList.remove("selected");
 
-    if (card.dataset.value === recommended) {
+    if (card.dataset.vehicle === recommended) {
       card.classList.add("selected");
     }
   });
 
   showToast("🚚 Recommended vehicle selected automatically.");
+  calculateQuote(true);
 }
 /* ============================================
 MULTI-STEP FORM
@@ -570,8 +571,8 @@ let currentStep = 0;
 const STEP_LABELS = [
   "What type of move?",
   "Where are you moving?",
-  "When & what type of move?",
   "What are you moving?",
+  "When & what type of move?",
   "Almost done — confirm & book"
 ];
 
@@ -614,11 +615,11 @@ function showStep(n) {
     }
   }, 50);
   if (n === 2) {
-    renderSizeCards(selectedMoveType || "home");
+    renderFurnitureGrid(selectedMoveType || "home");
     const vc = document.getElementById("vehicle");
     if (!vc?.value) document.querySelector(".vehicle-card")?.click();
   }
-  if (n === 3) renderFurnitureGrid(selectedMoveType || "home");
+  if (n === 3) renderSizeCards(selectedMoveType || "home");
   if (n === getSteps().length - 1) { calculateQuote(true); autoFillCustomerDetails(); }
 }
 
@@ -633,10 +634,12 @@ function nextStep() {
     if (!dropPlace || !dropPlace.geometry) { showToast("⚠️ Please select drop address from dropdown"); return; }
   }
   if (currentStep === 2) {
+    if (!isIntercityMove && !document.getElementById("vehicle")?.value) { showToast("🚚 Please select a vehicle type"); return; }
+  }
+  if (currentStep === 3) {
     if (!document.getElementById("shiftDate")?.value) { showToast("📅 Please select a moving date"); return; }
     if (!document.getElementById("shiftTime")?.value) { showToast("🕐 Please select a time slot"); return; }
     if (!document.getElementById("house")?.value) { showToast("🏠 Please select your house type"); return; }
-    if (!isIntercityMove && !document.getElementById("vehicle")?.value) { showToast("🚚 Please select a vehicle type"); return; }
   }
   if (currentStep < getSteps().length - 1) { currentStep++; showStep(currentStep); }
 }
@@ -1160,9 +1163,10 @@ Delegates ALL pricing logic to Pricing Engine v4.2.
 Google Maps distance API call is preserved exactly.
 ============================================ */
 
-// Legacy <select id="vehicle"> stores an old flat-price string in its
-// `value` (kept so existing markup/CSS didn't need to change) — map it
-// to the vehicleId keys the pricing engine actually understands.
+// The <select id="vehicle"> now stores real vehicleId strings directly
+// ("tata_ace", "truck_14ft", ...). This legacy map is kept only as a
+// safety fallback in case any older cached page/script still writes
+// one of the old flat-price string values into it.
 const VEHICLE_VALUE_TO_ID = {
   "200": "tata_ace",
   "2500": "truck_14ft",
@@ -1188,11 +1192,17 @@ function buildQuoteRawPayload(km) {
     if (el) furniture[itemId] = parseInt(el.value, 10) || 0;
   });
 
+  const knownVehicleIds = window.PackZenPricing?.config?.vehicles || {};
+  const rawVehicleValue = vehicleEl?.value || "";
+  const vehicleId = knownVehicleIds[rawVehicleValue]
+    ? rawVehicleValue
+    : (VEHICLE_VALUE_TO_ID[rawVehicleValue] || "tata_ace");
+
   return {
     pickup: pickup?.value || "",
     drop: drop?.value || "",
     km,
-    vehicleId: VEHICLE_VALUE_TO_ID[vehicleEl?.value] || "tata_ace",
+    vehicleId,
     furniture,
     cartonQty: parseInt(document.getElementById("cartonQty")?.value || "0", 10),
     pickupFloor: parseInt(document.getElementById("pickupFloor")?.value || "0", 10),
