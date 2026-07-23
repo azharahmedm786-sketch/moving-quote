@@ -51,7 +51,7 @@
     .theme-btn{background:var(--surface);border:1.5px solid var(--border);color:var(--text);width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;transition:transform .3s}
     .theme-btn:hover{transform:rotate(20deg)}
     .admin-badge{background:rgba(0,87,255,.1);color:var(--primary);font-size:.75rem;font-weight:700;padding:4px 12px;border-radius:20px;border:1px solid rgba(0,87,255,.2)}
-    /* <i data-lucide="check-circle"></i> FIX 3: Session timer display */
+    /* ✅ FIX 3: Session timer display */
     .session-timer{font-size:.75rem;color:var(--text-muted);padding:4px 10px;border:1px solid var(--border);border-radius:20px;}
     .session-timer.warn{color:#d97706;border-color:#d97706}
     .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-bottom:22px}
@@ -130,15 +130,13 @@
       .topbar-right{width:100%;justify-content:space-between}
     }
   </style>
-
-  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 </head>
 <body>
 
 <!-- LOGIN SCREEN -->
 <div class="admin-login" id="adminLogin">
   <div class="login-card">
-    <div class="login-logo"><i data-lucide="package"></i> PackZen <span style="color:var(--text-muted);font-size:.9rem;font-weight:500;">Admin</span></div>
+    <div class="login-logo">📦 PackZen <span style="color:var(--text-muted);font-size:.9rem;font-weight:500;">Admin</span></div>
     <p class="login-sub">Restricted — admin access only</p>
 
     <!-- ✅ FIX: autocomplete off prevents browser from suggesting admin credentials to non-admins -->
@@ -148,7 +146,7 @@
     <input id="adminPass" type="password" class="field-input" placeholder="Password" autocomplete="off">
 
     <div id="adminErr" class="auth-err"></div>
-    <div class="lockout-banner" id="lockoutBanner"><i data-lucide="lock"></i> Too many failed attempts. Please wait <span id="lockoutTimer">30</span>s before trying again.</div>
+    <div class="lockout-banner" id="lockoutBanner">🔒 Too many failed attempts. Please wait <span id="lockoutTimer">30</span>s before trying again.</div>
 
     <button class="btn-auth" id="loginBtn" onclick="adminLogin()">Login to Dashboard →</button>
   </div>
@@ -1888,35 +1886,5 @@ async function emailInvoice(docId) {
 }
 </script>
 
-
-
-
-
-<script>
-  document.addEventListener('DOMContentLoaded', () => {
-    if (typeof lucide !== 'undefined') {
-        lucide.createIcons();
-
-        // Debounced observer to prevent infinite loops and performance issues
-        let timeout;
-        const observer = new MutationObserver((mutations) => {
-            let shouldUpdate = false;
-            for (let m of mutations) {
-                if (m.addedNodes.length > 0) {
-                    shouldUpdate = true;
-                    break;
-                }
-            }
-            if (shouldUpdate) {
-                clearTimeout(timeout);
-                timeout = setTimeout(() => lucide.createIcons(), 50);
-            }
-        });
-        observer.observe(document.body, { childList: true, subtree: true });
-    }
-  });
-</script>
-
-  <script src="icon-init.js"></script>
 </body>
 </html>

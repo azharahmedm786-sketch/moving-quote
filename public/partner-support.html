@@ -16,8 +16,6 @@
 <link rel="stylesheet" href="desktop.css">
 <link rel="stylesheet" href="partner.css">
 <link rel="stylesheet" href="partner-portal.css">
-
-  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 </head>
 <body class="app-body partner-body portal-body" data-page="support">
 
@@ -32,35 +30,5 @@
 <script src="firebase-config.js"></script>
 <script src="https://packzen-config.azharahmedm786.workers.dev"></script>
 <script src="partner.js"></script>
-
-
-
-
-<script>
-  document.addEventListener('DOMContentLoaded', () => {
-    if (typeof lucide !== 'undefined') {
-        lucide.createIcons();
-
-        // Debounced observer to prevent infinite loops and performance issues
-        let timeout;
-        const observer = new MutationObserver((mutations) => {
-            let shouldUpdate = false;
-            for (let m of mutations) {
-                if (m.addedNodes.length > 0) {
-                    shouldUpdate = true;
-                    break;
-                }
-            }
-            if (shouldUpdate) {
-                clearTimeout(timeout);
-                timeout = setTimeout(() => lucide.createIcons(), 50);
-            }
-        });
-        observer.observe(document.body, { childList: true, subtree: true });
-    }
-  });
-</script>
-
-  <script src="icon-init.js"></script>
 </body>
 </html>

@@ -179,16 +179,14 @@
 
     @media(max-width:480px){.driver-app{padding:14px}}
   </style>
-
-  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 </head>
 <body>
 
 <!-- LOGIN -->
 <div class="driver-login" id="driverLogin">
   <div class="login-card">
-    <div class="login-logo"><i data-lucide="package"></i> PackZen</div>
-    <div class="login-role"><i data-lucide="truck"></i> Driver Portal</div>
+    <div class="login-logo">📦 PackZen</div>
+    <div class="login-role">🚚 Driver Portal</div>
     <label class="field-label">Email</label>
     <input id="drvEmail" type="email" class="field-input" placeholder="driver@packzen.com">
     <label class="field-label">Password</label>
@@ -219,10 +217,10 @@
 
   <!-- BOTTOM NAV -->
   <nav class="bottom-nav" id="bottomNav">
-    <button class="bn-item active" onclick="switchTab('job',this)"><span class="bn-icon"><i data-lucide="package"></i></span>Current Job</button>
-    <button class="bn-item" onclick="switchTab('parcel',this)"><span class="bn-icon"><i data-lucide="bike"></i></span>Parcel</button>
-    <button class="bn-item" onclick="switchTab('history',this)"><span class="bn-icon"><i data-lucide="clipboard"></i></span>History</button>
-    <button class="bn-item" onclick="switchTab('earnings',this)"><span class="bn-icon"><i data-lucide="indian-rupee"></i></span>Earnings</button>
+    <button class="bn-item active" onclick="switchTab('job',this)"><span class="bn-icon">📦</span>Current Job</button>
+    <button class="bn-item" onclick="switchTab('parcel',this)"><span class="bn-icon">🛵</span>Parcel</button>
+    <button class="bn-item" onclick="switchTab('history',this)"><span class="bn-icon">📋</span>History</button>
+    <button class="bn-item" onclick="switchTab('earnings',this)"><span class="bn-icon">💰</span>Earnings</button>
   </nav>
 
   <!-- TAB: PARCEL JOB -->
@@ -258,32 +256,32 @@
 
   <!-- TODAY'S JOBS -->
   <div id="todayJobsSection" style="display:none;margin-bottom:16px;">
-    <div style="font-family: 'Space Grotesk',sans-serif;font-size:1.1rem;font-weight:800;color:var(--text);margin-bottom:10px"><i data-lucide="calendar"></i> Today's Jobs</div>
+    <div style="font-family: 'Space Grotesk',sans-serif;font-size:1.1rem;font-weight:800;color:var(--text);margin-bottom:10px">📅 Today's Jobs</div>
     <div id="todayJobsList" style="display:flex;flex-direction:column;gap:12px;"></div>
   </div>
 
   <!-- UPCOMING JOBS -->
   <div id="upcomingJobsSection" style="display:none;margin-bottom:16px;">
-    <div style="font-family: 'Space Grotesk',sans-serif;font-size:1.1rem;font-weight:800;color:var(--text);margin-bottom:10px"><i data-lucide="clock"></i> Upcoming Jobs</div>
+    <div style="font-family: 'Space Grotesk',sans-serif;font-size:1.1rem;font-weight:800;color:var(--text);margin-bottom:10px">⏳ Upcoming Jobs</div>
     <div id="upcomingJobsList" style="display:flex;flex-direction:column;gap:12px;"></div>
   </div>
 
   <!-- CURRENT BOOKING -->
   <div class="booking-card" id="bookingCard">
     <div class="booking-header">
-      <div class="booking-title"><i data-lucide="package"></i> Current Assignment</div>
+      <div class="booking-title">📦 Current Assignment</div>
       <div class="booking-id" id="bkId">—</div>
     </div>
-    <div class="info-row"><span class="info-icon"><i data-lucide="user"></i></span><div class="info-text"><span class="lbl">Customer</span><span id="bkCustomer">—</span></div></div>
-    <div class="info-row"><span class="info-icon"><i data-lucide="phone"></i></span><div class="info-text"><span class="lbl">Phone</span><a id="bkPhone" href="#" style="color:var(--primary);font-weight:600">—</a></div></div>
-    <div class="info-row"><span class="info-icon"><i data-lucide="map-pin"></i></span><div class="info-text"><span class="lbl">Pickup</span><span id="bkPickup">—</span></div></div>
+    <div class="info-row"><span class="info-icon">👤</span><div class="info-text"><span class="lbl">Customer</span><span id="bkCustomer">—</span></div></div>
+    <div class="info-row"><span class="info-icon">📞</span><div class="info-text"><span class="lbl">Phone</span><a id="bkPhone" href="#" style="color:var(--primary);font-weight:600">—</a></div></div>
+    <div class="info-row"><span class="info-icon">📍</span><div class="info-text"><span class="lbl">Pickup</span><span id="bkPickup">—</span></div></div>
     <div class="info-row"><span class="info-icon">🏁</span><div class="info-text"><span class="lbl">Drop</span><span id="bkDrop">—</span></div></div>
-    <div class="info-row"><span class="info-icon"><i data-lucide="calendar"></i></span><div class="info-text"><span class="lbl">Date</span><span id="bkDate">—</span></div></div>
+    <div class="info-row"><span class="info-icon">📅</span><div class="info-text"><span class="lbl">Date</span><span id="bkDate">—</span></div></div>
     <div class="divider"></div>
     <div class="booking-amount">
       <div><div class="ba-lbl">Total Amount</div><div class="ba-val" id="bkAmount">₹0</div></div>
       <div style="display:flex;gap:8px">
-        <a id="bkCall" href="#" style="background:var(--primary);color:#fff;padding:8px 14px;border-radius:30px;text-decoration:none;font-size:.82rem;font-weight:700;box-shadow:0 4px 12px rgba(0,87,255,.2)"><i data-lucide="phone"></i> Call</a>
+        <a id="bkCall" href="#" style="background:var(--primary);color:#fff;padding:8px 14px;border-radius:30px;text-decoration:none;font-size:.82rem;font-weight:700;box-shadow:0 4px 12px rgba(0,87,255,.2)">📞 Call</a>
         <a id="bkNavigate" href="#" target="_blank" style="background:var(--accent);color:#fff;padding:8px 14px;border-radius:30px;text-decoration:none;font-size:.82rem;font-weight:700;box-shadow:0 4px 12px rgba(0,201,110,.2)">🗺️ Nav</a>
       </div>
     </div>
@@ -335,7 +333,7 @@
   <!-- LIVE LOCATION MAP -->
   <div class="map-card">
     <h3>📡 Your Live Location</h3>
-    <div id="driverMapDiv"><div style="height:200px;display:flex;align-items:center;justify-content:center;color:var(--text-muted);font-size:.85rem"><i data-lucide="map-pin"></i> Map loads when online</div></div>
+    <div id="driverMapDiv"><div style="height:200px;display:flex;align-items:center;justify-content:center;color:var(--text-muted);font-size:.85rem">📍 Map loads when online</div></div>
     <div class="location-info"><span class="loc-dot"></span><span id="locationText">Location not sharing</span></div>
   </div>
 
@@ -343,7 +341,7 @@
   <div class="chat-card" id="chatCard">
     <div class="chat-hdr">
       <div>
-        <div class="chat-hdr-title"><i data-lucide="message-circle"></i> Chat with Customer</div>
+        <div class="chat-hdr-title">💬 Chat with Customer</div>
         <div class="chat-hdr-sub" id="chatCustomerName">No active booking</div>
       </div>
     </div>
@@ -371,13 +369,13 @@
 
   <!-- TAB: HISTORY -->
   <div class="drv-tab" id="tabHistory">
-    <div style="font-family: 'Space Grotesk',sans-serif;font-size:1.1rem;font-weight:800;color:var(--text);margin-bottom:16px"><i data-lucide="clipboard"></i> Completed Jobs</div>
-    <div id="historyList"><div class="hist-empty"><i data-lucide="clock"></i> Loading history...</div></div>
+    <div style="font-family: 'Space Grotesk',sans-serif;font-size:1.1rem;font-weight:800;color:var(--text);margin-bottom:16px">📋 Completed Jobs</div>
+    <div id="historyList"><div class="hist-empty">⏳ Loading history...</div></div>
   </div>
 
   <!-- TAB: EARNINGS -->
   <div class="drv-tab" id="tabEarnings">
-    <div style="font-family: 'Space Grotesk',sans-serif;font-size:1.1rem;font-weight:800;color:var(--text);margin-bottom:16px"><i data-lucide="indian-rupee"></i> My Earnings</div>
+    <div style="font-family: 'Space Grotesk',sans-serif;font-size:1.1rem;font-weight:800;color:var(--text);margin-bottom:16px">💰 My Earnings</div>
 
     <!-- Period Filter -->
     <div class="earn-period">
@@ -404,7 +402,7 @@
 
     <!-- Per-job breakdown -->
     <div style="font-family: 'Space Grotesk',sans-serif;font-size:.85rem;font-weight:700;color:var(--text-muted);margin-bottom:10px;text-transform:uppercase;letter-spacing:.05em">Breakdown</div>
-    <div id="earningsList"><div class="hist-empty"><i data-lucide="clock"></i> Loading earnings...</div></div>
+    <div id="earningsList"><div class="hist-empty">⏳ Loading earnings...</div></div>
   </div>
 
 </div>
@@ -1227,35 +1225,5 @@ function filterEarnings(period, el) {
   loadEarnings(period);
 }
 </script>
-
-
-
-
-<script>
-  document.addEventListener('DOMContentLoaded', () => {
-    if (typeof lucide !== 'undefined') {
-        lucide.createIcons();
-
-        // Debounced observer to prevent infinite loops and performance issues
-        let timeout;
-        const observer = new MutationObserver((mutations) => {
-            let shouldUpdate = false;
-            for (let m of mutations) {
-                if (m.addedNodes.length > 0) {
-                    shouldUpdate = true;
-                    break;
-                }
-            }
-            if (shouldUpdate) {
-                clearTimeout(timeout);
-                timeout = setTimeout(() => lucide.createIcons(), 50);
-            }
-        });
-        observer.observe(document.body, { childList: true, subtree: true });
-    }
-  });
-</script>
-
-  <script src="icon-init.js"></script>
 </body>
 </html>

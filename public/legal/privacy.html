@@ -223,8 +223,6 @@
       .refund-table td, .refund-table th { padding: 0.5rem 0.6rem; }
     }
   </style>
-
-  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 </head>
 <body>
 
@@ -258,7 +256,7 @@
 PRIVACY POLICY
   ═══════════════════════════════════════ -->
   <div class="legal-section active" style="display:block" id="legal-privacy">
-    <span class="legal-updated"><i data-lucide="calendar"></i> Effective: 1 February 2026</span>
+    <span class="legal-updated">📅 Effective: 1 February 2026</span>
     <h2>Privacy Policy</h2>
     <p>PackZen respects your privacy. This policy explains what data we collect, how we use it, and your rights over it. We comply with India's Information Technology Act, 2000 and the Digital Personal Data Protection Act, 2023.</p>
 
@@ -293,7 +291,7 @@ PRIVACY POLICY
     </ul>
 
     <div class="success-box">
-      <i data-lucide="check-circle"></i> <strong>We never sell your data</strong> to third parties. We never share your data with advertisers.
+      ✅ <strong>We never sell your data</strong> to third parties. We never share your data with advertisers.
     </div>
 
     <h3>3. Data Sharing</h3>
@@ -343,9 +341,9 @@ PRIVACY POLICY
     <h3>9. Contact for Privacy</h3>
     <p>For any privacy-related concerns, data requests, or to report a data breach:</p>
     <ul>
-      <li><i data-lucide="mail"></i> Email: <a href="mailto:support@packzenblr.in" style="color:#2563eb">support@packzenblr.in</a></li>
-      <li><i data-lucide="message-circle"></i> WhatsApp: <a href="https://wa.me/919945095453" style="color:#2563eb">+91 99450 95453</a></li>
-      <li><i data-lucide="map-pin"></i> Address: HSR Layout, Bangalore — 560102, Karnataka, India</li>
+      <li>📧 Email: <a href="mailto:support@packzenblr.in" style="color:#2563eb">support@packzenblr.in</a></li>
+      <li>💬 WhatsApp: <a href="https://wa.me/919945095453" style="color:#2563eb">+91 99450 95453</a></li>
+      <li>📍 Address: HSR Layout, Bangalore — 560102, Karnataka, India</li>
     </ul>
 
     <div class="contact-card">
@@ -354,8 +352,8 @@ PRIVACY POLICY
         <p>We take data protection seriously and respond within 24 hours</p>
       </div>
       <div class="contact-card-btns">
-        <a href="mailto:support@packzenblr.in" class="btn-wa" style="background:#0057ff"><i data-lucide="mail"></i> Email Us</a>
-        <a href="https://wa.me/919945095453" class="btn-tel"><i data-lucide="message-circle"></i> WhatsApp</a>
+        <a href="mailto:support@packzenblr.in" class="btn-wa" style="background:#0057ff">📧 Email Us</a>
+        <a href="https://wa.me/919945095453" class="btn-tel">💬 WhatsApp</a>
       </div>
     </div>
 </div>
@@ -364,13 +362,13 @@ PRIVACY POLICY
 <footer class="footer">
   <div class="footer-inner">
     <div class="footer-brand">
-      <div class="footer-logo"><i data-lucide="package"></i> Pack<span>Zen</span></div>
+      <div class="footer-logo">📦 Pack<span>Zen</span></div>
       <p>Bangalore's trusted packers & movers. Safe, reliable, affordable.</p>
     </div>
     <div class="footer-info">
-      <div class="footer-detail"><i data-lucide="map-pin"></i> HSR Layout, Bangalore</div>
-      <div class="footer-detail"><i data-lucide="phone"></i> <a href="tel:9945095453">9945095453</a></div>
-      <div class="footer-detail"><i data-lucide="message-circle"></i> <a href="https://wa.me/919945095453">WhatsApp Us</a></div>
+      <div class="footer-detail">📍 HSR Layout, Bangalore</div>
+      <div class="footer-detail">📞 <a href="tel:9945095453">9945095453</a></div>
+      <div class="footer-detail">💬 <a href="https://wa.me/919945095453">WhatsApp Us</a></div>
     </div>
   </div>
   <div class="footer-bottom">
@@ -391,35 +389,5 @@ PRIVACY POLICY
   }
 
   </script>
-
-
-
-
-<script>
-  document.addEventListener('DOMContentLoaded', () => {
-    if (typeof lucide !== 'undefined') {
-        lucide.createIcons();
-
-        // Debounced observer to prevent infinite loops and performance issues
-        let timeout;
-        const observer = new MutationObserver((mutations) => {
-            let shouldUpdate = false;
-            for (let m of mutations) {
-                if (m.addedNodes.length > 0) {
-                    shouldUpdate = true;
-                    break;
-                }
-            }
-            if (shouldUpdate) {
-                clearTimeout(timeout);
-                timeout = setTimeout(() => lucide.createIcons(), 50);
-            }
-        });
-        observer.observe(document.body, { childList: true, subtree: true });
-    }
-  });
-</script>
-
-  <script src="icon-init.js"></script>
 </body>
 </html>
