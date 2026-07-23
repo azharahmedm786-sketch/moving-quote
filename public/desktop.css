@@ -954,3 +954,98 @@
   .trust-divider { display: block; width: 1px; height: 24px; background: #e2e8f0; }
   .app-phone-btn { display: flex; }
 }
+/* ============================================================
+   PREMIUM VEHICLE CARDS — Phase 2a
+   ============================================================ */
+.vehicle-cards {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.75rem;
+}
+
+.vehicle-card {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  padding: 1.25rem;
+  border: 2px solid #e5e7eb !important;
+  border-radius: 20px !important;
+  background: #fff !important;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+}
+
+.vehicle-card:hover {
+  border-color: #c4b5fd !important;
+  background: #faf9ff !important;
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(124,58,237,0.12);
+}
+
+.vehicle-card.selected {
+  border-color: #7c3aed !important;
+  background: #f5f3ff !important;
+  box-shadow: 0 0 0 3px rgba(124,58,237,0.15) !important;
+}
+
+.vehicle-card.selected::after {
+  content: '✓';
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #7c3aed;
+  color: #fff !important;
+  font-size: 0.8rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 0;
+  flex-shrink: 0;
+}
+
+.vc-badge {
+  position: absolute;
+  top: -10px;
+  right: 14px;
+  background: #7c3aed;
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 20px;
+  letter-spacing: 0.02em;
+}
+
+.vc-icon {
+  width: 100%;
+  height: 88px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #ede9fe, #f5f3ff);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #7c3aed;
+  margin-bottom: 0.9rem;
+}
+
+.vc-icon svg { width: 40px; height: 40px; stroke-width: 1.5; }
+
+.vc-name { font-size: 1.05rem; font-weight: 800; color: #111827 !important; margin-bottom: 2px; }
+
+.vc-sub { font-size: 0.8rem; color: #6b7280 !important; margin-bottom: 0.75rem; }
+
+.vc-rate { display: inline-block; font-size: 0.95rem; font-weight: 800; color: #7c3aed !important; background: transparent !important; padding: 0 !important; border-radius: 0; }
+
+.vc-rate::before { content: "Starting from"; font-size: 0.7rem; font-weight: 600; color: #9ca3af; display: block; margin-bottom: 2px; }
+
+@media (min-width: 640px) {
+  .vehicle-cards { grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+}
+
+@media (min-width: 1024px) {
+  .vehicle-cards { grid-template-columns: repeat(4, 1fr); gap: 1rem; }
+}
