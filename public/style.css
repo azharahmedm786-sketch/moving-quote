@@ -1522,7 +1522,7 @@ select.field-input {
   position: absolute; inset: 0;
   background-image: url('images/footer/footer-bg.png');
   background-size: cover; background-position: center;
-  opacity: 0.18;
+  opacity: 0.70;
   pointer-events: none;
   z-index: 0;
 }
