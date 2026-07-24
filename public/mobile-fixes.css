@@ -2153,3 +2153,20 @@ touch-action: manipulation;
   .hero-premium-actions { flex-direction: column; }
   .hero-premium-title { font-size: 2.8rem; }
 }
+
+/* ============================================================
+   QUICK ACTIONS — 2-COLUMN ON NARROW PHONES
+   ──────────────────────────────────────────────────────────
+   The base 4-column grid (style.css) squeezes each image+label
+   into a tiny column below ~420px wide. Switch to 2x2 so each
+   card/image stays legible.
+   ============================================================ */
+@media (max-width: 420px) {
+  .quick-actions-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+  .qa-label {
+    font-size: 0.78rem;
+  }
+}
