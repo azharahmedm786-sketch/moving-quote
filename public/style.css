@@ -1512,7 +1512,7 @@ select.field-input {
    APP FOOTER
 ════════════════════════════════════════════ */
 .app-footer {
-  background: var(--navy-900); color: rgba(255,255,255,0.6);
+  background: var(--navy-900); color: #ffffff;
   padding: 2.5rem 1.25rem 1.5rem;
   margin-top: 2rem;
   position: relative;
@@ -1555,16 +1555,16 @@ select.field-input {
   font-family: 'Inter', sans-serif; font-size: 1.8rem; font-weight: 800;
   color: #fff; margin-bottom: 0.25rem;
 }
-.app-footer-logo span { color: var(--green-400); }
-.app-footer p { font-size: 0.85rem; margin-bottom: 0.5rem; line-height: 1.6; max-width: 280px; }
+.app-footer-logo span { color: #ffffff; }
+.app-footer p { font-size: 0.85rem; margin-bottom: 0.5rem; line-height: 1.6; max-width: 280px; color: #ffffff; }
 .app-footer-links { display: flex; flex-direction: column; gap: 10px; }
-.app-footer-links a { color: rgba(255,255,255,0.6); text-decoration: none; font-size: 0.85rem; transition: color 0.2s; }
-.app-footer-links a:hover { color: rgba(255,255,255,1); }
+.app-footer-links a { color: #ffffff; text-decoration: none; font-size: 0.85rem; transition: opacity 0.2s; }
+.app-footer-links a:hover { opacity: 0.8; }
 .app-footer-contact { display: flex; flex-direction: column; gap: 10px; }
-.app-footer-contact a { color: var(--green-400); text-decoration: none; font-size: 0.85rem; font-weight: 600; display: flex; align-items: center; gap: 6px; }
+.app-footer-contact a { color: #ffffff; text-decoration: none; font-size: 0.85rem; font-weight: 600; display: flex; align-items: center; gap: 6px; }
 .app-footer-bottom {
   font-size: 0.75rem;
-  color: rgba(255,255,255,0.4);
+  color: #ffffff;
   line-height: 1.7;
   margin-top: 2rem;
   padding-top: 1.5rem;
@@ -1575,9 +1575,9 @@ select.field-input {
   align-items: center;
   text-align: center;
 }
-.app-footer-bottom strong { color: rgba(255,255,255,0.7); }
-.app-footer-bottom a { color: rgba(255,255,255,0.5); text-decoration: none; }
-.app-footer-bottom a:hover { color: rgba(255,255,255,0.9); }
+.app-footer-bottom strong { color: #ffffff; }
+.app-footer-bottom a { color: #ffffff; text-decoration: none; }
+.app-footer-bottom a:hover { opacity: 0.8; }
 
 /* ════════════════════════════════════════════
    LOCAL SEO (visually hidden but accessible/indexed)
@@ -2028,13 +2028,13 @@ body {
     to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
-.white-nav { background: #ffffff !important; box-shadow: 0 4px 20px rgba(0,0,0,0.05) !important; border-bottom: none !important; }
-.dark-text { color: #111827 !important; }
+.white-nav { background: var(--navy-800) !important; box-shadow: 0 4px 20px rgba(0,0,0,0.25) !important; border-bottom: none !important; }
+.dark-text { color: #ffffff !important; }
 .app-phone-btn { display: flex; align-items: center; gap: 6px; padding: 8px 16px; background: rgba(91, 61, 245, 0.1); color: #5B3DF5; border-radius: 100px; font-weight: 600; text-decoration: none; font-size: 0.9rem; }
 .app-login-pill { padding: 8px 24px; background: #111827; color: #ffffff; border-radius: 100px; font-weight: 600; border: none; cursor: pointer; }
-.dark-icon { color: #111827 !important; background: transparent !important; border: 1px solid #e5e7eb !important; }
-.white-nav .desktop-nav-links a { color: #374151 !important; }
-.white-nav .desktop-nav-links a:hover { background: rgba(0,0,0,0.05) !important; color: #111827 !important; }
+.dark-icon { color: rgba(255,255,255,0.9) !important; background: transparent !important; border: 1px solid rgba(255,255,255,0.18) !important; }
+.white-nav .desktop-nav-links a { color: rgba(255,255,255,0.78) !important; }
+.white-nav .desktop-nav-links a:hover { background: rgba(255,255,255,0.1) !important; color: #ffffff !important; }
 
 .hero-premium-section { padding: 2rem 1rem; position: relative; }
 .hero-badge { display: inline-block; padding: 6px 16px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 100px; font-size: 0.85rem; font-weight: 600; color: #334155; margin-bottom: 1.5rem; }
