@@ -920,9 +920,9 @@ margin: 0 auto 10px;
   .hero-premium-actions { flex-direction: row; gap: 1.5rem; }
   .hero-premium-illustration { margin-top: 0; }
 .floating-track-card { margin: 2rem auto 0; max-width: 600px; width: 100%; }
-  .trust-signals-card { flex-direction: row; justify-content: space-between; align-items: center; padding: 1.5rem 3rem; border-radius: 100px; margin: -2rem auto 4rem; max-width: 1200px; position: relative; z-index: 10; box-shadow: 0 10px 40px rgba(0,0,0,0.08); }
-  .trust-divider { display: block; width: 1px; height: 24px; background: #e2e8f0; }
-  .app-phone-btn { display: flex; }
+.trust-signals-card { flex-direction: row; justify-content: space-between; align-items: center; padding: 1.5rem 3rem; border-radius: 100px; margin: -2rem auto 4rem; max-width: 1200px; position: relative; z-index: 10; box-shadow: 0 10px 40px rgba(0,0,0,0.25); }
+.trust-divider { display: block; width: 1px; height: 24px; background: rgba(255,255,255,0.15); }
+   .app-phone-btn { display: flex; }
 }
 /* ============================================================
    PREMIUM VEHICLE CARDS — Phase 2a
