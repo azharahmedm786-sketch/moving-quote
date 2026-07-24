@@ -397,11 +397,12 @@ const advanceAmount = toRupees(grandTotal * (PRICING_CONFIG.payment.advancePerce
           packZenMargin: platformCommission,
           partnerTakePercent: grandTotal > 0 ? Math.round((partnerPayout / grandTotal) * 100) : 0
         },
-      paymentOptions: {
-          advanceAmount,
-          fullOnlineAmount,
-          atDropAmount: grandTotal - advanceAmount
-        },
+     paymentOptions: {
+  grandTotal,
+  advanceAmount,
+  fullOnlineAmount,
+  atDropAmount: grandTotal - advanceAmount   // balance owed only if Advance was already paid online
+},
         capacityDetail: {
           totalUnits,
           vehicleCapacity: selectedVehicle.capacity,
