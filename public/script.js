@@ -572,8 +572,8 @@ let currentStep = 0;
 const STEP_LABELS = [
   "What type of move?",
   "Where are you moving?",
-  "What are you moving?",
   "When & what type of move?",
+  "What are you moving?",
   "Almost done — confirm & book"
 ];
 
@@ -615,12 +615,12 @@ function showStep(n) {
       window.scrollTo({ top: window.scrollY + formCard.getBoundingClientRect().top - navH - 12, behavior: "smooth" });
     }
   }, 50);
-  if (n === 2) {
+  if (n === 2) renderSizeCards(selectedMoveType || "home");
+  if (n === 3) {
     renderFurnitureGrid(selectedMoveType || "home");
     const vc = document.getElementById("vehicle");
     if (!vc?.value) document.querySelector(".vehicle-card")?.click();
   }
-  if (n === 3) renderSizeCards(selectedMoveType || "home");
   if (n === getSteps().length - 1) { calculateQuote(true); autoFillCustomerDetails(); }
   syncQuoteSummary();
 }
@@ -636,12 +636,12 @@ function nextStep() {
     if (!dropPlace || !dropPlace.geometry) { showToast("⚠️ Please select drop address from dropdown"); return; }
   }
   if (currentStep === 2) {
-    if (!isIntercityMove && !document.getElementById("vehicle")?.value) { showToast("🚚 Please select a vehicle type"); return; }
-  }
-  if (currentStep === 3) {
     if (!document.getElementById("shiftDate")?.value) { showToast("📅 Please select a moving date"); return; }
     if (!document.getElementById("shiftTime")?.value) { showToast("🕐 Please select a time slot"); return; }
     if (!document.getElementById("house")?.value) { showToast("🏠 Please select your house type"); return; }
+  }
+  if (currentStep === 3) {
+    if (!isIntercityMove && !document.getElementById("vehicle")?.value) { showToast("🚚 Please select a vehicle type"); return; }
   }
   if (currentStep < getSteps().length - 1) { currentStep++; showStep(currentStep); }
 }
