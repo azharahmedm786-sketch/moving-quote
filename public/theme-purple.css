@@ -58,7 +58,7 @@
 /* ════════════════════════════════════════════════════════════
    TOP BAR / FOOTER — dark navy → deep purple (always)
 ════════════════════════════════════════════════════════════ */
-.app-bar,
+.app-bar:not(.white-nav),
 .navbar,
 footer,
 .site-footer,
