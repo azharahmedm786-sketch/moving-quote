@@ -152,7 +152,7 @@
     storage: { pricePerDay: 250 },
 
     discounts: { maxPromoFraction: 0.30 },
-    payment: { advancePercent: 15 }
+payment: { advancePercent: 15, fullPaymentDiscount: 200 }
   });
 
   /* ── HELPERS ── */
@@ -369,8 +369,8 @@
       const commissionableTotal = grandTotal - passThroughExpenses;
       const platformCommission = toRupees(commissionableTotal * (PRICING_CONFIG.platformCommissionPercent / 100));
       const partnerPayout = toRupees((commissionableTotal - platformCommission) + passThroughExpenses);
-
-      const advanceAmount = toRupees(grandTotal * (PRICING_CONFIG.payment.advancePercent / 100));
+const advanceAmount = toRupees(grandTotal * (PRICING_CONFIG.payment.advancePercent / 100));
+      const fullOnlineAmount = toRupees(Math.max(grandTotal - PRICING_CONFIG.payment.fullPaymentDiscount, 0));
 
       return {
         valid: true,
@@ -397,8 +397,9 @@
           packZenMargin: platformCommission,
           partnerTakePercent: grandTotal > 0 ? Math.round((partnerPayout / grandTotal) * 100) : 0
         },
-        paymentOptions: {
+      paymentOptions: {
           advanceAmount,
+          fullOnlineAmount,
           atDropAmount: grandTotal - advanceAmount
         },
         capacityDetail: {
