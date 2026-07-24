@@ -1443,7 +1443,7 @@ function updatePriceDisplay() {
   if (window._lastQuoteResult?.paymentOptions) {
     paymentOpts = window._lastQuoteResult.paymentOptions;
     // _lastQuoteResult.finalTotal already has promo baked in via v2
-    const discounted = paymentOpts.atDropAmount;
+const discounted = paymentOpts.grandTotal;
     priceEl.textContent = "₹" + discounted.toLocaleString("en-IN");
     if (advanceEl) advanceEl.textContent = "₹" + paymentOpts.advanceAmount.toLocaleString("en-IN");
     if (optAdv) optAdv.textContent = "₹" + paymentOpts.advanceAmount.toLocaleString("en-IN");
@@ -1497,7 +1497,7 @@ function selectPayment(type) {
   let discounted, advanceAmt, fullAmt;
   if (window._lastQuoteResult?.paymentOptions) {
     const opts = window._lastQuoteResult.paymentOptions;
-    discounted = opts.atDropAmount;
+   discounted = opts.grandTotal;
     advanceAmt = opts.advanceAmount;
     fullAmt    = opts.fullOnlineAmount;
   } else {
@@ -1540,8 +1540,8 @@ function _getPayAmount() {
   if (window._lastQuoteResult?.paymentOptions) {
     const opts = window._lastQuoteResult.paymentOptions;
     if (selectedPayment === "full")    return Math.max(opts.fullOnlineAmount, 500);
-    if (selectedPayment === "advance") return Math.max(opts.advanceAmount, 199);
-    return opts.atDropAmount;
+if (selectedPayment === "advance") return Math.max(opts.advanceAmount, 199);
+    return opts.grandTotal;
   }
   // Fallback
   const discounted = Math.max(lastCalculatedTotal - promoDiscount, 0);
@@ -1551,8 +1551,8 @@ function _getPayAmount() {
 }
 
 function _getDiscountedTotal() {
-  if (window._lastQuoteResult?.paymentOptions) {
-    return window._lastQuoteResult.paymentOptions.atDropAmount;
+ if (window._lastQuoteResult?.paymentOptions) {
+    return window._lastQuoteResult.paymentOptions.grandTotal;
   }
   return Math.max(lastCalculatedTotal - promoDiscount, 0);
 }
@@ -1708,7 +1708,6 @@ function onPaymentSuccess(response, name, phone, email, paid, total) {
       assembly: !!document.getElementById("assemblyService")?.checked,
 storageNeeded: !!document.getElementById("storageService")?.checked,
     storageDays: parseInt(document.getElementById("storageDays")?.value || 0, 10),
-      storageDays: parseInt(document.getElementById("storageDays")?.value || 0, 10),
       fragileItems: document.getElementById("custFragileItems")?.value.trim() || "",
       specialItems: document.getElementById("custSpecialItems")?.value.trim() || "",
       remarks: document.getElementById("custRemarks")?.value.trim() || "",
