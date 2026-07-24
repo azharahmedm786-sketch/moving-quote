@@ -634,7 +634,7 @@ img { max-width: 100%; height: auto; display: block; }
 .wcs-card:hover { transform: translateY(-3px) scale(1.015); box-shadow: var(--shadow-md); }
 
 .wcs-icon-circle {
-  width: 46px; height: 46px; border-radius: 50%;
+ width: 64px; height: 64px; border-radius: 50%;
   border: 1.5px solid var(--primary-ring);
   background: var(--green-50);
   display: flex; align-items: center; justify-content: center;
