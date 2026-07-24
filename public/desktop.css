@@ -259,7 +259,8 @@
   }
 
   .offer-right {
-    font-size: 5rem;
+    width: 140px;
+    height: 140px;
   }
 
   .offer-title {
