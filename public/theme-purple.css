@@ -56,34 +56,71 @@
 }
 
 /* ════════════════════════════════════════════════════════════
-   TOP BAR / HEADERS / FOOTERS — dark navy → deep purple
+   TOP BAR / FOOTER — dark navy → deep purple (always)
 ════════════════════════════════════════════════════════════ */
 .app-bar,
 .navbar,
-.step-header,
 footer,
 .site-footer,
 .chat-header,
 .cc-btn-invoice {
   background: var(--purple-900) !important;
 }
-.step-header::before { background: var(--purple-500); }
-.step-header::after { background: rgba(255,255,255,0.05); }
+
+/* Step header: desktop.css already gives this a white bg + dark text +
+   #7c3aed accents ≥1024px. Only force the dark-header mobile treatment
+   BELOW that breakpoint, so we don't fight it and cause invisible text. */
+@media (max-width: 1023px) {
+  .step-header {
+    background: var(--purple-900) !important;
+  }
+  .step-header::before { background: var(--purple-500); }
+  .step-header::after { background: rgba(255,255,255,0.05); }
+}
 
 /* ════════════════════════════════════════════════════════════
-   PROGRESS / STEP DOTS
+   PROGRESS / STEP DOTS  (mobile only — desktop.css owns ≥1024px)
 ════════════════════════════════════════════════════════════ */
-.step-progress-fill {
-  background: linear-gradient(90deg, var(--purple-500), var(--purple-400));
-  box-shadow: 0 0 12px rgba(139, 108, 249, 0.55);
+@media (max-width: 1023px) {
+  .step-progress-fill {
+    background: linear-gradient(90deg, var(--purple-500), var(--purple-400));
+    box-shadow: 0 0 12px rgba(139, 108, 249, 0.55);
+  }
+  .step-dot.active .dot-icon {
+    background: var(--purple-500);
+    border-color: var(--purple-400);
+    box-shadow: 0 0 0 4px rgba(139, 108, 249, 0.28);
+  }
+  .step-dot.done .dot-icon { background: rgba(139,108,249,0.35); border-color: var(--purple-400); }
+  .step-line.done { background: var(--purple-400); }
 }
-.step-dot.active .dot-icon {
-  background: var(--purple-500);
-  border-color: var(--purple-400);
-  box-shadow: 0 0 0 4px rgba(139, 108, 249, 0.28);
+
+/* ════════════════════════════════════════════════════════════
+   HOMEPAGE HERO — these used hardcoded hex colors in style.css /
+   theme-dg.css, not CSS variables, so they need direct overrides.
+════════════════════════════════════════════════════════════ */
+.app-phone-btn {
+  background: rgba(91, 61, 245, 0.10) !important;
+  color: var(--purple-700) !important;
 }
-.step-dot.done .dot-icon { background: rgba(139,108,249,0.35); border-color: var(--purple-400); }
-.step-line.done { background: var(--purple-400); }
+.hero-badge {
+  background: var(--purple-50) !important;
+  border-color: var(--purple-100) !important;
+  color: var(--purple-800) !important;
+}
+.hero-cta-btn.primary {
+  background: var(--accent-gradient) !important;
+  color: #fff !important;
+}
+.hero-cta-btn.primary:hover { box-shadow: 0 8px 24px rgba(91, 61, 245, 0.4) !important; }
+.hero-cta-btn.secondary {
+  color: var(--purple-800) !important;
+  border-color: var(--purple-100) !important;
+}
+.trust-item i,
+.trust-strip-inline i {
+  color: var(--purple-600) !important;
+}
 
 /* ════════════════════════════════════════════════════════════
    PRIMARY BUTTONS
@@ -150,10 +187,12 @@ button.btn-primary,
 .mt-icon i, .move-type-card .mt-icon { color: var(--purple-600); }
 
 /* ════════════════════════════════════════════════════════════
-   DISCOUNT / SAVINGS — kept green intentionally
+   DISCOUNT / SAVINGS — kept green intentionally.
+   (theme-dg.css's bulk green→purple pass also caught .discount-row;
+   this restores it since savings should stay green per the reference design.)
 ════════════════════════════════════════════════════════════ */
-#discountRow, .discount-badge, .savings-badge {
-  color: var(--success, #16a34a) !important;
+.discount-row, #discountRow, .discount-badge, .savings-badge {
+  color: var(--success, #059669) !important;
 }
 
 /* ════════════════════════════════════════════════════════════
