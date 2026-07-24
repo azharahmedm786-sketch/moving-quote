@@ -185,17 +185,13 @@
   .quick-actions-grid {
     grid-template-columns: repeat(4, 1fr);
     gap: 16px;
-    align-items: start; /* CRITICAL: stop cards from stretching to row height */
+    align-items: stretch;
   }
 
   .qa-card {
-    padding: 1.5rem 1rem;
+    padding: 8px 8px 14px;
     border-radius: 16px;
-    height: 110px;          /* fixed height — no stretching */
-    min-height: unset;
-    max-height: 110px;
     gap: 10px;
-    font-size: 0.82rem;
     border: 1px solid #e2e8f0;
     background: #fff;
     box-shadow: 0 2px 8px rgba(0,0,0,0.06);
@@ -203,7 +199,6 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
     cursor: pointer;
     text-decoration: none;
     color: var(--text-primary);
@@ -214,12 +209,8 @@
     box-shadow: 0 8px 24px rgba(0,0,0,0.12);
   }
 
-  .qa-icon-wrap {
-    width: 48px;
-    height: 48px;
-    border-radius: 14px;
-    font-size: 1.4rem;
-    flex-shrink: 0;
+  .qa-label {
+    font-size: 0.85rem;
   }
 
   /* ── 8. SERVICES — HORIZONTAL GRID ──────────────────────────── */
@@ -626,21 +617,11 @@
   .quick-actions-grid {
     grid-template-columns: repeat(4, 1fr);
     gap: 20px;
-    align-items: start;
+    align-items: stretch;
   }
 
   .qa-card {
-    height: 116px;
-    min-height: unset;
-    max-height: 116px;
-    padding: 1.5rem 1.25rem;
-  }
-
-  .qa-icon-wrap {
-    width: 52px;
-    height: 52px;
-    border-radius: 16px;
-    font-size: 1.5rem;
+    padding: 10px 10px 16px;
   }
 
   .app-footer {
