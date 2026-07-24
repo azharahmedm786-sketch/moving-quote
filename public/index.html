@@ -98,6 +98,7 @@
   <link rel="stylesheet" href="mobile-fixes.css">
   <link rel="stylesheet" href="theme-dg.css">
   <link rel="stylesheet" href="desktop.css">
+  <link rel="stylesheet" href="theme-purple.css">
 
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 </head>
@@ -1009,6 +1010,72 @@
       </div>
 
     </div><!-- /form-card -->
+
+    <!-- ═══════════════════════════════════════════
+         LIVE BOOKING SUMMARY (desktop only ≥1024px, see theme-purple.css)
+    ═══════════════════════════════════════════ -->
+    <aside class="booking-summary-panel" id="bookingSummaryPanel">
+      <div class="qsum-header">
+        <div class="qsum-title">Booking Summary</div>
+        <button class="qsum-edit-btn" type="button" onclick="goToStep(0)">Edit</button>
+      </div>
+
+      <div class="qsum-block">
+        <div class="qsum-label">Move Type</div>
+        <div class="qsum-value" id="qsumMoveType">—</div>
+      </div>
+
+      <div class="qsum-route">
+        <div class="qsum-route-row"><span class="qsum-dot pickup"></span><span id="qsumPickup">Pickup address not set</span></div>
+        <div class="qsum-route-row"><span class="qsum-dot drop"></span><span id="qsumDrop">Drop address not set</span></div>
+      </div>
+
+      <div class="qsum-meta-row">
+        <div class="qsum-block">
+          <div class="qsum-label">Date</div>
+          <div class="qsum-value" id="qsumDate">—</div>
+        </div>
+        <div class="qsum-block">
+          <div class="qsum-label">Time Slot</div>
+          <div class="qsum-value" id="qsumTime">—</div>
+        </div>
+      </div>
+
+      <hr class="qsum-divider">
+
+      <div class="qsum-breakdown-title">
+        <span>Price Breakdown</span>
+        <span class="qsum-save-pill" id="qsumSavePill" style="display:none;">You Save <span id="qsumSaveAmt">₹0</span></span>
+      </div>
+
+      <div id="qsumBreakdownRows">
+        <div class="qsum-line"><span>Base Fare<span id="qsumVehicleName"></span></span><span class="qsum-line-value" id="qsumBaseFare">₹0</span></div>
+        <div class="qsum-line"><span>Distance Charge</span><span class="qsum-line-value" id="qsumDistanceCharge">₹0</span></div>
+        <div class="qsum-line" id="qsumFloorRow" style="display:none;"><span>Floor Charge</span><span class="qsum-line-value" id="qsumFloorCharge">₹0</span></div>
+        <div class="qsum-line" id="qsumLoadingRow" style="display:none;"><span>Loading &amp; Unloading</span><span class="qsum-line-value" id="qsumLoadingCharge">₹0</span></div>
+        <div class="qsum-line" id="qsumPackingRow" style="display:none;"><span>Packers &amp; Helpers</span><span class="qsum-line-value" id="qsumPackingCharge">₹0</span></div>
+        <div class="qsum-line" id="qsumOtherRow" style="display:none;"><span>Other Charges</span><span class="qsum-line-value" id="qsumOtherCharge">₹0</span></div>
+        <div class="qsum-line discount" id="qsumDiscountRow" style="display:none;"><span>Discount</span><span class="qsum-line-value" id="qsumDiscountAmt" style="color:inherit;">- ₹0</span></div>
+      </div>
+
+      <hr class="qsum-divider">
+
+      <div class="qsum-total-row">
+        <span class="qsum-total-label">Grand Total</span>
+        <span class="qsum-total-value" id="qsumGrandTotal">₹0</span>
+      </div>
+      <div class="qsum-advance-row">
+        <span>Advance (10%)</span>
+        <span id="qsumAdvance">₹0</span>
+      </div>
+
+      <div class="qsum-trust-row">
+        <span class="qsum-trust-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>Secure Payments</span>
+        <span class="qsum-trust-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>100% Safe</span>
+        <span class="qsum-trust-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>Easy Cancellation</span>
+      </div>
+    </aside>
+
   </div><!-- /sheet-form-wrap -->
 </div><!-- /booking-sheet -->
 
