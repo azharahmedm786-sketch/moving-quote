@@ -224,9 +224,8 @@
 
   .service-app-card {
     flex: none;
-    min-height: 96px;
     border-radius: 16px;
-    padding: 1.25rem;
+    padding: 10px 10px 14px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.06);
     transition: transform 0.2s, box-shadow 0.2s;
   }
@@ -234,13 +233,6 @@
   .service-app-card:hover {
     transform: translateY(-4px);
     box-shadow: 0 12px 32px rgba(0,0,0,0.12);
-  }
-
-  .sac-icon {
-    width: 48px;
-    height: 48px;
-    font-size: 1.5rem;
-    border-radius: 14px;
   }
 
   .sac-title {
