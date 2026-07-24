@@ -191,7 +191,7 @@
      </div>
    <div class="hero-premium-illustration">
        <div class="illustration-bg"></div>
-       <img src="images/service-truck.jpg.png" alt="Moving Truck" class="hero-truck-img">
+       <img src="images/service-truck.jpg" alt="Moving Truck" class="hero-truck-img">
      </div>
    </div>
 <div class="trust-signals-card">
@@ -202,8 +202,7 @@
      <div class="trust-item"><i data-lucide="map-pin"></i> Live GPS Tracking</div>
      <div class="trust-divider"></div>
      <div class="trust-item"><i data-lucide="credit-card"></i> Secure Payments</div>
-     <div class="trust-divider"></div>   <span class="qa-label">WhatsApp</span>
-
+     <div class="trust-divider"></div>
      <div class="trust-item"><i data-lucide="award"></i> Trusted Across Bangalore</div>
    </div>
 
@@ -213,16 +212,19 @@
       <div class="quick-actions-grid">
         <button class="qa-card" onclick="openBookingSheet()">
           <div class="qa-img-wrap"><img src="images/quick-actions/book-your-move.png" alt="Book your move" loading="lazy"></div>
+          <span class="qa-label">Book your move</span>
         </button>
         <button class="qa-card" onclick="openTrackingOrLogin()">
           <div class="qa-img-wrap"><img src="images/quick-actions/track.png" alt="Track" loading="lazy"></div>
+          <span class="qa-label">Track</span>
         </button>
         <a href="tel:9945095453" class="qa-card">
           <div class="qa-img-wrap"><img src="images/quick-actions/call-us.png" alt="Call Us" loading="lazy"></div>
+          <span class="qa-label">Call Us</span>
         </a>
         <a href="https://wa.me/919945095453" class="qa-card" target="_blank" rel="noopener noreferrer">
           <div class="qa-img-wrap"><img src="images/quick-actions/whatsapp.png" alt="WhatsApp" loading="lazy"></div>
-
+          <span class="qa-label">WhatsApp</span>
         </a>
       </div>
     </div>
@@ -237,7 +239,7 @@
   <div class="services-scroll" id="services">
 
     <div class="service-app-card" onclick="selectMoveTypeFromHome('home')">
-      <div class="sac-icon sac-home"><i data-lucide="home"></i></div>
+      <div class="sac-img-wrap"><img src="images/services/home-shift.png" alt="Home Shift" loading="lazy"></div>
       <div class="sac-body">
         <div class="sac-title">Home Shift</div>
         <div class="sac-sub">Apartment · Villa · PG</div>
@@ -246,7 +248,7 @@
     </div>
 
     <div class="service-app-card" onclick="selectMoveTypeFromHome('office')">
-      <div class="sac-icon sac-office"><i data-lucide="building-2"></i></div>
+      <div class="sac-img-wrap"><img src="images/services/office-shift.png" alt="Office Shift" loading="lazy"></div>
       <div class="sac-body">
         <div class="sac-title">Office Shift</div>
         <div class="sac-sub">Minimal downtime</div>
@@ -254,7 +256,7 @@
     </div>
 
     <div class="service-app-card" onclick="selectMoveTypeFromHome('single')">
-      <div class="sac-icon sac-single"> <i data-lucide="package"></i></div>
+      <div class="sac-img-wrap"><img src="images/services/single-item.png" alt="Single Item" loading="lazy"></div>
       <div class="sac-body">
         <div class="sac-title">Single Item</div>
         <div class="sac-sub">Sofa · Fridge · Bike</div>
@@ -262,7 +264,7 @@
     </div>
 
     <div class="service-app-card" onclick="window.location.href='parcel.html'">
-      <div class="sac-icon sac-parcel"><i data-lucide="bike"></i></div>
+      <div class="sac-img-wrap"><img src="images/services/parcel-delivery.png" alt="Parcel Delivery" loading="lazy"></div>
       <div class="sac-body">
         <div class="sac-title">Parcel Delivery</div>
         <div class="sac-sub">Starting from ₹59</div>
