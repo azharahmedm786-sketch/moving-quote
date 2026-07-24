@@ -745,8 +745,9 @@ img { max-width: 100%; height: auto; display: block; }
 }
 
 .faq-app-list .faq-item { border-bottom: 1px solid var(--border-light); border-radius: 0; }
-.faq-app-list .faq-item:last-child { border-bottom: none; }
-
+.chatbot-cta { margin-top: 24px; }
+.chatbot-cta-title { font-size: 0.95rem; font-weight: 800; color: var(--text-primary); margin-bottom: 2px; }
+.chatbot-cta-sub { font-size: 0.75rem; color: var(--text-muted); margin-bottom: 10px; }
 .faq-q {
   width: 100%; background: #fff; border: none;
   text-align: left; padding: 1rem 1.25rem;
