@@ -13,12 +13,17 @@ const {
 } = require("./booking-notifications");
 const { BREVO_SECRETS } = require("./brevo-client");
 
+const { defineSecret } = require("firebase-functions/params");
+const MSG91_AUTHKEY       = defineSecret("MSG91_AUTHKEY");
+const RAZORPAY_KEY_ID     = defineSecret("RAZORPAY_KEY_ID");
+const RAZORPAY_KEY_SECRET = defineSecret("RAZORPAY_KEY_SECRET");
 /* ============================================================
    SEND SMS VIA MSG91
    Triggered whenever a new doc is added to /smsQueue
    ============================================================ */ 
 exports.sendSMS = functions
   .region("asia-south1")            // Mumbai — lowest latency for India
+  .runWith({ secrets: [MSG91_AUTHKEY] })
   .firestore.document("smsQueue/{docId}")
   .onWrite(async (change, context) => {
     // Only process if doc was created or updated
@@ -38,11 +43,12 @@ exports.sendSMS = functions
 
     // Get MSG91 auth key from Firebase environment config
     // Set it with: firebase functions:config:set msg91.authkey="YOUR_KEY" msg91.senderid="PKZNSM"
-    const authKey  = functions.config().msg91?.authkey;
-    const senderId = functions.config().msg91?.senderid || "PKZNSM";
+ // MSG91 auth key from Secret Manager (set via: firebase functions:secrets:set MSG91_AUTHKEY)
+    const authKey  = MSG91_AUTHKEY.value();
+    const senderId = "PKZNSM";
 
     if (!authKey) {
-      console.error("MSG91 authkey not configured. Run: firebase functions:config:set msg91.authkey=YOUR_KEY");
+      console.error("MSG91 authkey not configured. Run: firebase functions:secrets:set MSG91_AUTHKEY");
       await docRef.update({ status: "failed", error: "MSG91 authkey not set" });
       return null;
     }
@@ -223,21 +229,21 @@ const cors = require("cors")({
   ]
 });
 
-const razorpay = new Razorpay({
-  key_id: functions.config().razorpay.key_id,
-  key_secret: functions.config().razorpay.key_secret
-});
-
 exports.createRazorpayOrder = functions
   .region("asia-south1")
+  .runWith({ secrets: [RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET] })
   .https.onRequest((req, res) => {
 
     return cors(req, res, async () => {
 
       try {
 
+        const razorpay = new Razorpay({
+          key_id: RAZORPAY_KEY_ID.value(),
+          key_secret: RAZORPAY_KEY_SECRET.value()
+        });
+
         console.log("Request body received:", req.body);
-        const { amount } = req.body;
          const safeAmount = Number(amount);
 
 if (
@@ -291,7 +297,7 @@ amount: safeAmount * 100,
 const crypto = require("crypto");
 exports.verifyRazorpayPayment = functions
   .region("asia-south1")
-  .runWith({ secrets: BREVO_SECRETS })
+  .runWith({ secrets: [...BREVO_SECRETS, RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET] })
   .https.onRequest(async (req, res) => {
     console.log("VERIFY VERSION 2");
 
@@ -325,8 +331,8 @@ if (
   });
 }
       const body = razorpay_order_id + "|" + razorpay_payment_id;
-      const expectedSignature = crypto
-       .createHmac("sha256", functions.config().razorpay.key_secret)
+    const expectedSignature = crypto
+       .createHmac("sha256", RAZORPAY_KEY_SECRET.value())
         .update(body)
         .digest("hex");
 
