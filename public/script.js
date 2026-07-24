@@ -335,6 +335,7 @@ function selectMoveType(el, type) {
   if (input) input.value = type;
   renderSizeCards(type);
   renderFurnitureGrid(type);
+  syncQuoteSummary();
 }
 
 /* ============================================
@@ -621,6 +622,7 @@ function showStep(n) {
   }
   if (n === 3) renderSizeCards(selectedMoveType || "home");
   if (n === getSteps().length - 1) { calculateQuote(true); autoFillCustomerDetails(); }
+  syncQuoteSummary();
 }
 
 function nextStep() {
@@ -645,6 +647,90 @@ function nextStep() {
 }
 
 function prevStep() { if (currentStep > 0) { currentStep--; showStep(currentStep); } }
+
+function goToStep(n) {
+  const steps = getSteps();
+  if (n < 0 || n >= steps.length) return;
+  currentStep = n;
+  showStep(n);
+}
+
+/* ============================================
+LIVE BOOKING SUMMARY SIDEBAR (desktop)
+Mirrors #result price breakdown into #bookingSummaryPanel
+============================================ */
+const MOVE_TYPE_LABELS = { home: "Home Shifting", office: "Office Relocation", vehicle: "Vehicle Transport", intercity: "Intercity Move" };
+
+function syncQuoteSummary() {
+  const panel = document.getElementById("bookingSummaryPanel");
+  if (!panel) return;
+
+  const set = (id, text) => { const el = document.getElementById(id); if (el) el.textContent = text; };
+  const showRow = (id, visible) => { const el = document.getElementById(id); if (el) el.style.display = visible ? "flex" : "none"; };
+
+  // Move type
+  const moveType = document.getElementById("moveType")?.value || "";
+  set("qsumMoveType", MOVE_TYPE_LABELS[moveType] || "—");
+
+  // Route
+  const pickup = document.getElementById("pickup")?.value.trim();
+  const drop = document.getElementById("drop")?.value.trim();
+  set("qsumPickup", pickup || "Pickup address not set");
+  set("qsumDrop", drop || "Drop address not set");
+
+  // Date & time
+  const dateVal = document.getElementById("shiftDate")?.value;
+  if (dateVal) {
+    const d = new Date(dateVal + "T00:00:00");
+    const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+    set("qsumDate", `${d.getDate()} ${months[d.getMonth()]}, ${d.getFullYear()}`);
+  } else {
+    set("qsumDate", "—");
+  }
+  const timeLabel = document.getElementById("shiftTimeLabel")?.value;
+  set("qsumTime", timeLabel || "—");
+
+  // Price breakdown — sourced from the same pricing engine result used elsewhere
+  const q = window._lastQuoteResult;
+  if (q && q.valid && q.breakdown) {
+    const b = q.breakdown;
+    const rupee = n => "₹" + Math.round(n || 0).toLocaleString("en-IN");
+
+    set("qsumVehicleName", b.vehicleUsed ? ` (${b.vehicleUsed})` : "");
+    set("qsumBaseFare", rupee(b.baseFare));
+    set("qsumDistanceCharge", rupee(b.distanceCharge));
+
+    showRow("qsumFloorRow", b.floorCharge > 0);
+    set("qsumFloorCharge", rupee(b.floorCharge));
+
+    showRow("qsumLoadingRow", b.labourCharge > 0);
+    set("qsumLoadingCharge", rupee(b.labourCharge));
+
+    showRow("qsumPackingRow", b.packingCharge > 0);
+    set("qsumPackingCharge", rupee(b.packingCharge));
+
+    const other = (b.specializedTradeCharges || 0) + (b.waitingCharge || 0) + (b.longCarryCharge || 0) + (b.passThroughExpenses || 0);
+    showRow("qsumOtherRow", other > 0);
+    set("qsumOtherCharge", rupee(other));
+
+    const discount = b.discount || 0;
+    showRow("qsumDiscountRow", discount > 0);
+    set("qsumDiscountAmt", "- " + rupee(discount));
+
+    const savePill = document.getElementById("qsumSavePill");
+    if (savePill) savePill.style.display = discount > 0 ? "inline-flex" : "none";
+    set("qsumSaveAmt", rupee(discount));
+
+    set("qsumGrandTotal", rupee(b.grandTotal));
+    set("qsumAdvance", rupee(q.paymentOptions?.advanceAmount));
+  } else {
+    ["qsumBaseFare","qsumDistanceCharge","qsumFloorCharge","qsumLoadingCharge","qsumPackingCharge","qsumOtherCharge","qsumGrandTotal","qsumAdvance"]
+      .forEach(id => set(id, "₹0"));
+    ["qsumFloorRow","qsumLoadingRow","qsumPackingRow","qsumOtherRow","qsumDiscountRow"].forEach(id => showRow(id, false));
+    const savePill = document.getElementById("qsumSavePill");
+    if (savePill) savePill.style.display = "none";
+  }
+}
 
 function autoFillCustomerDetails() {
   if (!currentUser || !window._firebase) return;
@@ -734,6 +820,7 @@ function onCustomDatePicked(val) {
     label.textContent = `✅ ${days[d.getDay()]}, ${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
     label.className = "date-selected-label has-date";
   }
+  syncQuoteSummary();
   calculateQuote(true);
 }
 
@@ -744,6 +831,7 @@ function selectTimeSlot(btn, value, label, range) {
   const labelInput = document.getElementById("shiftTimeLabel");
   if (timeInput) timeInput.value = value;
   if (labelInput) labelInput.value = range;
+  syncQuoteSummary();
 }
 
 /* ============================================
@@ -1347,6 +1435,7 @@ function updatePriceDisplay() {
   const optAdv = document.getElementById("optAdvanceAmt");
   const optFull = document.getElementById("optFullAmt");
   const optAtDrop = document.getElementById("optAtDropAmt");
+  syncQuoteSummary();
   if (!priceEl) return;
 
   // Payment options come from v2 engine if available, otherwise compute locally
