@@ -152,7 +152,7 @@
     storage: { pricePerDay: 250 },
 
     discounts: { maxPromoFraction: 0.30 },
-payment: { advancePercent: 15, fullPaymentDiscount: 200 }
+payment: { advancePercent: 10, fullPaymentDiscount: 200 }
   });
 
   /* ── HELPERS ── */
