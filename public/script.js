@@ -1328,6 +1328,7 @@ function runQuoteEngine(km, opts = {}) {
   const quote = window.PackZenPricing.calculateQuote(raw);
 
   window._lastQuoteResult = quote;
+  window._lastQuoteRawInput = raw; // sent to the server at payment time so it can independently re-price the booking
   window._lastCalculatedKm = km;
 
   if (quote.valid) {
@@ -1594,18 +1595,27 @@ async function startPayment() {
   if (!pickupField || !dropField) { showToast("Please enter pickup and drop location."); isProcessingPayment = false; if (payBtn) { payBtn.disabled = false; payBtn.innerText = "Pay Now"; } return; }
   if (!shiftDate) { showToast("Please select shifting date."); isProcessingPayment = false; if (payBtn) { payBtn.disabled = false; payBtn.innerText = "Pay Now"; } return; }
 
-  console.log("Total booking amount:", lastCalculatedTotal);
-  console.log("Calculated advance amount:", selectedPayment === "advance" ? payAmount : undefined);
-  console.log("Amount sent to Razorpay (Cloud Function payload in INR):", payAmount);
+  console.log("Client-displayed amount (UI only — server re-prices this):", payAmount);
+
+  if (!window._lastQuoteRawInput) { showToast("⚠️ Price not calculated yet."); isProcessingPayment = false; if (payBtn) { payBtn.disabled = false; payBtn.innerText = "Pay Now"; } return; }
 
   try {
     const orderResponse = await fetch("https://asia-south1-packzen-e7539.cloudfunctions.net/createRazorpayOrder", {
       method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ amount: payAmount, customerName: name, phone: phone, moveType: selectedMoveType, pickup: pickupField, drop: dropField, date: shiftDate })
+      body: JSON.stringify({
+        quoteInput: window._lastQuoteRawInput,
+        paymentType: selectedPayment, // "full" | "advance" — server derives the actual amount
+        customerName: name, phone: phone, moveType: selectedMoveType,
+        pickup: pickupField, drop: dropField, date: shiftDate
+      })
     });
     const orderData = await orderResponse.json();
     console.log("Razorpay API response:", orderData);
     if (!orderData.success) { showToast("Failed to create payment order"); isProcessingPayment = false; if (payBtn) { payBtn.disabled = false; payBtn.innerText = "Pay Now"; } return; }
+
+    // The server is the source of truth for the amount actually charged —
+    // use it for what we display from here on, not the client-side guess.
+    const serverTotal = orderData.serverCalculatedTotal;
 
     const rzp = new Razorpay({
       key: RAZORPAY_KEY, amount: orderData.amount, currency: orderData.currency, order_id: orderData.orderId,
@@ -1619,11 +1629,7 @@ async function startPayment() {
               razorpay_order_id: response.razorpay_order_id,
               razorpay_payment_id: response.razorpay_payment_id,
               razorpay_signature: response.razorpay_signature,
-              bookingData: {
-                customerName: name, phone: phone, moveType: selectedMoveType,
-                pickup: pickupField, drop: dropField, date: shiftDate,
-                total: payAmount, paymentType: selectedPayment, paymentStatus: "paid"
-              }
+              bookingData: { email: email || null }
             })
           });
           const verifyData = await verifyResponse.json();
@@ -1636,7 +1642,7 @@ async function startPayment() {
             name: name, phone: phone, pickup: pickupField, drop: dropField, date: shiftDate,
             house: document.getElementById("house")?.options[document.getElementById("house")?.selectedIndex]?.text || "",
             vehicle: document.getElementById("vehicle")?.options[document.getElementById("vehicle")?.selectedIndex]?.text || "",
-            total: payAmount,
+            total: serverTotal || payAmount,
             paymentLabel: selectedPayment === "full" ? "Paid Full Online" : "Advance Paid Online",
             paymentNote: "Payment ID: " + response.razorpay_payment_id,
             source: "payment", showInvoice: true
