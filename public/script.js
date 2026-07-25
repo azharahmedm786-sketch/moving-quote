@@ -3459,12 +3459,12 @@ async function submitDamageClaim() {
 SMS & NOTIFICATIONS
 ============================================ */
 const SMS_TEMPLATES = {
-booking_confirmed: d => `Hi ${d.name}, your PackZen booking ${d.bookingRef} is confirmed for ${d.date}! Pickup: ${(d.pickup||"").split(",")[0]}. Est. cost: Rs.${Number(d.total).toLocaleString("en-IN")}. Track: packzenblr.in. Queries: 9945095453`,
-  driver_assigned: d => `Hi ${d.name}, your PackZen driver ${d.driverName} (${d.driverPhone}) is assigned for booking ${d.bookingRef}.`,
-  move_started: d => `Hi ${d.name}, your goods are now in transit for booking ${d.bookingRef}. Track: packzenblr.in`,
-  delivered: d => `Hi ${d.name}, your PackZen move ${d.bookingRef} is complete! Rate your driver on packzenblr.in.`,
+  booking_confirmed: d => `Hi ${d.name}, your PackZen booking ${d.bookingRef} is confirmed for ${d.date}! Pickup: ${(d.pickup||"").split(",")[0]}. Est. cost: Rs.${Number(d.total).toLocaleString("en-IN")}. Track: packzenblr.in. Queries: 9945095453`,
+  driver_assigned: d => `Hi ${d.name}, your PackZen driver ${d.driverName} (${d.driverPhone}) is assigned for booking ${d.bookingRef}. Track live on packzenblr.in. Queries: 9945095453`,
+  move_started: d => `Hi ${d.name}, your goods are now in transit for booking ${d.bookingRef}. Track your driver live on packzenblr.in.`,
+  delivered: d => `Hi ${d.name}, your PackZen move ${d.bookingRef} is complete! Please rate your driver on packzenblr.in. Thank you for choosing PackZen!`,
   cancelled: d => `Hi ${d.name}, your PackZen booking ${d.bookingRef} has been cancelled. Refund (if any) in 5-7 business days. Queries: 9945095453`,
-  damage_claim: d => `Hi ${d.name}, your damage claim (${d.claimId}) for booking ${d.bookingRef} has been received. We'll respond within 3 business days.`,
+  damage_claim: d => `Hi ${d.name}, your damage claim (ID: ${d.claimId}) for booking ${d.bookingRef} has been received. Our team will respond within 3 business days. Queries: 9945095453`,
   reschedule_confirmed: d => `Hi ${d.name}, your PackZen booking ${d.bookingRef} has been rescheduled to ${d.date}. Queries: 9945095453`,
 };
 
