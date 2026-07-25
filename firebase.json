@@ -7,7 +7,7 @@
       "**/node_modules/**",
       "!**/.well-known/**"
     ],
-"headers": [
+    "headers": [
       {
         "source": "/sw.js",
         "headers": [
@@ -21,7 +21,14 @@
         ]
       }
     ],
-    "functions": {
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
+  },
+  "functions": {
     "source": "functions",
     "runtime": "nodejs20"
   },
