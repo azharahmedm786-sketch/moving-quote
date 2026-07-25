@@ -2335,7 +2335,7 @@ function listenChatMessages() {
         const msg = d.data();
         const isMine = msg.senderUid === currentUser?.uid;
         const time = msg.time?.toDate ? msg.time.toDate().toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"}) : "";
-        const senderLabel = (!isMine && msg.senderName) ? `<span class="chat-sender">${msg.senderName}</span>` : "";
+      const senderLabel = (!isMine && msg.senderName) ? `<span class="chat-sender">${escapeHTML(msg.senderName)}</span>` : "";
         container.innerHTML += `<div class="chat-bubble ${isMine?"mine":"theirs"}">${senderLabel}<div>${escapeHTML(msg.text)}</div><div class="chat-time">${time}</div></div>`;
       });
       container.scrollTop = container.scrollHeight;
