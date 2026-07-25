@@ -7,22 +7,21 @@
       "**/node_modules/**",
       "!**/.well-known/**"
     ],
-    "headers": [
+"headers": [
       {
         "source": "/sw.js",
         "headers": [
           { "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" }
         ]
+      },
+      {
+        "source": "/env-config.js",
+        "headers": [
+          { "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" }
+        ]
       }
     ],
-    "rewrites": [
-      {
-        "source": "**",
-        "destination": "/index.html"
-      }
-    ]
-  },
-  "functions": {
+    "functions": {
     "source": "functions",
     "runtime": "nodejs20"
   },
