@@ -220,6 +220,7 @@ exports.retryWhatsApp = functions
   });
 
 const Razorpay = require("razorpay");
+const PackZenPricing = require("./pricing-engine-v2.js");
 
 const cors = require("cors")({
   origin: [
@@ -228,6 +229,20 @@ const cors = require("cors")({
     "http://localhost:5000"
   ]
 });
+
+// Mirrors the client's _getPayAmount() logic in public/script.js — kept in
+// one place so the "how much do we actually charge for this paymentType"
+// rule can't drift between client and server. This is the ONLY function
+// allowed to decide what gets charged; nothing else should read a total
+// off the request body.
+function computePayAmount(quote, paymentType) {
+  if (!quote || !quote.valid || !quote.paymentOptions) return null;
+  const opts = quote.paymentOptions;
+  if (paymentType === "full") return Math.max(opts.fullOnlineAmount, 500);
+  if (paymentType === "advance") return Math.max(opts.advanceAmount, 199);
+  if (paymentType === "at_drop") return null; // no online order for pay-at-drop
+  return null;
+}
 
 exports.createRazorpayOrder = functions
   .region("asia-south1")
@@ -244,38 +259,75 @@ exports.createRazorpayOrder = functions
         });
 
         console.log("Request body received:", req.body);
-         const safeAmount = Number(amount);
 
-if (
-  !safeAmount ||
-  safeAmount <= 0 ||
-  safeAmount > 100000
-) {
-  return res.status(400).json({
-    error: "Invalid amount"
-  });
-}
+        const { quoteInput, paymentType, customerName, phone, moveType, pickup, drop, date } = req.body;
 
-        if (!amount) {
+        if (!quoteInput || typeof quoteInput !== "object") {
+          return res.status(400).json({ error: "quoteInput required" });
+        }
+        if (paymentType !== "full" && paymentType !== "advance") {
+          return res.status(400).json({ error: "paymentType must be 'full' or 'advance'" });
+        }
+        if (!customerName || !phone || !pickup || !drop || !date) {
+          return res.status(400).json({ error: "Missing booking details" });
+        }
+
+        // ── SERVER-SIDE PRICE OF RECORD ──────────────────────────────
+        // The client's displayed total is UI only. We recompute the
+        // quote here, from the same raw inputs (vehicle, distance,
+        // furniture, floors, etc.) using the same pricing engine, and
+        // that is the number that gets charged. A manipulated
+        // `amount`/`total` sent by the client is never used.
+        const quote = PackZenPricing.calculateQuote(quoteInput);
+        if (!quote.valid) {
           return res.status(400).json({
-            error: "Amount required"
+            error: "Could not price this booking",
+            details: quote.errors
+          });
+        }
+
+        const safeAmount = computePayAmount(quote, paymentType);
+
+        if (!safeAmount || safeAmount <= 0 || safeAmount > 100000) {
+          return res.status(400).json({
+            error: "Invalid amount"
           });
         }
 
         const order = await razorpay.orders.create({
-amount: safeAmount * 100,
-           currency: "INR",
+          amount: safeAmount * 100,
+          currency: "INR",
           receipt: "receipt_" + Date.now()
         });
 
-        console.log("Order created:", order.id);
+        console.log("Order created:", order.id, "server-priced amount:", safeAmount);
 
-       return res.status(200).json({
-  success: true,
-  orderId: order.id,
-  amount: order.amount,
-  currency: order.currency,
-});
+        // Persist the server-computed amount + booking details keyed by
+        // orderId. verifyRazorpayPayment reads the total from HERE, not
+        // from whatever the client sends back after payment — so even if
+        // the client is fully compromised post-order, the stored price
+        // can't be altered.
+        await admin.firestore().collection("pendingPayments").doc(order.id).set({
+          amount: safeAmount,
+          paymentType,
+          quoteInput,
+          quoteBreakdown: quote.breakdown, // vehicleUsed, distanceCharge, floorCharge, etc. — so the confirmed booking isn't just a name/phone/total stub
+          customerName,
+          phone,
+          moveType: moveType || "",
+          pickup,
+          drop,
+          date,
+          createdAt: admin.firestore.FieldValue.serverTimestamp()
+        });
+
+        return res.status(200).json({
+          success: true,
+          orderId: order.id,
+          amount: order.amount,
+          currency: order.currency,
+          serverCalculatedTotal: safeAmount
+        });
 
       } catch (err) {
 
@@ -317,19 +369,14 @@ exports.verifyRazorpayPayment = functions
     razorpay_signature,
     bookingData
   } = req.body;
-if (
-  !bookingData ||
-  !bookingData.customerName ||
-  !bookingData.phone ||
-  !bookingData.total ||
-  bookingData.total <= 0 ||
-  bookingData.total > 100000
-) {
-  return res.status(400).json({
-    success: false,
-    error: "Invalid booking data"
-  });
-}
+
+  if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
+    return res.status(400).json({
+      success: false,
+      error: "Missing payment identifiers"
+    });
+  }
+
       const body = razorpay_order_id + "|" + razorpay_payment_id;
     const expectedSignature = crypto
        .createHmac("sha256", RAZORPAY_KEY_SECRET.value())
@@ -363,19 +410,53 @@ if (!existingBooking.empty) {
   });
 }
 
+      // ── TRUSTED PRICE LOOKUP ──────────────────────────────────────
+      // The booking total NEVER comes from bookingData (client-supplied).
+      // It comes from the pendingPayments doc this same server wrote
+      // during createRazorpayOrder, keyed by the Razorpay order id that
+      // the signature above just proved this payment belongs to.
+      const pendingRef = admin.firestore().collection("pendingPayments").doc(razorpay_order_id);
+      const pendingSnap = await pendingRef.get();
+
+      if (!pendingSnap.exists) {
+        return res.status(400).json({
+          success: false,
+          error: "No matching order found for this payment"
+        });
+      }
+
+      const trusted = pendingSnap.data();
+      const verifiedTotal = Number(trusted.amount);
+
       const bookingRef = "PKZ-" + Date.now().toString(36).toUpperCase();
       console.log("ABOUT TO CREATE BOOKING");
-console.log("BOOKING DATA:", bookingData);
+console.log("SERVER-TRUSTED TOTAL:", verifiedTotal);
      await admin.firestore().collection("bookings").add({
 
-  customerName: bookingData.customerName || "",
-  phone: bookingData.phone || "",
-  pickup: bookingData.pickup || "",
-  drop: bookingData.drop || "",
-  date: bookingData.date || "",
-  moveType: bookingData.moveType || "", 
+  customerName: trusted.customerName || "",
+  phone: trusted.phone || "",
+  pickup: trusted.pickup || "",
+  drop: trusted.drop || "",
+  date: trusted.date || "",
+  moveType: trusted.moveType || "",
+  paymentType: trusted.paymentType || "",
 
- total: Number(bookingData.total),
+  // Operational details the driver/advisor/admin dashboards need —
+  // previously this document only had name/phone/total, so a paid
+  // booking had no record of what to actually move or which vehicle
+  // to send. Sourced from the trusted server-side quote, not the client.
+  vehicleId: (trusted.quoteInput && trusted.quoteInput.vehicleId) || "",
+  vehicleUsed: (trusted.quoteBreakdown && trusted.quoteBreakdown.vehicleUsed) || "",
+  furniture: (trusted.quoteInput && trusted.quoteInput.furniture) || {},
+  cartonQty: (trusted.quoteInput && trusted.quoteInput.cartonQty) || 0,
+  pickupFloor: (trusted.quoteInput && trusted.quoteInput.pickupFloor) || 0,
+  dropFloor: (trusted.quoteInput && trusted.quoteInput.dropFloor) || 0,
+  liftAvailable: !!(trusted.quoteInput && trusted.quoteInput.liftAvailable),
+  packingService: !!(trusted.quoteInput && trusted.quoteInput.packingService),
+  distance: (trusted.quoteInput && trusted.quoteInput.km) || 0,
+  quoteBreakdown: trusted.quoteBreakdown || null,
+
+ total: verifiedTotal,
 
   bookingRef,
   paymentId: razorpay_payment_id,
@@ -384,15 +465,20 @@ console.log("BOOKING DATA:", bookingData);
   status: "confirmed",
   createdAt: admin.firestore.FieldValue.serverTimestamp()
 });
+
+      // The pending doc has been consumed — clear it so the same order
+      // can't be used to mint a second booking.
+      await pendingRef.delete();
+
        // Send booking confirmation email — never blocks or throws
        await sendBookingConfirmationEmail({
          bookingRef,
-         customerName: bookingData.customerName || "Customer",
-         customerEmail: bookingData.email || null,
-         pickup: bookingData.pickup || "",
-         drop: bookingData.drop || "",
-         date: bookingData.date || "",
-         total: Number(bookingData.total),
+         customerName: trusted.customerName || "Customer",
+         customerEmail: (bookingData && bookingData.email) || null,
+         pickup: trusted.pickup || "",
+         drop: trusted.drop || "",
+         date: trusted.date || "",
+         total: verifiedTotal,
          paymentStatus: "paid"
        }).catch(err => console.error("Booking confirmation email error (non-blocking):", err.message));
 
