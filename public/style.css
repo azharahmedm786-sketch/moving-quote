@@ -1104,6 +1104,7 @@ select.field-input {
 .move-type-card:active { transform: scale(0.98); }
 
 .mt-icon  { font-size: 1.8rem; flex-shrink: 0; }
+.mt-icon img { width: 40px; height: 40px; object-fit: contain; display: block; }
 .mt-label { font-size: 0.88rem; font-weight: 700; color: var(--text-primary); }
 .mt-sub   { font-size: 0.7rem; color: var(--text-muted); margin-top: 2px; }
 
