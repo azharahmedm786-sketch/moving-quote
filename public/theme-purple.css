@@ -100,8 +100,8 @@ footer,
    theme-dg.css, not CSS variables, so they need direct overrides.
 ════════════════════════════════════════════════════════════ */
 .app-phone-btn {
-  background: rgba(91, 61, 245, 0.10) !important;
-  color: var(--purple-700) !important;
+  background: rgba(255, 255, 255, 0.10) !important;
+  color: #ffffff !important;
 }
 .hero-badge {
   background: var(--purple-50) !important;
