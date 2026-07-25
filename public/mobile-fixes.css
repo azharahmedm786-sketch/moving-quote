@@ -568,6 +568,7 @@ body {
     padding: 1.5rem 0.75rem;
     min-height: 110px;
     gap: 0.4rem;
+    overflow: hidden; /* clips the bled image below to the card's rounded corners */
   }
 }
 
@@ -581,9 +582,20 @@ body {
   .mt-icon {
     font-size: 2.2rem;
     margin-bottom: 0.3rem;
+    /* Bleed the image out to the card's edges instead of sitting inside the padding */
+    width: calc(100% + 1.5rem);
+    margin-left: -0.75rem;
+    margin-right: -0.75rem;
+    margin-top: -1.5rem;
+  }
+  .mt-icon img {
+    width: 100%;
+    height: 130px;
+    object-fit: cover;
+    border-radius: 0;
+    margin: 0;
   }
 }
-
 .mt-label {
   font-size: 0.9rem;
   font-weight: 800;
