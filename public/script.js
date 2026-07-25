@@ -1459,7 +1459,7 @@ const discounted = paymentOpts.grandTotal;
     // Fallback if v2 result not yet available
     const discounted = Math.max(lastCalculatedTotal - promoDiscount, 0);
     const fullAmt = Math.max(discounted - 200, 0);
-    const advanceAmt = Math.round(discounted * 0.10);
+    const advanceAmt = Math.round(discounted * _advanceRate());
     priceEl.textContent = "₹" + discounted.toLocaleString("en-IN");
     if (advanceEl) advanceEl.textContent = "₹" + advanceAmt.toLocaleString("en-IN");
     if (optAdv) optAdv.textContent = "₹" + advanceAmt.toLocaleString("en-IN");
@@ -1503,7 +1503,7 @@ function selectPayment(type) {
     fullAmt    = opts.fullOnlineAmount;
   } else {
     discounted = Math.max(lastCalculatedTotal - promoDiscount, 0);
-    advanceAmt = Math.round(discounted * 0.10);
+    advanceAmt = Math.round(discounted * _advanceRate());
     fullAmt    = Math.max(discounted - 200, 0);
   }
 
@@ -1537,6 +1537,13 @@ PAYMENT AMOUNT HELPERS
 Returns the correct amount to charge based on selectedPayment.
 Always derived from v2 engine result.
 ============================================ */
+// Single source of truth for the advance rate used in fallback paths —
+// reads the engine's own config instead of a hardcoded literal, so this
+// can never silently drift out of sync with pricing-engine-v2.js again.
+function _advanceRate() {
+  return (window.PackZenPricing?.config?.payment?.advancePercent ?? 10) / 100;
+}
+
 function _getPayAmount() {
   if (window._lastQuoteResult?.paymentOptions) {
     const opts = window._lastQuoteResult.paymentOptions;
@@ -1547,7 +1554,7 @@ if (selectedPayment === "advance") return Math.max(opts.advanceAmount, 199);
   // Fallback
   const discounted = Math.max(lastCalculatedTotal - promoDiscount, 0);
   if (selectedPayment === "full")    return Math.max(discounted - 200, 500);
-  if (selectedPayment === "advance") return Math.max(Math.round(discounted * 0.10), 199);
+  if (selectedPayment === "advance") return Math.max(Math.round(discounted * _advanceRate()), 199);
   return discounted;
 }
 
