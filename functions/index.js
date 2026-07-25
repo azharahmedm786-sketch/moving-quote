@@ -353,7 +353,11 @@ exports.verifyRazorpayPayment = functions
   .https.onRequest(async (req, res) => {
     console.log("VERIFY VERSION 2");
 
-    res.set("Access-Control-Allow-Origin", "*");
+const allowedOrigins = ["https://packzenblr.in", "https://www.packzenblr.in", "http://localhost:5000"];
+    const origin = req.headers.origin;
+    if (allowedOrigins.includes(origin)) {
+      res.set("Access-Control-Allow-Origin", origin);
+    }
     res.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
     res.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
 
