@@ -3459,7 +3459,7 @@ async function submitDamageClaim() {
 SMS & NOTIFICATIONS
 ============================================ */
 const SMS_TEMPLATES = {
-  booking_confirmed: d => `Hi ${d.name}, your PackZen booking ${d.bookingRef} is confirmed for ${d.date}! Pickup: ${(d.pickup||"").split(",")[0]}. Est: Rs.${Number(d.total).toLocaleString("en-IN")}. Track: packzenblr.in`,
+booking_confirmed: d => `Hi ${d.name}, your PackZen booking ${d.bookingRef} is confirmed for ${d.date}! Pickup: ${(d.pickup||"").split(",")[0]}. Est. cost: Rs.${Number(d.total).toLocaleString("en-IN")}. Track: packzenblr.in. Queries: 9945095453`,
   driver_assigned: d => `Hi ${d.name}, your PackZen driver ${d.driverName} (${d.driverPhone}) is assigned for booking ${d.bookingRef}.`,
   move_started: d => `Hi ${d.name}, your goods are now in transit for booking ${d.bookingRef}. Track: packzenblr.in`,
   delivered: d => `Hi ${d.name}, your PackZen move ${d.bookingRef} is complete! Rate your driver on packzenblr.in.`,
