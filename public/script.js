@@ -363,8 +363,7 @@ function renderSizeCards(type) {
     const card = document.createElement("div");
     card.className = "select-card";
     card.dataset.value = s.value;
-    card.innerHTML = `<div class="sc-icon">${s.icon}</div><div class="sc-label">${s.label}</div><div class="sc-sub">${s.sub}</div>`;
-    
+card.innerHTML = `<div class="sc-label">${s.label}</div><div class="sc-sub">${s.sub}</div>`;    
     card.addEventListener("click", () => {
       container.querySelectorAll(".select-card").forEach(c => c.classList.remove("selected"));
       card.classList.add("selected");
@@ -429,8 +428,7 @@ function renderFurnitureGrid(type) {
     const isFree = FREE_CATS.includes(catId);
     const priceLabel = getPriceForDisplay(item.id, catId);
     const priceColor = (isFree || priceLabel === "FREE") ? 'color:#94a3b8' : '';
-    return `<div class="fc-qty-card" id="card-${item.id}" data-item-id="${item.id}">
-      <span class="fc-emoji">${item.emoji}</span>
+return `<div class="fc-qty-card" id="card-${item.id}" data-item-id="${item.id}">
       <span class="fc-name">${item.name}</span>
       <span class="fc-price-tag" style="display:none!important; ${priceColor}">${priceLabel}</span>
       <div class="fc-qty-row">
@@ -443,8 +441,7 @@ function renderFurnitureGrid(type) {
 
   const categoryBlock = cat => `<div class="fc-category" data-cat-id="${cat.id}">
     <div class="fc-category-header" data-toggle-cat="${cat.id}">
-      <span class="fc-cat-icon">${cat.icon}</span>
-      <span class="fc-cat-label">${cat.label}</span>
+ <span class="fc-cat-label">${cat.label}</span>
       <span class="fc-cat-arrow" id="arrow-${cat.id}">▾</span>
     </div>
     <div class="fc-category-items" id="${cat.id}" style="display:flex">
@@ -454,14 +451,13 @@ function renderFurnitureGrid(type) {
 
   const cartonSection = `<div class="fc-category" data-cat-id="cat-carton">
     <div class="fc-category-header" data-toggle-cat="cat-carton">
-      <span class="fc-cat-icon">📦</span>
-      <span class="fc-cat-label">Carton Boxes</span>
+     <span class="fc-cat-label">Carton Boxes</span>
       <span class="fc-cat-arrow" id="arrow-cat-carton">▾</span>
     </div>
     <div class="fc-category-items" id="cat-carton" style="display:flex">
       <div class="carton-box-row">
-        <span class="carton-label">📦 How many carton boxes?</span>
-        <div class="carton-qty-wrap">
+<span class="carton-label">How many carton boxes?</span>
+<div class="carton-qty-wrap">
           <button class="qty-btn" data-carton-action="minus">−</button>
           <input type="number" id="cartonQty" value="0" min="0" max="50" class="fc-qty" onchange="calculateQuote(true)">
           <button class="qty-btn" data-carton-action="plus">+</button>
