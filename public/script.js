@@ -608,11 +608,10 @@ function showStep(n) {
   const pb = document.getElementById("progressBar");
   if (pb) pb.style.width = ((n + 1) / 5) * 100 + "%";
   updateStepDots(n);
-  setTimeout(() => {
-    const formCard = document.querySelector(".form-card");
-    if (formCard) {
-      const navH = document.querySelector("nav")?.offsetHeight || 65;
-      window.scrollTo({ top: window.scrollY + formCard.getBoundingClientRect().top - navH - 12, behavior: "smooth" });
+setTimeout(() => {
+    const sheetWrap = document.querySelector(".sheet-form-wrap");
+    if (sheetWrap) {
+      sheetWrap.scrollTo({ top: 0, behavior: "smooth" });
     }
   }, 50);
   if (n === 2) renderSizeCards(selectedMoveType || "home");
