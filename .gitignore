@@ -19,6 +19,8 @@ twa/.gradle/
 twa/build/
 twa/node_modules/
 twa/android.keystore
+twa/release.keystore
+twa/key.properties
 *.apk
 *.aab
 *.idsig
