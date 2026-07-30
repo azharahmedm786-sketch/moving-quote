@@ -34,7 +34,7 @@
     max-width: 100%;
     height: 68px;
     background: #060e24;
-    border-bottom: 1px solid rgba(91, 61, 245,0.25);
+    border-bottom: 1px solid rgba(47, 158, 92,0.25);
     box-shadow: 0 2px 20px rgba(0,0,0,0.35);
     border-radius: 0;
     transform: none;
@@ -484,7 +484,7 @@ margin: 0 auto 10px;
     max-height: calc(100vh - 68px);
     border-top: none;
     border-left: 3px solid var(--green-500);
-    border-top: 1px solid rgba(91, 61, 245,0.2);
+    border-top: 1px solid rgba(47, 158, 92,0.2);
   }
 
   .booking-sheet.open {
@@ -946,16 +946,16 @@ margin: 0 auto 10px;
 }
 
 .vehicle-card:hover {
-  border-color: #c4b5fd !important;
-  background: #faf9ff !important;
+  border-color: #A7E9BE !important;
+  background: #F3FBF5 !important;
   transform: translateY(-4px);
-  box-shadow: 0 12px 24px rgba(124,58,237,0.12);
+  box-shadow: 0 12px 24px rgba(28,110,66,0.12);
 }
 
 .vehicle-card.selected {
-  border-color: #7c3aed !important;
-  background: #f5f3ff !important;
-  box-shadow: 0 0 0 3px rgba(124,58,237,0.15) !important;
+  border-color: #1C6E42 !important;
+  background: #F0FBF3 !important;
+  box-shadow: 0 0 0 3px rgba(28,110,66,0.15) !important;
 }
 
 .vehicle-card.selected::after {
@@ -966,7 +966,7 @@ margin: 0 auto 10px;
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  background: #7c3aed;
+  background: #1C6E42;
   color: #fff !important;
   font-size: 0.8rem;
   font-weight: 800;
@@ -981,7 +981,7 @@ margin: 0 auto 10px;
   position: absolute;
   top: -10px;
   right: 14px;
-  background: #7c3aed;
+  background: #1C6E42;
   color: #fff;
   font-size: 0.65rem;
   font-weight: 700;
@@ -994,12 +994,12 @@ margin: 0 auto 10px;
   width: 100%;
   height: 110px;
   border-radius: 14px;
-  background: linear-gradient(135deg, #ede9fe, #f5f3ff);
+  background: linear-gradient(135deg, #DFF5E6, #F0FBF3);
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  color: #7c3aed;
+  color: #1C6E42;
   margin-bottom: 0.9rem;
 }
 
@@ -1016,7 +1016,7 @@ margin: 0 auto 10px;
 
 .vc-sub { font-size: 0.8rem; color: #6b7280 !important; margin-bottom: 0.75rem; }
 
-.vc-rate { display: inline-block; font-size: 0.95rem; font-weight: 800; color: #7c3aed !important; background: transparent !important; padding: 0 !important; border-radius: 0; }
+.vc-rate { display: inline-block; font-size: 0.95rem; font-weight: 800; color: #1C6E42 !important; background: transparent !important; padding: 0 !important; border-radius: 0; }
 
 .vc-rate::before { content: "Starting from"; font-size: 0.7rem; font-weight: 600; color: #9ca3af; display: block; margin-bottom: 2px; }
 
@@ -1034,7 +1034,7 @@ margin: 0 auto 10px;
   gap: 0.6rem 1.4rem;
   align-items: center;
   justify-content: center;
-  background: #f5f3ff;
+  background: #F0FBF3;
   border-radius: 14px;
   padding: 0.9rem 1.1rem;
   margin-top: 1rem;
@@ -1042,7 +1042,7 @@ margin: 0 auto 10px;
 .trust-strip-inline span {
   font-size: 0.78rem;
   font-weight: 600;
-  color: #5b21b6 !important;
+  color: #14532D !important;
 }
 /* ============================================================
    PREMIUM STEPPER — Phase 2b
@@ -1071,15 +1071,15 @@ margin: 0 auto 10px;
 .dot-label { display: none !important; }
 
 .step-dot.active .dot-icon {
-  background: #7c3aed !important;
-  border-color: #7c3aed !important;
+  background: #1C6E42 !important;
+  border-color: #1C6E42 !important;
   color: #fff !important;
-  box-shadow: 0 0 0 4px rgba(124,58,237,0.18) !important;
+  box-shadow: 0 0 0 4px rgba(28,110,66,0.18) !important;
 }
 
 .step-dot.done .dot-icon {
-  background: #7c3aed !important;
-  border-color: #7c3aed !important;
+  background: #1C6E42 !important;
+  border-color: #1C6E42 !important;
 }
 .step-dot.done .dot-icon::after { color: #fff !important; }
 
@@ -1090,4 +1090,4 @@ margin: 0 auto 10px;
   align-self: center !important;
   background: #e5e7eb !important;
 }
-.step-line.done { background: #7c3aed !important; }
+.step-line.done { background: #1C6E42 !important; }
