@@ -219,14 +219,17 @@ img { max-width: 100%; height: auto; display: block; }
   text-decoration: none; flex-shrink: 0;
 }
 .app-logo img {
-  width: 34px; height: 34px; border-radius: 8px;
+  width: 44px; height: 44px; border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.3);
 }
 .app-logo-text {
-  font-family: 'Inter', sans-serif;
-  font-weight: 800; font-size: 1.1rem;
-  color: #fff; letter-spacing: -0.02em;
-}
+    font-size: 1.25rem;
+  }
+
+  .app-logo img {
+    width: 40px;
+    height: 40px;
+  }
 
 .app-bar-center { flex: 1; display: flex; justify-content: center; }
 
