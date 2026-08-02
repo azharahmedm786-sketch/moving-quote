@@ -1560,9 +1560,18 @@ select.field-input {
   margin-bottom: 4px;
 }
 
+.app-footer-logo-wrap {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 0.5rem;
+}
+.app-footer-logo-img {
+  width: 44px; height: 44px; border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+  flex-shrink: 0;
+}
 .app-footer-logo {
   font-family: 'Inter', sans-serif; font-size: 1.8rem; font-weight: 800;
-  color: #fff; margin-bottom: 0.25rem;
+  color: #fff; margin-bottom: 0;
 }
 .app-footer-logo span { color: #ffffff; }
 .app-footer p { font-size: 0.85rem; margin-bottom: 0.5rem; line-height: 1.6; max-width: 280px; color: #ffffff; }
