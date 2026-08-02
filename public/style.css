@@ -777,7 +777,7 @@ img { max-width: 100%; height: auto; display: block; }
   background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid var(--border-light);
   border-radius: 100px; padding: 6px 14px;
   font-size: 0.78rem; font-weight: 600; color: var(--text-secondary);
-  box-shadow: var(--shadow-xs);
+  box-shadow: var(--shadow-xs); text-decoration: none; display: inline-block;
 }
 
 /* ════════════════════════════════════════════
@@ -1602,6 +1602,8 @@ select.field-input {
 .local-seo h3 { font-size: 0.88rem; margin: 1rem 0 0.4rem; color: var(--green-600); }
 .local-seo ul { padding-left: 1.25rem; }
 .local-seo li { color: var(--text-secondary); margin-bottom: 3px; font-size: 0.82rem; }
+.local-seo li a { color: var(--green-600); text-decoration: none; font-weight: 600; }
+.local-seo li a:hover { text-decoration: underline; }
 
 /* ════════════════════════════════════════════
    MODALS (all existing — styled for app)
