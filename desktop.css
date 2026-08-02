@@ -420,9 +420,18 @@ margin: 0 auto 10px;
     gap: 3rem;
   }
 
+.app-footer-logo-wrap {
+    margin-bottom: 0.75rem;
+  }
+
+  .app-footer-logo-img {
+    width: 52px;
+    height: 52px;
+  }
+
   .app-footer-logo {
     font-size: 1.6rem;
-    margin-bottom: 0.75rem;
+    margin-bottom: 0;
   }
 
   .app-footer p {
