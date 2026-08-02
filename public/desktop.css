@@ -48,13 +48,13 @@
     gap: 1.5rem;
   }
 
-  .app-logo-text {
-    font-size: 1.25rem;
+ .app-logo-text {
+    font-size: 1.4rem;
   }
 
   .app-logo img {
-    width: 40px;
-    height: 40px;
+    width: 56px;
+    height: 56px;
   }
 
   /* Desktop nav links inside app-bar */
