@@ -595,10 +595,12 @@
       </ul>
       <h3>Our Moving Services</h3>
       <ul>
-        <li>House Shifting Services</li>
-        <li>Office Relocation</li>
-        <li>Local Packers and Movers</li>
-        <li>Intercity Moving Services</li>
+        <li><a href="house-shifting-bangalore.html">House Shifting Services</a></li>
+        <li><a href="office-relocation-bangalore.html">Office Relocation</a></li>
+        <li><a href="packers-and-movers-bangalore.html">Local Packers and Movers</a></li>
+        <li><a href="bike-transport-bangalore.html">Bike Transport</a></li>
+        <li><a href="car-transport-bangalore.html">Car Transport</a></li>
+        <li><a href="packing-unpacking-services-bangalore.html">Packing &amp; Unpacking Services</a></li>
       </ul>
     </section>
 
@@ -1685,6 +1687,14 @@ window.addEventListener('load', function() {
 document.addEventListener('click', function(e) {
   var a = e.target.closest('a[href="#quote"]');
   if (a) { e.preventDefault(); openBookingSheet(); }
+});
+
+// ── Auto-open booking sheet if arriving here with #quote already
+//    in the URL (e.g. a CTA link from a service/locality page) ──
+window.addEventListener('load', function() {
+  if (window.location.hash === '#quote' && typeof openBookingSheet === 'function') {
+    setTimeout(openBookingSheet, 300);
+  }
 });
 
 // ── Swipe-down to close sheet (touch) ─────────────────────
